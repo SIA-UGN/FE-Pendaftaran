@@ -18,11 +18,14 @@ export default function Footer() {
             <li className='flex items-center justify-center'></li>
           </ul>
         </div>
-        <div className='w-3/4 text-center'>Jl. di mana - mana hatiku senang, tapi ngeliat dia senang sama yang lain gajadi</div>
-        <div className='flex'>
-          <p> : info@ugn.ac.id</p>
-          <p> : info@ugn.ac.id</p>
+        <div className='flex flex-col gap-3 text-(var(--light-cream)) text-sm items-center'>
+            <div className='w-3/4 text-center'>Jl. Cendekia Utama No. 123, Surakarta, Jawa Tengah, Indonesia 57126</div>
+            <div className='flex gap-3 flex-col md:flex-row'>
+                <p>Telp : (0271) 555-0123</p>
+                <p>Email : info@ugn.ac.id</p>
+            </div>    
         </div>
+              
       </div>
     </footer>
   );
