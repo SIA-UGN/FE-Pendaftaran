@@ -41,7 +41,7 @@ export default function Navbar() {
             height={40}
             alt="Logo"
           ></Image>
-          <p className="text-[var(--cream)] font-bold text-xl">Universitas Global Nusantara</p>
+          <p className="text-[var(--cream)] font-regular text-lg">Universitas Global Nusantara</p>
         </Link>
       </div>
       <NavigationMenu viewport={false} className={""}>
