@@ -22,7 +22,7 @@ export default function RootLayout({ children }) {
         className={`${poppins.variable} font-sans bg-white text-gray-900 antialiased`}
       >
         <div>Ini Header</div>
-        {children}
+          {children}
         <div>Ini Footer</div>
       </body>
     </html>
