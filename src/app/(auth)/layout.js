@@ -1,4 +1,5 @@
 import "../globals.css";
+import Providers from "@/components/Providers";
 
 import { Poppins } from "next/font/google";
 
@@ -13,10 +14,12 @@ export default function AuthLayout({ children }) {
     <html lang="en">
       <body
         className={`${poppins.variable} font-sans bg-white text-gray-900 antialiased`}
-      >
+          >
+        <Providers>
           <div>
             {children}
-          </div>
+          </div>  
+        </Providers>
       </body>
     </html>
   );
