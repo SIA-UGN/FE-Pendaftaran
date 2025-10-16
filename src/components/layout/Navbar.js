@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Bell, Menu, X } from "lucide-react";
@@ -14,7 +14,6 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,20 +22,59 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
-
 import { Button } from "@/components/ui/button";
-
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetch("http://localhost:8000/api/auth/user", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      })
+        .then((res) => {
+          if (res.ok) return res.json();
+          throw new Error("Token invalid");
+        })
+        .then((data) => {
+          setIsLoggedIn(true);
+          setUser(data.data.user);
+        })
+        .catch(() => {
+          setIsLoggedIn(false);
+          localStorage.removeItem("token");
+        });
+    }
+  }, []);
+
+  const handleLogout = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    await fetch("http://localhost:8000/api/auth/logout", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    });
+
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+    setUser(null);
+  };
 
   return (
     <nav className="w-full flex items-center justify-between px-12 bg-[var(--green)] z-[1000] fixed top-0">
@@ -57,7 +95,6 @@ export default function Navbar() {
                 <Link href="/">Home</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
-
             <NavigationMenuItem>
               <NavigationMenuTrigger>Profil</NavigationMenuTrigger>
               <NavigationMenuContent>
@@ -76,7 +113,6 @@ export default function Navbar() {
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
-
             <NavigationMenuItem>
               <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                 <Link href="/pendaftaran">Pendaftaran</Link>
@@ -102,16 +138,20 @@ export default function Navbar() {
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Avatar>
-                  <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                  <AvatarFallback>CN</AvatarFallback>
+                  <AvatarImage src="https://github.com/shadcn.png" alt="avatar" />
+                  <AvatarFallback>
+                    {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                  </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" alignOffset={14} className="z-[2000]">
-                <DropdownMenuLabel>faradisy20@gmail.com</DropdownMenuLabel>
+                <DropdownMenuLabel>{user?.email}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Pendaftaran</DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/pendaftaran">Pendaftaran</Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem>Ubah Password</DropdownMenuItem>
-                <DropdownMenuItem>Logout</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </>
@@ -125,6 +165,7 @@ export default function Navbar() {
         )}
       </div>
 
+      {/* Mobile menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -143,7 +184,7 @@ export default function Navbar() {
             {isLoggedIn ? (
               <>
                 <Link href="#">Ubah Password</Link>
-                <Button variant={"destructive"}>Logout</Button>
+                <Button variant={"destructive"} onClick={handleLogout}>Logout</Button>
               </>
             ) : (
               <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="w-3/4">
