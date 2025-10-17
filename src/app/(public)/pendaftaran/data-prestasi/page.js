@@ -17,12 +17,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from 'next/link'
 import Prestasi from '@/components/prestasi/Prestasi'
 
-// Skema Zod disesuaikan untuk data prestasi.
-// Semua field dibuat opsional karena prestasi mungkin tidak dimiliki semua pendaftar.
 const FormSchema = z.object({
   uploadSertifikat: z.any().optional(),
   namaPrestasi: z.string().optional(),
-  tahun: z.coerce.number().optional(), // z.coerce.number() akan mengubah string angka menjadi number
+  tahun: z.coerce.number().optional(),
   jenisPrestasi: z.string().optional(),
   tingkatPrestasi: z.string().optional(),
   penyelenggara: z.string().optional(),
@@ -31,17 +29,8 @@ const FormSchema = z.object({
 
 export default function DataPrestasi() {
   
-  // const form = useForm({
-  //   resolver: zodResolver(FormSchema),
-  //   defaultValues: {
-  //     namaPrestasi: "",
-  //     penyelenggara: "",
-  //     peringkat: "",
-  //   },
-  // });
 
   function onSubmit(data) {
-    // Fungsi 'toast' diganti dengan console.log dan alert standar
     console.log(data);
     alert("You submitted the following values:\n" + JSON.stringify(data, null, 2));
   }

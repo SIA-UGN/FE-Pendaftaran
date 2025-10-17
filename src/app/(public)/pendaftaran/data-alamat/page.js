@@ -130,7 +130,6 @@ export default function DataAkademik() {
           </div>
           </div>
 
-          {/* Semua input file dibungkus dengan FormField */}
           <FormField
             control={form.control}
             name="uploadIjazah"
@@ -203,7 +202,7 @@ export default function DataAkademik() {
 
           </div>
           <div className="w-full flex items-center justify-end my-12 px-12">
-                        <Link href="/pendaftaran/data-prestasi" className="w-48"><Button type="submit" variant={"matcha"} className={"w-full"}>Lanjut</Button></Link>
+                        <Link href="/pendaftaran/data-orangtua" className="w-48"><Button type="submit" variant={"matcha"} className={"w-full"}>Lanjut</Button></Link>
                     </div>
         </form>
       </Form>
