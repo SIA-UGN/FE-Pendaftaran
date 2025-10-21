@@ -18,11 +18,9 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import  Link  from "next/link"
 
-// Validasi untuk file upload
-const MAX_FILE_SIZE = 5000000; // 5MB
+const MAX_FILE_SIZE = 5000000; 
 const ACCEPTED_FILE_TYPES = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
 
-// Skema Zod disesuaikan dengan semua field form
 const FormSchema = z.object({
   sekolahAsal: z.string().min(3, { message: "Nama sekolah asal wajib diisi." }),
   statusKelulusan: z.string({ required_error: "Status kelulusan harus dipilih." }),
@@ -31,14 +29,14 @@ const FormSchema = z.object({
     .refine((files) => files?.length == 1, "File ijazah wajib diupload.")
     .refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, `Ukuran file maksimal 5MB.`)
     .refine((files) => ACCEPTED_FILE_TYPES.includes(files?.[0]?.type), "Format file harus .pdf, .jpg, atau .png"),
-  uploadSkl: z.any().optional(), // Opsional
+  uploadSkl: z.any().optional(), 
   uploadTranskrip: z.any()
     .refine((files) => files?.length == 1, "File transkrip/rapor wajib diupload.")
     .refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, `Ukuran file maksimal 5MB.`),
   uploadUn: z.any()
     .refine((files) => files?.length == 1, "File nilai UN wajib diupload.")
     .refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, `Ukuran file maksimal 5MB.`),
-  uploadSertifikat: z.any().optional(), // Opsional
+  uploadSertifikat: z.any().optional(), 
 });
 
 export default function DataAkademik() {
@@ -46,12 +44,10 @@ export default function DataAkademik() {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       sekolahAsal: "",
-      // default value untuk file upload bisa dikosongkan
     },
   });
 
   function onSubmit(data) {
-    // Fungsi 'toast' diganti dengan console.log dan alert standar
     console.log(data);
     alert("You submitted the following values:\n" + JSON.stringify(data, null, 2));
   }
@@ -202,7 +198,7 @@ export default function DataAkademik() {
 
           </div>
           <div className="w-full flex items-center justify-end my-12 px-12">
-                        <Link href="/pendaftaran/data-orangtua" className="w-48"><Button type="submit" variant={"matcha"} className={"w-full"}>Lanjut</Button></Link>
+                        <Link href="/pendaftaran/data-prestasi" className="w-48"><Button type="submit" variant={"matcha"} className={"w-full"}>Lanjut</Button></Link>
                     </div>
         </form>
       </Form>

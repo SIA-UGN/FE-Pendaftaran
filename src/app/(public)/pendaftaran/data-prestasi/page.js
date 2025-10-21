@@ -64,7 +64,8 @@ export default function DataPrestasi() {
                 <Button
                   type="button"
                   variant="matcha"
-                  className="flex-1"
+            className="flex-1"
+              
                 > Konfirmasi Data
                 </Button>
                 </div>

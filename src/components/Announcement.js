@@ -63,18 +63,10 @@ export default async function Announcement() {
 
   return (
     <div className="flex flex-col items-center bg-[var(--light-cream)] min-h-screen pt-28 pb-16 px-4 sm:px-8">
-      <div className="w-full bg-[var(--green)] text-[var(--cream)] text-center py-10 px-4 rounded-xl shadow-md">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-wide">
-          🎉 Selamat kepada Calon Mahasiswa Baru!
-        </h1>
-        <p className="text-base sm:text-lg mt-2 font-light">
-          Universitas Global Nusantara — Tahun Akademik 2025/2026
-        </p>
-      </div>
 
       <Card className="w-full max-w-6xl mt-10 p-6 sm:p-8 rounded-xl shadow-md bg-white">
-        <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-center text-[var(--green)]">
-          Daftar Pendaftar yang Diterima
+        <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-center text-[var(--green)] w-fit">
+          Pengumuman
         </h2>
 
         <ScrollArea className="max-h-[500px] rounded-md border border-gray-200">

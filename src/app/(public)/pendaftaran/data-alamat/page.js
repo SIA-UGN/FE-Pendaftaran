@@ -17,7 +17,6 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from 'next/link'
 
-// Skema Zod disesuaikan dengan field form alamat
 const FormSchema = z.object({
   provinsi: z.string().min(1, { message: "Provinsi wajib diisi." }),
   kota: z.string().min(1, { message: "Kota / Kabupaten wajib diisi." }),
@@ -31,7 +30,6 @@ const FormSchema = z.object({
 export default function DataAlamat() {
   const form = useForm({
     resolver: zodResolver(FormSchema),
-    // Default values disesuaikan dengan skema baru
     defaultValues: {
       provinsi: "",
       kota: "",
@@ -44,7 +42,6 @@ export default function DataAlamat() {
   });
 
   function onSubmit(data) {
-    // Fungsi 'toast' diganti dengan console.log dan alert standar
     console.log(data);
     alert("You submitted the following values:\n" + JSON.stringify(data, null, 2));
   }

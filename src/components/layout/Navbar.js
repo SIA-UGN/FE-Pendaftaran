@@ -142,6 +142,9 @@ export default function Navbar() {
                 <DropdownMenuLabel>{user?.email}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
+                  <Link href="/profil">Profil</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link href="/pendaftaran">Pendaftaran</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>Ubah Password</DropdownMenuItem>
