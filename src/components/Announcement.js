@@ -62,7 +62,7 @@ export default async function Announcement() {
   const data = await getData();
 
   return (
-    <div className="flex flex-col items-center pt-28 pb-16 px-4 sm:px-8 max-w-11/12 mx-auto">
+    <div className="flex flex-col items-center pt-4 pb-16 px-4 sm:px-8 max-w-11/12 mx-auto">
 
         <h2 className="text-xl sm:text-2xl font-medium mb-4 w-full border-b-2 border-black pb-2">
           Pengumuman
