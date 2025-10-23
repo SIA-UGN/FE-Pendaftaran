@@ -22,59 +22,56 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { getCookie, deleteCookie } from "cookies-next";
 
 export default function Navbar() {
+  const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      fetch("http://localhost:8000/api/auth/user", {
+ useEffect(() => {
+  const fetchUser = async () => {
+    try {
+      const token = getCookie("access_token"); // ambil token dari cookie
+      if (!token) throw new Error("No token");
+
+      const res = await fetch("http://localhost:8000/api/auth/user", {
+        method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`,
           Accept: "application/json",
+          Authorization: `Bearer ${token}`, // kirim token di header
         },
-      })
-        .then((res) => {
-          if (res.ok) return res.json();
-          throw new Error("Token invalid");
-        })
-        .then((data) => {
-          setIsLoggedIn(true);
-          setUser(data.data.user);
-        })
-        .catch(() => {
-          setIsLoggedIn(false);
-          localStorage.removeItem("token");
-        });
+      });
+
+      if (res.status === 401) throw new Error("Unauthorized");
+
+      const data = await res.json();
+      setIsLoggedIn(true);
+      setUser(data.data.user);
+    } catch (err) {
+      console.log("User not logged in", err);
+      setIsLoggedIn(false);
+      setUser(null);
     }
-  }, []);
+  };
 
-  const handleLogout = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
+  fetchUser();
+}, []);
 
-    await fetch("http://localhost:8000/api/auth/logout", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-      },
-    });
 
-    localStorage.removeItem("token");
+  const handleLogout = () => {
+    deleteCookie("access_token");
     setIsLoggedIn(false);
     setUser(null);
+    router.push("/");
   };
+
+  const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
 
   return (
     <nav className="w-full flex items-center justify-between px-12 bg-[var(--green)] z-[1000] fixed top-0">
@@ -123,10 +120,7 @@ export default function Navbar() {
       </div>
 
       <div className="flex md:hidden items-center">
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="text-white cursor-pointer"
-        >
+        <button onClick={toggleMobileMenu} className="text-white cursor-pointer">
           {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
       </div>
@@ -148,6 +142,9 @@ export default function Navbar() {
                 <DropdownMenuLabel>{user?.email}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
+                  <Link href="/profil">Profil</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link href="/pendaftaran">Pendaftaran</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>Ubah Password</DropdownMenuItem>
@@ -156,16 +153,12 @@ export default function Navbar() {
             </DropdownMenu>
           </>
         ) : (
-          <Link
-            href="/login"
-            className="text-[var(--cream)] font-bold text-md hover:underline"
-          >
+          <Link href="/login" className="text-[var(--cream)] font-bold text-md hover:underline">
             Login
           </Link>
         )}
       </div>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -183,15 +176,11 @@ export default function Navbar() {
 
             {isLoggedIn ? (
               <>
-                <Link href="#">Ubah Password</Link>
-                <Button variant={"destructive"} onClick={handleLogout}>Logout</Button>
+                <span>Welcome, {user?.name}</span>
+                <button onClick={handleLogout}>Logout</button>
               </>
             ) : (
-              <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="w-3/4">
-                <Button variant={"yellow"} size={"default"} className={"w-full"}>
-                  Login
-                </Button>
-              </Link>
+              <Button onClick={() => router.push("/login")}>Login</Button>
             )}
           </motion.div>
         )}

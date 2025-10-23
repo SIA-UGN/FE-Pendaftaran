@@ -1,17 +1,36 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { isLoggedIn } from "@/lib/auth";
+import { getCookie } from "cookies-next";
 
 export default function ProtectedRoute({ children }) {
   const router = useRouter();
+  const [isChecking, setIsChecking] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    if (!isLoggedIn()) {
-      router.push("/login"); // redirect ke login kalau belum login
-    }
-  }, []);
+    const token = getCookie("access_token");
 
-  return isLoggedIn() ? children : null;
+    if (!token) {
+      // Kalau ga ada cookie → redirect ke login
+      router.push("/login");
+    } else {
+      setIsAuthenticated(true);
+    }
+
+    setIsChecking(false);
+  }, [router]);
+
+  if (isChecking) {
+    // Bisa ganti jadi spinner/loading state
+    return (
+      <div className="flex justify-center items-center h-screen text-lg">
+        Checking authentication...
+      </div>
+    );
+  }
+
+  // Kalau sudah dicek dan user punya cookie → render halaman
+  return isAuthenticated ? children : null;
 }
