@@ -29,7 +29,7 @@ const news = [
 ];
 
 export default function News() {
-  const [data, setData] = useState(news); // langsung pakai data statis
+  const [data, setData] = useState(news);
 
   return (
     <div className="flex flex-col items-center pt-4 pb-16 px-4 sm:px-8 max-w-11/12 mx-auto">
@@ -39,8 +39,7 @@ export default function News() {
 
       <div className="flex flex-col gap-12 w-full">
         {data.map((item) => (
-          <Card key={item.title} className="flex flex-col md:flex-row w-full overflow-hidden p-0">
-            {/* Image wrapper */}
+          <Card key={item.title} className="flex flex-col md:flex-row w-full overflow-hidden p-0 min-h-60">
             <div className="relative w-full md:w-1/3 h-64 md:h-auto flex-shrink-0">
               <Image
                 src={item.image}
@@ -50,7 +49,6 @@ export default function News() {
               />
             </div>
 
-            {/* Content */}
             <div className="p-6 flex flex-col gap-4 md:w-2/3">
               <div className="flex justify-between items-start">
                 <h3 className="font-bold text-xl md:text-2xl">{item.title}</h3>
