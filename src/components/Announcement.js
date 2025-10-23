@@ -1,10 +1,14 @@
+'use client'
+
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 
 import { columns } from "./Column";
 import { DataTable } from "./DataTable";
+import { useEffect, useState } from "react";
 
-async function getData() {
+function getData() {
   return [
     {
       id: "PEN-001",
@@ -58,8 +62,19 @@ async function getData() {
   ];
 }
 
-export default async function Announcement() {
-  const data = await getData();
+export default function Announcement() {
+  const [data, setData] = useState([]);
+  const [isOn, setIsOn] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await getData();
+      setData(result);
+
+      if (result.length > 0) setIsOn(true);
+    };
+    fetchData();
+  }, []);
 
   return (
     <div className="flex flex-col items-center pt-4 pb-16 px-4 sm:px-8 max-w-11/12 mx-auto">
@@ -67,10 +82,23 @@ export default async function Announcement() {
         <h2 className="text-xl sm:text-2xl font-medium mb-4 w-full border-b-2 border-black pb-2">
           Pengumuman
         </h2>
-
-        <ScrollArea className="max-h-[500px] rounded-md border border-gray-200 w-full">
+        {
+        isOn ? (
+          <ScrollArea className="max-h-[500px] rounded-md border border-gray-200 w-full">
           <DataTable columns={columns} data={data} />
-        </ScrollArea>
+          </ScrollArea>
+        ) : (
+          <div className="w-full p-6 flex flex-col items-center justify-center">
+              <p className="text-center text-gray-500">
+                Dokumen masih berada dalam proses verifikasi. Silakan cek kembali nanti.
+              </p>
+              <Button variant="yellow" className="rounded-lg my-6">
+                17 November 2025
+              </Button>
+          </div>
+        )
+        }
+        
 
     </div>
   );
