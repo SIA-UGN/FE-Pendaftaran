@@ -13,6 +13,7 @@ export default function Profil() {
         const fetchUser = async () => {
           try {
             const token = getCookie("access_token");
+
             if (!token) return;
     
             const res = await fetch("http://localhost:8000/api/auth/user", {
@@ -23,7 +24,10 @@ export default function Profil() {
               },
             });
     
-            if (!res.ok) throw new Error("Unauthorized");
+            if (!res.ok) {
+              console.warn("Token invalid, redirect ke login");
+              router.push("/login");
+            }
     
             const data = await res.json();
             const userData = data.data.user;
@@ -55,18 +59,18 @@ export default function Profil() {
                 alt="profile-image"
                 className="object-cover rounded-2xl"
                 />
-                <div className="py-6 w-xl flex flex-col gap-6">
+                <div className="py-6 w-xl max-w-3/4 flex flex-col gap-6">
                     <div className="grid w-full items-center gap-3">
                         <Label htmlFor="name">Nama Lengkap</Label>
-                        <Input type="text" id="name" value={user.name} />
+                        <Input type="text" id="name" value={user.name} readOnly/>
                     </div>
                     <div className="grid w-full items-center gap-3">
                         <Label htmlFor="email">Email</Label>
-                        <Input type="email" id="email" value={user.email} />
+                        <Input type="email" id="email" value={user.email} readOnly/>
                     </div>
                     <div className="grid w-full  items-center gap-3">
                         <Label htmlFor="email">Change Password</Label>
-                        <Input type="password" id="password" value={user.password} />
+                        <Input type="password" id="password" value={"••••••••"} />
                     </div>
                 </div>
                     

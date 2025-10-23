@@ -19,6 +19,7 @@ import Link from "next/link";
 import { setCookie } from "cookies-next";
 import ReCAPTCHA from "react-google-recaptcha";
 
+
 export default function Login() {
   const router = useRouter();
   const [captcha, setCaptcha] = useState(null);
@@ -28,46 +29,56 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e) {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+  e.preventDefault();
+  setError("");
+  setLoading(true);
 
-    if (!captcha) {
-      setError("Silakan selesaikan reCAPTCHA terlebih dahulu");
-      setLoading(false);
+  if (!captcha) {
+    setError("Silakan selesaikan reCAPTCHA terlebih dahulu");
+    setLoading(false);
+    return;
+  }
+
+  try {
+    const res = await fetch("http://localhost:8000/api/auth/login", {
+      method: "POST", // ✅ gunakan POST, bukan GET
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setError(data.message || "Login gagal");
       return;
     }
 
-    try {
-      const res = await fetch("http://localhost:8000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || "Login gagal");
-        return;
-      }
-
-      setCookie("access_token", data.data.access_token, {
-        path: "/",
-        maxAge: 60 * 60 * 24 * 3, // 3 hari
-      });
-
-      router.push("/"); 
-    } catch (err) {
-      console.error(err);
-      setError("Terjadi kesalahan saat login");
-    } finally {
-      setLoading(false);
+    // ✅ simpan token yang dikirim backend
+    const token = data.data?.access_token || data.token;
+    if (!token) {
+      setError("Token tidak ditemukan di respons server");
+      return;
     }
+
+    setCookie("access_token", token, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 3, // 3 hari
+    });
+
+    router.push("/");
+  } catch (err) {
+    console.error(err);
+    setError("Terjadi kesalahan saat login");
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <div className="flex items-center gap-6 w-screen h-screen justify-center bg-[url('/auth.png')] bg-cover ">

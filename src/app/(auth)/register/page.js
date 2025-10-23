@@ -136,6 +136,7 @@ export default function RegisterPage() {
                         required
                       />
                     </div>
+                    {error && <p className="text-red-600 text-sm">{error}</p>}
                   </div>
                     <Button type="submit" className="w-full rounded-full text-white hover:text-white" variant={'matcha'}>
                     Register

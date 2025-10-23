@@ -1,5 +1,7 @@
 "use client"
 
+import { useRouter } from "next/navigation";
+
 import { Info, AlertCircle, XCircle, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
@@ -16,6 +18,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from 'next/link'
+import ProtectedRoute from "@/components/ProtectedRoute";
+import { toast } from "sonner";
+import { getCookie } from "cookies-next";
 
 const FormSchema = z.object({
     namaLengkap: z.string().min(2, {
@@ -41,6 +46,83 @@ const FormSchema = z.object({
 });
 
 export default function DataDiri() {
+    const router = useRouter();
+
+async function onSubmit(data) {
+  console.log("📤 Data dikirim:", data);
+  try {
+    const formData = new FormData();
+
+    // Struktur sesuai Laravel: profile[...]
+    formData.append("profile[full_name]", data.namaLengkap);
+    formData.append("profile[email]", data.email);
+    formData.append("profile[gender]", data.jenisKelamin);
+    formData.append("profile[religion]", data.agama);
+    formData.append("profile[phone]", data.noPonsel);
+    formData.append("profile[birth_place]", data.tempatLahir);
+    formData.append("profile[birth_date]", data.tanggalLahir);
+    formData.append("profile[nik_kitas]", data.nik);
+    formData.append("profile[family_card_number]", data.noKK);
+    formData.append("profile[citizenship]", data.kewarganegaraan);
+    formData.append("profile[child_number]", data.anakKe);
+    formData.append("profile[siblings_count]", data.jumlahSaudara);
+    formData.append("profile[birth_certificate_number]", data.noAkta);
+
+    // File upload
+    if (data.ktp && data.ktp.length > 0) {
+      formData.append("profile[ktp_kitas_file]", data.ktp[0]);
+    }
+    if (data.akta && data.akta.length > 0) {
+      formData.append("profile[birth_certificate_file]", data.akta[0]);
+    }
+    if (data.kk && data.kk.length > 0) {
+      formData.append("profile[family_card_file]", data.kk[0]);
+    }
+
+    const token = getCookie("access_token");
+    console.log("🟢 Token dari cookie:", token);
+
+    const res = await fetch("http://localhost:8000/api/registration", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+      body: formData,
+    });
+
+    console.log("🟡 Status:", res.status, res.statusText);
+
+    // Ambil response sebagai text
+    const text = await res.text();
+    console.log("🧩 Raw response dari server:", text);
+
+    // Parse JSON
+    let result;
+    try {
+      result = JSON.parse(text);
+    } catch (e) {
+      console.error("⚠️ Response bukan JSON, kemungkinan HTML error (token salah / route salah / sanctum belum aktif)");
+      throw new Error("Server tidak mengembalikan JSON. Mungkin token salah, route salah, atau sanctum belum aktif.");
+    }
+
+    if (!res.ok) {
+      console.error("🚫 Server balas error JSON:", result);
+      throw new Error(result?.message || "Gagal menyimpan data pendaftaran");
+    }
+
+    console.log("✅ Response dari server:", result);
+    toast.success("Data berhasil disimpan!");
+    router.push("/pendaftaran/data-alamat");
+
+  } catch (err) {
+    console.error("❌ Error saat submit:", err);
+    toast.error(err.message || "Terjadi kesalahan saat menyimpan data");
+  }
+}
+
+
+    
     const form = useForm({
         resolver: zodResolver(FormSchema),
         defaultValues: {
@@ -60,13 +142,8 @@ export default function DataDiri() {
         },
     });
 
-    function onSubmit(data) {
-        console.log(data); 
-        alert("You submitted the following values:\n" + JSON.stringify(data, null, 2));
-    }
-
     return (
-        <>
+        <ProtectedRoute>
         <div className="flex items-center gap-2 m-12 mt-6 pt-12">
                 <CheckCircle className="text-green-500" />
                 <h2 className="text-xl font-semibold">Data Diri</h2>
@@ -304,10 +381,12 @@ export default function DataDiri() {
                     </div>
                     </div>
                     <div className="w-full flex items-center justify-end my-12 px-12">
-                        <Link href="/pendaftaran/data-alamat" className="w-48"><Button type="submit" variant={"matcha"} className={"w-full"}>Lanjut</Button></Link>
+                    <Button type="submit" variant={"matcha"} className={"w-48"}>
+                        Lanjut
+                    </Button>
                     </div>
                 </form>
             </Form>
-        </>
+        </ProtectedRoute>
     );
 }

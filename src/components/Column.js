@@ -10,10 +10,14 @@ export const columns = [
     },
     {
         accessorKey: "id",
-        header: "ID",
+        header: "Nomor Peserta",
     }, 
     {
         accessorKey: "name",
         header: "Nama",
     },
+    {
+        accessorKey: "status",
+        header: "Status",
+    }
 ]

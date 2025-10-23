@@ -65,11 +65,11 @@ export default function Navbar() {
 
 
   const handleLogout = () => {
-  deleteCookie("access_token");
-  setIsLoggedIn(false);
-  setUser(null);
-  router.push("/");
-};
+    deleteCookie("access_token");
+    setIsLoggedIn(false);
+    setUser(null);
+    router.push("/");
+  };
 
   const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
 
