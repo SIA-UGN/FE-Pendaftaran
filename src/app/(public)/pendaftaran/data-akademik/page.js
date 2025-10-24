@@ -16,7 +16,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import  Link  from "next/link"
+import Link from "next/link"
+import RegistrationProgress from "@/components/RegistrationProgress";
 
 const MAX_FILE_SIZE = 5000000; 
 const ACCEPTED_FILE_TYPES = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
@@ -54,7 +55,8 @@ export default function DataAkademik() {
 
   return (
     <>
-    <div className="flex items-center gap-2 m-12 mt-6 pt-12">
+      <div className="flex items-center gap-2 m-12 mt-6 pt-12">
+        <RegistrationProgress />
                 <CheckCircle className="text-green-500" />
                 <h2 className="text-xl font-semibold">Data Akademik</h2>
     </div>

@@ -21,6 +21,7 @@ import Link from 'next/link'
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { toast } from "sonner";
 import { getCookie } from "cookies-next";
+import RegistrationProgress from "@/components/RegistrationProgress";
 
 const FormSchema = z.object({
     namaLengkap: z.string().min(2, {
@@ -120,8 +121,6 @@ async function onSubmit(data) {
     toast.error(err.message || "Terjadi kesalahan saat menyimpan data");
   }
 }
-
-
     
     const form = useForm({
         resolver: zodResolver(FormSchema),
@@ -144,6 +143,8 @@ async function onSubmit(data) {
 
     return (
         <ProtectedRoute>
+        <RegistrationProgress />
+        
         <div className="flex items-center gap-2 m-12 mt-6 pt-12">
                 <CheckCircle className="text-green-500" />
                 <h2 className="text-xl font-semibold">Data Diri</h2>

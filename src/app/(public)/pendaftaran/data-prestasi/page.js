@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from 'next/link'
 import Prestasi from '@/components/prestasi/Prestasi'
+import RegistrationProgress from "@/components/RegistrationProgress";
 
 const FormSchema = z.object({
   uploadSertifikat: z.any().optional(),
@@ -37,7 +38,8 @@ export default function DataPrestasi() {
 
   return (
             <>
-              <div className="flex justify-between items-center m-12 mt-6 pt-12">
+      <div className="flex justify-between items-center m-12 mt-6 pt-12">
+        <RegistrationProgress />
                 <div className="flex items-center gap-2 ">
                   <CheckCircle className="text-green-500" />
                   <h2 className="text-xl font-semibold">Data Prestasi</h2>

@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from 'next/link'
+import RegistrationProgress from "@/components/RegistrationProgress";
 
 import {
   AlertDialog,
@@ -54,7 +55,8 @@ export default function Pembayaran() {
 
   return (
     <>
-    <div className="flex items-center gap-2 m-12 mt-6 pt-12">
+      <div className="flex items-center gap-2 m-12 mt-6 pt-12">
+        <RegistrationProgress />
                 <CheckCircle className="text-green-500" />
                 <h2 className="text-xl font-semibold">Pembayaran</h2>
     </div>

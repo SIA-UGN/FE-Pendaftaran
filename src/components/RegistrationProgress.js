@@ -50,21 +50,19 @@ export default function RegistrationProgress() {
         })
     }
   return (
-        <div className="w-full p-4 flex flex-col items-center gap-12">
-            <div className="flex gap-5 w-full text-2xl">
-              <Image src={"/tahapan.svg"} width={30} height={30} alt='tahapan'></Image>
-              Tahapan
-            </div>
+        <div className="w-full max-w-11/12 p-4 flex flex-col items-center gap-12 mx-auto my-12">
             <div className="flex flex-col gap-5  w-full items-center justify-center">
             <div className="flex gap-5 w-full flex-col-reverse">
               <div className="w-full relative grid grid-cols-6 gap-12 border border-green-500 rounded-full">
+                <div className="absolute left-23 top-1/2 transform -translate-y-1/2 w-[86%] h-[4px] bg-gray-200 rounded-full z-0"></div>
+                <div className="absolute left-23 top-1/2 transform -translate-y-1/2 w-[80%] h-[4px] bg-green-500 rounded-full z-0 transition-all duration-500"></div>
                   <Image src={'/line.svg'} className="absolute right-2 z-0 rotate-90" width={1} height={100} alt='kube'></Image>
-                  <div className="h-12 flex justify-center items-center w-full z-10"><CheckCircle className="text-green-500 "/></div>
-                  <div className="h-12 flex justify-center items-center w-full z-10"><CheckCircle className="text-green-500 "/></div>
-                  <div className="h-12 flex justify-center items-center w-full z-10"><CheckCircle className="text-green-500 "/></div>
-                  <div className="h-12 flex justify-center items-center w-full z-10"><CheckCircle className="text-green-500 "/></div>
-                  <div className="h-12 flex justify-center items-center w-full z-10"><CheckCircle className="text-green-500 "/></div>
-                  <div className="h-12 flex justify-center items-center w-full z-10"><CheckCircle className="text-green-500 "/></div>
+                  <div className="h-12 flex justify-center items-center w-full z-10"><CheckCircle className="text-green-500 bg-white "/></div>
+                  <div className="h-12 flex justify-center items-center w-full z-10"><CheckCircle className="text-green-500 bg-white"/></div>
+                  <div className="h-12 flex justify-center items-center w-full z-10"><CheckCircle className="text-green-500 bg-white"/></div>
+                  <div className="h-12 flex justify-center items-center w-full z-10"><CheckCircle className="text-green-500 bg-white"/></div>
+                  <div className="h-12 flex justify-center items-center w-full z-10"><CheckCircle className="text-green-500 bg-white"/></div>
+                  <div className="h-12 flex justify-center items-center w-full z-10"><CheckCircle className="text-green-500 bg-white"/></div>
               </div>
 
               <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-12">
