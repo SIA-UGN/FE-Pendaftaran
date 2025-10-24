@@ -51,7 +51,7 @@ export default function News() {
 
             <div className="p-6 flex flex-col gap-4 md:w-2/3">
               <div className="flex justify-between items-start">
-                <h3 className="font-bold text-xl md:text-2xl">{item.title}</h3>
+                <h3 className="font-medium text-xl md:text-2xl">{item.title}</h3>
                 <span className="text-gray-500 text-sm">{item.date}</span>
               </div>
               <p className="text-gray-700">{item.summary}</p>

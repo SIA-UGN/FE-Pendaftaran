@@ -9,8 +9,9 @@ export default function PendaftaranPage() {
         <ProtectedRoute>
             <div className="py-5 flex items-center w-screen justify-center flex-col gap-5 max-w-11/12 mx-auto">
                 <InformasiPendaftaran />
-                <InformasiProfil />
+                {/* <InformasiProfil /> */}
                 <RegistrationProgress />
+                <
             </div>
         </ProtectedRoute>
     )
