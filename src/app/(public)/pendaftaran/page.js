@@ -2,7 +2,9 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 
 import InformasiPendaftaran from "@/components/InformasiPendaftaran";
 import InformasiProfil from "@/components/InformasiProfil";
-import RegistrationProgress from "@/components/RegistrationProgress"
+import RegistrationProgress from "@/components/RegistrationProgress";
+import UrutanTahapan from "@/components/UrutanTahapan";
+import Ketentuan from "@/components/Ketentuan"
 
 export default function PendaftaranPage() {
     return (
@@ -11,7 +13,8 @@ export default function PendaftaranPage() {
                 <InformasiPendaftaran />
                 {/* <InformasiProfil /> */}
                 <RegistrationProgress />
-                <
+                <UrutanTahapan />
+                <Ketentuan />
             </div>
         </ProtectedRoute>
     )
