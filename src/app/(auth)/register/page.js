@@ -70,7 +70,7 @@ export default function RegisterPage() {
   return (
     <div>
         <div className="flex items-center gap-6 w-screen h-screen justify-center bg-[url('/auth.png')] bg-cover ">
-          <Card className="w-3/4 w-m-7/8 flex flex-col md:flex-row gap-2 p-12 md:p-0 h-full md:h-3/4 relative rounded-[5vw]">
+          <Card className="w-3/4 w-m-7/8 max-w-11/12 flex flex-col md:flex-row gap-2 p-12 md:p-0 h-full md:h-3/4 relative rounded-[5vw]">
             <div className="w-full md:w-3/8 min-h-fit h-11/10 bg-[var(--green)] flex items-center justify-between flex-col px-4 gap-4 rounded-[5vw] md:absolute overflow-hidden left-[-10px] md:top-1/2 md:-translate-y-1/2 py-12">
               <div className="flex flex-col items-center gap-2 w-full h-3/4 justify-center">
                 <div className="relative w-32 h-32 sm:w-48 sm:h-48 md:w-60 md:h-60 lg:w-72 lg:h-72">

@@ -6,6 +6,8 @@ import Image from "next/image";
 import { getCookie } from "cookies-next";
 import { Label } from "@/components/ui/label";
 
+import { SquarePen } from 'lucide-react';
+
 export default function Profil() {
     const [user, setUser] = useState({ name: "", email: "", picture: "/logo.jpg" });
     
@@ -45,12 +47,13 @@ export default function Profil() {
         fetchUser();
       }, []);
     
-    return (
-        <div className="flex flex-col gap-5">
-            <div className="flex items-center gap-2 m-12">
-                <h2 className="text-xl font-semibold">Profil</h2>
-            </div>
-            <div className="w-full flex items-center justify-center relative flex-col gap-4 my-6">
+  return (
+      <div className="my-12">
+          <div className="flex flex-col items-center pt-4 pb-16 px-4 sm:px-8 max-w-11/12 mx-auto">
+            <h2 className="text-xl sm:text-2xl font-medium mb-8 w-full border-b-2 border-black pb-2">
+              Profil Saya
+            </h2>
+            <div className="w-full h-full flex items-center justify-center relative flex-col gap-4 my-6">
             <Input id="picture" type="file" className="absolute w-0 opacity-0" />
             <Image
                 src={user.picture}
@@ -59,23 +62,27 @@ export default function Profil() {
                 alt="profile-image"
                 className="object-cover rounded-2xl"
                 />
-                <div className="py-6 w-xl max-w-3/4 flex flex-col gap-6">
+                <div className="py-6 w-full flex flex-col gap-6">
                     <div className="grid w-full items-center gap-3">
                         <Label htmlFor="name">Nama Lengkap</Label>
                         <Input type="text" id="name" value={user.name} readOnly/>
                     </div>
                     <div className="grid w-full items-center gap-3">
-                        <Label htmlFor="email">Email</Label>
-                        <Input type="email" id="email" value={user.email} readOnly/>
+              <Label htmlFor="email">Email</Label>
+                    <div className="relative w-full">
+                <Input type="email" id="email" value={user.email} onChange/> <SquarePen size={16} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400" />
+
+                    </div>
                     </div>
                     <div className="grid w-full  items-center gap-3">
-                        <Label htmlFor="email">Change Password</Label>
-                        <Input type="password" id="password" value={"••••••••"} />
+              <Label htmlFor="email">Change Password</Label>
+                    <div className="relative w-full">
+                        <Input type="password" id="password" value={"••••••••"} onChange/> <SquarePen size={16} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400" />
                     </div>
-                </div>
-                    
-                
+                    </div>
+                </div> 
             </div>
-        </div>
+      </div>
+    </div>
     )
 }
