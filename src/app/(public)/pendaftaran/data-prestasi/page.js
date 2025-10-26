@@ -38,8 +38,8 @@ export default function DataPrestasi() {
 
   return (
             <>
-      <div className="flex justify-between items-center m-12 mt-6 pt-12">
         <RegistrationProgress />
+      <div className="flex justify-between items-center m-12 mt-6 pt-12">
                 <div className="flex items-center gap-2 ">
                   <CheckCircle className="text-green-500" />
                   <h2 className="text-xl font-semibold">Data Prestasi</h2>
@@ -56,29 +56,25 @@ export default function DataPrestasi() {
               <Prestasi />
 
               <div className="flex flex-col m-12 gap-5 items-center">
-                <div className="w-10/12 flex gap-5 items-center justify-center">
+        <div className="w-10/12 flex gap-5 items-center justify-center">
+          <Link href="/pendaftaran/data-akademik" className="w-full">
                   <Button
                   type="button"
                   variant="matcha"
-                  className="flex-1"
+                  className="w-full"
                 > Kembali
-                </Button>
+          </Button>
+          </Link>
+          <Link href="/pendaftaran/data-orangtua" className="w-full">
                 <Button
                   type="button"
                   variant="matcha"
-            className="flex-1"
+            className="w-full"
               
                 > Konfirmasi Data
-                </Button>
-                </div>
-                <Link href="/pendaftaran/pembayaran" className={"w-10/12"}>
-                  <Button
-                    type="button"
-                    variant="matcha"
-                    className={"w-full"}
-                  > Pembayaran
-                  </Button>
+          </Button>
                 </Link>
+                </div>
               </div>
             </>
   );

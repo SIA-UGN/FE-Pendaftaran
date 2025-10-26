@@ -168,7 +168,7 @@ export default function Login() {
                 <Button
                   type="submit"
                   className="w-full rounded-full text-white hover:text-white"
-                  variant={"matcha"}
+                  variant={"green"}
                   disabled={loading}
                 >
                   {loading ? "Logging in..." : "Login"}

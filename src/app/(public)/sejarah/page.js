@@ -5,7 +5,7 @@ export default function History() {
     return (
         <div>
             <HomeCarousel />
-            <div className="flex flex-col items-center py-16 pb-16 px-4 sm:px-8 max-w-11/12 mx-auto">
+            <div className="flex flex-col items-center py-16 pb-16 px-4 sm:px-8 max-w-11/12 mx-auto gap-6">
                 <h2 className="text-xl sm:text-2xl font-medium mb-4 w-full border-b-2 border-black pb-2">
                     Sejarah
                 </h2>
