@@ -36,7 +36,6 @@ export function TeamSwitcher({
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild className={"cursor-pointer"}>
             <Link  href="/" className="cursor-pointer">
 
             <SidebarMenuButton
@@ -58,7 +57,6 @@ export function TeamSwitcher({
               {/* <ChevronsUpDown className="ml-auto" /> */}
             </SidebarMenuButton>
             </Link>
-          </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
             align="start"

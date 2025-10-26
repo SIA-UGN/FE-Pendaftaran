@@ -19,6 +19,7 @@ import Link from "next/link";
 import { setCookie } from "cookies-next";
 import ReCAPTCHA from "react-google-recaptcha";
 
+import { jwtDecode } from "jwt-decode";
 
 export default function Login() {
   const router = useRouter();
@@ -41,15 +42,12 @@ export default function Login() {
 
   try {
     const res = await fetch("http://localhost:8000/api/auth/login", {
-      method: "POST", // ✅ gunakan POST, bukan GET
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
+      body: JSON.stringify({ email, password }),
     });
 
     const data = await res.json();
@@ -59,19 +57,25 @@ export default function Login() {
       return;
     }
 
-    // ✅ simpan token yang dikirim backend
-    const token = data.data?.access_token || data.token;
+    const token = data.data?.access_token;
+    const role = data.data?.user?.roles?.[0] || "user";
+
     if (!token) {
       setError("Token tidak ditemukan di respons server");
       return;
     }
 
-    setCookie("access_token", token, {
-      path: "/",
-      maxAge: 60 * 60 * 24 * 3, // 3 hari
-    });
+    // Simpan ke cookie
+    setCookie("access_token", token, { path: "/", maxAge: 60 * 60 * 24 * 3 });
+    setCookie("role", role, { path: "/", maxAge: 60 * 60 * 24 * 3 });
 
-    router.push("/");
+    // Arahkan user
+    if (role === "admin") {
+      router.push("/dashboard");
+    } else {
+      router.push("/");
+    }
+
   } catch (err) {
     console.error(err);
     setError("Terjadi kesalahan saat login");
@@ -79,6 +83,7 @@ export default function Login() {
     setLoading(false);
   }
 }
+
 
   return (
     <div className="flex items-center gap-6 w-screen h-screen justify-center bg-[url('/auth.png')] bg-cover ">

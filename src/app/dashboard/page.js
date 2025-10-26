@@ -6,12 +6,12 @@ import Keuangan from '@/components/Keuangan'
 
 export default function Page() {
   return (
-    <>
+    <div className='flex flex-col items-center justify-center'>
         <AccountInformation />
         <RegistrantInformation />
         <ApplicantInformation />
         <Statistics />
         <Keuangan />
-    </>
+    </div>
   )
 }
