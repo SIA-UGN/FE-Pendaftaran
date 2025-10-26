@@ -83,12 +83,12 @@ const data = {
   },
   {
     title: "Tambahkan Manajer",
-    url: "/manajer/tambah",
+    url: "/dashboard/manajer/tambah",
     icon: BookOpen,
     items: [
       {
         title: "Form Tambah",
-        url: "/manajer/tambah",
+        url: "/dashboard/manajer/tambah",
       },
       {
         title: "Panduan Tambah",
