@@ -37,14 +37,14 @@ export default function Navbar() {
  useEffect(() => {
   const fetchUser = async () => {
     try {
-      const token = getCookie("access_token"); // ambil token dari cookie
+      const token = getCookie("access_token"); 
       if (!token) throw new Error("No token");
 
       const res = await fetch("http://localhost:8000/api/auth/user", {
         method: "GET",
         headers: {
           Accept: "application/json",
-          Authorization: `Bearer ${token}`, // kirim token di header
+          Authorization: `Bearer ${token}`, 
         },
       });
 
