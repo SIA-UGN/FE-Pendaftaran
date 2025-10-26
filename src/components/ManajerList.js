@@ -19,9 +19,9 @@ import { SearchIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 
-import {ApplicantTable} from '@/components/ApplicantTable'
+import {ManajerTable} from '@/components/ManajerTable'
 
-export default function ApplicantList() {
+export default function ManajerList() {
     return (
         <>     
             <div className="flex gap-5 my-6 w-full">
@@ -43,7 +43,7 @@ export default function ApplicantList() {
                 </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-            <ApplicantTable/>
+            <ManajerTable/>
         </>
     )
 }
