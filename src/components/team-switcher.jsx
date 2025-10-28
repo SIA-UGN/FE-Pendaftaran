@@ -40,18 +40,18 @@ export function TeamSwitcher({
 
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent">
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg overflow-hidden">
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent w-fit h-fit">
+              <div className="flex aspect-square size-12 items-center justify-center rounded-lg overflow-hidden">
                 <Image
-                  src="/logo.jpg"  // ✅ jangan pakai /public/logo.jpg
+                  src="/logo.jpg" 
                   alt="Logo"
-                  width={40}
-                  height={40}
+                  width={60}
+                  height={60}
                   className="rounded-lg object-cover"
                 />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight text-wrap">
-                <span className="truncate font-medium text-[var(--yellow)]">{activeTeam.name}</span>
+                <span className="truncate font-semibold text-[var(--yellow)] text-wrap text-md">{activeTeam.name}</span>
                 {/* <span className="truncate text-xs">{activeTeam.plan}</span> */}
               </div>
               {/* <ChevronsUpDown className="ml-auto" /> */}

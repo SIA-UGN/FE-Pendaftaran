@@ -10,10 +10,8 @@ export default function Page() {
   return (
     <div className='flex flex-col items-center justify-center'>
         <AccountInformation />
-        <RegistrantInformation />
+        {/* <RegistrantInformation /> */}
         <ApplicantInformation />
-        <Statistics />
-        <Keuangan />
     </div>
   )
 }

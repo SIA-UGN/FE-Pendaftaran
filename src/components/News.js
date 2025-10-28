@@ -39,7 +39,7 @@ export default function News() {
 
       <div className="flex flex-col gap-12 w-full">
         {data.map((item) => (
-          <Card key={item.title} className="flex flex-col md:flex-row w-full overflow-hidden p-0 min-h-60">
+          <Card key={item.title} className="flex flex-col md:flex-row w-full overflow-hidden p-0 min-h-60 bg-white">
             <div className="relative w-full md:w-1/3 h-64 md:h-auto flex-shrink-0">
               <Image
                 src={item.image}

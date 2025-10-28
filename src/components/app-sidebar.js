@@ -48,7 +48,7 @@ const data = {
   navMain: [
   {
     title: "Data Pendaftar",
-    url: "/pendaftar",
+    url: "/dashboard",
     icon: SquareTerminal,
     isActive: true,
     items: [
@@ -106,7 +106,7 @@ const data = {
   },
   {
     title: "Statistika",
-    url: "/statistika",
+    url: "/dashboard/statistika",
     icon: Settings2,
     items: [
       {
@@ -129,7 +129,7 @@ const data = {
   },
   {
     title: "Keuangan",
-    url: "/keuangan",
+    url: "/dashboard/keuangan",
     icon: Wallet,
     items: [
       {

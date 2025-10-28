@@ -23,7 +23,7 @@ export default function DashboardLayout({ children }) {
       <SidebarInset>
         <header className="flex h-16 items-center gap-2 px-4 border-b bg-background">
           <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="h-4 mx-2" />
+          <Separator orientation="vertical" className="h-4 m-0 mx-2" />
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">

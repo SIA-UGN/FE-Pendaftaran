@@ -213,7 +213,7 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="bg-[var(--green)] group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm">
+          className="bg-[var(--green)] group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm rounded-r-2xl">
           {children}
         </div>
       </div>
@@ -350,7 +350,7 @@ function SidebarContent({
       data-slot="sidebar-content"
       data-sidebar="content"
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto text-white  group-data-[collapsible=icon]:overflow-hidden",
+        "flex min-h-0 flex-1 flex-col overflow-auto text-white  group-data-[collapsible=icon]:overflow-hidden",
         className
       )}
       {...props} />
@@ -365,7 +365,7 @@ function SidebarGroup({
     <div
       data-slot="sidebar-group"
       data-sidebar="group"
-      className={cn("relative flex w-full min-w-0 flex-col p-2", className)}
+      className={cn("relative flex w-full min-w-0 flex-col p-0", className)}
       {...props} />
   );
 }
@@ -433,7 +433,7 @@ function SidebarMenu({
     <ul
       data-slot="sidebar-menu"
       data-sidebar="menu"
-      className={cn("flex w-full min-w-0 flex-col gap-1 text-white", className)}
+      className={cn("flex w-full min-w-0 flex-col gap-0 text-white", className)}
       {...props} />
   );
 }
@@ -456,7 +456,7 @@ const sidebarMenuButtonVariants = cva(
   {
     variants: {
       variant: {
-        default: "hover:bg-[var(--yellow)] hover:text-white cursor-pointer py-2",
+        default: "hover:bg-[var(--yellow)] hover:text-white cursor-pointer rounded-none focus:bg-[var(--yellow)] p-4 py-6",
         outline:
           "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-[var(--green)]-accent hover:text-white hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
       },
@@ -643,7 +643,7 @@ function SidebarMenuSubButton({
       data-size={size}
       data-active={isActive}
       className={cn(
-        "text-white ring-sidebar-ring hover:bg-[var(--yellow)] py-2 hover:text-white active:bg-[var(--yellow)] active:text-white [&>svg]:text-[var(--yellow)] flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 outline-hidden focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 focus:bg-[var(--yellow)]",
+        "text-white ring-sidebar-ring hover:bg-[var(--yellow)] py-2 hover:text-white active:bg-[var(--yellow)] active:text-white [&>svg]:text-[var(--yellow)] flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 outline-hidden focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 focus:bg-[var(--yellow)]" ,
         "data-[active=true]:bg-[var(--yellow)] data-[active=true]:text-[var(--yellow)]",
         size === "sm" && "text-xs",
         size === "md" && "text-sm",

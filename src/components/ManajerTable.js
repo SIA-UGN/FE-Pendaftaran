@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 
+import Link from "next/link"
+
 const managers = [
   {
     name: "Ahmad Fauzi",
@@ -66,9 +68,11 @@ export function ManajerTable() {
             <TableCell>{manager.email}</TableCell>
             <TableCell>{manager.verifications}</TableCell>
             <TableCell className="text-right">
+              <Link href="/dashboard/manajer/profile">
               <Button size="sm" variant="outline">
                 Lihat
               </Button>
+              </Link>
             </TableCell>
           </TableRow>
         ))}

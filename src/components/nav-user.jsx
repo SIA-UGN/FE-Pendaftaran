@@ -71,7 +71,7 @@ export function NavUser({ user }) {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+              className="data-[state=open]:bg-[var(--yellow)] data-[state=open]:text-white rounded-lg">
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback className="rounded-lg">
@@ -87,7 +87,7 @@ export function NavUser({ user }) {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg bg-[var(--yellow)] text-white"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={4}>
@@ -111,7 +111,7 @@ export function NavUser({ user }) {
             <DropdownMenuItem
               onClick={handleLogout}
               disabled={loading}
-              className="text-red-600 focus:text-red-600 fw-bold">
+              className="text-red-800 focus:text-red-800 fw-bold cursor-pointer hover:bg-[var(--yellow)]">
               <LogOut />
               {loading ? "Logging out..." : "Log out"}
             </DropdownMenuItem>

@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import Link from "next/link"
 
 const students = [
   {
@@ -73,9 +74,11 @@ export function ApplicantTable() {
             <TableCell>{student.major}</TableCell>
             <TableCell>{student.status}</TableCell>
             <TableCell className="text-right">
+              <Link href="/dashboard/profile">
               <Button size="sm" variant="outline">
                 Lihat
               </Button>
+              </Link>
             </TableCell>
           </TableRow>
         ))}
