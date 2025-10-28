@@ -5,11 +5,11 @@ export default function History() {
     return (
         <div>
             <HomeCarousel />
-            <div className="flex flex-col items-center py-16 pb-16 px-4 sm:px-8 max-w-11/12 mx-auto gap-6">
+            <div className="flex flex-col items-center py-16 pb-16 px-4 sm:px-8 max-w-11/12 mx-auto gap-5">
                 <h2 className="text-xl sm:text-2xl font-medium mb-4 w-full border-b-2 border-black pb-2">
                     Sejarah
                 </h2>
-                <div className="w-full">
+            <div className="w-full flex flex-col gap-5">
                 <div className="relative w-full h-96 sm:h-96">
                     <Image
                     src="/auth.png"

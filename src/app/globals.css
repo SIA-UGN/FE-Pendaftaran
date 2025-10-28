@@ -13,7 +13,7 @@ html {
 
 :root {
   /* custom color */
-  --yellow: #AE963E;
+  --yellow: #DABC50;
   --green: #015023;
   --dark-green: oklch(0.467 0.083 182.489);
   --cream: #CBA400;
@@ -153,4 +153,10 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+:root {
+  --color-pendaftar: #22c55e;
+  --color-growth: #3b82f6;
+  --color-degrowth: #ef4444;
 }

@@ -6,6 +6,9 @@ import RegistrationProgress from "@/components/RegistrationProgress";
 import UrutanTahapan from "@/components/UrutanTahapan";
 import Ketentuan from "@/components/Ketentuan"
 
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+
 export default function PendaftaranPage() {
     return (
         <ProtectedRoute>
@@ -15,6 +18,14 @@ export default function PendaftaranPage() {
                 <RegistrationProgress />
                 <UrutanTahapan />
                 <Ketentuan />
+                <Link href="/data-diri" className={"w-10/12 mb-12"}>
+                    <Button
+                                        type="button"
+                                        variant="matcha"
+                                        className={"w-full"}
+                                    > Mulai Pendaftaran
+                    </Button>
+                </Link>
             </div>
         </ProtectedRoute>
     )

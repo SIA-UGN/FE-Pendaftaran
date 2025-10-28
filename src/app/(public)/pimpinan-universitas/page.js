@@ -36,10 +36,10 @@ export default function Pimpinan() {
         <div>
                     <HomeCarousel />
                     <div className="flex flex-col items-center py-16 pb-16 px-4 sm:px-8 max-w-11/12 mx-auto">
-                        <h2 className="text-xl sm:text-2xl font-medium mb-4 w-full border-b-2 border-black pb-2">
+                <h2 className="text-xl sm:text-2xl font-medium mb-4 w-full border-b-2 border-black pb-2">
                             Pimpinan Universitas
                 </h2>
-                <div className='flex flex-col gap-5 w-full'>
+                <div className='flex flex-col gap-12 w-full mt-12'>
                     {
                         pimpinan.map((item) => (
                             <div className='flex w-full gap-5 flex-col md:flex-row' key={item.nama}>

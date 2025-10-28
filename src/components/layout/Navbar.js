@@ -84,6 +84,10 @@ export default function Navbar() {
         </Link>
       </div>
 
+
+      
+
+      <div className="flex gap-6 items-center">
       <div className="hidden md:flex">
         <NavigationMenu>
           <NavigationMenuList className="w-fit">
@@ -122,12 +126,6 @@ export default function Navbar() {
         </NavigationMenu>
       </div>
 
-      <div className="flex md:hidden items-center">
-        <button onClick={toggleMobileMenu} className="text-white cursor-pointer">
-          {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
-      </div>
-
       <div className="hidden md:flex items-center gap-4">
         {isLoggedIn ? (
           <>
@@ -160,6 +158,13 @@ export default function Navbar() {
             Login
           </Link>
         )}
+      </div>
+      </div>
+
+      <div className="flex md:hidden items-center">
+        <button onClick={toggleMobileMenu} className="text-white cursor-pointer">
+          {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+        </button>
       </div>
 
       <AnimatePresence>
