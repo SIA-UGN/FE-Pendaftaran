@@ -16,7 +16,9 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import Link from "next/link"
+import { CardContent, Card } from "@/components/ui/card";
+
+import { Info } from 'lucide-react'
 
 // 🧩 Schema Validasi
 const FormSchema = z.object({
@@ -65,7 +67,21 @@ export default function TambahManajer() {
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <PenambahanManajer />
+      <div className="flex flex-col items-center px-4 sm:px-8 max-w-11/12 mt-12 w-full">
+            <h2 className="text-3xl sm:text-2xl font-semibold mb-6 mt-6 border-b-2 border-black pb-2 text-[var(--green)] w-full">
+                Pendaftaran Manajer Baru
+            </h2>
+        <Card className="rounded-lg shadow-md flex flex-row gap-2 min-h-0.5 p-6 w-full mx-6 bg-[#E6EEE9] hover:bg-[#E6EEE9]">
+            <CardContent className=" flex flex-col gap-5 w-full">
+                <h2 className="scroll-m-20 border-b-1 pb-2 text-3xl tracking-tight first:mt-0 flex items-center gap-2 border-gray-500"><Info />Informasi Tahapan</h2>
+                <div className="pl-6 flex flex-col gap-2">
+                    <p className="leading-7 flex items-center gap-2"> Masukkan data manajer baru pada form</p>
+                    <p className="leading-7 flex items-center gap-2">Pilih hak akses untuk manajer baru</p>
+                    <p className="leading-7 flex items-center gap-2">Periksa kembali data manajer sebelum disimpan dan mengirimkan email aktivasi</p>
+                </div>
+            </CardContent>
+        </Card>
+        </div>
 
       <div className="flex flex-col items-center px-4 sm:px-8 max-w-11/12 my-12 w-full">
         <Form {...form}>
@@ -73,7 +89,7 @@ export default function TambahManajer() {
             
             {/* === BAGIAN 1: DATA MANAJER === */}
             <h2 className="text-3xl sm:text-2xl font-semibold mb-6 mt-12 w-full border-b-2 border-black pb-2 text-[var(--green)]">
-              Data Manajer Baru
+              Validasi Data Manajer Baru
             </h2>
 
             <div className="flex flex-col gap-5 p-12 border rounded-xl bg-[var(--light-cream)]">
@@ -131,55 +147,18 @@ export default function TambahManajer() {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
-            </div>
-
-            {/* === BAGIAN 2: HAK AKSES === */}
-            <h2 className="text-3xl sm:text-2xl font-semibold mb-6 mt-12 w-full border-b-2 border-black pb-2 text-[var(--green)]">
-              Hak Akses Manajer Baru
-            </h2>
-
-            <div className="flex flex-col gap-5 p-6 border rounded-xl bg-[var(--light-cream)]">
-              <FormField
+                          />
+                          
+                          <FormField
                 control={form.control}
-                name="hakAkses"
-                render={() => (
+                name="acces"
+                render={({ field }) => (
                   <FormItem>
-                    <div className="flex flex-col space-y-3 mt-2">
-                      {[
-                        { id: "pendaftaran", label: "Mengelola Pendaftaran" },
-                        { id: "pembayaran", label: "Validasi Pembayaran" },
-                        { id: "reports", label: "View Reports" },
-                        { id: "delete", label: "Delete Data" },
-                      ].map((item) => (
-                        <FormField
-                          key={item.id}
-                          control={form.control}
-                          name="hakAkses"
-                          render={({ field }) => {
-                            const value = field.value || [];
-                            return (
-                              <FormItem
-                                key={item.id}
-                                className="flex flex-row space-x-3 space-y-0 items-center"
-                              >
-                                <FormControl className="flex justify-center">
-                                  <Checkbox
-                                    checked={value.includes(item.id)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([...value, item.id])
-                                        : field.onChange(value.filter((v) => v !== item.id));
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-medium text-lg">{item.label}</FormLabel>
-                              </FormItem>
-                            );
-                          }}
-                        />
-                      ))}
-                    </div>
+                    <FormLabel>Hak Akses</FormLabel>
+                    <FormControl>
+                            <Input type="text" placeholder="Mengelola Pendaftaran
+                       Validasi Pembayaran" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -187,11 +166,9 @@ export default function TambahManajer() {
             </div>
 
             <div className="w-full flex items-center justify-end gap-2">
-              <Link href="/dashboard/manajer/tambah/validasi">
               <Button type="submit" variant={"matcha"} className={"w-48 rounded-md"}>
                 Kembali
               </Button>
-              </Link>
               <Button type="submit" variant={"matcha"} className={"w-48 rounded-md"}>
                 Lanjut
               </Button>
