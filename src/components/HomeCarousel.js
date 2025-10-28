@@ -14,7 +14,7 @@ import { AspectRatio } from "@radix-ui/react-aspect-ratio"
 
 export default function HomeCarousel() {
     const plugin = React.useRef(
-    Autoplay({ delay: 2000, stopOnInteraction: true })
+    Autoplay({ delay: 5000, stopOnInteraction: true })
   )
 
     const images = [

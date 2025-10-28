@@ -1,3 +1,5 @@
+'use client'
+
 import AccountInformation from '@/components/AccountInformation'
 import RegistrantInformation from '@/components/RegistrantInformation'
 import ApplicantInformation from '@/components/ApplicantInformation'

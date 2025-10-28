@@ -456,7 +456,7 @@ const sidebarMenuButtonVariants = cva(
   {
     variants: {
       variant: {
-        default: "hover:bg-[var(--green)]-accent hover:text-white",
+        default: "hover:bg-[var(--yellow)] hover:text-white cursor-pointer py-2",
         outline:
           "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-[var(--green)]-accent hover:text-white hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
       },
@@ -643,7 +643,7 @@ function SidebarMenuSubButton({
       data-size={size}
       data-active={isActive}
       className={cn(
-        "text-white ring-sidebar-ring hover:bg-[var(--green)]-accent hover:text-white active:bg-[var(--green)]-accent active:text-white [&>svg]:text-[var(--yellow)] flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 outline-hidden focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+        "text-white ring-sidebar-ring hover:bg-[var(--yellow)] py-2 hover:text-white active:bg-[var(--yellow)] active:text-white [&>svg]:text-[var(--yellow)] flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 outline-hidden focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
         "data-[active=true]:bg-[var(--green)]-accent data-[active=true]:text-[var(--yellow)]",
         size === "sm" && "text-xs",
         size === "md" && "text-sm",

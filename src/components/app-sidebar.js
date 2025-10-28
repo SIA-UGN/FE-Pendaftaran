@@ -14,6 +14,10 @@ import {
   SquareTerminal,
 } from "lucide-react"
 
+import {
+  DropdownMenuSeparator
+} from "@/components/ui/dropdown-menu"
+
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
@@ -174,6 +178,7 @@ export function AppSidebar({
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
+      <DropdownMenuSeparator/>
       <SidebarContent>
         <NavMain items={data.navMain} />
         {/* <NavProjects projects={data.projects} /> */}
