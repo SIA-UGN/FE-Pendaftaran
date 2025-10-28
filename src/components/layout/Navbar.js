@@ -154,7 +154,7 @@ export default function Navbar() {
             </DropdownMenu>
           </>
         ) : (
-          <Link href="/login" className="text-[var(--cream)] font-bold text-md hover:underline">
+          <Link href="/login" className="text-[var(--cream)] font-bold text-md hover:bg-white  py-1 px-6 rounded-lg">
             Login
           </Link>
         )}
