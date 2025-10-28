@@ -40,7 +40,7 @@ export function TeamSwitcher({
 
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent">
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg overflow-hidden">
                 <Image
                   src="/logo.jpg"  // ✅ jangan pakai /public/logo.jpg

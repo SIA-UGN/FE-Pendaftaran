@@ -530,7 +530,7 @@ function SidebarMenuAction({
       data-slot="sidebar-menu-action"
       data-sidebar="menu-action"
       className={cn(
-        "text-[var(--yellow)] ring-sidebar-ring hover:bg-[var(--green)]-accent hover:text-[var(--yellow)] peer-hover/menu-button:text-[var(--yellow)] absolute top-1.5 right-1 flex aspect-square w-5 items-center justify-center rounded-md p-0 outline-hidden transition-transform focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+        "text-[var(--yellow)] ring-sidebar-ring hover:bg-[var(--green)]-accent hover:text-[var(--yellow)] peer-hover/menu-button:text-[var(--yellow)] absolute top-1.5 right-1 flex aspect-square w-5 items-center justify-center rounded-md p-0 outline-hidden transition-transform focus-bg-[var(--yellow)] [&>svg]:size-4 [&>svg]:shrink-0 focus:bg-[var(--yellow)]",
         // Increases the hit area of the button on mobile.
         "after:absolute after:-inset-2 md:after:hidden",
         "peer-data-[size=sm]/menu-button:top-1",
@@ -643,8 +643,8 @@ function SidebarMenuSubButton({
       data-size={size}
       data-active={isActive}
       className={cn(
-        "text-white ring-sidebar-ring hover:bg-[var(--yellow)] py-2 hover:text-white active:bg-[var(--yellow)] active:text-white [&>svg]:text-[var(--yellow)] flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 outline-hidden focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
-        "data-[active=true]:bg-[var(--green)]-accent data-[active=true]:text-[var(--yellow)]",
+        "text-white ring-sidebar-ring hover:bg-[var(--yellow)] py-2 hover:text-white active:bg-[var(--yellow)] active:text-white [&>svg]:text-[var(--yellow)] flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 outline-hidden focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 focus:bg-[var(--yellow)]",
+        "data-[active=true]:bg-[var(--yellow)] data-[active=true]:text-[var(--yellow)]",
         size === "sm" && "text-xs",
         size === "md" && "text-sm",
         "group-data-[collapsible=icon]:hidden",
