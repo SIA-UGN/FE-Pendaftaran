@@ -9,17 +9,16 @@ export default function AccountInformation() {
                 <h2 className="text-xl sm:text-2xl font-medium mb-8 w-full border-b-2 border-black pb-2">
                     Pendaftar & Manager
                 </h2>
-                <div className="grid grid-cols-2 w-full gap-5">
-        <Card className="flex items-center justify-center p-6 flex-col w-full stroke-black ">
-                        <span className="font-bold">123 Jumlah</span>
-                        <span>Pendaftar</span>
-        </Card>
-        <Card className="flex items-center justify-center p-6 flex-col w-full stroke-black ">
-                        <span className="font-bold">20 Jumlah</span>
-                        <span>Manager</span>
-        </Card>
-
-        </div>
+                <div className="grid grid-cols-2 w-8/12 gap-12 h-2xl">
+                    <Card className="flex items-center justify-center p-6 flex-col w-full stroke-black gap-2 ">
+                                    <span className="font-bold text-3xl">123</span>
+                                    <span className='text-lg'>Jumlah Pendaftar</span>
+                    </Card>
+                    <Card className="flex items-center justify-center p-6 flex-col w-full stroke-black gap-2">
+                                    <span className="font-bold text-3xl">20</span>
+                                    <span className="text-lg">Jumlah Manager</span>
+                    </Card>
+                </div>
             </div>
         </>
     )
