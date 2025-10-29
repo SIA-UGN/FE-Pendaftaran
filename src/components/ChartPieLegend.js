@@ -24,7 +24,7 @@ export function ChartPieLegend() {
       </CardHeader>
 
       <CardContent className="flex flex-col items-center justify-center">
-        <div className="w-full max-w-[300px] aspect-square">
+        <div className="w-full max-w-[400px] aspect-square">
           <ResponsiveContainer>
             <PieChart>
               <Pie

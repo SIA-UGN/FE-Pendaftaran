@@ -1,6 +1,6 @@
 "use client"
 
-import { AppSidebar } from "@/components/app-sidebar"
+import { ManagerSidebar } from "@/components/manager-sidebar"
 import {
   SidebarInset,
   SidebarProvider,
@@ -19,7 +19,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 export default function DashboardLayout({ children }) {
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <ManagerSidebar />
       <SidebarInset>
         <header className="flex h-18 items-center gap-6 px-4 border-b bg-white fixed w-full z-10">
           <SidebarTrigger className="-ml-1" />

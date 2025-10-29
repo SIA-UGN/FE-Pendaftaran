@@ -12,11 +12,11 @@ export default function AccountInformation() {
                 <div className="grid grid-cols-2 w-8/12 gap-12 h-2xl">
                     <Card className="flex items-center justify-center p-6 flex-col w-full  gap-2 h-[160px]">
                                     <span className="font-bold text-4xl text-[var(--green)]">123</span>
-                                    <span className='text-lg text-gray-500'>Jumlah Pendaftar</span>
+                                    <span className='text-lg text-gray-500'>Total Pendaftar</span>
                     </Card>
                     <Card className="flex items-center justify-center p-6 flex-col w-full gap-2  h-[160px]">
                                     <span className="font-bold text-4xl text-[var(--green)]">20</span>
-                                    <span className="text-lg text-gray-500">Jumlah Manager</span>
+                                    <span className="text-lg text-gray-500">Total Manager</span>
                     </Card>
                 </div>
             </div>

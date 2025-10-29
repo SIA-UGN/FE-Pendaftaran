@@ -72,6 +72,8 @@ export default function Login() {
     // Arahkan user
     if (role === "admin") {
       router.push("/dashboard");
+    } else if (role == "manager") {
+      router.push("/manager")
     } else {
       router.push("/");
     }

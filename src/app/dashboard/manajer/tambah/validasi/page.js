@@ -149,20 +149,6 @@ export default function TambahManajer() {
                 )}
                           />
                           
-                          <FormField
-                control={form.control}
-                name="acces"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Hak Akses</FormLabel>
-                    <FormControl>
-                            <Input type="text" placeholder="Mengelola Pendaftaran
-                       Validasi Pembayaran" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
 
             <div className="w-full flex items-center justify-end gap-2">

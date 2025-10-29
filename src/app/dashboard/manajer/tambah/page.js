@@ -134,58 +134,6 @@ export default function TambahManajer() {
               />
             </div>
 
-            {/* === BAGIAN 2: HAK AKSES === */}
-            <h2 className="text-3xl sm:text-2xl font-semibold mb-6 mt-12 w-full border-b-2 border-black pb-2 text-[var(--green)]">
-              Hak Akses Manajer Baru
-            </h2>
-
-            <div className="flex flex-col gap-5 p-6 border rounded-xl bg-[var(--light-cream)]">
-              <FormField
-                control={form.control}
-                name="hakAkses"
-                render={() => (
-                  <FormItem>
-                    <div className="flex flex-col space-y-3 mt-2">
-                      {[
-                        { id: "pendaftaran", label: "Mengelola Pendaftaran" },
-                        { id: "pembayaran", label: "Validasi Pembayaran" },
-                        { id: "reports", label: "View Reports" },
-                        { id: "delete", label: "Delete Data" },
-                      ].map((item) => (
-                        <FormField
-                          key={item.id}
-                          control={form.control}
-                          name="hakAkses"
-                          render={({ field }) => {
-                            const value = field.value || [];
-                            return (
-                              <FormItem
-                                key={item.id}
-                                className="flex flex-row space-x-3 space-y-0 items-center"
-                              >
-                                <FormControl className="flex justify-center">
-                                  <Checkbox
-                                    checked={value.includes(item.id)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([...value, item.id])
-                                        : field.onChange(value.filter((v) => v !== item.id));
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-medium text-lg">{item.label}</FormLabel>
-                              </FormItem>
-                            );
-                          }}
-                        />
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
             <div className="w-full flex items-center justify-end gap-2">
               <Link href="/dashboard/manajer/tambah/validasi">
               <Button type="submit" variant={"matcha"} className={"w-48 rounded-md"}>
