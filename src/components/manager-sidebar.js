@@ -48,7 +48,7 @@ const data = {
   navMain: [
   {
     title: "Data Pendaftar",
-    url: "/dashboard",
+    url: "/manager",
     icon: SquareTerminal,
     isActive: true,
     items: [
@@ -67,46 +67,8 @@ const data = {
     ],
   },
   {
-    title: "Data Manajer",
-    url: "/dashboard/manajer",
-    icon: Bot,
-    items: [
-      {
-        title: "Daftar Manajer",
-        url: "/dashboard/manajer",
-      },
-      {
-        title: "Detail Manajer",
-        url: "/manajer/detail",
-      },
-      {
-        title: "Performa Manajer",
-        url: "/manajer/performa",
-      },
-    ],
-  },
-  {
-    title: "Tambahkan Manajer",
-    url: "/dashboard/manajer/tambah",
-    icon: BookOpen,
-    items: [
-      {
-        title: "Form Tambah",
-        url: "/dashboard/manajer/tambah",
-      },
-      {
-        title: "Panduan Tambah",
-        url: "/manajer/tambah/panduan",
-      },
-      {
-        title: "Riwayat Tambah",
-        url: "/manajer/tambah/history",
-      },
-    ],
-  },
-  {
     title: "Statistika",
-    url: "/dashboard/statistika",
+    url: "/manager/statistika",
     icon: Settings2,
     items: [
       {
@@ -129,7 +91,7 @@ const data = {
   },
   {
     title: "Keuangan",
-    url: "/dashboard/keuangan",
+    url: "/manager/keuangan",
     icon: Wallet,
     items: [
       {

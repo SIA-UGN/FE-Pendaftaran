@@ -74,7 +74,7 @@ export function ApplicantTable() {
             <TableCell>{student.major}</TableCell>
             <TableCell>{student.status}</TableCell>
             <TableCell className="text-right">
-              <Link href="/dashboard/profile">
+              <Link href="/manager/profile">
               <Button size="sm" variant="outline">
                 Lihat
               </Button>
