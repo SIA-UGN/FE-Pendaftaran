@@ -503,93 +503,86 @@ export const useAuthContext = () => {
 ## 12. MAIN APP SETUP (APP ROUTER)
 # ==================================
 
-# app/layout.js
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { Toaster } from 'react-hot-toast';
-import { AuthProvider } from '@/contexts/AuthContext';
+# app/layout.js (Server Component)
+import { Providers } from './providers';
 import './globals.css';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 60 * 1000, // 1 minute
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-    mutations: {
-      retry: 1,
-    },
-  },
-});
+export const metadata = {
+  title: 'SIA System',
+  description: 'Student Information System',
+  keywords: ['SIA', 'Student', 'Registration', 'Education'],
+};
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            {children}
-            <Toaster 
-              position="top-right"
-              toastOptions={{
-                duration: 4000,
-                style: {
-                  background: '#363636',
-                  color: '#fff',
-                },
-                success: {
-                  duration: 3000,
-                  iconTheme: {
-                    primary: '#10B981',
-                    secondary: '#fff',
-                  },
-                },
-                error: {
-                  duration: 5000,
-                  iconTheme: {
-                    primary: '#EF4444',
-                    secondary: '#fff',
-                  },
-                },
-              }}
-            />
-            <ReactQueryDevtools initialIsOpen={false} />
-          </AuthProvider>
-        </QueryClientProvider>
+      <body className="bg-gray-50 min-h-screen">
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
 }
 
-# app/providers.js (Alternative Client Component approach)
+# app/providers.js (Client Component)
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from '@/contexts/AuthContext';
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 60 * 1000,
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-    mutations: {
-      retry: 1,
-    },
-  },
-});
+import { useState } from 'react';
 
 export function Providers({ children }) {
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 60 * 1000, // 1 minute
+        retry: 1,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: true,
+      },
+      mutations: {
+        retry: 1,
+      },
+    },
+  }));
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        {children}
-        <Toaster position="top-right" />
-        <ReactQueryDevtools initialIsOpen={false} />
+        <main className="min-h-screen">
+          {children}
+        </main>
+        <Toaster 
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#363636',
+              color: '#fff',
+              fontSize: '14px',
+            },
+            success: {
+              duration: 3000,
+              iconTheme: {
+                primary: '#10B981',
+                secondary: '#fff',
+              },
+            },
+            error: {
+              duration: 5000,
+              iconTheme: {
+                primary: '#EF4444',
+                secondary: '#fff',
+              },
+            },
+          }}
+        />
+        {process.env.NODE_ENV === 'development' && (
+          <ReactQueryDevtools initialIsOpen={false} />
+        )}
       </AuthProvider>
     </QueryClientProvider>
   );
@@ -1061,31 +1054,8 @@ export default function PaymentStatus() {
   return null;
 }
 
-## 15. UTILS & HELPERS
+## 15. UTILS (MINIMAL)
 # ===================
-
-# utils/auth.js
-export const getToken = () => {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('access_token');
-  }
-  return null;
-};
-
-export const getUser = () => {
-  if (typeof window !== 'undefined') {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
-  }
-  return null;
-};
-
-export const clearAuth = () => {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('user');
-  }
-};
 
 # utils/format.js
 export const formatCurrency = (amount) => {
@@ -1104,67 +1074,7 @@ export const formatDate = (date) => {
   }).format(new Date(date));
 };
 
-## 16. CONSTANTS
-# ==============
-
-# constants/api.js
-export const API_ENDPOINTS = {
-  AUTH: {
-    LOGIN: '/auth/login',
-    REGISTER: '/auth/register',
-    LOGOUT: '/auth/logout',
-    USER: '/auth/user',
-    REFRESH: '/auth/refresh-token',
-  },
-  REGISTRATION: {
-    PROGRESS: '/registration/progress',
-    MY: '/registration/my',
-    PERSONAL_IDENTITY: '/registration/personal-identity',
-    ADDRESS_INFORMATION: '/registration/address-information',
-    ACADEMIC_BACKGROUND: '/registration/academic-background',
-    FAMILY_DATA: '/registration/family-data',
-    ACHIEVEMENTS: '/registration/achievements',
-    SUBMIT: '/registration/submit',
-  },
-  PAYMENT: {
-    MY: '/payment/my',
-    CREATE: '/payment',
-    UPLOAD_PROOF: (id) => `/payments/${id}/upload-proof`,
-  },
-  ADMIN: {
-    REGISTRATIONS: '/registrations',
-    PAYMENTS: '/payments',
-    ANNOUNCEMENTS: '/announcements',
-  },
-};
-
-# constants/roles.js
-export const ROLES = {
-  APPLICANT: 'applicant',
-  STUDENT: 'student',
-  MANAGER: 'manager',
-  ADMIN: 'admin',
-};
-
-# constants/status.js
-export const REGISTRATION_STATUS = {
-  DRAFT: 'draft',
-  SUBMITTED: 'submitted',
-  UNDER_REVIEW: 'under_review',
-  REVISION_NEEDED: 'revision_needed',
-  APPROVED: 'approved',
-  REJECTED: 'rejected',
-};
-
-export const PAYMENT_STATUS = {
-  PENDING: 'pending',
-  WAITING_VERIFICATION: 'waiting_verification',
-  VERIFIED: 'verified',
-  REJECTED: 'rejected',
-  EXPIRED: 'expired',
-};
-
-## 17. PAGE EXAMPLES
+## 16. PAGE EXAMPLES
 # ==================
 
 # app/login/page.js
@@ -1422,12 +1332,13 @@ function AdminDashboard() {
    - Integration tests
    - E2E tests with Playwright
 
-## FOLDER STRUCTURE (APP ROUTER)
-# =================================
+## FOLDER STRUCTURE (APP ROUTER - MINIMAL)
+# =========================================
 
 src/
 ├── app/
-│   ├── layout.js                    // Root layout
+│   ├── layout.js                    // Root layout (server component)
+│   ├── providers.js                 // Client providers
 │   ├── page.js                      // Homepage
 │   ├── globals.css                  // Global styles
 │   ├── login/
@@ -1468,12 +1379,23 @@ src/
 │   ├── admin/
 │   └── common/
 ├── contexts/
+│   └── AuthContext.js
 ├── hooks/
+│   ├── useAuth.js
+│   ├── useRegistration.js
+│   └── usePayment.js
 ├── lib/
+│   └── api.js
 ├── services/
-├── utils/
-├── constants/
+│   ├── authService.js
+│   ├── registrationService.js
+│   ├── paymentService.js
+│   └── announcementService.js
+├── utils/                           // MINIMAL - Only essential utils
+│   └── format.js                    // formatCurrency, formatDate
 └── styles/
+
+middleware.js                        // Root level - route protection
 
 This setup provides a complete, production-ready Next.js App Router application with:
 - TanStack Query for state management
@@ -1486,3 +1408,4 @@ This setup provides a complete, production-ready Next.js App Router application 
 - Performance optimizations
 - App Router compatibility with proper SSR handling
 - Client component optimization for browser-only features
+- Minimal and clean architecture
