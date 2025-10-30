@@ -74,21 +74,18 @@ export default function Navbar() {
   const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
 
   return (
-    <nav className="w-full flex items-center justify-between px-12 bg-[var(--green)] z-[1000] fixed top-0">
+    <nav className="w-full flex items-center justify-between px-12 bg-[var(--green)] z-[1000] fixed top-0 border-b-2 border-[var(--yellow)]">
       <div className="py-4 flex items-center gap-3">
         <Link href="/" className="flex items-center gap-3">
-          <Image src="/logo.svg" width={60} height={60} alt="Logo" />
-          <p className="text-[var(--cream)] font-regular text-lg hidden sm:block">
+          <Image src="/logo.svg" width={60} height={75} alt="Logo" />
+          <p className="text-[var(--cream)] font-medium text-lg/6 hidden sm:block text-wrap w-[200px]">
             Universitas Global Nusantara
           </p>
         </Link>
       </div>
 
-
-      
-
       <div className="flex gap-6 items-center">
-      <div className="hidden md:flex">
+      <div className="hidden md:flex h-full">
         <NavigationMenu>
           <NavigationMenuList className="w-fit">
             <NavigationMenuItem>
@@ -154,7 +151,7 @@ export default function Navbar() {
             </DropdownMenu>
           </>
         ) : (
-          <Link href="/login" className="text-[var(--cream)] font-bold text-md hover:bg-white  py-1 px-6 rounded-lg">
+          <Link href="/login" className="text-white bg-[var(--yellow)] font-bold text-md hover:bg-white  py-1 px-6 rounded-lg hover:text-[var(--yellow)]">
             Login
           </Link>
         )}
