@@ -504,37 +504,53 @@ export const useAuthContext = () => {
 # ==================================
 
 # app/layout.js (Server Component)
-import { Providers } from './providers';
-import './globals.css';
+import "./globals.css";
+import { Poppins } from "next/font/google";
+import Providers from "@/components/Providers";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-poppins",
+});
 
 export const metadata = {
-  title: 'SIA System',
-  description: 'Student Information System',
-  keywords: ['SIA', 'Student', 'Registration', 'Education'],
+  title: "Universitas Global Nusantara",
+  description: "Sistem Informasi Akademik Universitas Global Nusantara",
+  icons: {
+    icon: "/logo.jpg",
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="bg-gray-50 min-h-screen">
+      <body className={`${poppins.variable} font-sans bg-white text-gray-900 antialiased`}>
         <Providers>
-          {children}
+          <Navbar />
+          <main className="min-h-screen">
+            {children}
+          </main>
+          <Footer />
         </Providers>
       </body>
     </html>
   );
 }
 
-# app/providers.js (Client Component)
-'use client';
+# components/Providers.js (Client Component - ALL PROVIDERS COMBINED)
+"use client";
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { Toaster } from 'react-hot-toast';
-import { AuthProvider } from '@/contexts/AuthContext';
-import { useState } from 'react';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { Toaster } from "react-hot-toast";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "next-themes";
+import { useState } from "react";
 
-export function Providers({ children }) {
+export default function Providers({ children }) {
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
       queries: {
@@ -552,37 +568,41 @@ export function Providers({ children }) {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <main className="min-h-screen">
+        <ThemeProvider
+          attribute="class"         
+          defaultTheme="light"      
+          enableSystem={false}     
+        >
           {children}
-        </main>
-        <Toaster 
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#363636',
-              color: '#fff',
-              fontSize: '14px',
-            },
-            success: {
-              duration: 3000,
-              iconTheme: {
-                primary: '#10B981',
-                secondary: '#fff',
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: "#363636",
+                color: "#fff",
+                fontSize: "14px",
               },
-            },
-            error: {
-              duration: 5000,
-              iconTheme: {
-                primary: '#EF4444',
-                secondary: '#fff',
+              success: {
+                duration: 3000,
+                iconTheme: {
+                  primary: "#10B981",
+                  secondary: "#fff",
+                },
               },
-            },
-          }}
-        />
-        {process.env.NODE_ENV === 'development' && (
-          <ReactQueryDevtools initialIsOpen={false} />
-        )}
+              error: {
+                duration: 5000,
+                iconTheme: {
+                  primary: "#EF4444",
+                  secondary: "#fff",
+                },
+              },
+            }}
+          />
+          {process.env.NODE_ENV === "development" && (
+            <ReactQueryDevtools initialIsOpen={false} />
+          )}
+        </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
