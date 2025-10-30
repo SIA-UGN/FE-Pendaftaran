@@ -18,6 +18,7 @@ html {
   --dark-green: oklch(0.467 0.083 182.489);
   --cream: #CBA400;
   --light-cream: #F5EFD3;
+  --light-green: rgba(230, 238, 233, 1);
 
   --font-poppins: 'Poppins', sans-serif;
   --radius: 0.625rem;

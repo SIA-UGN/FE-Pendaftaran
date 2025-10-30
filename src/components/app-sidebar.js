@@ -10,8 +10,12 @@ import {
   GalleryVerticalEnd,
   Map,
   PieChart,
+  ChartPie,
   Settings2,
   SquareTerminal,
+  Users,
+  UserLock,
+  UserPlus,
 } from "lucide-react"
 
 import {
@@ -22,6 +26,8 @@ import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
+import { SidebarTrigger } from "@/components/ui/sidebar"
+
 import {
   Sidebar,
   SidebarContent,
@@ -29,7 +35,8 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import {Wallet } from "lucide-react";
+import { Wallet } from "lucide-react";
+
 
 // This is sample data.
 const data = {
@@ -49,7 +56,7 @@ const data = {
   {
     title: "Data Pendaftar",
     url: "/dashboard",
-    icon: SquareTerminal,
+    icon: Users,
     isActive: true,
     items: [
       {
@@ -69,7 +76,7 @@ const data = {
   {
     title: "Data Manajer",
     url: "/dashboard/manajer",
-    icon: Bot,
+    icon: UserLock,
     items: [
       {
         title: "Daftar Manajer",
@@ -88,7 +95,7 @@ const data = {
   {
     title: "Tambahkan Manajer",
     url: "/dashboard/manajer/tambah",
-    icon: BookOpen,
+    icon: UserPlus,
     items: [
       {
         title: "Form Tambah",
@@ -107,7 +114,7 @@ const data = {
   {
     title: "Statistika",
     url: "/dashboard/statistika",
-    icon: Settings2,
+    icon: ChartPie,
     items: [
       {
         title: "Data Umum",
@@ -174,19 +181,24 @@ export function AppSidebar({
   ...props
 }) {
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
-      </SidebarHeader>
-      <DropdownMenuSeparator/>
-      <SidebarContent>
-        <NavMain items={data.navMain} />
-        {/* <NavProjects projects={data.projects} /> */}
-      </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={data.user} />
-      </SidebarFooter>
-      <SidebarRail />
-    </Sidebar>
+    <div className="bg-[var(--light-green)] flex">
+      <Sidebar collapsible="icon" {...props} className={"h-[92.5vh] mt-auto"}>
+        {/* <SidebarHeader>
+          <TeamSwitcher teams={data.teams} />
+        </SidebarHeader> */}
+        <DropdownMenuSeparator/>
+        <SidebarContent>
+          <NavMain items={data.navMain} />
+          {/* <NavProjects projects={data.projects} /> */}
+        </SidebarContent>
+        <SidebarFooter>
+          <NavUser user={data.user} />
+        </SidebarFooter>
+        <SidebarRail />
+      </Sidebar>
+      
+      <SidebarTrigger className="-ml-1 mt-28 bg-white p-6" />
+    </div>
+
   );
 }
