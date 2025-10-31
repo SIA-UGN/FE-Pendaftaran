@@ -1,21 +1,19 @@
 import { NextResponse } from "next/server";
 
 export async function middleware(request) {
-  const pathname = request.nextUrl;
+  const { pathname } = request.nextUrl;
 
   //   protected routes
   const protectedRoutes = ["/dashboard", "/registration", "/payment", "/admin"];
-  const authRoutes = ["/login", "/register"];
+  const authRoutes = ["/login", "/register", "/forgot-passwrord", "/reset-password"];
 
   const authHeader = request.headers.get("authorization");
   const token =
     authHeader?.replace("Bearer ", "") ||
     request.cookies.get("access_token")?.value;
 
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
-  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
+  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
+  const isAuthRoute = authRoutes.some(route => pathname.startsWith(route));
 
   if (isProtectedRoute && !token) {
     return NextResponse.redirect(new URL("/login", request.url));
