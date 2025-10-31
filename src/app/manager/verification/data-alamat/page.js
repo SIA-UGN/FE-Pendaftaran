@@ -159,7 +159,7 @@ export default function DataAlamat() {
 
         </div>
           <div className="w-full flex items-center justify-end my-12 px-12">
-                        <Link href="/manager/verification/data-akademik" className="w-48"><Button type="submit" variant={"matcha"} className={"w-full"}>Lanjut</Button></Link>
+                    <Link href="/manager/verification/data-orangtua" className="w-48"><Button type="submit" variant={"matcha"} className={"w-full"}>Lanjut</Button></Link>
                     </div>
         </form>
       </Form>

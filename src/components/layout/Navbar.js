@@ -33,6 +33,7 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [user, setUser] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [hasNotification, setHasNotification] = useState(true);
 
  useEffect(() => {
   const fetchUser = async () => {
@@ -125,8 +126,14 @@ export default function Navbar() {
 
       <div className="hidden md:flex items-center gap-4">
         {isLoggedIn ? (
-          <>
-            <Bell className="w-6 h-6 cursor-pointer hover:text-white/90 text-white" />
+            <>
+             <Link href="/notifikasi" className="relative">
+              <Bell className="w-6 h-6 cursor-pointer hover:text-white/90 text-white" />
+
+              {hasNotification && (
+                <span className="absolute top-0 right-0 block w-2.5 h-2.5 bg-[var(--yellow)] rounded-full ring-1 ring-white"></span>
+              )}
+            </Link>
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Avatar>

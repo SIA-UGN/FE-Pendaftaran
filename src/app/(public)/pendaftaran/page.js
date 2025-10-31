@@ -18,12 +18,12 @@ export default function PendaftaranPage() {
                 <RegistrationProgress />
                 <UrutanTahapan />
                 <Ketentuan />
-                <Link href="/data-diri" className={"w-10/12 mb-12"}>
+                <Link href="/pendaftaran/data-diri" className={"w-lg ms-auto mb-12"}>
                     <Button
-                                        type="button"
-                                        variant="matcha"
-                                        className={"w-full"}
-                                    > Mulai Pendaftaran
+                        type="button"
+                        variant="green"
+                        className={"w-full"}
+                    > Mulai Pendaftaran
                     </Button>
                 </Link>
             </div>

@@ -30,6 +30,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
+import {Card} from "@/components/ui/card"
+
 const FormSchema = z.object({
   rekening: z.string({
     required_error: "Silakan pilih rekening tujuan pembayaran.",
@@ -58,82 +60,41 @@ export default function Pembayaran() {
       <div className="flex items-center gap-2 mx-12 mt-6 pt-12  pb-0">
                 <CheckCircle className="text-green-500" />
                 <h2 className="text-xl font-semibold">Pembayaran</h2>
-    </div>
+      </div>
+      <h2 className="text-3xl sm:text-2xl font-semibold mt-12 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)] mx-12">Rincian Pembayaran</h2>
+      <Card className={"mx-12 p-6 gap-0"}>
+        <h1 className="font-bold text-lg text-[var(--green)] mb-4">Ringkasan Pembayaran</h1>
+        <div className="ms-6 gap-4">
+          <p>Nama Pengguna</p>
+          <p>Nomor Pengguna</p>
+          <p>Rp 300.000</p>
+          <p>Metode Pembayaran</p>
+        </div>
+      </Card>
+
+      <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)] mx-12">Bukti Pembayaran</h2>
+      <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)] mx-12">Validation Notes</h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="flex flex-col gap-5 p-12 border rounded-xl m-12 bg-[var(--light-cream)]">
-          <FormField
-            control={form.control}
-            name="rekening"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Pilih Rekening Pembayaran</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih rekening tujuan" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="bca">BCA - 123456789 a/n Universitas</SelectItem>
-                    <SelectItem value="bni">BNI - 987654321 a/n Universitas</SelectItem>
-                    <SelectItem value="mandiri">Mandiri - 555222111 a/n Universitas</SelectItem>
-                    <SelectItem value="bri">BRI - 111222333 a/n Universitas</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="buktiBayar"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Upload Bukti Pembayaran</FormLabel>
-                <FormControl>
-                  <Input
-                    type="file"
-                    accept=".jpg,.jpeg,.png,.pdf"
-                    onChange={(e) => field.onChange(e.target.files)}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
 
           </div>
-          <div className="flex flex-col m-12 gap-5 items-center">
-          <Button type="button"
-                    variant="matcha"
-                    className={"w-10/12 cursor-pointer"}>
-          <AlertDialog>
-            <AlertDialogTrigger>Konfirmasi Pembayaran</AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Konfirmasi Pembayaran</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Silahkan upload bukti pembayaran anda!
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <Input id='picture' type='file'></Input>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction>Continue</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-          </Button>
-          <Link href="/manager" className={"w-10/12"}>
+          <div className="flex ms-auto gap-5 mx-12">
+          <Link href="/manager/verification/data-prestasi" className="ms-auto">
                   <Button
                     type="button"
                     variant="matcha"
-                    className={"w-full"}
-                  > Kembali Ke Tahap Pendaftaran
+                    className={"w-sm"}
+                  > Batal
                   </Button>
-                </Link>
+            </Link>
+            <Link href="/manager">
+            <Button type="button"
+                      variant="matcha"
+                      className={"w-sm cursor-pointer"}>
+                      Simpan
+            </Button>
+          </Link>
             </div>
         </form>
       </Form>
