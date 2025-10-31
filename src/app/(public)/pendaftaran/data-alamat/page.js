@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from 'next/link'
+import RegistrationProgress from "@/components/RegistrationProgress";
 
 const FormSchema = z.object({
   provinsi: z.string().min(1, { message: "Provinsi wajib diisi." }),
@@ -48,6 +49,7 @@ export default function DataAlamat() {
 
   return (
     <>
+      <RegistrationProgress />
       <div className="flex items-center gap-2 m-12 mt-6 pt-12">
             <CheckCircle className="text-green-500" />
             <h2 className="text-xl font-semibold">Data Alamat</h2>
@@ -158,7 +160,7 @@ export default function DataAlamat() {
 
         </div>
           <div className="w-full flex items-center justify-end my-12 px-12">
-                        <Link href="/pendaftaran/data-orangtua" className="w-48"><Button type="submit" variant={"matcha"} className={"w-full"}>Lanjut</Button></Link>
+                        <Link href="/pendaftaran/data-akademik" className="w-48"><Button type="submit" variant={"matcha"} className={"w-full"}>Lanjut</Button></Link>
                     </div>
         </form>
       </Form>

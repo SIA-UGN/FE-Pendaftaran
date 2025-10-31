@@ -21,7 +21,7 @@ export default function Footer() {
       <div className="flex flex-col items-center text-center gap-8 z-10">
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4 text-2xl font-bold">
           <Image src="/logo.svg" width={90} height={90} alt="logo" />
-          <p className="max-w-[300px] sm:max-w-none text-xl sm:text-2xl leading-tight">
+          <p className="max-w-[300px] sm:max-w-none text-2xl sm:text-xl leading-tight font-bold">
             UNIVERSITAS GLOBAL NUSANTARA
           </p>
         </div>

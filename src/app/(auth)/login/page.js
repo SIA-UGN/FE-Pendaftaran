@@ -19,6 +19,7 @@ import Link from "next/link";
 import { setCookie } from "cookies-next";
 import ReCAPTCHA from "react-google-recaptcha";
 
+import { jwtDecode } from "jwt-decode";
 
 export default function Login() {
   const router = useRouter();
@@ -41,15 +42,12 @@ export default function Login() {
 
   try {
     const res = await fetch("http://localhost:8000/api/auth/login", {
-      method: "POST", // ✅ gunakan POST, bukan GET
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
+      body: JSON.stringify({ email, password }),
     });
 
     const data = await res.json();
@@ -59,19 +57,27 @@ export default function Login() {
       return;
     }
 
-    // ✅ simpan token yang dikirim backend
-    const token = data.data?.access_token || data.token;
+    const token = data.data?.access_token;
+    const role = data.data?.user?.roles?.[0] || "user";
+
     if (!token) {
       setError("Token tidak ditemukan di respons server");
       return;
     }
 
-    setCookie("access_token", token, {
-      path: "/",
-      maxAge: 60 * 60 * 24 * 3, // 3 hari
-    });
+    // Simpan ke cookie
+    setCookie("access_token", token, { path: "/", maxAge: 60 * 60 * 24 * 3 });
+    setCookie("role", role, { path: "/", maxAge: 60 * 60 * 24 * 3 });
 
-    router.push("/");
+    // Arahkan user
+    if (role === "admin") {
+      router.push("/dashboard");
+    } else if (role == "manager") {
+      router.push("/manager")
+    } else {
+      router.push("/");
+    }
+
   } catch (err) {
     console.error(err);
     setError("Terjadi kesalahan saat login");
@@ -80,9 +86,10 @@ export default function Login() {
   }
 }
 
+
   return (
     <div className="flex items-center gap-6 w-screen h-screen justify-center bg-[url('/auth.png')] bg-cover ">
-      <Card className="w-3/4 w-m-7/8 max-w-11/12 flex flex-col md:flex-row gap-2 p-12 md:p-0 h-full md:h-3/4 relative rounded-[5vw]">
+      <Card className="w-3/4 w-m-7/8 max-w-11/12 flex flex-col md:flex-row gap-2 p-12 md:p-0 h-full md:h-3/4 relative rounded-[5vw] bg-white">
         <div className="w-full md:w-3/8  min-h-fit md:h-11/10 bg-[var(--green)] flex items-center justify-between flex-col px-4 gap-4 rounded-[5vw] md:absolute overflow-hidden left-md:[-10px] md:top-1/2 md:-translate-y-1/2 py-12">
           <div className="flex flex-col items-center gap-2 w-full h-3/4 justify-center">
             <div className="relative w-32 h-32 sm:w-48 sm:h-48 md:w-60 md:h-60 lg:w-72 lg:h-72">
@@ -168,7 +175,7 @@ export default function Login() {
                 <Button
                   type="submit"
                   className="w-full rounded-full text-white hover:text-white"
-                  variant={"matcha"}
+                  variant={"green"}
                   disabled={loading}
                 >
                   {loading ? "Logging in..." : "Login"}

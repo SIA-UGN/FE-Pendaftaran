@@ -77,9 +77,9 @@ export default function Announcement() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center pt-4 pb-16 px-4 sm:px-8 max-w-11/12 mx-auto">
+    <div className="flex flex-col items-center pt-4 pb-16 px-4 sm:px-8 max-w-10/12 mx-auto">
 
-        <h2 className="text-xl sm:text-2xl font-medium mb-4 w-full border-b-2 border-black pb-2">
+        <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
           Pengumuman
         </h2>
         {
