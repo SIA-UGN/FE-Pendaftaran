@@ -66,3 +66,51 @@ export const useLogout = () => {
     },
   });
 };
+
+export const useForgotPassword = () => {
+  return useMutation({
+    mutationFn: authService.forgotPassword,
+    onSuccess: (data) => {
+      toast.success("Password reset link has been sent to your email!");
+      if (process.env.NODE_ENV === "development" && data?.data?.reset_token) {
+        console.log("Reset token (dev only):", data.data.reset_token);
+      }
+    },
+    onError: (error) => {
+      const message =
+        error?.response?.data?.message || "Failed to send password reset link.";
+      toast.error(message);
+    },
+  });
+};
+
+export const useResetPassword = () => {
+  const router = useRouter();
+
+  return useMutation({
+    mutationFn: authService.resetPassword,
+    onSuccess: () => {
+      toast.success("Password has been reset successfully!");
+      router.push("/login");
+    },
+    onError: (error) => {
+      const message =
+        error?.response?.data?.message || "Failed to reset password.";
+      toast.error(message);
+    },
+  });
+};
+
+export const useChangePassword = () => {
+  return useMutation({
+    mutationFn: authService.changePassword,
+    onSuccess: () => {
+      toast.success("Password has been changed successfully!");
+    },
+    onError: (error) => {
+      const message =
+        error?.response?.data?.message || "Failed to change password.";
+      toast.error(message);
+    },
+  });
+};
