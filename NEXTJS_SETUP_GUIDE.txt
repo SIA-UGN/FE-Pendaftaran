@@ -20,7 +20,7 @@ NEXT_PUBLIC_APP_NAME=SIA System
 
 # lib/api.js
 import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
@@ -157,13 +157,39 @@ export const notificationService = {
   clearRead: () => apiClient.delete('/notifications/read/clear'),
 };
 
-## 9. AUTH HOOKS
+## 9. PROFILE SERVICE
+# ===================
+
+# services/profileService.js
+import apiClient from '@/lib/api';
+
+export const profileService = {
+  // Get user profile
+  getProfile: () => apiClient.get('/profile'),
+  
+  // Update profile (name, phone, date_of_birth, gender)
+  updateProfile: (data) => apiClient.put('/profile', data),
+  
+  // Upload avatar image
+  uploadAvatar: (file) => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    return apiClient.post('/profile/avatar', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  
+  // Delete avatar (revert to default)
+  deleteAvatar: () => apiClient.delete('/profile/avatar'),
+};
+
+## 10. AUTH HOOKS
 # ==============
 
 # hooks/useAuth.js
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authService } from '@/services/authService';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -276,13 +302,13 @@ export const useChangePassword = () => {
   });
 };
 
-## 9. REGISTRATION HOOKS
+## 11. REGISTRATION HOOKS
 # ======================
 
 # hooks/useRegistration.js
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { registrationService } from '@/services/registrationService';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 
 export const useRegistrationProgress = () => {
@@ -434,13 +460,13 @@ export const useUpdateRegistrationStatus = () => {
   });
 };
 
-## 10. NOTIFICATION HOOKS
+## 12. NOTIFICATION HOOKS
 # =======================
 
 # hooks/useNotification.js
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notificationService } from '@/services/notificationService';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 export const useNotifications = (params) => {
   return useQuery({
@@ -515,13 +541,84 @@ export const useClearReadNotifications = () => {
   });
 };
 
-## 11. PAYMENT HOOKS
+## 13. PROFILE HOOKS
+# ===================
+
+# hooks/useProfile.js
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { profileService } from '@/services/profileService';
+import { toast } from 'react-hot-toast';
+
+// Get user profile
+export const useProfile = () => {
+  return useQuery({
+    queryKey: ['profile'],
+    queryFn: profileService.getProfile,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+// Update profile mutation
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (data) => profileService.updateProfile(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: ['auth', 'user'] });
+      toast.success('Profile updated successfully!');
+    },
+    onError: (error) => {
+      const message = error?.response?.data?.message || 'Failed to update profile';
+      toast.error(message);
+    },
+  });
+};
+
+// Upload avatar mutation
+export const useUploadAvatar = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (file) => profileService.uploadAvatar(file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: ['auth', 'user'] });
+      toast.success('Avatar uploaded successfully!');
+    },
+    onError: (error) => {
+      const message = error?.response?.data?.message || 'Failed to upload avatar';
+      toast.error(message);
+    },
+  });
+};
+
+// Delete avatar mutation
+export const useDeleteAvatar = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: profileService.deleteAvatar,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: ['auth', 'user'] });
+      toast.success('Avatar deleted successfully!');
+    },
+    onError: (error) => {
+      const message = error?.response?.data?.message || 'Failed to delete avatar';
+      toast.error(message);
+    },
+  });
+};
+
+## 14. PAYMENT HOOKS
 # ==================
 
 # hooks/usePayment.js
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { paymentService } from '@/services/paymentService';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 export const useMyPayment = () => {
   return useQuery({
@@ -592,13 +689,13 @@ export const useVerifyPayment = () => {
   });
 };
 
-## 12. ANNOUNCEMENT HOOKS
+## 15. ANNOUNCEMENT HOOKS
 # =======================
 
 # hooks/useAnnouncement.js
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { announcementService } from '@/services/announcementService';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 export const useAnnouncements = (params) => {
   return useQuery({
@@ -624,7 +721,7 @@ export const useCreateAnnouncement = () => {
   });
 };
 
-## 13. CONTEXT & PROVIDERS
+## 16. CONTEXT & PROVIDERS
 # ========================
 
 # contexts/AuthContext.js
@@ -677,7 +774,7 @@ export const useAuthContext = () => {
   return context;
 };
 
-## 14. MAIN APP SETUP (APP ROUTER)
+## 17. MAIN APP SETUP (APP ROUTER)
 # ==================================
 
 # app/layout.js (Server Component)
@@ -785,7 +882,7 @@ export default function Providers({ children }) {
   );
 }
 
-## 15. MIDDLEWARE FOR ROUTE PROTECTION (APP ROUTER)
+## 18. MIDDLEWARE FOR ROUTE PROTECTION (APP ROUTER)
 # ===================================================
 
 # middleware.js
@@ -842,7 +939,7 @@ export const config = {
   ],
 };
 
-## 16. UTILS (MINIMAL)
+## 19. UTILS (MINIMAL)
 # ===================
 
 # utils/format.js
@@ -862,14 +959,13 @@ export const formatDate = (date) => {
   }).format(new Date(date));
 };
 
-## 17. IMPLEMENTATION
+## 20. IMPLEMENTATION
 # ===================
 
 # app/(auth)/login/page.js
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -884,10 +980,9 @@ import Image from "next/image";
 import Link from "next/link";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useLogin } from "@/hooks/useAuth";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 export default function Login() {
-  const router = useRouter();
   const [captcha, setCaptcha] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -938,6 +1033,16 @@ export default function Login() {
                 Register
               </Button>
             </Link>
+            <Link href="/forgot-password" className="w-8/10 flex-shrink">
+              <Button
+                variant={"yellow"}
+                className={
+                  "w-full rounded-full bg-white text-[var(--green)] hover:bg-white/80"
+                }
+              >
+                Forgot Password
+              </Button>
+            </Link>
           </div>
         </div>
         <div className="w-full flex items-center justify-end">
@@ -960,15 +1065,7 @@ export default function Login() {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <div className="flex items-center">
-                      <Label htmlFor="password">Password</Label>
-                      <Link
-                        href="/forgot-password"
-                        className="ml-auto inline-block text-sm underline"
-                      >
-                        Forgot your password?
-                      </Link>
-                    </div>
+                    <Label htmlFor="password">Password</Label>
                     <Input
                       id="password"
                       type="password"
@@ -1024,7 +1121,7 @@ import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import Link from "next/link";
 import { useRegister } from "@/hooks/useAuth";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -1168,6 +1265,7 @@ export default function RegisterPage() {
    - Database connection strings
    - JWT secrets
    - File upload paths
+   - APP_URL (for correct avatar_url generation)
 
 2. Security Headers (next.config.js):
    - CSP (Content Security Policy)
@@ -1209,6 +1307,10 @@ src/
 │   │   └── page.js                  // Reset password page
 │   ├── dashboard/
 │   │   └── page.js                  // Dashboard page
+│   ├── profile/
+│   │   └── page.js                  // User profile page (with avatar upload)
+│   ├── notifications/
+│   │   └── page.js                  // Notifications page
 │   ├── registration/
 │   │   ├── page.js                  // Registration overview
 │   │   ├── personal-identity/
@@ -1239,6 +1341,14 @@ src/
 │   │   ├── ForgotPasswordForm.js    // Forgot password form
 │   │   ├── ResetPasswordForm.js     // Reset password form
 │   │   └── ChangePasswordForm.js    // Change password form
+│   ├── profile/
+│   │   ├── ProfileForm.js           // Edit profile form
+│   │   ├── AvatarUpload.js          // Avatar upload component
+│   │   └── AvatarDisplay.js         // Avatar display component
+│   ├── notification/
+│   │   ├── NotificationBell.js      // Bell icon with badge
+│   │   ├── NotificationDropdown.js  // Dropdown with recent notifications
+│   │   └── NotificationList.js      // Full notification list
 │   ├── registration/
 │   ├── payment/
 │   ├── admin/
@@ -1248,14 +1358,19 @@ src/
 ├── hooks/
 │   ├── useAuth.js                   // Auth hooks including password reset
 │   ├── useRegistration.js
-│   └── usePayment.js
+│   ├── usePayment.js
+│   ├── useNotification.js           // Notification hooks
+│   ├── useProfile.js                // Profile and avatar hooks
+│   └── useAnnouncement.js
 ├── lib/
 │   └── api.js
 ├── services/
 │   ├── authService.js               // Auth service with password reset
 │   ├── registrationService.js
 │   ├── paymentService.js
-│   └── announcementService.js
+│   ├── announcementService.js
+│   ├── notificationService.js       // Notification service
+│   └── profileService.js            // Profile and avatar service
 ├── utils/                           // MINIMAL - Only essential utils
 │   └── format.js                    // formatCurrency, formatDate
 └── styles/
@@ -1274,3 +1389,7 @@ This setup provides a complete, production-ready Next.js App Router application 
 - App Router compatibility with proper SSR handling
 - Client component optimization for browser-only features
 - Minimal and clean architecture
+- User profile management with avatar upload
+- Real-time notification system with bell icon
+- Password reset and change functionality
+- File upload handling (payment proof, avatar)
