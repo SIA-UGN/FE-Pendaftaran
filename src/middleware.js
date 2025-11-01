@@ -5,15 +5,22 @@ export async function middleware(request) {
 
   //   protected routes
   const protectedRoutes = ["/dashboard", "/registration", "/payment", "/admin"];
-  const authRoutes = ["/login", "/register", "/forgot-passwrord", "/reset-password"];
+  const authRoutes = [
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/reset-password",
+  ];
 
   const authHeader = request.headers.get("authorization");
   const token =
     authHeader?.replace("Bearer ", "") ||
     request.cookies.get("access_token")?.value;
 
-  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
-  const isAuthRoute = authRoutes.some(route => pathname.startsWith(route));
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
+  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
 
   if (isProtectedRoute && !token) {
     return NextResponse.redirect(new URL("/login", request.url));
