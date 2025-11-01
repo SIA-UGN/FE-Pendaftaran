@@ -3,11 +3,11 @@ import Image from 'next/image'
 export default function UrutanTahapan() {
     return (
         <div className="flex flex-col items-center pt-4 pb-16 max-w-11/12 w-full">
-            <h2 className="text-xl sm:text-2xl font-medium mb-8 w-full border-b-2 border-black pb-2">
+            <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
               Urutan Tahapan
             </h2>
-            <div className='flex gap-5 w-full'>
-                <div className="relative w-1/2 h-96 sm:h-96">
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-5 w-full'>
+                <div className="relative h-96 sm:h-96">
                                                     <Image
                                                     src="/auth.png"
                                                     alt="sejarah"
