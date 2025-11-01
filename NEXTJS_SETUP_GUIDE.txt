@@ -141,7 +141,23 @@ export const announcementService = {
   create: (data) => apiClient.post('/announcements', data),
 };
 
-## 8. AUTH HOOKS
+## 8. NOTIFICATION SERVICE
+# ========================
+
+# services/notificationService.js
+import apiClient from '@/lib/api';
+
+export const notificationService = {
+  getAll: (params) => apiClient.get('/notifications', { params }),
+  getUnreadCount: () => apiClient.get('/notifications/unread-count'),
+  getRecent: () => apiClient.get('/notifications/recent'),
+  markAsRead: (id) => apiClient.patch(`/notifications/${id}/read`),
+  markAllAsRead: () => apiClient.post('/notifications/mark-all-read'),
+  delete: (id) => apiClient.delete(`/notifications/${id}`),
+  clearRead: () => apiClient.delete('/notifications/read/clear'),
+};
+
+## 9. AUTH HOOKS
 # ==============
 
 # hooks/useAuth.js
@@ -418,7 +434,88 @@ export const useUpdateRegistrationStatus = () => {
   });
 };
 
-## 10. PAYMENT HOOKS
+## 10. NOTIFICATION HOOKS
+# =======================
+
+# hooks/useNotification.js
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { notificationService } from '@/services/notificationService';
+import { toast } from 'react-hot-toast';
+
+export const useNotifications = (params) => {
+  return useQuery({
+    queryKey: ['notifications', 'all', params],
+    queryFn: () => notificationService.getAll(params),
+    keepPreviousData: true,
+  });
+};
+
+export const useUnreadCount = () => {
+  return useQuery({
+    queryKey: ['notifications', 'unread-count'],
+    queryFn: notificationService.getUnreadCount,
+    refetchInterval: 30000, // Refresh every 30 seconds
+    staleTime: 20000, // Consider data stale after 20 seconds
+  });
+};
+
+export const useRecentNotifications = () => {
+  return useQuery({
+    queryKey: ['notifications', 'recent'],
+    queryFn: notificationService.getRecent,
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+};
+
+export const useMarkAsRead = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (id) => notificationService.markAsRead(id),
+    onSuccess: () => {
+      // Invalidate all notification queries
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
+};
+
+export const useMarkAllAsRead = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: notificationService.markAllAsRead,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      toast.success('All notifications marked as read');
+    },
+  });
+};
+
+export const useDeleteNotification = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (id) => notificationService.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      toast.success('Notification deleted');
+    },
+  });
+};
+
+export const useClearReadNotifications = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: notificationService.clearRead,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      toast.success('Read notifications cleared');
+    },
+  });
+};
+
+## 11. PAYMENT HOOKS
 # ==================
 
 # hooks/usePayment.js
@@ -495,7 +592,7 @@ export const useVerifyPayment = () => {
   });
 };
 
-## 11. CONTEXT & PROVIDERS
+## 12. CONTEXT & PROVIDERS
 # ========================
 
 # contexts/AuthContext.js
@@ -548,7 +645,7 @@ export const useAuthContext = () => {
   return context;
 };
 
-## 12. MAIN APP SETUP (APP ROUTER)
+## 13. MAIN APP SETUP (APP ROUTER)
 # ==================================
 
 # app/layout.js (Server Component)
@@ -656,7 +753,7 @@ export default function Providers({ children }) {
   );
 }
 
-## 13. MIDDLEWARE FOR ROUTE PROTECTION (APP ROUTER)
+## 14. MIDDLEWARE FOR ROUTE PROTECTION (APP ROUTER)
 # ===================================================
 
 # middleware.js
@@ -713,7 +810,7 @@ export const config = {
   ],
 };
 
-## 14. UTILS (MINIMAL)
+## 15. UTILS (MINIMAL)
 # ===================
 
 # utils/format.js
@@ -733,7 +830,7 @@ export const formatDate = (date) => {
   }).format(new Date(date));
 };
 
-## 15. IMPLEMENTATION
+## 16. IMPLEMENTATION
 # ===================
 
 # app/(auth)/login/page.js
