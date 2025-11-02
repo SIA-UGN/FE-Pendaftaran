@@ -1581,6 +1581,2275 @@ export default function ProfilePage() {
   );
 }
 
+# app/(public)/pendaftaran/data-akademik/page.js (Step 3: Academic Background)
+"use client";
+
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { CheckCircle, Loader2, Upload, X } from "lucide-react";
+import { useRegistrationStep } from "@/hooks/useRegistration";
+import toast from "react-hot-toast";
+import Link from "next/link";
+
+// File upload service (Opsi A: Upload first, get URL, then submit)
+const uploadFile = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  
+  try {
+    // Sesuaikan dengan endpoint upload backend Anda
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+      body: formData,
+    });
+    
+    if (!response.ok) throw new Error("Upload failed");
+    
+    const data = await response.json();
+    return data.data.url; // Return URL dari backend
+  } catch (error) {
+    throw new Error("Failed to upload file");
+  }
+};
+
+// Validation Schema
+const MAX_FILE_SIZE = 5000000; // 5MB
+const ACCEPTED_FILE_TYPES = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
+
+const academicSchema = z.object({
+  school_origin: z.string().min(3, "Nama sekolah asal wajib diisi minimal 3 karakter"),
+  graduation_status: z.enum(["graduated", "not_graduated"], {
+    required_error: "Status kelulusan harus dipilih",
+  }),
+  last_certificate: z.enum(["sma", "smk", "ma", "paket_c", "other"], {
+    required_error: "Ijazah terakhir harus dipilih",
+  }),
+});
+
+export default function DataAkademikPage() {
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState({
+    certificate_file: null,
+    graduation_letter_file: null,
+    transcript_file: null,
+    national_exam_file: null,
+    selection_test_file: null,
+  });
+
+  const stepMutation = useRegistrationStep(3);
+
+  const form = useForm({
+    resolver: zodResolver(academicSchema),
+    defaultValues: {
+      school_origin: "",
+      graduation_status: "",
+      last_certificate: "",
+    },
+  });
+
+  // Handle file upload
+  const handleFileUpload = async (fieldName, file) => {
+    if (!file) return;
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("Ukuran file maksimal 5MB");
+      return;
+    }
+
+    // Validate file type
+    if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+      toast.error("Format file harus PDF, JPG, atau PNG");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const fileUrl = await uploadFile(file);
+      setUploadedFiles((prev) => ({
+        ...prev,
+        [fieldName]: { url: fileUrl, name: file.name },
+      }));
+      toast.success(`${file.name} berhasil diupload`);
+    } catch (error) {
+      toast.error("Gagal upload file, silakan coba lagi");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Handle remove uploaded file
+  const handleRemoveFile = (fieldName) => {
+    setUploadedFiles((prev) => ({
+      ...prev,
+      [fieldName]: null,
+    }));
+  };
+
+  // Handle form submit
+  const onSubmit = (data) => {
+    // Validate required files
+    if (!uploadedFiles.certificate_file) {
+      toast.error("Upload ijazah terakhir wajib diisi");
+      return;
+    }
+    if (!uploadedFiles.transcript_file) {
+      toast.error("Upload transkrip nilai/rapor wajib diisi");
+      return;
+    }
+    if (!uploadedFiles.national_exam_file) {
+      toast.error("Upload nilai ujian nasional wajib diisi");
+      return;
+    }
+
+    // Prepare payload with file URLs
+    const payload = {
+      school_origin: data.school_origin,
+      graduation_status: data.graduation_status,
+      last_certificate: data.last_certificate,
+      certificate_file: uploadedFiles.certificate_file?.url || null,
+      graduation_letter_file: uploadedFiles.graduation_letter_file?.url || null,
+      transcript_file: uploadedFiles.transcript_file?.url || null,
+      national_exam_file: uploadedFiles.national_exam_file?.url || null,
+      selection_test_file: uploadedFiles.selection_test_file?.url || null,
+    };
+
+    stepMutation.mutate(payload);
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="flex items-center gap-2 mb-6">
+        <CheckCircle className="text-green-500" />
+        <h1 className="text-2xl font-bold">Step 3: Data Akademik</h1>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Informasi Pendidikan Terakhir</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* School Origin */}
+              <FormField
+                control={form.control}
+                name="school_origin"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Sekolah Asal *</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Contoh: SMA Negeri 1 Jakarta"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Graduation Status & Last Certificate */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="graduation_status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status Kelulusan *</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih status" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="graduated">Sudah Lulus</SelectItem>
+                          <SelectItem value="not_graduated">Belum Lulus</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="last_certificate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ijazah Terakhir *</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih ijazah" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="sma">SMA</SelectItem>
+                          <SelectItem value="smk">SMK</SelectItem>
+                          <SelectItem value="ma">MA</SelectItem>
+                          <SelectItem value="paket_c">Paket C</SelectItem>
+                          <SelectItem value="other">Lainnya</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* File Uploads */}
+              <div className="space-y-4">
+                {/* Certificate File */}
+                <div className="space-y-2">
+                  <Label>Upload Ijazah Terakhir * (PDF/JPG/PNG, Max 5MB)</Label>
+                  {uploadedFiles.certificate_file ? (
+                    <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded">
+                      <span className="text-sm text-green-700">
+                        {uploadedFiles.certificate_file.name}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveFile("certificate_file")}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) =>
+                          handleFileUpload("certificate_file", e.target.files?.[0])
+                        }
+                        disabled={isUploading}
+                      />
+                      {isUploading && <Loader2 className="w-4 h-4 animate-spin" />}
+                    </div>
+                  )}
+                </div>
+
+                {/* Graduation Letter (Optional if not graduated) */}
+                <div className="space-y-2">
+                  <Label>Upload SKL (Jika Ijazah Belum Keluar)</Label>
+                  {uploadedFiles.graduation_letter_file ? (
+                    <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded">
+                      <span className="text-sm text-green-700">
+                        {uploadedFiles.graduation_letter_file.name}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveFile("graduation_letter_file")}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Input
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={(e) =>
+                        handleFileUpload("graduation_letter_file", e.target.files?.[0])
+                      }
+                      disabled={isUploading}
+                    />
+                  )}
+                </div>
+
+                {/* Transcript File */}
+                <div className="space-y-2">
+                  <Label>Upload Transkrip Nilai / Rapor 1 Tahun Terakhir *</Label>
+                  {uploadedFiles.transcript_file ? (
+                    <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded">
+                      <span className="text-sm text-green-700">
+                        {uploadedFiles.transcript_file.name}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveFile("transcript_file")}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Input
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={(e) =>
+                        handleFileUpload("transcript_file", e.target.files?.[0])
+                      }
+                      disabled={isUploading}
+                    />
+                  )}
+                </div>
+
+                {/* National Exam File */}
+                <div className="space-y-2">
+                  <Label>Upload Nilai Ujian Nasional *</Label>
+                  {uploadedFiles.national_exam_file ? (
+                    <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded">
+                      <span className="text-sm text-green-700">
+                        {uploadedFiles.national_exam_file.name}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveFile("national_exam_file")}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Input
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={(e) =>
+                        handleFileUpload("national_exam_file", e.target.files?.[0])
+                      }
+                      disabled={isUploading}
+                    />
+                  )}
+                </div>
+
+                {/* Selection Test File (Optional) */}
+                <div className="space-y-2">
+                  <Label>Upload Sertifikat / Surat Rekomendasi (Opsional)</Label>
+                  {uploadedFiles.selection_test_file ? (
+                    <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded">
+                      <span className="text-sm text-green-700">
+                        {uploadedFiles.selection_test_file.name}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveFile("selection_test_file")}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Input
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={(e) =>
+                        handleFileUpload("selection_test_file", e.target.files?.[0])
+                      }
+                      disabled={isUploading}
+                    />
+                  )}
+                </div>
+              </div>
+
+              {/* Navigation Buttons */}
+              <div className="flex justify-between pt-6">
+                <Link href="/pendaftaran/data-alamat">
+                  <Button type="button" variant="outline">
+                    Kembali
+                  </Button>
+                </Link>
+                <Button
+                  type="submit"
+                  variant="matcha"
+                  disabled={stepMutation.isPending || isUploading}
+                >
+                  {stepMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Menyimpan...
+                    </>
+                  ) : (
+                    "Simpan & Lanjut"
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+# app/(public)/pendaftaran/data-alamat/page.js (Step 2: Address Information)
+"use client";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from "@/components/ui/form";
+import { CheckCircle, Loader2 } from "lucide-react";
+import { useRegistrationStep } from "@/hooks/useRegistration";
+import toast from "react-hot-toast";
+import Link from "next/link";
+
+// Validation Schema
+const addressSchema = z.object({
+  province: z.string().min(1, "Provinsi wajib diisi"),
+  city_regency: z.string().min(1, "Kota/Kabupaten wajib diisi"),
+  district: z.string().min(1, "Kecamatan wajib diisi"),
+  village: z.string().min(1, "Kelurahan/Desa wajib diisi"),
+  postal_code: z
+    .string()
+    .min(5, "Kode pos minimal 5 digit")
+    .max(5, "Kode pos maksimal 5 digit")
+    .regex(/^\d+$/, "Kode pos harus berupa angka"),
+  hamlet: z.string().optional(), // Dusun/RW/RT (optional)
+  full_address: z.string().min(10, "Alamat lengkap minimal 10 karakter"),
+});
+
+export default function DataAlamatPage() {
+  const stepMutation = useRegistrationStep(2);
+
+  const form = useForm({
+    resolver: zodResolver(addressSchema),
+    defaultValues: {
+      province: "",
+      city_regency: "",
+      district: "",
+      village: "",
+      postal_code: "",
+      hamlet: "",
+      full_address: "",
+    },
+  });
+
+  const onSubmit = (data) => {
+    stepMutation.mutate(data);
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="flex items-center gap-2 mb-6">
+        <CheckCircle className="text-green-500" />
+        <h1 className="text-2xl font-bold">Step 2: Data Alamat</h1>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Informasi Alamat Lengkap</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Province & City/Regency */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="province"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Provinsi *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Contoh: Jawa Barat" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="city_regency"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Kota/Kabupaten *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Contoh: Bandung" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* District & Village */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="district"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Kecamatan *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Contoh: Coblong" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="village"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Kelurahan/Desa *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Contoh: Lebak Gede" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Postal Code & Hamlet */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="postal_code"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Kode Pos *</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Contoh: 40132"
+                          maxLength={5}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="hamlet"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Dusun/RW/RT (Opsional)</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Contoh: RW 05 RT 02"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Jika ada, sebutkan dusun/RW/RT
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Full Address */}
+              <FormField
+                control={form.control}
+                name="full_address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Alamat Lengkap *</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Contoh: Jl. Dipati Ukur No. 112, Lebak Gede, Coblong"
+                        rows={4}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Tulis alamat lengkap termasuk nama jalan, nomor rumah, RT/RW
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Navigation Buttons */}
+              <div className="flex justify-between pt-6">
+                <Link href="/pendaftaran/data-diri">
+                  <Button type="button" variant="outline">
+                    Kembali
+                  </Button>
+                </Link>
+                <Button
+                  type="submit"
+                  variant="matcha"
+                  disabled={stepMutation.isPending}
+                >
+                  {stepMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Menyimpan...
+                    </>
+                  ) : (
+                    "Simpan & Lanjut"
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+# app/(public)/pendaftaran/data-diri/page.js (Step 1: Personal Identity)
+"use client";
+
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from "@/components/ui/form";
+import { CheckCircle, Loader2, X } from "lucide-react";
+import { useRegistrationStep } from "@/hooks/useRegistration";
+import toast from "react-hot-toast";
+import Link from "next/link";
+
+// File upload service (Opsi A: Upload first, get URL, then submit)
+const uploadFile = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  
+  try {
+    // Sesuaikan dengan endpoint upload backend Anda
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+      body: formData,
+    });
+    
+    if (!response.ok) throw new Error("Upload failed");
+    
+    const data = await response.json();
+    return data.data.url; // Return URL dari backend
+  } catch (error) {
+    throw new Error("Failed to upload file");
+  }
+};
+
+// Validation Schema
+const MAX_FILE_SIZE = 5000000; // 5MB
+const ACCEPTED_FILE_TYPES = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
+
+const personalIdentitySchema = z.object({
+  full_name: z.string().min(2, "Nama lengkap minimal 2 karakter"),
+  email: z.string().email("Email tidak valid"),
+  gender: z.enum(["male", "female"], {
+    required_error: "Jenis kelamin harus dipilih",
+  }),
+  religion: z.enum(["islam", "christian", "catholic", "hindu", "buddha", "confucius", "other"], {
+    required_error: "Agama harus dipilih",
+  }),
+  phone: z.string().min(10, "Nomor ponsel minimal 10 digit"),
+  birth_place: z.string().min(1, "Tempat lahir wajib diisi"),
+  birth_date: z.string().min(1, "Tanggal lahir wajib diisi"),
+  nik_kitas: z.string().length(16, "NIK/KITAS harus 16 digit"),
+  birth_certificate_number: z.string().min(1, "Nomor akta lahir wajib diisi"),
+  family_card_number: z.string().length(16, "Nomor Kartu Keluarga harus 16 digit"),
+  citizenship: z.enum(["wni", "wna"], {
+    required_error: "Kewarganegaraan harus dipilih",
+  }),
+  child_number: z.string().min(1, "Anak ke berapa wajib diisi"),
+  siblings_count: z.string().min(1, "Jumlah saudara wajib diisi"),
+});
+
+export default function DataDiriPage() {
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState({
+    ktp_kitas_file: null,
+    birth_certificate_file: null,
+    family_card_file: null,
+  });
+
+  const stepMutation = useRegistrationStep(1);
+
+  const form = useForm({
+    resolver: zodResolver(personalIdentitySchema),
+    defaultValues: {
+      full_name: "",
+      email: "",
+      gender: "",
+      religion: "",
+      phone: "",
+      birth_place: "",
+      birth_date: "",
+      nik_kitas: "",
+      birth_certificate_number: "",
+      family_card_number: "",
+      citizenship: "",
+      child_number: "",
+      siblings_count: "",
+    },
+  });
+
+  // Handle file upload
+  const handleFileUpload = async (fieldName, file) => {
+    if (!file) return;
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("Ukuran file maksimal 5MB");
+      return;
+    }
+
+    // Validate file type
+    if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+      toast.error("Format file harus PDF, JPG, atau PNG");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const fileUrl = await uploadFile(file);
+      setUploadedFiles((prev) => ({
+        ...prev,
+        [fieldName]: { url: fileUrl, name: file.name },
+      }));
+      toast.success(`${file.name} berhasil diupload`);
+    } catch (error) {
+      toast.error("Gagal upload file, silakan coba lagi");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Handle remove uploaded file
+  const handleRemoveFile = (fieldName) => {
+    setUploadedFiles((prev) => ({
+      ...prev,
+      [fieldName]: null,
+    }));
+  };
+
+  // Handle form submit
+  const onSubmit = (data) => {
+    // Validate required files
+    if (!uploadedFiles.ktp_kitas_file) {
+      toast.error("Upload KTP/KITAS wajib diisi");
+      return;
+    }
+    if (!uploadedFiles.birth_certificate_file) {
+      toast.error("Upload Akta Lahir wajib diisi");
+      return;
+    }
+    if (!uploadedFiles.family_card_file) {
+      toast.error("Upload Kartu Keluarga wajib diisi");
+      return;
+    }
+
+    // Prepare payload with file URLs
+    const payload = {
+      full_name: data.full_name,
+      email: data.email,
+      gender: data.gender,
+      religion: data.religion,
+      phone: data.phone,
+      birth_place: data.birth_place,
+      birth_date: data.birth_date,
+      nik_kitas: data.nik_kitas,
+      birth_certificate_number: data.birth_certificate_number,
+      family_card_number: data.family_card_number,
+      citizenship: data.citizenship,
+      child_number: parseInt(data.child_number),
+      siblings_count: parseInt(data.siblings_count),
+      ktp_kitas_file: uploadedFiles.ktp_kitas_file?.url || null,
+      birth_certificate_file: uploadedFiles.birth_certificate_file?.url || null,
+      family_card_file: uploadedFiles.family_card_file?.url || null,
+    };
+
+    stepMutation.mutate(payload);
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="flex items-center gap-2 mb-6">
+        <CheckCircle className="text-green-500" />
+        <h1 className="text-2xl font-bold">Step 1: Data Diri</h1>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Informasi Identitas Pribadi</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Full Name */}
+              <FormField
+                control={form.control}
+                name="full_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nama Lengkap *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Contoh: Ahmad Fauzi" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Email */}
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email *</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="contoh@email.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Gender & Religion */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="gender"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Jenis Kelamin *</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih jenis kelamin" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="male">Laki-laki</SelectItem>
+                          <SelectItem value="female">Perempuan</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="religion"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Agama *</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih agama" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="islam">Islam</SelectItem>
+                          <SelectItem value="christian">Kristen</SelectItem>
+                          <SelectItem value="catholic">Katolik</SelectItem>
+                          <SelectItem value="hindu">Hindu</SelectItem>
+                          <SelectItem value="buddha">Buddha</SelectItem>
+                          <SelectItem value="confucius">Konghucu</SelectItem>
+                          <SelectItem value="other">Lainnya</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Phone, Birth Place, Birth Date */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nomor Ponsel *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="08xxxxxxxxxx" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="birth_place"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tempat Lahir *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Jakarta" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="birth_date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tanggal Lahir *</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* NIK/KITAS */}
+              <FormField
+                control={form.control}
+                name="nik_kitas"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>NIK / KITAS *</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="16 digit NIK/KITAS"
+                        maxLength={16}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Upload KTP/KITAS */}
+              <div className="space-y-2">
+                <Label>Upload KTP / KITAS * (PDF/JPG/PNG, Max 5MB)</Label>
+                {uploadedFiles.ktp_kitas_file ? (
+                  <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded">
+                    <span className="text-sm text-green-700">
+                      {uploadedFiles.ktp_kitas_file.name}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveFile("ktp_kitas_file")}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={(e) =>
+                        handleFileUpload("ktp_kitas_file", e.target.files?.[0])
+                      }
+                      disabled={isUploading}
+                    />
+                    {isUploading && <Loader2 className="w-4 h-4 animate-spin" />}
+                  </div>
+                )}
+              </div>
+
+              {/* Birth Certificate Number */}
+              <FormField
+                control={form.control}
+                name="birth_certificate_number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nomor Registrasi Akta Lahir *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nomor akta lahir" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Upload Birth Certificate */}
+              <div className="space-y-2">
+                <Label>Upload Akta Kelahiran * (PDF/JPG/PNG, Max 5MB)</Label>
+                {uploadedFiles.birth_certificate_file ? (
+                  <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded">
+                    <span className="text-sm text-green-700">
+                      {uploadedFiles.birth_certificate_file.name}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveFile("birth_certificate_file")}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <Input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={(e) =>
+                      handleFileUpload("birth_certificate_file", e.target.files?.[0])
+                    }
+                    disabled={isUploading}
+                  />
+                )}
+              </div>
+
+              {/* Family Card Number */}
+              <FormField
+                control={form.control}
+                name="family_card_number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nomor Kartu Keluarga *</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="16 digit Nomor KK"
+                        maxLength={16}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Upload Family Card */}
+              <div className="space-y-2">
+                <Label>Upload Kartu Keluarga * (PDF/JPG/PNG, Max 5MB)</Label>
+                {uploadedFiles.family_card_file ? (
+                  <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded">
+                    <span className="text-sm text-green-700">
+                      {uploadedFiles.family_card_file.name}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveFile("family_card_file")}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <Input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={(e) =>
+                      handleFileUpload("family_card_file", e.target.files?.[0])
+                    }
+                    disabled={isUploading}
+                  />
+                )}
+              </div>
+
+              {/* Citizenship */}
+              <FormField
+                control={form.control}
+                name="citizenship"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Kewarganegaraan *</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih kewarganegaraan" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="wni">WNI</SelectItem>
+                        <SelectItem value="wna">WNA</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Child Number & Siblings Count */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="child_number"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Anak Ke Berapa *</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="1"
+                          min="1"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Urutan anak dalam keluarga
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="siblings_count"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Jumlah Saudara Kandung *</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          min="0"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Jumlah saudara kandung (termasuk diri sendiri)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Navigation Buttons */}
+              <div className="flex justify-end pt-6">
+                <Button
+                  type="submit"
+                  variant="matcha"
+                  disabled={stepMutation.isPending || isUploading}
+                >
+                  {stepMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Menyimpan...
+                    </>
+                  ) : (
+                    "Simpan & Lanjut"
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+# app/(public)/pendaftaran/data-orangtua/page.js (Step 4: Family Data)
+"use client";
+
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from "@/components/ui/form";
+import { CheckCircle, Loader2 } from "lucide-react";
+import { useRegistrationStep } from "@/hooks/useRegistration";
+import toast from "react-hot-toast";
+import Link from "next/link";
+
+// Validation Schema
+const familyDataSchema = z.object({
+  // Father data (required)
+  father_name: z.string().min(2, "Nama ayah minimal 2 karakter"),
+  father_address: z.string().min(5, "Alamat ayah minimal 5 karakter"),
+  father_phone: z.string().min(10, "Nomor HP ayah minimal 10 digit"),
+  father_occupation: z.string().min(2, "Pekerjaan ayah wajib diisi"),
+  father_education: z.enum(["sd", "smp", "sma", "d1", "d2", "d3", "d4", "s1", "s2", "s3", "other"], {
+    required_error: "Pendidikan ayah harus dipilih",
+  }),
+  father_income: z.enum(["below_1m", "1m_3m", "3m_5m", "5m_10m", "above_10m"], {
+    required_error: "Penghasilan ayah harus dipilih",
+  }),
+
+  // Mother data (required)
+  mother_name: z.string().min(2, "Nama ibu minimal 2 karakter"),
+  mother_address: z.string().min(5, "Alamat ibu minimal 5 karakter"),
+  mother_phone: z.string().min(10, "Nomor HP ibu minimal 10 digit"),
+  mother_occupation: z.string().min(2, "Pekerjaan ibu wajib diisi"),
+  mother_education: z.enum(["sd", "smp", "sma", "d1", "d2", "d3", "d4", "s1", "s2", "s3", "other"], {
+    required_error: "Pendidikan ibu harus dipilih",
+  }),
+  mother_income: z.enum(["below_1m", "1m_3m", "3m_5m", "5m_10m", "above_10m"], {
+    required_error: "Penghasilan ibu harus dipilih",
+  }),
+
+  // Guardian data (optional)
+  guardian_name: z.string().optional(),
+  guardian_address: z.string().optional(),
+  guardian_phone: z.string().optional(),
+  guardian_occupation: z.string().optional(),
+  guardian_education: z.enum(["sd", "smp", "sma", "d1", "d2", "d3", "d4", "s1", "s2", "s3", "other", ""]).optional(),
+  guardian_income: z.enum(["below_1m", "1m_3m", "3m_5m", "5m_10m", "above_10m", ""]).optional(),
+});
+
+export default function DataOrangtuaPage() {
+  const [showGuardian, setShowGuardian] = useState(false);
+  const stepMutation = useRegistrationStep(4);
+
+  const form = useForm({
+    resolver: zodResolver(familyDataSchema),
+    defaultValues: {
+      father_name: "",
+      father_address: "",
+      father_phone: "",
+      father_occupation: "",
+      father_education: "",
+      father_income: "",
+      mother_name: "",
+      mother_address: "",
+      mother_phone: "",
+      mother_occupation: "",
+      mother_education: "",
+      mother_income: "",
+      guardian_name: "",
+      guardian_address: "",
+      guardian_phone: "",
+      guardian_occupation: "",
+      guardian_education: "",
+      guardian_income: "",
+    },
+  });
+
+  const onSubmit = (data) => {
+    // Prepare payload - remove empty guardian data if not filled
+    const payload = {
+      father: {
+        name: data.father_name,
+        address: data.father_address,
+        phone: data.father_phone,
+        occupation: data.father_occupation,
+        education: data.father_education,
+        income: data.father_income,
+      },
+      mother: {
+        name: data.mother_name,
+        address: data.mother_address,
+        phone: data.mother_phone,
+        occupation: data.mother_occupation,
+        education: data.mother_education,
+        income: data.mother_income,
+      },
+    };
+
+    // Add guardian data only if filled
+    if (data.guardian_name && data.guardian_name.trim() !== "") {
+      payload.guardian = {
+        name: data.guardian_name,
+        address: data.guardian_address || null,
+        phone: data.guardian_phone || null,
+        occupation: data.guardian_occupation || null,
+        education: data.guardian_education || null,
+        income: data.guardian_income || null,
+      };
+    }
+
+    stepMutation.mutate(payload);
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="flex items-center gap-2 mb-6">
+        <CheckCircle className="text-green-500" />
+        <h1 className="text-2xl font-bold">Step 4: Data Orang Tua / Wali</h1>
+      </div>
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* Father Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Data Identitas Ayah Kandung</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="father_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nama Ayah Kandung *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nama lengkap ayah" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="father_address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Alamat Ayah Kandung *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Alamat lengkap ayah" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="father_phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>No. HP Ayah *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="08xxxxxxxxxx" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="father_occupation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Pekerjaan Ayah *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Contoh: Pegawai Swasta" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="father_education"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Pendidikan Terakhir Ayah *</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih pendidikan" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="sd">SD</SelectItem>
+                          <SelectItem value="smp">SMP</SelectItem>
+                          <SelectItem value="sma">SMA/SMK</SelectItem>
+                          <SelectItem value="d1">D1</SelectItem>
+                          <SelectItem value="d2">D2</SelectItem>
+                          <SelectItem value="d3">D3</SelectItem>
+                          <SelectItem value="d4">D4</SelectItem>
+                          <SelectItem value="s1">S1</SelectItem>
+                          <SelectItem value="s2">S2</SelectItem>
+                          <SelectItem value="s3">S3</SelectItem>
+                          <SelectItem value="other">Lainnya</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="father_income"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Penghasilan Ayah per Bulan *</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih penghasilan" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="below_1m">&lt; Rp 1.000.000</SelectItem>
+                          <SelectItem value="1m_3m">Rp 1.000.000 - Rp 3.000.000</SelectItem>
+                          <SelectItem value="3m_5m">Rp 3.000.000 - Rp 5.000.000</SelectItem>
+                          <SelectItem value="5m_10m">Rp 5.000.000 - Rp 10.000.000</SelectItem>
+                          <SelectItem value="above_10m">&gt; Rp 10.000.000</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Mother Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Data Identitas Ibu Kandung</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="mother_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nama Ibu Kandung *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nama lengkap ibu" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="mother_address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Alamat Ibu Kandung *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Alamat lengkap ibu" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="mother_phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>No. HP Ibu *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="08xxxxxxxxxx" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="mother_occupation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Pekerjaan Ibu *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Contoh: Ibu Rumah Tangga" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="mother_education"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Pendidikan Terakhir Ibu *</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih pendidikan" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="sd">SD</SelectItem>
+                          <SelectItem value="smp">SMP</SelectItem>
+                          <SelectItem value="sma">SMA/SMK</SelectItem>
+                          <SelectItem value="d1">D1</SelectItem>
+                          <SelectItem value="d2">D2</SelectItem>
+                          <SelectItem value="d3">D3</SelectItem>
+                          <SelectItem value="d4">D4</SelectItem>
+                          <SelectItem value="s1">S1</SelectItem>
+                          <SelectItem value="s2">S2</SelectItem>
+                          <SelectItem value="s3">S3</SelectItem>
+                          <SelectItem value="other">Lainnya</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="mother_income"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Penghasilan Ibu per Bulan *</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih penghasilan" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="below_1m">&lt; Rp 1.000.000</SelectItem>
+                          <SelectItem value="1m_3m">Rp 1.000.000 - Rp 3.000.000</SelectItem>
+                          <SelectItem value="3m_5m">Rp 3.000.000 - Rp 5.000.000</SelectItem>
+                          <SelectItem value="5m_10m">Rp 5.000.000 - Rp 10.000.000</SelectItem>
+                          <SelectItem value="above_10m">&gt; Rp 10.000.000</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Guardian Section (Optional) */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Data Identitas Wali (Opsional)</CardTitle>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowGuardian(!showGuardian)}
+              >
+                {showGuardian ? "Sembunyikan" : "Tambah Data Wali"}
+              </Button>
+            </CardHeader>
+            {showGuardian && (
+              <CardContent className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="guardian_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nama Wali</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nama lengkap wali" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Isi hanya jika berbeda dengan orang tua
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="guardian_address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Alamat Wali</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Alamat lengkap wali" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="guardian_phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>No. HP Wali</FormLabel>
+                        <FormControl>
+                          <Input placeholder="08xxxxxxxxxx" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="guardian_occupation"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Pekerjaan Wali</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Pekerjaan wali" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="guardian_education"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Pendidikan Terakhir Wali</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih pendidikan" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="sd">SD</SelectItem>
+                            <SelectItem value="smp">SMP</SelectItem>
+                            <SelectItem value="sma">SMA/SMK</SelectItem>
+                            <SelectItem value="d1">D1</SelectItem>
+                            <SelectItem value="d2">D2</SelectItem>
+                            <SelectItem value="d3">D3</SelectItem>
+                            <SelectItem value="d4">D4</SelectItem>
+                            <SelectItem value="s1">S1</SelectItem>
+                            <SelectItem value="s2">S2</SelectItem>
+                            <SelectItem value="s3">S3</SelectItem>
+                            <SelectItem value="other">Lainnya</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="guardian_income"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Penghasilan Wali per Bulan</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih penghasilan" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="below_1m">&lt; Rp 1.000.000</SelectItem>
+                            <SelectItem value="1m_3m">Rp 1.000.000 - Rp 3.000.000</SelectItem>
+                            <SelectItem value="3m_5m">Rp 3.000.000 - Rp 5.000.000</SelectItem>
+                            <SelectItem value="5m_10m">Rp 5.000.000 - Rp 10.000.000</SelectItem>
+                            <SelectItem value="above_10m">&gt; Rp 10.000.000</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </CardContent>
+            )}
+          </Card>
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between pt-6">
+            <Link href="/pendaftaran/data-akademik">
+              <Button type="button" variant="outline">
+                Kembali
+              </Button>
+            </Link>
+            <Button
+              type="submit"
+              variant="matcha"
+              disabled={stepMutation.isPending}
+            >
+              {stepMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Menyimpan...
+                </>
+              ) : (
+                "Simpan & Lanjut"
+              )}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
+}
+
+# app/(public)/pendaftaran/data-prestasi/page.js (Step 5: Achievements)
+"use client";
+
+import { useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from "@/components/ui/form";
+import { CheckCircle, Loader2, Plus, Trash2, X } from "lucide-react";
+import { useRegistrationStep } from "@/hooks/useRegistration";
+import toast from "react-hot-toast";
+import Link from "next/link";
+
+// File upload service (Opsi A: Upload first, get URL, then submit)
+const uploadFile = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  
+  try {
+    // Sesuaikan dengan endpoint upload backend Anda
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+      body: formData,
+    });
+    
+    if (!response.ok) throw new Error("Upload failed");
+    
+    const data = await response.json();
+    return data.data.url; // Return URL dari backend
+  } catch (error) {
+    throw new Error("Failed to upload file");
+  }
+};
+
+// Validation Schema
+const MAX_FILE_SIZE = 5000000; // 5MB
+const ACCEPTED_FILE_TYPES = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
+
+const achievementItemSchema = z.object({
+  achievement_name: z.string().min(2, "Nama prestasi minimal 2 karakter"),
+  year: z.string().min(4, "Tahun harus 4 digit").max(4, "Tahun harus 4 digit"),
+  type: z.enum(["academic", "non_academic", "sports", "arts", "other"], {
+    required_error: "Jenis prestasi harus dipilih",
+  }),
+  level: z.enum(["school", "district", "city", "province", "national", "international"], {
+    required_error: "Tingkat prestasi harus dipilih",
+  }),
+  organizer: z.string().min(2, "Penyelenggara minimal 2 karakter"),
+  rank: z.string().min(1, "Peringkat wajib diisi"),
+  certificate_file: z.string().optional(), // URL file after upload
+});
+
+const achievementsSchema = z.object({
+  skip_achievements: z.boolean().default(false),
+  achievements: z.array(achievementItemSchema).optional(),
+});
+
+export default function DataPrestasiPage() {
+  const [isUploading, setIsUploading] = useState(false);
+  const [skipAchievements, setSkipAchievements] = useState(false);
+  const stepMutation = useRegistrationStep(5);
+
+  const form = useForm({
+    resolver: zodResolver(achievementsSchema),
+    defaultValues: {
+      skip_achievements: false,
+      achievements: [
+        {
+          achievement_name: "",
+          year: "",
+          type: "",
+          level: "",
+          organizer: "",
+          rank: "",
+          certificate_file: "",
+        },
+      ],
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "achievements",
+  });
+
+  // Handle file upload for specific achievement
+  const handleFileUpload = async (index, file) => {
+    if (!file) return;
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("Ukuran file maksimal 5MB");
+      return;
+    }
+
+    // Validate file type
+    if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+      toast.error("Format file harus PDF, JPG, atau PNG");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const fileUrl = await uploadFile(file);
+      form.setValue(`achievements.${index}.certificate_file`, fileUrl);
+      toast.success(`Sertifikat berhasil diupload`);
+    } catch (error) {
+      toast.error("Gagal upload file, silakan coba lagi");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Handle remove uploaded file
+  const handleRemoveFile = (index) => {
+    form.setValue(`achievements.${index}.certificate_file`, "");
+  };
+
+  const onSubmit = (data) => {
+    // If skip achievements, send skip flag
+    if (skipAchievements || data.skip_achievements) {
+      stepMutation.mutate({ skip_achievements: true });
+      return;
+    }
+
+    // Validate at least one achievement
+    if (!data.achievements || data.achievements.length === 0) {
+      toast.error("Tambahkan minimal 1 prestasi atau pilih 'Lewati Prestasi'");
+      return;
+    }
+
+    // Validate all achievements have required fields
+    const invalidAchievements = data.achievements.filter(
+      (achievement) =>
+        !achievement.achievement_name ||
+        !achievement.year ||
+        !achievement.type ||
+        !achievement.level ||
+        !achievement.organizer ||
+        !achievement.rank
+    );
+
+    if (invalidAchievements.length > 0) {
+      toast.error("Lengkapi semua field prestasi yang ditambahkan");
+      return;
+    }
+
+    // Prepare payload
+    const payload = {
+      achievements: data.achievements.map((achievement) => ({
+        achievement_name: achievement.achievement_name,
+        year: parseInt(achievement.year),
+        type: achievement.type,
+        level: achievement.level,
+        organizer: achievement.organizer,
+        rank: achievement.rank,
+        certificate_file: achievement.certificate_file || null,
+      })),
+    };
+
+    stepMutation.mutate(payload);
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="flex items-center gap-2 mb-6">
+        <CheckCircle className="text-green-500" />
+        <h1 className="text-2xl font-bold">Step 5: Data Prestasi</h1>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Informasi Prestasi (Opsional)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Skip Achievements Option */}
+              <div className="flex items-center space-x-2 p-4 bg-blue-50 border border-blue-200 rounded">
+                <input
+                  type="checkbox"
+                  id="skip_achievements"
+                  checked={skipAchievements}
+                  onChange={(e) => {
+                    setSkipAchievements(e.target.checked);
+                    form.setValue("skip_achievements", e.target.checked);
+                  }}
+                  className="w-4 h-4"
+                />
+                <label htmlFor="skip_achievements" className="text-sm font-medium">
+                  Saya tidak memiliki prestasi untuk dilaporkan (Lewati bagian ini)
+                </label>
+              </div>
+
+              {/* Achievements Array */}
+              {!skipAchievements && (
+                <div className="space-y-6">
+                  {fields.map((field, index) => (
+                    <Card key={field.id} className="border-2">
+                      <CardHeader className="flex flex-row items-center justify-between pb-4">
+                        <CardTitle className="text-lg">
+                          Prestasi #{index + 1}
+                        </CardTitle>
+                        {fields.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => remove(index)}
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Hapus
+                          </Button>
+                        )}
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {/* Achievement Name */}
+                        <FormField
+                          control={form.control}
+                          name={`achievements.${index}.achievement_name`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Nama Prestasi *</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Contoh: Juara 1 Olimpiade Matematika"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* Year, Type, Level */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <FormField
+                            control={form.control}
+                            name={`achievements.${index}.year`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Tahun *</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder="2024"
+                                    maxLength={4}
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`achievements.${index}.type`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Jenis *</FormLabel>
+                                <Select
+                                  onValueChange={field.onChange}
+                                  defaultValue={field.value}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Pilih jenis" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="academic">Akademik</SelectItem>
+                                    <SelectItem value="non_academic">Non-Akademik</SelectItem>
+                                    <SelectItem value="sports">Olahraga</SelectItem>
+                                    <SelectItem value="arts">Seni</SelectItem>
+                                    <SelectItem value="other">Lainnya</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`achievements.${index}.level`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Tingkat *</FormLabel>
+                                <Select
+                                  onValueChange={field.onChange}
+                                  defaultValue={field.value}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Pilih tingkat" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="school">Sekolah</SelectItem>
+                                    <SelectItem value="district">Kecamatan</SelectItem>
+                                    <SelectItem value="city">Kota/Kabupaten</SelectItem>
+                                    <SelectItem value="province">Provinsi</SelectItem>
+                                    <SelectItem value="national">Nasional</SelectItem>
+                                    <SelectItem value="international">Internasional</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        {/* Organizer & Rank */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name={`achievements.${index}.organizer`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Penyelenggara *</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder="Contoh: Kemendikbud"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`achievements.${index}.rank`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Peringkat/Penghargaan *</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder="Contoh: Juara 1, Medali Emas"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        {/* Certificate Upload */}
+                        <div className="space-y-2">
+                          <Label>
+                            Upload Sertifikat (PDF/JPG/PNG, Max 5MB)
+                          </Label>
+                          {form.watch(`achievements.${index}.certificate_file`) ? (
+                            <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded">
+                              <span className="text-sm text-green-700">
+                                Sertifikat telah diupload
+                              </span>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleRemoveFile(index)}
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <Input
+                                type="file"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                onChange={(e) =>
+                                  handleFileUpload(index, e.target.files?.[0])
+                                }
+                                disabled={isUploading}
+                              />
+                              {isUploading && (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              )}
+                            </div>
+                          )}
+                          <p className="text-xs text-gray-500">
+                            Opsional - Upload jika ada sertifikat
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                  {/* Add Achievement Button */}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() =>
+                      append({
+                        achievement_name: "",
+                        year: "",
+                        type: "",
+                        level: "",
+                        organizer: "",
+                        rank: "",
+                        certificate_file: "",
+                      })
+                    }
+                    className="w-full"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Tambah Prestasi
+                  </Button>
+                </div>
+              )}
+
+              {/* Navigation Buttons */}
+              <div className="flex justify-between pt-6">
+                <Link href="/pendaftaran/data-orangtua">
+                  <Button type="button" variant="outline">
+                    Kembali
+                  </Button>
+                </Link>
+                <Button
+                  type="submit"
+                  variant="matcha"
+                  disabled={stepMutation.isPending || isUploading}
+                >
+                  {stepMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Menyimpan...
+                    </>
+                  ) : (
+                    "Simpan & Lanjut"
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 ## DEPLOYMENT CONSIDERATIONS
 # ==========================
 
