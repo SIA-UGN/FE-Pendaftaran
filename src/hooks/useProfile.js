@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { profileService } from "@/services/profileService";
 import toast from "react-hot-toast";
 
-export const userProfile = () => {
+export const useProfile = () => {
   return useQuery({
     queryKey: ["profile"],
     queryFn: profileService.getProfile,

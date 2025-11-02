@@ -1257,6 +1257,330 @@ export default function RegisterPage() {
   );
 }
 
+# app/dashboard/profile/page.js (atau app/profile/page.js)
+"use client";
+
+import { useState, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Image from "next/image";
+import { Camera, Loader2 } from "lucide-react";
+import { useProfile, useUpdateProfile, useUploadAvatar } from "@/hooks/useProfile";
+import { useChangePassword } from "@/hooks/useAuth";
+import toast from "react-hot-toast";
+
+export default function ProfilePage() {
+  // Profile data
+  const { data: profileData, isPending: isLoadingProfile } = useProfile();
+  const profile = profileData?.data?.profile;
+
+  // Profile form states
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+
+  // Password form states
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const [isEditingPassword, setIsEditingPassword] = useState(false);
+
+  // Avatar upload
+  const fileInputRef = useRef(null);
+  const updateProfileMutation = useUpdateProfile();
+  const uploadAvatarMutation = useUploadAvatar();
+  const changePasswordMutation = useChangePassword();
+
+  // Initialize form when profile data loaded
+  useState(() => {
+    if (profile) {
+      setName(profile.name || "");
+      setEmail(profile.email || "");
+    }
+  }, [profile]);
+
+  // Handle profile update
+  const handleUpdateProfile = (e) => {
+    e.preventDefault();
+    
+    updateProfileMutation.mutate(
+      { name, email },
+      {
+        onSuccess: () => {
+          setIsEditingProfile(false);
+        },
+      }
+    );
+  };
+
+  // Handle password change
+  const handleChangePassword = (e) => {
+    e.preventDefault();
+
+    if (newPassword !== passwordConfirmation) {
+      toast.error("Password baru dan konfirmasi harus sama");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      toast.error("Password minimal 8 karakter");
+      return;
+    }
+
+    changePasswordMutation.mutate(
+      {
+        current_password: currentPassword,
+        new_password: newPassword,
+        new_password_confirmation: passwordConfirmation,
+      },
+      {
+        onSuccess: () => {
+          setCurrentPassword("");
+          setNewPassword("");
+          setPasswordConfirmation("");
+          setIsEditingPassword(false);
+        },
+      }
+    );
+  };
+
+  // Handle avatar upload
+  const handleAvatarChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.error("File harus berupa gambar");
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Ukuran file maksimal 2MB");
+      return;
+    }
+
+    uploadAvatarMutation.mutate(file);
+  };
+
+  if (isLoadingProfile) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <h1 className="text-3xl font-bold mb-8">Profil Saya</h1>
+
+      <div className="grid gap-6">
+        {/* Avatar Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Foto Profil</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center gap-4">
+            <div className="relative">
+              <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200">
+                <Image
+                  src={profile?.avatar_url || "/logo.jpg"}
+                  alt="Profile"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadAvatarMutation.isPending}
+                className="absolute bottom-0 right-0 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50"
+              >
+                {uploadAvatarMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Camera className="w-4 h-4" />
+                )}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarChange}
+                className="hidden"
+              />
+            </div>
+            <p className="text-sm text-gray-500">
+              Klik icon kamera untuk mengubah foto profil (max 2MB)
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Profile Info Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Informasi Profil</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleUpdateProfile} className="space-y-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Nama Lengkap</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  disabled={!isEditingProfile}
+                  required
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={!isEditingProfile}
+                  required
+                />
+              </div>
+
+              <div className="flex gap-2">
+                {!isEditingProfile ? (
+                  <Button
+                    type="button"
+                    onClick={() => setIsEditingProfile(true)}
+                  >
+                    Edit Profil
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      type="submit"
+                      disabled={updateProfileMutation.isPending}
+                    >
+                      {updateProfileMutation.isPending ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Menyimpan...
+                        </>
+                      ) : (
+                        "Simpan"
+                      )}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setIsEditingProfile(false);
+                        setName(profile?.name || "");
+                        setEmail(profile?.email || "");
+                      }}
+                    >
+                      Batal
+                    </Button>
+                  </>
+                )}
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+
+        {/* Change Password Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Ubah Password</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!isEditingPassword ? (
+              <Button
+                type="button"
+                onClick={() => setIsEditingPassword(true)}
+              >
+                Ubah Password
+              </Button>
+            ) : (
+              <form onSubmit={handleChangePassword} className="space-y-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="current_password">Password Saat Ini</Label>
+                  <Input
+                    id="current_password"
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="new_password">Password Baru</Label>
+                  <Input
+                    id="new_password"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Minimal 8 karakter"
+                    required
+                    minLength={8}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="password_confirmation">
+                    Konfirmasi Password Baru
+                  </Label>
+                  <Input
+                    id="password_confirmation"
+                    type="password"
+                    value={passwordConfirmation}
+                    onChange={(e) => setPasswordConfirmation(e.target.value)}
+                    placeholder="Ulangi password baru"
+                    required
+                    minLength={8}
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    type="submit"
+                    disabled={changePasswordMutation.isPending}
+                  >
+                    {changePasswordMutation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Mengubah...
+                      </>
+                    ) : (
+                      "Simpan Password"
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setIsEditingPassword(false);
+                      setCurrentPassword("");
+                      setNewPassword("");
+                      setPasswordConfirmation("");
+                    }}
+                  >
+                    Batal
+                  </Button>
+                </div>
+              </form>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 ## DEPLOYMENT CONSIDERATIONS
 # ==========================
 
