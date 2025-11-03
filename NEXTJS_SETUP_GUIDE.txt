@@ -315,7 +315,7 @@ export const useRegistrationProgress = () => {
   return useQuery({
     queryKey: ['registration', 'progress'],
     queryFn: registrationService.getProgress,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 2 * 60 * 1000,
   });
 };
 
@@ -458,6 +458,44 @@ export const useUpdateRegistrationStatus = () => {
       toast.error(message);
     },
   });
+};
+
+# hooks/useStepValidation.js
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useRegistrationProgress } from './useRegistration';
+import toast from 'react-hot-toast';
+
+export const useStepValidation = (currentStep) => {
+  const router = useRouter();
+  const { data: progressData, isPending } = useRegistrationProgress();
+  
+  useEffect(() => {
+    if (!isPending && progressData) {
+      const { completed_steps = [], accessible_steps = [] } = progressData.data || {};
+      
+      if (!accessible_steps.includes(currentStep)) {
+        const nextAccessibleStep = Math.max(...completed_steps, 0) + 1;
+        
+        toast.error(`Silakan selesaikan Step ${nextAccessibleStep} terlebih dahulu`);
+        
+        const stepRoutes = {
+          1: '/pendaftaran/data-diri',
+          2: '/pendaftaran/data-alamat',
+          3: '/pendaftaran/data-akademik',
+          4: '/pendaftaran/data-orangtua',
+          5: '/pendaftaran/data-prestasi',
+        };
+        
+        router.push(stepRoutes[nextAccessibleStep] || '/pendaftaran/data-diri');
+      }
+    }
+  }, [progressData, isPending, currentStep, router]);
+  
+  return {
+    isValidating: isPending,
+    progressData: progressData?.data,
+  };
 };
 
 ## 12. NOTIFICATION HOOKS
@@ -959,7 +997,143 @@ export const formatDate = (date) => {
   }).format(new Date(date));
 };
 
-## 20. IMPLEMENTATION
+## 20. COMPONENTS
+# ================
+
+# components/registration/ProgressIndicator.js
+"use client";
+
+import { useRegistrationProgress } from "@/hooks/useRegistration";
+import { CheckCircle, Circle, Clock } from "lucide-react";
+
+export default function ProgressIndicator() {
+  const { data: progressData } = useRegistrationProgress();
+  const { completed_steps = [], current_step = 1 } = progressData?.data || {};
+  
+  const steps = [
+    { number: 1, name: "Data Diri" },
+    { number: 2, name: "Data Alamat" },
+    { number: 3, name: "Data Akademik" },
+    { number: 4, name: "Data Orang Tua" },
+    { number: 5, name: "Data Prestasi" },
+  ];
+  
+  return (
+    <div className="mb-8">
+      <div className="flex items-center justify-between">
+        {steps.map((step, index) => (
+          <div key={step.number} className="flex items-center flex-1">
+            <div className="flex flex-col items-center">
+              <div
+                className={`
+                  flex items-center justify-center w-10 h-10 rounded-full border-2
+                  ${
+                    completed_steps.includes(step.number)
+                      ? "bg-green-500 border-green-500 text-white"
+                      : current_step === step.number
+                      ? "bg-blue-500 border-blue-500 text-white"
+                      : "bg-gray-200 border-gray-300 text-gray-500"
+                  }
+                `}
+              >
+                {completed_steps.includes(step.number) ? (
+                  <CheckCircle className="w-6 h-6" />
+                ) : current_step === step.number ? (
+                  <Clock className="w-6 h-6" />
+                ) : (
+                  <span className="font-bold">{step.number}</span>
+                )}
+              </div>
+              <span
+                className={`
+                  mt-2 text-xs text-center
+                  ${
+                    completed_steps.includes(step.number) || current_step === step.number
+                      ? "font-semibold text-gray-900"
+                      : "text-gray-500"
+                  }
+                `}
+              >
+                {step.name}
+              </span>
+            </div>
+            
+            {index < steps.length - 1 && (
+              <div
+                className={`
+                  flex-1 h-0.5 mx-2
+                  ${
+                    completed_steps.includes(step.number)
+                      ? "bg-green-500"
+                      : "bg-gray-300"
+                  }
+                `}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+# components/registration/StepNavigation.js
+"use client";
+
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
+
+export default function StepNavigation({ 
+  currentStep, 
+  isSubmitting,
+  prevRoute,
+  showBack = true,
+}) {
+  const stepRoutes = {
+    1: { prev: null, next: '/pendaftaran/data-alamat' },
+    2: { prev: '/pendaftaran/data-diri', next: '/pendaftaran/data-akademik' },
+    3: { prev: '/pendaftaran/data-alamat', next: '/pendaftaran/data-orangtua' },
+    4: { prev: '/pendaftaran/data-akademik', next: '/pendaftaran/data-prestasi' },
+    5: { prev: '/pendaftaran/data-orangtua', next: '/pendaftaran/review' },
+  };
+  
+  const route = stepRoutes[currentStep];
+  
+  return (
+    <div className="flex justify-between pt-6">
+      {showBack && route?.prev && (
+        <Link href={prevRoute || route.prev}>
+          <Button type="button" variant="outline">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Kembali
+          </Button>
+        </Link>
+      )}
+      
+      <Button
+        type="submit"
+        variant="matcha"
+        disabled={isSubmitting}
+        className={!showBack || !route?.prev ? "w-full" : "ml-auto"}
+      >
+        {isSubmitting ? (
+          <>
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            Menyimpan...
+          </>
+        ) : (
+          <>
+            Simpan & Lanjut
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </>
+        )}
+      </Button>
+    </div>
+  );
+}
+
+## 21. IMPLEMENTATION
 # ===================
 
 # app/(auth)/login/page.js
@@ -2242,7 +2416,7 @@ export default function DataAlamatPage() {
 # app/(public)/pendaftaran/data-diri/page.js (Step 1: Personal Identity)
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -2266,10 +2440,12 @@ import {
   FormMessage,
   FormDescription,
 } from "@/components/ui/form";
-import { CheckCircle, Loader2, X } from "lucide-react";
-import { useRegistrationStep } from "@/hooks/useRegistration";
+import { Loader2, X } from "lucide-react";
+import { useRegistrationStep, useMyRegistration } from "@/hooks/useRegistration";
+import { useStepValidation } from "@/hooks/useStepValidation";
 import toast from "react-hot-toast";
-import Link from "next/link";
+import ProgressIndicator from "@/components/registration/ProgressIndicator";
+import StepNavigation from "@/components/registration/StepNavigation";
 
 // File upload service (Opsi A: Upload first, get URL, then submit)
 const uploadFile = async (file) => {
@@ -2322,14 +2498,16 @@ const personalIdentitySchema = z.object({
 });
 
 export default function DataDiriPage() {
+  const { isValidating, progressData } = useStepValidation(1);
+  const { data: registrationData } = useMyRegistration();
+  const stepMutation = useRegistrationStep(1);
+  
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState({
     ktp_kitas_file: null,
     birth_certificate_file: null,
     family_card_file: null,
   });
-
-  const stepMutation = useRegistrationStep(1);
 
   const form = useForm({
     resolver: zodResolver(personalIdentitySchema),
@@ -2349,6 +2527,46 @@ export default function DataDiriPage() {
       siblings_count: "",
     },
   });
+
+  useEffect(() => {
+    if (registrationData?.data?.registration?.profile) {
+      const profile = registrationData.data.registration.profile;
+      form.reset({
+        full_name: profile.full_name || "",
+        email: profile.email || "",
+        gender: profile.gender || "",
+        religion: profile.religion || "",
+        phone: profile.phone || "",
+        birth_place: profile.birth_place || "",
+        birth_date: profile.birth_date || "",
+        nik_kitas: profile.nik_kitas || "",
+        birth_certificate_number: profile.birth_certificate_number || "",
+        family_card_number: profile.family_card_number || "",
+        citizenship: profile.citizenship || "",
+        child_number: profile.child_number?.toString() || "",
+        siblings_count: profile.siblings_count?.toString() || "",
+      });
+      
+      if (profile.ktp_kitas_file) {
+        setUploadedFiles(prev => ({
+          ...prev,
+          ktp_kitas_file: { url: profile.ktp_kitas_file, name: 'KTP/KITAS' }
+        }));
+      }
+      if (profile.birth_certificate_file) {
+        setUploadedFiles(prev => ({
+          ...prev,
+          birth_certificate_file: { url: profile.birth_certificate_file, name: 'Akta Lahir' }
+        }));
+      }
+      if (profile.family_card_file) {
+        setUploadedFiles(prev => ({
+          ...prev,
+          family_card_file: { url: profile.family_card_file, name: 'Kartu Keluarga' }
+        }));
+      }
+    }
+  }, [registrationData, form]);
 
   // Handle file upload
   const handleFileUpload = async (fieldName, file) => {
@@ -2428,13 +2646,19 @@ export default function DataDiriPage() {
     stepMutation.mutate(payload);
   };
 
+  if (isValidating) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin mr-2" />
+        <p>Memvalidasi akses step...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="flex items-center gap-2 mb-6">
-        <CheckCircle className="text-green-500" />
-        <h1 className="text-2xl font-bold">Step 1: Data Diri</h1>
-      </div>
-
+      <ProgressIndicator />
+      
       <Card>
         <CardHeader>
           <CardTitle>Informasi Identitas Pribadi</CardTitle>
@@ -3849,6 +4073,137 @@ export default function DataPrestasiPage() {
     </div>
   );
 }
+
+## 22. STEP VALIDATION & PRE-FILL IMPLEMENTATION
+# ==============================================
+
+IMPORTANT: Untuk mengimplementasikan step validation yang proper pada setiap halaman pendaftaran, 
+ikuti panduan berikut:
+
+### A. Update setiap halaman step (data-diri, data-alamat, data-akademik, data-orangtua, data-prestasi):
+
+1. Import tambahan:
+   - useStepValidation from "@/hooks/useStepValidation"
+   - useMyRegistration from "@/hooks/useRegistration"
+   - ProgressIndicator from "@/components/registration/ProgressIndicator"
+   - StepNavigation from "@/components/registration/StepNavigation"
+
+2. Tambahkan di awal component:
+   const { isValidating, progressData } = useStepValidation(STEP_NUMBER);
+   const { data: registrationData } = useMyRegistration();
+
+3. Tambahkan useEffect untuk pre-fill data dari database:
+   useEffect(() => {
+     if (registrationData?.data?.registration?.SECTION) {
+       const data = registrationData.data.registration.SECTION;
+       form.reset({ ...data yang sesuai... });
+       setUploadedFiles({ ...file URLs yang sudah ada... });
+     }
+   }, [registrationData, form]);
+
+4. Tambahkan loading state validation:
+   if (isValidating) {
+     return (
+       <div className="flex items-center justify-center min-h-screen">
+         <Loader2 className="w-8 h-8 animate-spin mr-2" />
+         <p>Memvalidasi akses step...</p>
+       </div>
+     );
+   }
+
+5. Tambahkan ProgressIndicator di awal return:
+   return (
+     <div className="container mx-auto px-4 py-8 max-w-4xl">
+       <ProgressIndicator />
+       ...rest of component
+     </div>
+   );
+
+6. Replace tombol navigasi dengan StepNavigation component:
+   <StepNavigation 
+     currentStep={STEP_NUMBER} 
+     isSubmitting={stepMutation.isPending || isUploading}
+     showBack={STEP_NUMBER > 1}
+   />
+
+### B. Mapping data untuk pre-fill per step:
+
+Step 1 (data-diri) - Section: profile
+  full_name, email, gender, religion, phone, birth_place, birth_date,
+  nik_kitas, birth_certificate_number, family_card_number, citizenship,
+  child_number, siblings_count, ktp_kitas_file, birth_certificate_file, family_card_file
+
+Step 2 (data-alamat) - Section: address
+  province, city_regency, district, village, postal_code, hamlet, full_address
+
+Step 3 (data-akademik) - Section: academic
+  school_origin, graduation_status, last_certificate,
+  certificate_file, graduation_letter_file, transcript_file,
+  national_exam_file, selection_test_file
+
+Step 4 (data-orangtua) - Section: family
+  father_name, father_address, father_phone, father_occupation, father_education, father_income,
+  mother_name, mother_address, mother_phone, mother_occupation, mother_education, mother_income,
+  guardian_name, guardian_address, guardian_phone, guardian_occupation, guardian_education, guardian_income
+
+Step 5 (data-prestasi) - Section: achievements (array)
+  achievements[].achievement_name, year, type, level, organizer, rank, certificate_file
+
+### C. Backend Response Structure untuk Pre-fill:
+
+GET /registration/my response:
+{
+  "data": {
+    "registration": {
+      "id": 1,
+      "user_id": 1,
+      "profile": { ...Step 1 data... },
+      "address": { ...Step 2 data... },
+      "academic": { ...Step 3 data... },
+      "family": { ...Step 4 data... },
+      "achievements": [...Step 5 data array...],
+      "status": "draft",
+      "completed_steps": [1, 2],
+      "current_step": 3
+    }
+  }
+}
+
+GET /registration/progress response:
+{
+  "data": {
+    "completed_steps": [1, 2],
+    "accessible_steps": [1, 2, 3],
+    "current_step": 3,
+    "total_steps": 5,
+    "can_submit": false,
+    "registration": { ...same as /my... }
+  }
+}
+
+### D. Flow Validasi:
+
+1. User akses halaman step (misal /pendaftaran/data-akademik yang adalah step 3)
+2. useStepValidation(3) hook akan fetch /registration/progress
+3. Hook cek apakah 3 ada di accessible_steps
+4. Jika tidak ada, redirect ke step yang accessible (misal step 2 belum complete, redirect ke step 2)
+5. Jika valid, render halaman dengan loading state hilang
+6. useMyRegistration() fetch data existing untuk pre-fill form
+7. useEffect update form.reset() dengan data dari database
+8. User edit/lengkapi form
+9. Submit → mutation → invalidate queries → auto redirect ke step berikutnya
+
+### E. Component Props:
+
+ProgressIndicator:
+  - Otomatis fetch useRegistrationProgress()
+  - Tidak perlu props
+  
+StepNavigation:
+  - currentStep: number (1-5)
+  - isSubmitting: boolean
+  - showBack: boolean (false untuk step 1)
+  - prevRoute: string (optional, override default route)
 
 ## DEPLOYMENT CONSIDERATIONS
 # ==========================
