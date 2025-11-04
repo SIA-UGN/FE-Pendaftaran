@@ -26,9 +26,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useLogout } from "@/hooks/useAuth";
 
 export default function Navbar() {
   const router = useRouter();
+  const logoutMutation = useLogout();
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [user, setUser] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -54,11 +56,9 @@ export default function Navbar() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("user");
+    logoutMutation.mutate();
     setIsLoggedIn(false);
     setUser(null);
-    router.push("/");
   };
 
   const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
@@ -150,7 +150,7 @@ export default function Navbar() {
                 alignOffset={14}
                 className="z-[2000]"
               >
-                <DropdownMenuLabel>{user?.email}</DropdownMenuLabel>
+                <DropdownMenuLabel>{user?.name}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/profil">Profil</Link>
