@@ -110,7 +110,7 @@ export const useLogout = () => {
       queryClient.clear();
       clearUser();
       toast.success("Logout successful");
-      router.push("/login");
+      router.push("/");
     },
     onError: (error) => {
       localStorage.removeItem("access_token");
