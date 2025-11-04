@@ -26,7 +26,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { getCookie, deleteCookie } from "cookies-next";
 
 export default function Navbar() {
   const router = useRouter();
@@ -34,38 +33,29 @@ export default function Navbar() {
   const [user, setUser] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
- useEffect(() => {
-  const fetchUser = async () => {
-    try {
-      const token = getCookie("access_token"); // ambil token dari cookie
-      if (!token) throw new Error("No token");
+  useEffect(() => {
+    const loadUser = () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        const storedUser = localStorage.getItem("user");
 
-      const res = await fetch("http://localhost:8000/api/auth/user", {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`, // kirim token di header
-        },
-      });
+        if (!token || !storedUser) throw new Error("No token");
 
-      if (res.status === 401) throw new Error("Unauthorized");
+        setIsLoggedIn(true);
+        setUser(JSON.parse(storedUser));
+      } catch (err) {
+        console.log("User not logged in", err);
+        setIsLoggedIn(false);
+        setUser(null);
+      }
+    };
 
-      const data = await res.json();
-      setIsLoggedIn(true);
-      setUser(data.data.user);
-    } catch (err) {
-      console.log("User not logged in", err);
-      setIsLoggedIn(false);
-      setUser(null);
-    }
-  };
-
-  fetchUser();
-}, []);
-
+    loadUser();
+  }, []);
 
   const handleLogout = () => {
-    deleteCookie("access_token");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user");
     setIsLoggedIn(false);
     setUser(null);
     router.push("/");
@@ -88,7 +78,10 @@ export default function Navbar() {
         <NavigationMenu>
           <NavigationMenuList className="w-fit">
             <NavigationMenuItem>
-              <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+              <NavigationMenuLink
+                asChild
+                className={navigationMenuTriggerStyle()}
+              >
                 <Link href="/">Home</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
@@ -104,7 +97,9 @@ export default function Navbar() {
                       <Link href="/visi-misi">Visi-Misi</Link>
                     </NavigationMenuLink>
                     <NavigationMenuLink asChild>
-                      <Link href="/pimpinan-universitas">Pimpinan Universitas</Link>
+                      <Link href="/pimpinan-universitas">
+                        Pimpinan Universitas
+                      </Link>
                     </NavigationMenuLink>
                     <NavigationMenuLink asChild>
                       <Link href="/fakultas">Fakultas</Link>
@@ -114,7 +109,10 @@ export default function Navbar() {
               </NavigationMenuContent>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+              <NavigationMenuLink
+                asChild
+                className={navigationMenuTriggerStyle()}
+              >
                 <Link href="/pendaftaran">Pendaftaran</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
@@ -123,7 +121,10 @@ export default function Navbar() {
       </div>
 
       <div className="flex md:hidden items-center">
-        <button onClick={toggleMobileMenu} className="text-white cursor-pointer">
+        <button
+          onClick={toggleMobileMenu}
+          className="text-white cursor-pointer"
+        >
           {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
       </div>
@@ -135,13 +136,20 @@ export default function Navbar() {
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Avatar>
-                  <AvatarImage src="https://github.com/shadcn.png" alt="avatar" />
+                  <AvatarImage
+                    src="https://github.com/shadcn.png"
+                    alt="avatar"
+                  />
                   <AvatarFallback>
                     {user?.name?.charAt(0)?.toUpperCase() || "U"}
                   </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" alignOffset={14} className="z-[2000]">
+              <DropdownMenuContent
+                align="start"
+                alignOffset={14}
+                className="z-[2000]"
+              >
                 <DropdownMenuLabel>{user?.email}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
@@ -151,12 +159,17 @@ export default function Navbar() {
                   <Link href="/pendaftaran">Pendaftaran</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>Ubah Password</DropdownMenuItem>
-                <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
+                  Logout
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </>
         ) : (
-          <Link href="/login" className="text-[var(--cream)] font-bold text-md hover:underline">
+          <Link
+            href="/login"
+            className="text-[var(--cream)] font-bold text-md hover:underline"
+          >
             Login
           </Link>
         )}
@@ -171,11 +184,24 @@ export default function Navbar() {
             transition={{ duration: 0.25, ease: "easeOut" }}
             className="absolute top-[72px] left-0 w-full bg-[var(--green)] text-white flex flex-col items-center gap-6 py-5 md:hidden z-[999]"
           >
-            <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
-            <Link href="/#sejarah" onClick={() => setIsMobileMenuOpen(false)}>Sejarah</Link>
-            <Link href="/#visi-misi" onClick={() => setIsMobileMenuOpen(false)}>Visi-Misi</Link>
-            <Link href="#" onClick={() => setIsMobileMenuOpen(false)}>Pimpinan Universitas</Link>
-            <Link href="/pendaftaran" onClick={() => setIsMobileMenuOpen(false)}>Pendaftaran</Link>
+            <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
+              Home
+            </Link>
+            <Link href="/#sejarah" onClick={() => setIsMobileMenuOpen(false)}>
+              Sejarah
+            </Link>
+            <Link href="/#visi-misi" onClick={() => setIsMobileMenuOpen(false)}>
+              Visi-Misi
+            </Link>
+            <Link href="#" onClick={() => setIsMobileMenuOpen(false)}>
+              Pimpinan Universitas
+            </Link>
+            <Link
+              href="/pendaftaran"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Pendaftaran
+            </Link>
 
             {isLoggedIn ? (
               <>

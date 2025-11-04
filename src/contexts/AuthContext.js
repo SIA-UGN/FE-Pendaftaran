@@ -1,22 +1,31 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
 
 const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUSer] = useState(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const { data: authData, isLoading, error } = useAuth();
-
   useEffect(() => {
-    if (authData?.data?.user) {
-      setUSer(authData.data.user);
-    } else {
-      setUSer(null);
+    const storedUser = localStorage.getItem("user");
+    if (storedUser && storedUser !== "undefined" && storedUser !== "null") {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error("Failed to parse user from localStorage:", error);
+        localStorage.removeItem("user");
+      }
     }
-    setLoading(isLoading);
-  }, [authData, isLoading]);
+    setLoading(false);
+  }, []);
+
+  const updateUser = (userData) => {
+    setUser(userData);
+  };
+
+  const clearUser = () => {
+    setUser(null);
+  };
 
   const hasRole = (role) => {
     return user?.roles?.includes(role) || false;
@@ -31,6 +40,8 @@ export const AuthProvider = ({ children }) => {
       value={{
         user,
         loading,
+        updateUser,
+        clearUser,
         hasRole,
         hasPermission,
         isAuthenticated: !!user,

@@ -2,8 +2,6 @@ import "./globals.css";
 import { Poppins } from "next/font/google";
 
 import Providers from "@/components/Providers";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -26,9 +24,7 @@ export default function RootLayout({ children }) {
         className={`${poppins.variable} font-sans bg-white text-gray-900 antialiased `}
       >
         <Providers>
-          <Navbar />
           <main className="min-h-screen">{children}</main>
-          <Footer />
         </Providers>
       </body>
     </html>
