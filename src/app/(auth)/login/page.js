@@ -1,13 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -16,69 +13,30 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import Link from "next/link";
-import { setCookie } from "cookies-next";
 import ReCAPTCHA from "react-google-recaptcha";
-
+import { useLogin } from "@/hooks/useAuth";
+import toast from "react-hot-toast";
 
 export default function Login() {
-  const router = useRouter();
   const [captcha, setCaptcha] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+
+  const loginMutation = useLogin();
 
   async function handleSubmit(e) {
-  e.preventDefault();
-  setError("");
-  setLoading(true);
+    e.preventDefault();
 
-  if (!captcha) {
-    setError("Silakan selesaikan reCAPTCHA terlebih dahulu");
-    setLoading(false);
-    return;
-  }
-
-  try {
-    const res = await fetch("http://localhost:8000/api/auth/login", {
-      method: "POST", // ✅ gunakan POST, bukan GET
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      setError(data.message || "Login gagal");
+    if (!captcha) {
+      toast.error("Silakan selesaikan reCAPTCHA terlebih dahulu");
       return;
     }
 
-    // ✅ simpan token yang dikirim backend
-    const token = data.data?.access_token || data.token;
-    if (!token) {
-      setError("Token tidak ditemukan di respons server");
-      return;
-    }
-
-    setCookie("access_token", token, {
-      path: "/",
-      maxAge: 60 * 60 * 24 * 3, // 3 hari
+    loginMutation.mutate({
+      email,
+      password,
     });
-
-    router.push("/");
-  } catch (err) {
-    console.error(err);
-    setError("Terjadi kesalahan saat login");
-  } finally {
-    setLoading(false);
   }
-}
 
   return (
     <div className="flex items-center gap-6 w-screen h-screen justify-center bg-[url('/auth.png')] bg-cover ">
@@ -108,7 +66,7 @@ export default function Login() {
                 Register
               </Button>
             </Link>
-            <Link href="/register" className="w-8/10 flex-shrink">
+            <Link href="/forgot-password" className="w-8/10 flex-shrink">
               <Button
                 variant={"yellow"}
                 className={
@@ -164,14 +122,13 @@ export default function Login() {
                     />
                   </div>
                 </div>
-                {error && <p className="text-red-600 text-sm">{error}</p>}
                 <Button
                   type="submit"
                   className="w-full rounded-full text-white hover:text-white"
-                  variant={"matcha"}
-                  disabled={loading}
+                  variant={"green"}
+                  disabled={loginMutation.isPending}
                 >
-                  {loading ? "Logging in..." : "Login"}
+                  {loginMutation.isPending ? "Logging in..." : "Login"}
                 </Button>
               </form>
             </CardContent>
