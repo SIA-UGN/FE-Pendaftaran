@@ -23,13 +23,22 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("access_token");
       localStorage.removeItem("user");
-      window.location.href = "/login";
+
+      if (
+        typeof window !== "undefined" &&
+        window.location.pathname !== "/login"
+      ) {
+        window.location.href = "/login";
+      }
     }
 
-    const message =
-      error.response?.data?.message ||
-      "Something went wrong. Please try again.";
-    toast.error(message);
+    if (error.response?.status === 500) {
+      toast.error("Terjadi kesalahan pada server. Silakan coba lagi nanti.");
+    }
+
+    if (!error.response) {
+      toast.error("Koneksi terputus. Silakan periksa jaringan Anda.");
+    }
 
     return Promise.reject(error);
   }
