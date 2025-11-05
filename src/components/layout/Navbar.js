@@ -4,7 +4,7 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Bell, Menu, X } from "lucide-react";
+import { Bell, Menu, X, ChevronDown } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -34,6 +34,8 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [user, setUser] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mobileProfilOpen, setMobileProfilOpen] = useState(false);
+  const [hasNotification, setHasNotification] = useState(true);
 
   useEffect(() => {
     const loadUser = () => {
@@ -61,14 +63,23 @@ export default function Navbar() {
     setUser(null);
   };
 
-  const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen((prev) => !prev);
+    setMobileProfilOpen(false);
+  };
 
   return (
-    <nav className="w-full flex items-center justify-between px-12 bg-[var(--green)] z-[1000] fixed top-0">
-      <div className="py-4 flex items-center gap-3">
-        <Link href="/" className="flex items-center gap-3">
-          <Image src="/logo.svg" width={60} height={60} alt="Logo" />
-          <p className="text-[var(--cream)] font-regular text-lg hidden sm:block">
+    <nav className="w-full flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-12 bg-[var(--green)] z-[1000] fixed top-0 border-b-2 border-[var(--yellow)]">
+      <div className="py-3 sm:py-4 flex items-center gap-2 sm:gap-3">
+        <Link href="/" className="flex items-center gap-2 sm:gap-3">
+          <Image 
+            src="/logo.svg" 
+            width={45} 
+            height={56} 
+            alt="Logo" 
+            className="w-[45px] h-[56px] sm:w-[50px] sm:h-[62px] md:w-[60px] md:h-[75px]"
+          />
+          <p className="text-[var(--cream)] font-medium text-sm sm:text-base md:text-lg leading-tight hidden sm:block max-w-[150px] md:max-w-[200px]">
             Universitas Global Nusantara
           </p>
         </Link>
@@ -173,6 +184,9 @@ export default function Navbar() {
             Login
           </Link>
         )}
+        <button onClick={toggleMobileMenu} className="text-white cursor-pointer p-1">
+          {isMobileMenuOpen ? <X size={24} className="sm:w-7 sm:h-7" /> : <Menu size={24} className="sm:w-7 sm:h-7" />}
+        </button>
       </div>
 
       <AnimatePresence>
@@ -182,7 +196,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="absolute top-[72px] left-0 w-full bg-[var(--green)] text-white flex flex-col items-center gap-6 py-5 md:hidden z-[999]"
+            className="absolute top-[calc(100%+2px)] left-0 w-full bg-[var(--green)] text-white flex flex-col lg:hidden z-[999] border-t border-[var(--yellow)]/20 shadow-lg max-h-[calc(100vh-80px)] overflow-y-auto"
           >
             <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
               Home

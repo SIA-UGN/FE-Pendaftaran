@@ -1,83 +1,45 @@
-import { Info, AlertCircle, XCircle, CheckCircle } from "lucide-react";
+// 🚫 Tidak pakai "use client" — ini Server Component
+import Link from "next/link";
+import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Link from 'next/link'
-import Prestasi from '@/components/prestasi/Prestasi'
+import Prestasi from "@/components/prestasi/Prestasi";
+import RegistrationProgress from "@/components/RegistrationProgress";
+import ConfirmDialogClient from "../data-prestasi/ConfirmDialogClient";
 
-const FormSchema = z.object({
-  uploadSertifikat: z.any().optional(),
-  namaPrestasi: z.string().optional(),
-  tahun: z.coerce.number().optional(),
-  jenisPrestasi: z.string().optional(),
-  tingkatPrestasi: z.string().optional(),
-  penyelenggara: z.string().optional(),
-  peringkat: z.string().optional(),
-});
-
-export default function DataPrestasi() {
-  
-
-  function onSubmit(data) {
-    console.log(data);
-    alert("You submitted the following values:\n" + JSON.stringify(data, null, 2));
-  }
-
+export default async function DataPrestasi() {
   return (
-            <>
-              <div className="flex justify-between items-center m-12 mt-6 pt-12">
-                <div className="flex items-center gap-2 ">
-                  <CheckCircle className="text-green-500" />
-                  <h2 className="text-xl font-semibold">Data Prestasi</h2>
-                </div>
-                <Link href="/pendaftaran/data-prestasi/input-data">
-                <Button
-                  type="button"
-                  variant="yellow"
-                > Tambah
-                </Button>
-                </Link>
-              </div>
-            
-              <Prestasi />
+    <>
+      <div className="max-w-7xl mx-auto">
+      <RegistrationProgress />
 
-              <div className="flex flex-col m-12 gap-5 items-center">
-                <div className="w-10/12 flex gap-5 items-center justify-center">
-                  <Button
-                  type="button"
-                  variant="matcha"
-                  className="flex-1"
-                > Kembali
-                </Button>
-                <Button
-                  type="button"
-                  variant="matcha"
-            className="flex-1"
-              
-                > Konfirmasi Data
-                </Button>
-                </div>
-                <Link href="/pendaftaran/pembayaran" className={"w-10/12"}>
-                  <Button
-                    type="button"
-                    variant="matcha"
-                    className={"w-full"}
-                  > Pembayaran
-                  </Button>
-                </Link>
-              </div>
-            </>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-2 mx-4 sm:mx-6 md:mx-8 lg:mx-12 mt-4 sm:mt-6">
+        <div className="flex items-center gap-2">
+          <CheckCircle className="text-green-500 w-5 h-5 sm:w-6 sm:h-6" />
+          <h2 className="text-lg sm:text-xl font-semibold">Data Prestasi</h2>
+        </div>
+        <Link href="/pendaftaran/data-prestasi/input-data" className="w-full sm:w-auto">
+          <Button type="button" variant="yellow" className="w-full sm:w-auto">
+            Tambah
+          </Button>
+        </Link>
+      </div>
+
+      {/* ✅ Boleh render async component */}
+      <Prestasi />
+
+      {/* ✅ Dialog konfirmasi dari Client Component */}
+      <div className="flex flex-col mx-4 sm:mx-6 md:mx-8 lg:mx-12 my-6 gap-5 items-center">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-5 items-center justify-end ms-auto">
+          <Link href="/pendaftaran/data-akademik">
+            <Button variant="matcha" className="w-sm">
+              Kembali
+            </Button>
+          </Link>
+
+          <ConfirmDialogClient />
+        </div>
+        </div>
+        </div>
+    </>
   );
 }

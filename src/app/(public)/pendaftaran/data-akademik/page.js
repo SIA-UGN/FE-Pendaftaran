@@ -1,4 +1,4 @@
-"use client"; // <-- Wajib ada untuk menggunakan hooks
+"use client";
 
 import { Info, AlertCircle, XCircle, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import  Link  from "next/link"
+import Link from "next/link"
+import RegistrationProgress from "@/components/RegistrationProgress";
 
 const MAX_FILE_SIZE = 5000000; 
 const ACCEPTED_FILE_TYPES = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
@@ -54,13 +55,15 @@ export default function DataAkademik() {
 
   return (
     <>
-    <div className="flex items-center gap-2 m-12 mt-6 pt-12">
-                <CheckCircle className="text-green-500" />
-                <h2 className="text-xl font-semibold">Data Akademik</h2>
-    </div>
+      <div className="max-w-7xl mx-auto">
+        <RegistrationProgress />
+        <div className="flex items-center gap-2 mx-4 sm:mx-6 md:mx-8 lg:mx-12 mt-4 sm:mt-6 mb-6">
+          <CheckCircle className="text-green-500 w-5 h-5 sm:w-6 sm:h-6"/>
+          <h2 className="text-lg sm:text-xl font-semibold">Data Akademik</h2>
+        </div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="flex flex-col gap-5 p-12 border rounded-xl m-12 bg-[var(--light-cream)]">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-6">
+          <div className="flex flex-col gap-4 sm:gap-5 p-4 sm:p-6 md:p-8 lg:p-12 border rounded-xl mx-4 sm:mx-6 md:mx-8 lg:mx-12 bg-[var(--light-cream)]">
           <FormField
             control={form.control}
             name="sekolahAsal"
@@ -75,7 +78,7 @@ export default function DataAkademik() {
             )}
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="w-full">
             <FormField
               control={form.control}
@@ -197,11 +200,19 @@ export default function DataAkademik() {
           />
 
           </div>
-          <div className="w-full flex items-center justify-end my-12 px-12">
-                        <Link href="/pendaftaran/data-prestasi" className="w-48"><Button type="submit" variant={"matcha"} className={"w-full"}>Lanjut</Button></Link>
+            <div className="w-full flex items-center justify-end my-6 sm:my-8 md:my-10 lg:my-12 px-4 sm:px-6 md:px-8 lg:px-12">
+              <Link href="/pendaftaran">
+                        <Button type="submit" variant={"yellow"} className={"w-full sm:w-48"}>
+                            Kembali
+                        </Button>
+                    </Link>
+                        <Link href="/pendaftaran/data-prestasi" className="w-full sm:w-48">
+                          <Button type="submit" variant={"matcha"} className={"w-full"}>Lanjut</Button>
+                        </Link>
                     </div>
         </form>
-      </Form>
+        </Form>
+        </div>
     </>
   );
 }

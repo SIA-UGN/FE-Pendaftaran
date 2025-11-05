@@ -1,104 +1,121 @@
-import HomeCarousel from "@/components/HomeCarousel";
-import Image from "next/image";
+
+import HomeCarousel from "@/components/HomeCarousel"
+import Image from 'next/image'
+import {Button} from "@/components/ui/button"
+import {Card} from "@/components/ui/card"
+
+const data = [
+  {
+    fakultas: "Fakultas Ekonomika dan Bisnis",
+    deskripsi: "Fakultas ini berfokus pada pengembangan ilmu ekonomi, manajemen, dan akuntansi untuk mencetak lulusan yang kompeten dan berintegritas di dunia bisnis modern.",
+    prodi: [
+      {
+        nama: "Ilmu Ekonomi",
+        deskripsi:
+          "Program studi yang mempelajari teori dan kebijakan ekonomi, serta penerapannya dalam menganalisis fenomena ekonomi nasional dan global."
+      },
+      {
+        nama: "Akuntansi",
+        deskripsi:
+          "Program studi yang membekali mahasiswa dengan kemampuan dalam menyusun, menganalisis, dan mengaudit laporan keuangan perusahaan maupun organisasi publik."
+      },
+      {
+        nama: "Manajemen",
+        deskripsi:
+          "Program studi yang mempersiapkan mahasiswa untuk menjadi pemimpin dan pengambil keputusan strategis dalam organisasi bisnis, publik, maupun wirausaha."
+      }
+    ]
+  },
+  {
+    fakultas: "Fakultas Ilmu Budaya",
+    deskripsi: "Fakultas yang mengkaji dan mengembangkan nilai-nilai budaya, bahasa, dan sastra untuk memperkuat identitas bangsa serta memperluas wawasan global mahasiswa.",
+    prodi: [
+      {
+        nama: "Sastra Indonesia",
+        deskripsi:
+          "Program studi yang mempelajari karya sastra, linguistik, dan budaya Indonesia sebagai bentuk pelestarian serta pengembangan kekayaan bahasa dan budaya nasional."
+      },
+      {
+        nama: "Sastra Inggris",
+        deskripsi:
+          "Program studi yang menekankan pada penguasaan bahasa Inggris, kajian sastra dunia, serta penerapan komunikasi lintas budaya dalam konteks global."
+      },
+      {
+        nama: "Sejarah",
+        deskripsi:
+          "Program studi yang mendalami perjalanan sejarah manusia, dengan fokus pada analisis peristiwa, tokoh, dan kebudayaan dalam konteks sosial dan politik."
+      }
+    ]
+  },
+  {
+    fakultas: "Fakultas Teknik",
+    deskripsi: "Fakultas yang mengedepankan inovasi dan penerapan teknologi untuk menjawab tantangan pembangunan berkelanjutan di berbagai sektor industri.",
+    prodi: [
+      {
+        nama: "Teknik Sipil",
+        deskripsi:
+          "Program studi yang berfokus pada perancangan dan pembangunan infrastruktur seperti jembatan, gedung, dan jalan raya dengan prinsip keamanan dan efisiensi."
+      },
+      {
+        nama: "Teknik Elektro",
+        deskripsi:
+          "Program studi yang mengajarkan konsep dan aplikasi kelistrikan, sistem kontrol, serta teknologi energi modern."
+      },
+      {
+        nama: "Teknik Informatika",
+        deskripsi:
+          "Program studi yang mempersiapkan mahasiswa dalam pengembangan perangkat lunak, kecerdasan buatan, dan sistem informasi untuk era digital."
+      }
+    ]
+  }
+];
+
 
 export default function Fakultas() {
-  return (
-    <>
-      <div>
-        <HomeCarousel />
-        <div className="flex flex-col items-center py-16 pb-16 px-4 sm:px-8 max-w-11/12 mx-auto">
-          <h2 className="text-xl sm:text-2xl font-medium mb-12 w-full border-b-2 border-black pb-2">
-            Fakultas
-          </h2>
-          <div className="flex w-full gap-5 flex-col md:flex-row-reverse">
-            <div className="relative w-full md:w-1/2 h-96 sm:h-96">
-              <Image
-                src="/auth.png"
-                alt="sejarah"
-                fill
-                className="object-cover"
-              />
+    return (
+        <>
+            <div>
+                <HomeCarousel />
+                <div className="flex flex-col items-center py-16 pb-16 px-4 sm:px-8 max-w-10/12 mx-auto">
+                    <h2 className="text-4xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
+                        Fakultas & Program Studi Universitas Global Nusantara
+                    </h2>
+                    {
+                        data.map((data, index) => (
+                            (
+                                <>
+                                    <h2 className="text-3xl sm:text-2xl font-semibold mb-2 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)] mt-6">
+                                        {data.fakultas}
+
+                                        
+                                    </h2>
+                                    <div className="w-full mb-4">
+                                        {data.deskripsi}
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                                        {
+                                            data['prodi'].map((prodi, index) => (
+                                                <Card key={index} className="grid grid-cols-1 p-4 gap-3">
+                                                    <h2 className="text-2xl sm:text-xl font-semibold w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
+                                                        
+                        {prodi.nama}
+                    </h2>
+                                                    <p className="text-sm text-gray-500">
+                                                    {prodi.deskripsi}
+                                                    </p>
+                                                    <Button variant={"green"} className={"w-4/10"}>
+                                                        Selengkapnya
+                                                    </Button>
+                                                </Card>
+                                            ))}
+                                    </div>
+                                </>
+                            )
+                        ))
+                    }
+                </div>
             </div>
-            <div className="w-full md:w-1/2">
-              <p>
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean
-                commodo ligula eget dolor. Aenean massa. Cum sociis natoque
-                penatibus et magnis dis parturient montes, nascetur ridiculus
-                mus
-              </p>
-              <p>
-                1. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
-                Aenean commodo ligula eget dolor. 2. Aenean massa. Cum sociis
-                natoque penatibus et magnis dis parturient montes, nascetur
-                ridiculus mus 3. Donec quam felis, ultricies nec, pellentesque
-                eu, pretium quis, sem. Nulla consequat massa quis enim.  4.
-                Donec pede justo, fringilla vel, aliquet nec, vulputate eget,
-                arcu. 5. In enim justo, rhoncus ut, imperdiet a, venenatis
-                vitae, justo. 
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="flex flex-col items-center py-16 pb-16 px-4 sm:px-8 max-w-11/12 mx-auto">
-        <h2 className="text-xl sm:text-2xl font-medium mb-12 w-full border-b-2 border-black pb-2 text-end">
-          Sejarah
-        </h2>
-        <div className="w-full flex flex-col gap-12">
-          <div className="relative w-full h-96 sm:h-96">
-            <Image
-              src="/auth.png"
-              alt="sejarah"
-              fill
-              className="object-cover"
-            />
-          </div>
-          <p>
-            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean
-            commodo ligula eget dolor. Aenean massa. Cum sociis natoque
-            penatibus et magnis dis parturient montes, nascetur ridiculus mus.
-            Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.
-            Nulla consequat massa quis enim. Donec pede justo, fringilla vel,
-            aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut,
-            imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede
-            mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum
-            semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula,
-            porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem
-            ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra
-            nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet.
-            Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies
-            nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget
-            condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem
-            neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar,
-            hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus.
-            Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante.
-            Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed
-            fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed
-            consequat, leo eget bibendum sodales, augue velit cursus nunc, quis
-            gravida magna mi a libero. Fusce vulputate eleifend sapien.
-            Vestibulum purus quam, scelerisque ut, mollis sed, nonummy id,
-            metus. Nullam accumsan lorem in dui. Cras ultricies mi eu turpis
-            hendrerit fringilla. Vestibulum ante ipsum primis in faucibus orci
-            luctus et ultrices posuere cubilia Curae; In ac dui quis mi
-            consectetuer lacinia. Nam pretium turpis et arcu. Duis arcu tortor,
-            suscipit eget, imperdiet nec, imperdiet iaculis, ipsum. Sed aliquam
-            ultrices mauris. Integer ante arcu, accumsan a, consectetuer eget,
-            posuere ut, mauris. Praesent adipiscing. Phasellus ullamcorper ipsum
-            rutrum nunc. Nunc nonummy metus. Vestibulum volutpat pretium libero.
-            Cras id dui. Aenean ut eros et nisl sagittis vestibulum. Nullam
-            nulla eros, ultricies sit amet, nonummy id, imperdiet feugiat, pede.
-            Sed lectus. Donec mollis hendrerit risus. Phasellus nec sem in justo
-            pellentesque facilisis. Etiam imperdiet imperdiet orci. Nunc nec
-            neque. Phasellus leo dolor, tempus non, auctor et, hendrerit quis,
-            nisi. Curabitur ligula sapien, tincidunt non, euismod vitae, posuere
-            imperdiet, leo. Maecenas malesuada. Praesent congue erat at massa.
-            Sed cursus turpis vitae tortor. Donec posuere vulputate arcu.
-            Phasellus accumsan cursus velit. Vestibulum ante ipsum primis in
-            faucibus orci luctus et ultrices posuere cubilia Curae; Sed aliquam,
-            nisi quis porttitor congue, elit erat euismod orci, ac.
-          </p>
-        </div>
-      </div>
-    </>
-  );
+        </>
+    )
 }

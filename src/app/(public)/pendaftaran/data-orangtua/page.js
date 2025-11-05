@@ -17,7 +17,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from 'next/link'
-import {useState} from "react"
+import { useState } from "react"
+import RegistrationProgress from "@/components/RegistrationProgress";
+
 
 const FormSchema = z.object({
   namaAyah: z.string().min(2, { message: "Nama Ayah harus diisi." }),
@@ -68,7 +70,9 @@ export default function DataOrangtua() {
 
   return (
     <>
-    <div className="flex items-center gap-2 m-12 mt-6 pt-12 justify-between">
+      <div className="max-w-7xl mx-auto">
+        <RegistrationProgress />
+      <div className="flex items-center gap-2 m-12 mt-6 justify-between">
         <div className="flex gap-5 items-center">
             <CheckCircle className="text-green-500" />
             <h2 className="text-xl font-semibold">Data Orang Tua/ Wali</h2>
@@ -258,11 +262,17 @@ export default function DataOrangtua() {
           </div>
           )}
           </div>
-          <div className="w-full flex items-center justify-end my-12 px-12">
+            <div className="w-full flex items-center justify-end my-12 px-12">
+              <Link href="/pendaftaran">
+                        <Button type="submit" variant={"yellow"} className={"w-full sm:w-48"}>
+                            Kembali
+                        </Button>
+                    </Link>
                         <Link href="/pendaftaran/data-akademik" className="w-48"><Button type="submit" variant={"matcha"} className={"w-full"}>Lanjut</Button></Link>
                     </div>
         </form>
-      </Form>
+        </Form>
+        </div>
     </>
   );
 }
