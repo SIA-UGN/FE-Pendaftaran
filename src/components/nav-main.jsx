@@ -46,9 +46,9 @@ export function NavMain({ items }) {
                   <CollapsibleContent>
                     <SidebarMenuSub>
                       {[
-                        { title: "Pendaftar", url: "/manager/statistik/pendaftar" },
-                        { title: "Program Studi", url: "/manager/statistik/program-studi" },
-                        { title: "Keuangan", url: "/manager/statistik/keuangan" },
+                        { title: "Pendaftar", url: "/dashboard/statistik/pendaftar" },
+                        { title: "Program Studi", url: "/dashboard/statistik/program-studi" },
+                        { title: "Keuangan", url: "/dashboard/statistik/keuangan" },
                       ].map((sub) => (
                         <SidebarMenuSubItem key={sub.title}>
                           <SidebarMenuSubButton asChild>

@@ -10,12 +10,8 @@ import {
   GalleryVerticalEnd,
   Map,
   PieChart,
-  ChartPie,
   Settings2,
   SquareTerminal,
-  Users,
-  UserLock,
-  UserPlus,
 } from "lucide-react"
 
 import {
@@ -26,8 +22,6 @@ import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
-import { SidebarTrigger } from "@/components/ui/sidebar"
-
 import {
   Sidebar,
   SidebarContent,
@@ -35,8 +29,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { Wallet } from "lucide-react";
-
+import {Wallet } from "lucide-react";
 
 // This is sample data.
 const data = {
@@ -54,9 +47,29 @@ const data = {
   ],
   navMain: [
   {
-    title: "Data Pendaftar",
+    title: "Dashboard",
     url: "/dashboard",
-    icon: Users,
+    icon: SquareTerminal,
+    isActive: true,
+    items: [
+      {
+        title: "Semua Pendaftar",
+        url: "/dashboard",
+      },
+      {
+        title: "History Pendaftaran",
+        url: "/pendaftar/history",
+      },
+      {
+        title: "Pengaturan",
+        url: "/pendaftar/settings",
+      },
+    ],
+    },
+    {
+    title: "Pendaftar & Manager",
+    url: "/dashboard/data",
+    icon: SquareTerminal,
     isActive: true,
     items: [
       {
@@ -74,47 +87,9 @@ const data = {
     ],
   },
   {
-    title: "Data Manajer",
-    url: "/dashboard/manajer",
-    icon: UserLock,
-    items: [
-      {
-        title: "Daftar Manajer",
-        url: "/dashboard/manajer",
-      },
-      {
-        title: "Detail Manajer",
-        url: "/manajer/detail",
-      },
-      {
-        title: "Performa Manajer",
-        url: "/manajer/performa",
-      },
-    ],
-  },
-  {
-    title: "Tambahkan Manajer",
+    title: "Tambahkan Manager",
     url: "/dashboard/manajer/tambah",
-    icon: UserPlus,
-    items: [
-      {
-        title: "Form Tambah",
-        url: "/dashboard/manajer/tambah",
-      },
-      {
-        title: "Panduan Tambah",
-        url: "/manajer/tambah/panduan",
-      },
-      {
-        title: "Riwayat Tambah",
-        url: "/manajer/tambah/history",
-      },
-    ],
-  },
-  {
-    title: "Statistika",
-    url: "/dashboard/statistika",
-    icon: ChartPie,
+    icon: Settings2,
     items: [
       {
         title: "Data Umum",
@@ -135,8 +110,8 @@ const data = {
     ],
   },
   {
-    title: "Keuangan",
-    url: "/dashboard/keuangan",
+    title: "Statistik",
+    url: "/dashboard/statistik",
     icon: Wallet,
     items: [
       {
@@ -156,7 +131,7 @@ const data = {
         url: "/keuangan/rekap",
       },
     ],
-  },
+    },
 ],
   projects: [
     {
@@ -175,30 +150,26 @@ const data = {
       icon: Map,
     },
   ],
+  
 }
 
 export function AppSidebar({
   ...props
 }) {
   return (
-    <div className="bg-[var(--light-green)] flex">
-      <Sidebar collapsible="icon" {...props} className={"h-[92.5vh] mt-auto"}>
-        {/* <SidebarHeader>
-          <TeamSwitcher teams={data.teams} />
-        </SidebarHeader> */}
-        <DropdownMenuSeparator/>
-        <SidebarContent>
-          <NavMain items={data.navMain} />
-          {/* <NavProjects projects={data.projects} /> */}
-        </SidebarContent>
-        <SidebarFooter>
-          <NavUser user={data.user} />
-        </SidebarFooter>
-        <SidebarRail />
-      </Sidebar>
-      
-      <SidebarTrigger className="-ml-1 mt-28 bg-white p-6" />
-    </div>
-
+    <Sidebar collapsible="icon" {...props}>
+      <SidebarHeader>
+        <TeamSwitcher teams={data.teams} />
+      </SidebarHeader>
+      <DropdownMenuSeparator/>
+      <SidebarContent>
+        <NavMain items={data.navMain} />
+        {/* <NavProjects projects={data.projects} /> */}
+      </SidebarContent>
+      <SidebarFooter>
+        <NavUser user={data.user} />
+      </SidebarFooter>
+      <SidebarRail />
+    </Sidebar>
   );
 }

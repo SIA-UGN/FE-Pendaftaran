@@ -32,7 +32,7 @@ export default function ManajerList() {
                     </InputGroupAddon>
                 </InputGroup>
                 <DropdownMenu>
-                <Button variant="green" className={"rounded-lg"}>
+                <Button variant="outline" className={"rounded-lg"}>
                 <DropdownMenuTrigger>Cari Akun Berdasarkan Data</DropdownMenuTrigger>
                     </Button>
                 <DropdownMenuContent>
