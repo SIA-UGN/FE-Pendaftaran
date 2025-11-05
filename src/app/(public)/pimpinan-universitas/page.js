@@ -1,4 +1,4 @@
-import HomeCarousel from '@/components/HomeCarousel'
+import HomeCarousel from "@/components/HomeCarousel";
 import Image from "next/image";
 
 const pimpinan = [

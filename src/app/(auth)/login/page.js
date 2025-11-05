@@ -1,13 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -16,75 +13,30 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import Link from "next/link";
-import { setCookie } from "cookies-next";
 import ReCAPTCHA from "react-google-recaptcha";
-
-import { jwtDecode } from "jwt-decode";
+import { useLogin } from "@/hooks/useAuth";
+import toast from "react-hot-toast";
 
 export default function Login() {
-  const router = useRouter();
   const [captcha, setCaptcha] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+
+  const loginMutation = useLogin();
 
   async function handleSubmit(e) {
-  e.preventDefault();
-  setError("");
-  setLoading(true);
+    e.preventDefault();
 
-  if (!captcha) {
-    setError("Silakan selesaikan reCAPTCHA terlebih dahulu");
-    setLoading(false);
-    return;
-  }
+    if (!captcha) {
+      toast.error("Silakan selesaikan reCAPTCHA terlebih dahulu");
+      return;
+    }
 
-  try {
-    const res = await fetch("http://localhost:8000/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({ email, password }),
+    loginMutation.mutate({
+      email,
+      password,
     });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      setError(data.message || "Login gagal");
-      return;
-    }
-
-    const token = data.data?.access_token;
-    const role = data.data?.user?.roles?.[0] || "user";
-
-    if (!token) {
-      setError("Token tidak ditemukan di respons server");
-      return;
-    }
-
-    // Simpan ke cookie
-    setCookie("access_token", token, { path: "/", maxAge: 60 * 60 * 24 * 3 });
-    setCookie("role", role, { path: "/", maxAge: 60 * 60 * 24 * 3 });
-
-    // Arahkan user
-    if (role === "admin") {
-      router.push("/dashboard");
-    } else if (role == "manager") {
-      router.push("/manager")
-    } else {
-      router.push("/");
-    }
-
-  } catch (err) {
-    console.error(err);
-    setError("Terjadi kesalahan saat login");
-  } finally {
-    setLoading(false);
   }
-}
 
 
   return (
@@ -115,7 +67,7 @@ export default function Login() {
                 Register
               </Button>
             </Link>
-            <Link href="/register" className="w-8/10 flex-shrink">
+            <Link href="/forgot-password" className="w-8/10 flex-shrink">
               <Button
                 variant={"yellow"}
                 className={
@@ -171,14 +123,13 @@ export default function Login() {
                     />
                   </div>
                 </div>
-                {error && <p className="text-red-600 text-sm">{error}</p>}
                 <Button
                   type="submit"
                   className="w-full rounded-full text-white hover:text-white"
                   variant={"green"}
-                  disabled={loading}
+                  disabled={loginMutation.isPending}
                 >
-                  {loading ? "Logging in..." : "Login"}
+                  {loginMutation.isPending ? "Logging in..." : "Login"}
                 </Button>
               </form>
             </CardContent>

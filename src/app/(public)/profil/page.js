@@ -3,10 +3,8 @@
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import { getCookie } from "cookies-next";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button"
-
+import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -16,178 +14,305 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
-} from "@/components/ui/alert-dialog"
-
-import { SquarePen } from 'lucide-react';
+} from "@/components/ui/alert-dialog";
+import { SquarePen, Upload } from "lucide-react";
+import { useProfile, useUploadAvatar } from "@/hooks/useProfile";
+import { useChangePassword } from "@/hooks/useAuth";
+import toast from "react-hot-toast";
 
 export default function Profil() {
-    const [user, setUser] = useState({ name: "", email: "", picture: "/logo.jpg" });
-    const [open, setOpen] = useState(false)
-    const [alertMessage, setAlertMessage] = useState("")
-    const [alertTitle, setAlertTitle] = useState("")
-    
-    const handleEditClick = ({ title, message }) => {
-      setAlertTitle(title)
-      setAlertMessage(message)
-      setOpen(true)
-    }
-    
-    useEffect(() => {
-        const fetchUser = async () => {
-          try {
-            const token = getCookie("access_token");
+  const { data: profileData, isPending: isLoadingProfile } = useProfile();
+  const user = profileData?.data?.data?.user;
 
-            if (!token) return;
-    
-            const res = await fetch("http://localhost:8000/api/auth/user", {
-              method: "GET",
-              headers: {
-                "Accept": "application/json",
-                "Authorization": `Bearer ${token}`,
-              },
-            });
-    
-            if (!res.ok) {
-              console.warn("Token invalid, redirect ke login");
-              // router.push("/login");
-            }
-    
-            const data = await res.json();
-            const userData = data.data.user;
-    
-            setUser({
-              name: userData.name || "User",
-              email: userData.email || "user@example.com",
-              picture: userData.picture || "/logo.jpg",
-            });
-          } catch (err) {
-            console.error("Gagal ambil data user:", err);
-          }
-        };
-    
-        fetchUser();
-      }, []);
-    
+  const uploadAvatarMutation = useUploadAvatar();
+  const changePasswordMutation = useChangePassword();
+
+  const [open, setOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertTitle, setAlertTitle] = useState("");
+  const [alertType, setAlertType] = useState("");
+  const [inputValue, setInputValue] = useState("");
+
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
+
+  const handleEditClick = ({ title, message, type }) => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setAlertType(type);
+    setInputValue("");
+    setCurrentPassword("");
+    setNewPassword("");
+    setPasswordConfirmation("");
+    setOpen(true);
+  };
+
+  const handleAvatarUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Ukuran file maksimal 2MB!");
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("File harus berupa gambar!");
+      return;
+    }
+
+    uploadAvatarMutation.mutate(file);
+  };
+
+  const handleSave = () => {
+    if (alertType === "password") {
+      if (!currentPassword || !newPassword || !passwordConfirmation) {
+        toast.error("Semua field password harus diisi!");
+        return;
+      }
+
+      if (newPassword !== passwordConfirmation) {
+        toast.error("Konfirmasi password tidak cocok!");
+        return;
+      }
+
+      if (newPassword.length < 8) {
+        toast.error("Password baru minimal 8 karakter!");
+        return;
+      }
+
+      changePasswordMutation.mutate(
+        {
+          current_password: currentPassword,
+          password: newPassword,
+          password_confirmation: passwordConfirmation,
+        },
+        {
+          onSuccess: () => {
+            setOpen(false);
+            setCurrentPassword("");
+            setNewPassword("");
+            setPasswordConfirmation("");
+          },
+        }
+      );
+    } else if (alertType === "email") {
+      if (!inputValue || !inputValue.includes("@")) {
+        toast.error("Email tidak valid!");
+        return;
+      }
+      toast.info("Fitur ubah email akan segera tersedia");
+      setOpen(false);
+    }
+  };
+
+  if (isLoadingProfile) {
     return (
-      <div className="py-8 md:py-12 lg:py-16">
-        <div className="flex flex-col items-center px-4 sm:px-6 md:px-8 lg:px-12 w-full max-w-7xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold mb-6 md:mb-8 w-full border-b border-gray-300 pb-3 md:pb-4 text-[var(--green)]">
-            Profil Saya
-          </h2>
-          
-          <div className="w-full flex flex-col items-center gap-6 md:gap-8 my-4 md:my-6">
-            {/* Profile Image Section */}
-            <div className="relative w-full flex flex-col items-center gap-4">
-              <Input id="picture" type="file" className="absolute w-0 opacity-0" />
-              <div className="relative w-48 h-64 sm:w-56 sm:h-72 md:w-64 md:h-80 lg:w-72 lg:h-96 rounded-xl cursor-pointer group">
-                <Image
-                  src={user.picture}
-                  fill
-                  alt="profile-image"
-                  className="object-cover rounded-2xl transition duration-300 group-hover:opacity-70"
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-white/20 opacity-0 group-hover:opacity-100 transition duration-300 rounded-2xl">
-                  <Button 
-                    className="text-white font-semibold text-sm md:text-base lg:text-lg rounded-md cursor-pointer px-4 py-2 md:px-6 md:py-3" 
-                    variant="green"
-                  >
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--green)]"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="my-12">
+      <div className="flex flex-col items-center pt-4 pb-16 px-4 sm:px-8 max-w-11/12 mx-auto">
+        <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
+          Profil Saya
+        </h2>
+        <div className="w-full h-full flex items-center justify-center relative flex-col gap-4 my-6">
+          <Input
+            id="picture"
+            type="file"
+            accept="image/*"
+            className="absolute w-0 opacity-0"
+            onChange={handleAvatarUpload}
+            disabled={uploadAvatarMutation.isPending}
+          />
+          <div className="relative w-72 h-96 rounded-xl cursor-pointer group">
+            <Image
+              src={user?.avatar_url || "/logo.jpg"}
+              fill
+              alt="profile-image"
+              className="object-cover rounded-2xl transition duration-300 group-hover:opacity-70"
+            />
+            <label
+              htmlFor="picture"
+              className="absolute inset-0 flex items-center justify-center bg-white/20 opacity-0 group-hover:opacity-100 transition duration-300 rounded-2xl cursor-pointer"
+            >
+              <Button
+                type="button"
+                className="text-white font-semibold text-lg rounded-md cursor-pointer pointer-events-none"
+                variant={"green"}
+                disabled={uploadAvatarMutation.isPending}
+              >
+                {uploadAvatarMutation.isPending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="mr-2 h-4 w-4" />
                     Upload Image
-                  </Button>
-                </div>
+                  </>
+                )}
+              </Button>
+            </label>
+          </div>
+          <div className="py-6 w-full flex flex-col gap-6">
+            <div className="grid w-full items-center gap-3">
+              <Label htmlFor="name">Nama Lengkap</Label>
+              <Input
+                type="text"
+                id="name"
+                value={user?.name || ""}
+                readOnly
+                className="bg-muted cursor-not-allowed"
+              />
+            </div>
+            <div className="grid w-full items-center gap-3">
+              <Label htmlFor="email">Email</Label>
+              <div className="relative w-full">
+                <Input
+                  type="email"
+                  id="email"
+                  value={user?.email || ""}
+                  readOnly
+                  className="pr-10"
+                />
+                <SquarePen
+                  size={16}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-[var(--green)] transition-colors"
+                  onClick={() =>
+                    handleEditClick({
+                      title: "Ubah Email",
+                      message: "Tuliskan email baru anda di bawah:",
+                      type: "email",
+                    })
+                  }
+                />
               </div>
             </div>
-
-            {/* Form Section */}
-            <div className="w-full max-w-2xl flex flex-col gap-4 md:gap-6">
-              {/* Nama Lengkap */}
-              <div className="grid w-full items-center gap-2 md:gap-3">
-                <Label htmlFor="name" className="text-sm md:text-base">Nama Lengkap</Label>
-                <Input 
-                  type="text" 
-                  id="name" 
-                  value={user.name} 
+            <div className="grid w-full items-center gap-3">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative w-full">
+                <Input
+                  type="password"
+                  id="password"
+                  value="••••••••"
                   readOnly
-                  className="text-sm md:text-base"
+                  className="pr-10"
                 />
-              </div>
-
-              {/* Email */}
-              <div className="grid w-full items-center gap-2 md:gap-3">
-                <Label htmlFor="email" className="text-sm md:text-base">Email</Label>
-                <div className="relative w-full">
-                  <Input 
-                    type="email" 
-                    id="email" 
-                    value={user.email} 
-                    readOnly
-                    className="pr-10 text-sm md:text-base"
-                    onClick={() => handleEditClick({
-                      title: "Ubah Email",
-                      message: "Tuliskan email baru anda di bawah!",
-                    })}
-                  />
-                  <SquarePen 
-                    size={16} 
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-gray-600 transition-colors" 
-                  />
-                </div>
-              </div>
-
-              {/* Change Password */}
-              <div className="grid w-full items-center gap-2 md:gap-3">
-                <Label htmlFor="password" className="text-sm md:text-base">Change Password</Label>
-                <div className="relative w-full">
-                  <Input 
-                    type="password" 
-                    id="password" 
-                    value="••••••••" 
-                    readOnly
-                    className="pr-10 text-sm md:text-base"
-                    onClick={() => handleEditClick({
+                <SquarePen
+                  size={16}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-[var(--green)] transition-colors"
+                  onClick={() =>
+                    handleEditClick({
                       title: "Ubah Password",
-                      message: "Tuliskan password baru anda di bawah!",
-                    })} 
-                  />
-                  <SquarePen 
-                    size={16} 
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-gray-600 transition-colors" />
-                </div>
+                      message: "Isi form di bawah untuk mengubah password:",
+                      type: "password",
+                    })
+                  }
+                />
               </div>
             </div>
           </div>
         </div>
-        
-        {/* Alert Dialog */}
+
         <AlertDialog open={open} onOpenChange={setOpen}>
-          <AlertDialogContent className="w-[90%] max-w-md sm:max-w-lg">
+          <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-lg md:text-xl">{alertTitle}</AlertDialogTitle>
-              <AlertDialogDescription className="text-sm md:text-base">
-                {alertMessage}
-                <Input 
-                  type="password" 
-                  id="new-password" 
-                  className="mt-3 md:mt-4 text-sm md:text-base"
-                  placeholder="Masukkan password baru"
-                />
+              <AlertDialogTitle>{alertTitle}</AlertDialogTitle>
+              <AlertDialogDescription className="space-y-3">
+                <p className="mb-2 text-foreground">{alertMessage}</p>
+
+                {alertType === "email" && (
+                  <Input
+                    type="email"
+                    placeholder="Masukkan email baru"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    className="mt-2"
+                  />
+                )}
+
+                {alertType === "password" && (
+                  <div className="space-y-3 mt-2">
+                    <div>
+                      <Label
+                        htmlFor="current"
+                        className="text-xs text-muted-foreground mb-1 block"
+                      >
+                        Password Saat Ini
+                      </Label>
+                      <Input
+                        type="password"
+                        id="current"
+                        placeholder="Masukkan password saat ini"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label
+                        htmlFor="new"
+                        className="text-xs text-muted-foreground mb-1 block"
+                      >
+                        Password Baru
+                      </Label>
+                      <Input
+                        type="password"
+                        id="new"
+                        placeholder="Minimal 8 karakter"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label
+                        htmlFor="confirm"
+                        className="text-xs text-muted-foreground mb-1 block"
+                      >
+                        Konfirmasi Password Baru
+                      </Label>
+                      <Input
+                        type="password"
+                        id="confirm"
+                        placeholder="Ulangi password baru"
+                        value={passwordConfirmation}
+                        onChange={(e) =>
+                          setPasswordConfirmation(e.target.value)
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
-              <AlertDialogCancel className="w-full sm:w-auto text-sm md:text-base">
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={changePasswordMutation.isPending}>
                 Batal
               </AlertDialogCancel>
               <AlertDialogAction
-                onClick={() => {
-                  setOpen(false)
-                  console.log("Aksi dikonfirmasi!")
-                }}
-                className="bg-[var(--green)] w-full sm:w-auto text-sm md:text-base hover:bg-[var(--green)]/90"
+                onClick={handleSave}
+                className="bg-[var(--green)] hover:bg-[var(--green)]/90"
+                disabled={changePasswordMutation.isPending}
               >
-                Simpan
+                {changePasswordMutation.isPending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Menyimpan...
+                  </>
+                ) : (
+                  "Simpan"
+                )}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
       </div>
-    )
+    </div>
+  );
 }

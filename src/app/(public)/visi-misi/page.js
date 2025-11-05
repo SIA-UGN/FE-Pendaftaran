@@ -1,5 +1,5 @@
-import HomeCarousel from '@/components/HomeCarousel'
-import Image from 'next/image'
+import HomeCarousel from "@/components/HomeCarousel";
+import Image from "next/image";
 
 import {Card} from "@/components/ui/card"
 
