@@ -45,8 +45,10 @@ export const useLogin = () => {
 
       const userRoles = data.user.roles || [];
 
-      if (userRoles.includes("admin") || userRoles.includes("manager")) {
-        router.push("/admin/registrations");
+      if (userRoles.includes("admin")) {
+        router.push("/dashboard");
+      } else if (userRoles.includes("manager")) {
+        router.push("/manager");
       } else if (
         userRoles.includes("applicant") ||
         userRoles.includes("student")
