@@ -835,7 +835,307 @@ export const useCreateAnnouncement = () => {
   });
 };
 
-## 16. CONTEXT & PROVIDERS (UPDATED WITH LOCALSTORAGE)
+## 16. MANAGER SERVICE
+# ===================
+
+# services/managerService.js
+import apiClient from '@/lib/api';
+
+export const managerService = {
+  // Dashboard
+  getDashboard: () => apiClient.get('/manager/dashboard'),
+  
+  // Applicant Management
+  getApplicants: (params) => apiClient.get('/manager/applicants', { params }),
+  getApplicantDetail: (id) => apiClient.get(`/manager/applicants/${id}`),
+  verifyApplicant: (id, data) => apiClient.put(`/manager/applicants/${id}/verify`, data),
+  setGraduationStatus: (id, data) => apiClient.put(`/manager/applicants/${id}/graduation`, data),
+  
+  // Payment Management
+  getPaymentVerification: (id) => apiClient.get(`/manager/payments/${id}/verification`),
+  verifyPayment: (id, data) => apiClient.put(`/manager/payments/${id}/verify`, data),
+  
+  // Notifications
+  getNotifications: (params) => apiClient.get('/manager/notifications', { params }),
+  createBroadcastNotification: (data) => apiClient.post('/manager/notifications/broadcast', data),
+};
+
+## 17. MANAGER HOOKS
+# ==================
+
+# hooks/useManager.js
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { managerService } from '@/services/managerService';
+import { toast } from 'react-hot-toast';
+
+// Dashboard hook
+export const useManagerDashboard = () => {
+  return useQuery({
+    queryKey: ['manager', 'dashboard'],
+    queryFn: managerService.getDashboard,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+// Applicants List hook
+export const useManagerApplicants = (params) => {
+  return useQuery({
+    queryKey: ['manager', 'applicants', params],
+    queryFn: () => managerService.getApplicants(params),
+    keepPreviousData: true,
+  });
+};
+
+// Applicant Detail hook
+export const useApplicantDetail = (id) => {
+  return useQuery({
+    queryKey: ['manager', 'applicant', id],
+    queryFn: () => managerService.getApplicantDetail(id),
+    enabled: !!id,
+  });
+};
+
+// Verify Applicant mutation
+export const useVerifyApplicant = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ id, data }) => managerService.verifyApplicant(id, data),
+    onSuccess: (data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['manager', 'applicants'] });
+      queryClient.invalidateQueries({ queryKey: ['manager', 'applicant', id] });
+      queryClient.invalidateQueries({ queryKey: ['manager', 'dashboard'] });
+      
+      const status = data.data.registration.status;
+      const message = status === 'approved' ? 'Registration approved successfully!' : 
+                     status === 'rejected' ? 'Registration rejected.' : 
+                     'Registration status updated.';
+      toast.success(message);
+    },
+    onError: (error) => {
+      const message = error?.response?.data?.message || 'Failed to update registration status';
+      toast.error(message);
+    },
+  });
+};
+
+// Set Graduation Status mutation
+export const useSetGraduationStatus = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ id, data }) => managerService.setGraduationStatus(id, data),
+    onSuccess: (data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['manager', 'applicants'] });
+      queryClient.invalidateQueries({ queryKey: ['manager', 'applicant', id] });
+      queryClient.invalidateQueries({ queryKey: ['manager', 'dashboard'] });
+      
+      const status = data.data.registration.graduation_status;
+      const message = status === 'graduated' ? 'Student marked as graduated! 🎉' : 
+                     'Graduation status updated.';
+      toast.success(message);
+    },
+    onError: (error) => {
+      const message = error?.response?.data?.message || 'Failed to update graduation status';
+      toast.error(message);
+    },
+  });
+};
+
+// Payment Verification Detail hook
+export const usePaymentVerification = (id) => {
+  return useQuery({
+    queryKey: ['manager', 'payment', 'verification', id],
+    queryFn: () => managerService.getPaymentVerification(id),
+    enabled: !!id,
+  });
+};
+
+// Verify Payment mutation
+export const useVerifyPayment = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ id, data }) => managerService.verifyPayment(id, data),
+    onSuccess: (data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['manager', 'payment', 'verification', id] });
+      queryClient.invalidateQueries({ queryKey: ['manager', 'applicants'] });
+      queryClient.invalidateQueries({ queryKey: ['manager', 'dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['payments'] });
+      
+      const status = data.data.payment.status;
+      const message = status === 'verified' ? 'Payment verified successfully!' : 
+                     'Payment rejected.';
+      toast.success(message);
+    },
+    onError: (error) => {
+      const message = error?.response?.data?.message || 'Failed to verify payment';
+      toast.error(message);
+    },
+  });
+};
+
+// Manager Notifications hook
+export const useManagerNotifications = (params) => {
+  return useQuery({
+    queryKey: ['manager', 'notifications', params],
+    queryFn: () => managerService.getNotifications(params),
+    keepPreviousData: true,
+  });
+};
+
+// Create Broadcast Notification mutation
+export const useCreateBroadcastNotification = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (data) => managerService.createBroadcastNotification(data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['manager', 'notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] }); // For applicants
+      
+      toast.success(`Broadcast sent to ${data.data.target_count} users!`);
+    },
+    onError: (error) => {
+      const message = error?.response?.data?.message || 'Failed to send broadcast notification';
+      toast.error(message);
+    },
+  });
+};
+
+## 18. ADMIN SERVICE
+# ==================
+
+# services/adminService.js
+import apiClient from '@/lib/api';
+
+export const adminService = {
+  // Dashboard
+  getDashboard: () => apiClient.get('/admin/dashboard'),
+  
+  // Statistics
+  getApplicantStatistics: (params) => apiClient.get('/admin/statistics/applicants', { params }),
+  getProgramStatistics: () => apiClient.get('/admin/statistics/programs'),
+  getFinancialStatistics: () => apiClient.get('/admin/statistics/financial'),
+  
+  // Manager Management
+  getManagers: (params) => apiClient.get('/admin/managers', { params }),
+  createManager: (data) => apiClient.post('/admin/managers', data),
+  deleteManager: (id) => apiClient.delete(`/admin/managers/${id}`),
+  
+  // User Profile
+  getUserProfile: (id) => apiClient.get(`/admin/users/${id}`),
+  
+  // Payment Verification
+  getPaymentVerification: (id) => apiClient.get(`/admin/payments/${id}/verification`),
+};
+
+## 19. ADMIN HOOKS
+# ================
+
+# hooks/useAdmin.js
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { adminService } from '@/services/adminService';
+import { toast } from 'react-hot-toast';
+
+// Dashboard hook
+export const useAdminDashboard = () => {
+  return useQuery({
+    queryKey: ['admin', 'dashboard'],
+    queryFn: adminService.getDashboard,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+// Applicant Statistics hook
+export const useApplicantStatistics = (params) => {
+  return useQuery({
+    queryKey: ['admin', 'statistics', 'applicants', params],
+    queryFn: () => adminService.getApplicantStatistics(params),
+    keepPreviousData: true,
+  });
+};
+
+// Program Statistics hook
+export const useProgramStatistics = () => {
+  return useQuery({
+    queryKey: ['admin', 'statistics', 'programs'],
+    queryFn: adminService.getProgramStatistics,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+};
+
+// Financial Statistics hook
+export const useFinancialStatistics = () => {
+  return useQuery({
+    queryKey: ['admin', 'statistics', 'financial'],
+    queryFn: adminService.getFinancialStatistics,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+// Manager List hook
+export const useManagers = (params) => {
+  return useQuery({
+    queryKey: ['admin', 'managers', params],
+    queryFn: () => adminService.getManagers(params),
+    keepPreviousData: true,
+  });
+};
+
+// Create Manager mutation
+export const useCreateManager = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: adminService.createManager,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'managers'] });
+      toast.success('Manager created successfully!');
+    },
+    onError: (error) => {
+      const message = error?.response?.data?.message || 'Failed to create manager';
+      toast.error(message);
+    },
+  });
+};
+
+// Delete Manager mutation
+export const useDeleteManager = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: adminService.deleteManager,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'managers'] });
+      toast.success('Manager deleted successfully!');
+    },
+    onError: (error) => {
+      const message = error?.response?.data?.message || 'Failed to delete manager';
+      toast.error(message);
+    },
+  });
+};
+
+// User Profile hook
+export const useUserProfile = (id) => {
+  return useQuery({
+    queryKey: ['admin', 'users', id],
+    queryFn: () => adminService.getUserProfile(id),
+    enabled: !!id,
+  });
+};
+
+// Payment Verification hook
+export const usePaymentVerification = (id) => {
+  return useQuery({
+    queryKey: ['admin', 'payments', id, 'verification'],
+    queryFn: () => adminService.getPaymentVerification(id),
+    enabled: !!id,
+  });
+};
+
+## 18. CONTEXT & PROVIDERS (UPDATED WITH LOCALSTORAGE)
 # ======================================================
 
 # contexts/AuthContext.js
@@ -904,7 +1204,7 @@ export const useAuthContext = () => {
   return context;
 };
 
-## 17. MAIN APP SETUP (APP ROUTER)
+## 19. MAIN APP SETUP (APP ROUTER)
 # ==================================
 
 # app/layout.js (Server Component)
@@ -1012,7 +1312,7 @@ export default function Providers({ children }) {
   );
 }
 
-## 18. MIDDLEWARE FOR ROUTE PROTECTION (APP ROUTER)
+## 20. MIDDLEWARE FOR ROUTE PROTECTION (APP ROUTER)
 # ===================================================
 
 # middleware.js
@@ -1069,7 +1369,7 @@ export const config = {
   ],
 };
 
-## 19. UTILS (MINIMAL)
+## 21. UTILS (MINIMAL)
 # ===================
 
 # utils/format.js
@@ -4447,6 +4747,15 @@ src/
 │   │       └── page.js
 │   ├── payment/
 │   │   └── page.js
+│   ├── manager/
+│   │   ├── dashboard/
+│   │   │   └── page.js
+│   │   ├── applicants/
+│   │   │   └── page.js
+│   │   ├── payments/
+│   │   │   └── page.js
+│   │   └── notifications/
+│   │       └── page.js
 │   └── admin/
 │       ├── registrations/
 │       │   └── page.js
@@ -4469,6 +4778,7 @@ src/
 │   │   └── NotificationList.js      // Full notification list
 │   ├── registration/
 │   ├── payment/
+│   ├── manager/
 │   ├── admin/
 │   └── common/
 ├── contexts/
@@ -4479,6 +4789,8 @@ src/
 │   ├── usePayment.js
 │   ├── useNotification.js           // Notification hooks
 │   ├── useProfile.js                // Profile and avatar hooks
+│   ├── useManager.js                // Manager dashboard hooks
+│   ├── useAdmin.js                  // Admin dashboard hooks
 │   └── useAnnouncement.js
 ├── lib/
 │   └── api.js
@@ -4488,7 +4800,9 @@ src/
 │   ├── paymentService.js
 │   ├── announcementService.js
 │   ├── notificationService.js       // Notification service
-│   └── profileService.js            // Profile and avatar service
+│   ├── profileService.js            // Profile and avatar service
+│   ├── managerService.js            // Manager dashboard service
+│   └── adminService.js              // Admin dashboard service
 ├── utils/                           // MINIMAL - Only essential utils
 │   └── format.js                    // formatCurrency, formatDate
 └── styles/
@@ -4596,5 +4910,8 @@ This setup provides a complete, production-ready Next.js App Router application 
 
 See sections above for:
 - Section 10: AUTH HOOKS (with localStorage & AuthContext)
-- Section 16: CONTEXT & PROVIDERS (with localStorage read)
+- Section 11: PROFILE SERVICE & HOOKS (avatar upload system)
+- Section 12: NOTIFICATION SERVICE & HOOKS (bell icon system)
+- Section 16: MANAGER SERVICE & HOOKS (applicant verification, graduation status, payment verification, broadcast notifications)
+- Section 18: ADMIN SERVICE & HOOKS (comprehensive dashboard & management)
 - Section 21: IMPLEMENTATION (Profile page with original design + backend)
