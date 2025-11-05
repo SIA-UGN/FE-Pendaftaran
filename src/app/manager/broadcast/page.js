@@ -116,15 +116,16 @@ export default function BroadcastMessage() {
 
     return (
         <ProtectedRoute>
-            <div className="max-w-8xl mx-auto">
+            <div className="max-w-7xl ">
                 <div className="flex items-center gap-2 mx-4 sm:mx-8 md:mx-12 mt-4 sm:mt-6 mb-12">
-                    <Send className="text-blue-500 w-5 h-5 sm:w-6 sm:h-6" />
-                    <h2 className="text-lg sm:text-xl font-semibold">Broadcast Message</h2>
+                    <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)] mt-12">
+                    Broadcast
+                    </h2> 
                 </div>
 
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        <div className="flex flex-col gap-4 sm:gap-5 p-4 sm:p-8 md:p-12 border rounded-xl mx-4 sm:mx-8 md:mx-12 bg-[var(--light-cream)]">
+                        <div className="flex flex-col gap-4 sm:gap-5 rounded-xl mx-4 sm:mx-8 md:mx-12">
                             
                             <FormField
                                 control={form.control}
@@ -133,12 +134,12 @@ export default function BroadcastMessage() {
                                     <FormItem>
                                         <FormLabel>Target Audience</FormLabel>
                                         <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Pilih target audience" />
+                                            <FormControl className="bg-[var(--light-cream)]">
+                                                <SelectTrigger className="bg-[var(--light-cream)]">
+                                                    <SelectValue placeholder="Pilih target audience" className="bg-[var(--light-cream)]"/>
                                                 </SelectTrigger>
                                             </FormControl>
-                                            <SelectContent>
+                                            <SelectContent className="bg-[var(--light-cream)]">
                                                 <SelectItem value="all">Semua Pengguna</SelectItem>
                                                 <SelectItem value="students">Siswa</SelectItem>
                                                 <SelectItem value="parents">Orang Tua</SelectItem>
@@ -146,9 +147,6 @@ export default function BroadcastMessage() {
                                                 <SelectItem value="staff">Staff</SelectItem>
                                             </SelectContent>
                                         </Select>
-                                        <FormDescription>
-                                            Pilih siapa yang akan menerima pesan ini
-                                        </FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -161,11 +159,8 @@ export default function BroadcastMessage() {
                                     <FormItem>
                                         <FormLabel>Judul Pesan</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Contoh: Pengumuman Penting" {...field} />
+                                            <Input placeholder="Contoh: Pengumuman Penting" {...field}  className="bg-[var(--light-cream)]"/>
                                         </FormControl>
-                                        <FormDescription>
-                                            Judul yang menarik akan meningkatkan tingkat pembacaan
-                                        </FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -180,13 +175,10 @@ export default function BroadcastMessage() {
                                         <FormControl>
                                             <Textarea 
                                                 placeholder="Tulis isi pesan Anda di sini..." 
-                                                className="min-h-[150px]"
+                                                className="min-h-[150px] bg-[var(--light-cream)]"
                                                 {...field} 
                                             />
                                         </FormControl>
-                                        <FormDescription>
-                                            Tulis pesan dengan jelas dan ringkas
-                                        </FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -200,7 +192,7 @@ export default function BroadcastMessage() {
                                         <FormItem>
                                             <FormLabel>Tanggal Pengiriman</FormLabel>
                                             <FormControl>
-                                                <Input type="date" {...field} />
+                                                <Input type="date" {...field}  className="bg-[var(--light-cream)]"/>
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -214,7 +206,7 @@ export default function BroadcastMessage() {
                                         <FormItem>
                                             <FormLabel>Waktu Pengiriman</FormLabel>
                                             <FormControl>
-                                                <Input type="time" {...field} />
+                                                <Input type="time" {...field}  className="bg-[var(--light-cream)]"/>
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -226,11 +218,11 @@ export default function BroadcastMessage() {
 
                         <div className="w-full flex items-center justify-end gap-4 my-8 sm:my-12 px-4 sm:px-8 md:px-12">
                             <Link href="/broadcast">
-                                <Button type="button" variant={"outline"} className={"w-full sm:w-48"}>
+                                <Button type="button" variant={"yellow"} className={"w-full sm:w-48"}>
                                     Batal
                                 </Button>
                             </Link>
-                            <Button type="submit" variant={"default"} className={"w-full sm:w-48"}>
+                            <Button type="submit" variant={"green"} className={"w-full sm:w-48"}>
                                 Kirim Broadcast
                             </Button>
                         </div>
