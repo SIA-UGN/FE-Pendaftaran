@@ -249,8 +249,10 @@ export const useLogin = () => {
       // Role-based redirect
       const userRoles = data.user.roles || [];
       
-      if (userRoles.includes('admin') || userRoles.includes('manager')) {
-        router.push('/admin/registrations');
+      if (userRoles.includes('admin')) {
+        router.push('/dashboard');
+      } else if (userRoles.includes('manager')) {
+        router.push('/manager');
       } else if (userRoles.includes('applicant') || userRoles.includes('student')) {
         router.push('/pendaftaran');
       } else {
@@ -1521,381 +1523,325 @@ export default function RegisterPage() {
   );
 }
 
-# app/(public)/profil/page.js (UPDATED WITH FULL PROFILE FIELDS)
+# app/(public)/profil/page.js (UPDATED - ORIGINAL DESIGN WITH BACKEND INTEGRATION)
 "use client";
 
-import { useState, useRef } from "react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
-import { Camera, Loader2, SquarePen } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import {
-  useProfile,
-  useUpdateProfile,
-  useUploadAvatar,
-} from "@/hooks/useProfile";
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import { SquarePen, Upload } from "lucide-react";
+import { useProfile, useUploadAvatar } from "@/hooks/useProfile";
 import { useChangePassword } from "@/hooks/useAuth";
 import toast from "react-hot-toast";
 
 export default function Profil() {
-  // Profile data - note: response.data.user not response.data.profile
+  // Profile data - response.data.user structure
   const { data: profileData, isPending: isLoadingProfile } = useProfile();
   const user = profileData?.data?.user;
 
-  // Profile form states with new fields (phone, date_of_birth, gender)
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState("");
-  const [gender, setGender] = useState("");
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-
-  // Password form states
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [passwordConfirmation, setPasswordConfirmation] = useState("");
-  const [isEditingPassword, setIsEditingPassword] = useState(false);
-
-  // Avatar upload
-  const fileInputRef = useRef(null);
-  const updateProfileMutation = useUpdateProfile();
   const uploadAvatarMutation = useUploadAvatar();
   const changePasswordMutation = useChangePassword();
 
-  // Initialize form when user data loaded (NOT profile, it's user)
-  useState(() => {
-    if (user) {
-      setName(user.name || "");
-      setPhone(user.phone || "");
-      setDateOfBirth(user.date_of_birth || "");
-      setGender(user.gender || "");
-    }
-  }, [user]);
+  // Alert dialog states
+  const [open, setOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertTitle, setAlertTitle] = useState("");
+  const [alertType, setAlertType] = useState("");
+  const [inputValue, setInputValue] = useState("");
 
-  // Handle profile update with new fields
-  const handleUpdateProfile = (e) => {
-    e.preventDefault();
-    
-    updateProfileMutation.mutate(
-      {
-        name,
-        phone,
-        date_of_birth: dateOfBirth,
-        gender,
-      },
-      {
-        onSuccess: () => {
-          setIsEditingProfile(false);
-        },
-      }
-    );
+  // Password change states
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
+
+  const handleEditClick = ({ title, message, type }) => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setAlertType(type);
+    setInputValue("");
+    setCurrentPassword("");
+    setNewPassword("");
+    setPasswordConfirmation("");
+    setOpen(true);
   };
 
-  // Handle password change
-  const handleChangePassword = (e) => {
-    e.preventDefault();
-
-    if (newPassword !== passwordConfirmation) {
-      toast.error("Password baru dan konfirmasi harus sama");
-      return;
-    }
-
-    if (newPassword.length < 8) {
-      toast.error("Password minimal 8 karakter");
-      return;
-    }
-
-    changePasswordMutation.mutate(
-      {
-        current_password: currentPassword,
-        new_password: newPassword,
-        new_password_confirmation: passwordConfirmation,
-      },
-      {
-        onSuccess: () => {
-          setCurrentPassword("");
-          setNewPassword("");
-          setPasswordConfirmation("");
-          setIsEditingPassword(false);
-        },
-      }
-    );
-  };
-
-  // Handle avatar upload
-  const handleAvatarChange = (e) => {
+  const handleAvatarUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
-      toast.error("File harus berupa gambar");
-      return;
-    }
-
-    // Validate file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
-      toast.error("Ukuran file maksimal 2MB");
+      toast.error("Ukuran file maksimal 2MB!");
       return;
     }
 
+    if (!file.type.startsWith("image/")) {
+      toast.error("File harus berupa gambar!");
+      return;
+    }
+
+    // Pass file directly, not FormData
     uploadAvatarMutation.mutate(file);
+  };
+
+  const handleSave = () => {
+    if (alertType === "password") {
+      if (!currentPassword || !newPassword || !passwordConfirmation) {
+        toast.error("Semua field password harus diisi!");
+        return;
+      }
+
+      if (newPassword !== passwordConfirmation) {
+        toast.error("Konfirmasi password tidak cocok!");
+        return;
+      }
+
+      if (newPassword.length < 8) {
+        toast.error("Password baru minimal 8 karakter!");
+        return;
+      }
+
+      changePasswordMutation.mutate(
+        {
+          current_password: currentPassword,
+          password: newPassword,
+          password_confirmation: passwordConfirmation,
+        },
+        {
+          onSuccess: () => {
+            setOpen(false);
+            setCurrentPassword("");
+            setNewPassword("");
+            setPasswordConfirmation("");
+          },
+        }
+      );
+    } else if (alertType === "email") {
+      if (!inputValue || !inputValue.includes("@")) {
+        toast.error("Email tidak valid!");
+        return;
+      }
+      toast.info("Fitur ubah email akan segera tersedia");
+      setOpen(false);
+    }
   };
 
   if (isLoadingProfile) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--green)]"></div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl mt-20">
-      <h1 className="text-3xl font-bold mb-8">Profil Saya</h1>
-
-      {/* Avatar Upload Card */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Foto Profil</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center gap-4">
-          <div className="relative">
+    <div className="my-12">
+      <div className="flex flex-col items-center pt-4 pb-16 px-4 sm:px-8 max-w-11/12 mx-auto">
+        <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
+          Profil Saya
+        </h2>
+        <div className="w-full h-full flex items-center justify-center relative flex-col gap-4 my-6">
+          <Input
+            id="picture"
+            type="file"
+            accept="image/*"
+            className="absolute w-0 opacity-0"
+            onChange={handleAvatarUpload}
+            disabled={uploadAvatarMutation.isPending}
+          />
+          <div className="relative w-72 h-96 rounded-xl cursor-pointer group">
             <Image
-              src={user?.avatar_url || "/images/default-avatar-male.png"}
-              width={150}
-              height={150}
-              alt="profile-avatar"
-              className="rounded-full object-cover w-[150px] h-[150px]"
+              src={user?.avatar_url || "/logo.jpg"}
+              fill
+              alt="profile-image"
+              className="object-cover rounded-2xl transition duration-300 group-hover:opacity-70"
             />
-            <Button
-              size="icon"
-              variant="secondary"
-              className="absolute bottom-0 right-0 rounded-full"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploadAvatarMutation.isPending}
+            <label
+              htmlFor="picture"
+              className="absolute inset-0 flex items-center justify-center bg-white/20 opacity-0 group-hover:opacity-100 transition duration-300 rounded-2xl cursor-pointer"
             >
-              {uploadAvatarMutation.isPending ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Camera className="w-4 h-4" />
-              )}
-            </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleAvatarChange}
-            />
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Klik ikon kamera untuk mengubah foto profil (Max 2MB)
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Profile Information Card */}
-      <Card className="mb-6">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Informasi Profil</CardTitle>
-          {!isEditingProfile && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditingProfile(true)}
-            >
-              <SquarePen className="w-4 h-4 mr-2" />
-              Edit
-            </Button>
-          )}
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleUpdateProfile} className="space-y-4">
-            <div>
-              <Label htmlFor="name">Nama Lengkap</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                disabled={!isEditingProfile}
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={user?.email || ""}
-                disabled
-                className="bg-muted"
-              />
-              <p className="text-sm text-muted-foreground mt-1">
-                Email tidak dapat diubah
-              </p>
-            </div>
-
-            <div>
-              <Label htmlFor="phone">Nomor Telepon</Label>
-              <Input
-                id="phone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                disabled={!isEditingProfile}
-                placeholder="08123456789"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="dateOfBirth">Tanggal Lahir</Label>
-              <Input
-                id="dateOfBirth"
-                type="date"
-                value={dateOfBirth}
-                onChange={(e) => setDateOfBirth(e.target.value)}
-                disabled={!isEditingProfile}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="gender">Jenis Kelamin</Label>
-              <select
-                id="gender"
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                disabled={!isEditingProfile}
-                className="w-full px-3 py-2 border rounded-md disabled:bg-muted"
-              >
-                <option value="">Pilih Jenis Kelamin</option>
-                <option value="male">Laki-laki</option>
-                <option value="female">Perempuan</option>
-              </select>
-            </div>
-
-            {isEditingProfile && (
-              <div className="flex gap-2">
-                <Button
-                  type="submit"
-                  disabled={updateProfileMutation.isPending}
-                >
-                  {updateProfileMutation.isPending ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Menyimpan...
-                    </>
-                  ) : (
-                    "Simpan"
-                  )}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setIsEditingProfile(false);
-                    if (user) {
-                      setName(user.name || "");
-                      setPhone(user.phone || "");
-                      setDateOfBirth(user.date_of_birth || "");
-                      setGender(user.gender || "");
-                    }
-                  }}
-                >
-                  Batal
-                </Button>
-              </div>
-            )}
-          </form>
-        </CardContent>
-      </Card>
-
-        {/* Change Password Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Ubah Password</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {!isEditingPassword ? (
               <Button
                 type="button"
-                onClick={() => setIsEditingPassword(true)}
+                className="text-white font-semibold text-lg rounded-md cursor-pointer pointer-events-none"
+                variant={"green"}
+                disabled={uploadAvatarMutation.isPending}
               >
-                Ubah Password
+                {uploadAvatarMutation.isPending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Upload Image
+                  </>
+                )}
               </Button>
-            ) : (
-              <form onSubmit={handleChangePassword} className="space-y-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="current_password">Password Saat Ini</Label>
-                  <Input
-                    id="current_password"
-                    type="password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    required
-                  />
-                </div>
+            </label>
+          </div>
+          <div className="py-6 w-full flex flex-col gap-6">
+            <div className="grid w-full items-center gap-3">
+              <Label htmlFor="name">Nama Lengkap</Label>
+              <Input
+                type="text"
+                id="name"
+                value={user?.name || ""}
+                readOnly
+                className="bg-muted cursor-not-allowed"
+              />
+            </div>
+            <div className="grid w-full items-center gap-3">
+              <Label htmlFor="email">Email</Label>
+              <div className="relative w-full">
+                <Input
+                  type="email"
+                  id="email"
+                  value={user?.email || ""}
+                  readOnly
+                  className="pr-10"
+                />
+                <SquarePen
+                  size={16}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-[var(--green)] transition-colors"
+                  onClick={() =>
+                    handleEditClick({
+                      title: "Ubah Email",
+                      message: "Tuliskan email baru anda di bawah:",
+                      type: "email",
+                    })
+                  }
+                />
+              </div>
+            </div>
+            <div className="grid w-full items-center gap-3">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative w-full">
+                <Input
+                  type="password"
+                  id="password"
+                  value="••••••••"
+                  readOnly
+                  className="pr-10"
+                />
+                <SquarePen
+                  size={16}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-[var(--green)] transition-colors"
+                  onClick={() =>
+                    handleEditClick({
+                      title: "Ubah Password",
+                      message: "Isi form di bawah untuk mengubah password:",
+                      type: "password",
+                    })
+                  }
+                />
+              </div>
+            </div>
+          </div>
+        </div>
 
-                <div className="grid gap-2">
-                  <Label htmlFor="new_password">Password Baru</Label>
-                  <Input
-                    id="new_password"
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Minimal 8 karakter"
-                    required
-                    minLength={8}
-                  />
-                </div>
+        <AlertDialog open={open} onOpenChange={setOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>{alertTitle}</AlertDialogTitle>
+              <AlertDialogDescription className="space-y-3">
+                <p className="mb-2 text-foreground">{alertMessage}</p>
 
-                <div className="grid gap-2">
-                  <Label htmlFor="password_confirmation">
-                    Konfirmasi Password Baru
-                  </Label>
+                {alertType === "email" && (
                   <Input
-                    id="password_confirmation"
-                    type="password"
-                    value={passwordConfirmation}
-                    onChange={(e) => setPasswordConfirmation(e.target.value)}
-                    placeholder="Ulangi password baru"
-                    required
-                    minLength={8}
+                    type="email"
+                    placeholder="Masukkan email baru"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    className="mt-2"
                   />
-                </div>
+                )}
 
-                <div className="flex gap-2">
-                  <Button
-                    type="submit"
-                    disabled={changePasswordMutation.isPending}
-                  >
-                    {changePasswordMutation.isPending ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Mengubah...
-                      </>
-                    ) : (
-                      "Simpan Password"
-                    )}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setIsEditingPassword(false);
-                      setCurrentPassword("");
-                      setNewPassword("");
-                      setPasswordConfirmation("");
-                    }}
-                  >
-                    Batal
-                  </Button>
-                </div>
-              </form>
-            )}
-          </CardContent>
-        </Card>
+                {alertType === "password" && (
+                  <div className="space-y-3 mt-2">
+                    <div>
+                      <Label
+                        htmlFor="current"
+                        className="text-xs text-muted-foreground mb-1 block"
+                      >
+                        Password Saat Ini
+                      </Label>
+                      <Input
+                        type="password"
+                        id="current"
+                        placeholder="Masukkan password saat ini"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label
+                        htmlFor="new"
+                        className="text-xs text-muted-foreground mb-1 block"
+                      >
+                        Password Baru
+                      </Label>
+                      <Input
+                        type="password"
+                        id="new"
+                        placeholder="Minimal 8 karakter"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label
+                        htmlFor="confirm"
+                        className="text-xs text-muted-foreground mb-1 block"
+                      >
+                        Konfirmasi Password Baru
+                      </Label>
+                      <Input
+                        type="password"
+                        id="confirm"
+                        placeholder="Ulangi password baru"
+                        value={passwordConfirmation}
+                        onChange={(e) =>
+                          setPasswordConfirmation(e.target.value)
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={changePasswordMutation.isPending}>
+                Batal
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleSave}
+                className="bg-[var(--green)] hover:bg-[var(--green)]/90"
+                disabled={changePasswordMutation.isPending}
+              >
+                {changePasswordMutation.isPending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Menyimpan...
+                  </>
+                ) : (
+                  "Simpan"
+                )}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
@@ -4595,13 +4541,16 @@ This setup provides a complete, production-ready Next.js App Router application 
    - In hooks, access: response.data.data.user
    - NOT data.data.user (missing response wrapper)
 
-4. **PROFILE PAGE WITH NEW FIELDS**
+4. **PROFILE PAGE (ORIGINAL DESIGN WITH BACKEND)**
    - Response structure: response.data.user (NOT profile)
-   - Fields: name, email (read-only), phone, date_of_birth, gender
-   - Update payload: { name, phone, date_of_birth, gender }
-   - Avatar upload with FormData
-   - Edit mode toggle with Cancel button
-   - Password change in separate card
+   - Original UI design maintained (with avatar, name, email, password)
+   - Name: read-only, bg-muted styling
+   - Email: read-only with SquarePen icon (not yet functional)
+   - Password: shown as ••••••••, change via AlertDialog
+   - Avatar: Upload on hover with validation (2MB max)
+   - AlertDialog for email/password change
+   - Password change: 3 fields (current, new, confirmation)
+   - Full validation and loading states
 
 5. **STRING VALIDATION IN LOCALSTORAGE**
    - Check for "undefined" and "null" strings (not actual null/undefined)
@@ -4613,9 +4562,39 @@ This setup provides a complete, production-ready Next.js App Router application 
    - Navbar uses useLogout() hook instead of custom handleLogout
    - ProtectedRoute redirects to /login if no token
 
+7. **ROLE-BASED ROUTING**
+   - Admin → /dashboard
+   - Manager → /manager
+   - Applicant/Student → /pendaftaran
+   - Default → /
+
+8. **NEXT.JS IMAGE CONFIGURATION (IMPORTANT!)**
+   - Must configure external image domains in next.config.js
+   - Required for avatar_url from Laravel backend
+   - Add localhost:8000 for development
+   - Add production domain when deploying
+   - Example config:
+     ```javascript
+     /** @type {import('next').NextConfig} */
+     const nextConfig = {
+       images: {
+         remotePatterns: [
+           {
+             protocol: 'http',
+             hostname: 'localhost',
+             port: '8000',
+             pathname: '/storage/**',
+           },
+         ],
+       },
+     }
+     module.exports = nextConfig
+     ```
+   - MUST restart dev server after config change!
+
 ### COMPLETE UPDATED FILES:
 
 See sections above for:
 - Section 10: AUTH HOOKS (with localStorage & AuthContext)
 - Section 16: CONTEXT & PROVIDERS (with localStorage read)
-- Section 21: IMPLEMENTATION (Profile page with full fields)
+- Section 21: IMPLEMENTATION (Profile page with original design + backend)
