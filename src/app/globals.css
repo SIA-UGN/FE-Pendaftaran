@@ -13,11 +13,12 @@ html {
 
 :root {
   /* custom color */
-  --yellow: #AE963E;
+  --yellow: #DABC50;
   --green: #015023;
   --dark-green: oklch(0.467 0.083 182.489);
   --cream: #CBA400;
   --light-cream: #F5EFD3;
+  --light-green: rgba(230, 238, 233, 1);
 
   --font-poppins: 'Poppins', sans-serif;
   --radius: 0.625rem;
@@ -39,7 +40,7 @@ html {
 
   --accent: oklch(0.968 0.007 247.896);
   --accent-foreground: oklch(0.208 0.042 265.755);
-  
+
   --destructive: oklch(0.577 0.245 27.325);
 
   --border: oklch(0.929 0.013 255.508);
@@ -153,4 +154,10 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+:root {
+  --color-pendaftar: #22c55e;
+  --color-growth: #3b82f6;
+  --color-degrowth: #ef4444;
 }

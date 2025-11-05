@@ -21,6 +21,7 @@ import Link from 'next/link'
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { toast } from "sonner";
 import { getCookie } from "cookies-next";
+import RegistrationProgress from "@/components/RegistrationProgress";
 
 const FormSchema = z.object({
     namaLengkap: z.string().min(2, {
@@ -120,8 +121,6 @@ async function onSubmit(data) {
     toast.error(err.message || "Terjadi kesalahan saat menyimpan data");
   }
 }
-
-
     
     const form = useForm({
         resolver: zodResolver(FormSchema),
@@ -144,14 +143,18 @@ async function onSubmit(data) {
 
     return (
         <ProtectedRoute>
-        <div className="flex items-center gap-2 m-12 mt-6 pt-12">
-                <CheckCircle className="text-green-500" />
-                <h2 className="text-xl font-semibold">Data Diri</h2>
+        <div className="max-w-7xl mx-auto">
+            <RegistrationProgress />
+            
+        
+        <div className="flex items-center gap-2 mx-4 sm:mx-8 md:mx-12 mt-4 sm:mt-6 mb-12">
+                <CheckCircle className="text-green-500 w-5 h-5 sm:w-6 sm:h-6" />
+                <h2 className="text-lg sm:text-xl font-semibold">Data Diri</h2>
         </div>
 
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    <div className="flex flex-col gap-5 p-12 border rounded-xl m-12 bg-[var(--light-cream)]">
+                    <div className="flex flex-col gap-4 sm:gap-5 p-4 sm:p-8 md:p-12 border rounded-xl mx-4 sm:mx-8 md:mx-12 bg-[var(--light-cream)]">
                     <FormField
                         control={form.control}
                         name="namaLengkap"
@@ -180,7 +183,7 @@ async function onSubmit(data) {
                         )}
                     />
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <FormField
                             control={form.control}
                             name="jenisKelamin"
@@ -350,7 +353,7 @@ async function onSubmit(data) {
                         )}
                     />
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <FormField
                             control={form.control}
                             name="anakKe"
@@ -380,13 +383,22 @@ async function onSubmit(data) {
                         />
                     </div>
                     </div>
-                    <div className="w-full flex items-center justify-end my-12 px-12">
-                    <Button type="submit" variant={"matcha"} className={"w-48"}>
-                        Lanjut
-                    </Button>
+                    <div className="w-full flex items-center justify-end my-8 sm:my-12 px-4 sm:px-8 md:px-12">
+                    <Link href="/pendaftaran">
+                        <Button type="submit" variant={"yellow"} className={"w-full sm:w-48"}>
+                            Kembali
+                        </Button>
+                    </Link>
+                    <Link href="/pendaftaran/data-alamat">
+                        <Button type="submit" variant={"matcha"} className={"w-full sm:w-48"}>
+                            Lanjut
+                        </Button>
+                    </Link>
                     </div>
                 </form>
-            </Form>
+                </Form>
+            </div>
         </ProtectedRoute>
+        
     );
 }
