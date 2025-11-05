@@ -18,6 +18,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from 'next/link'
 import RegistrationProgress from "@/components/RegistrationProgress";
 
+
+import { Card } from "@/components/ui/card"
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,8 +32,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import TextareaAutosize from "react-textarea-autosize"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+} from "@/components/ui/input-group"
+import { useState } from "react"
 
-import {Card} from "@/components/ui/card"
 
 const FormSchema = z.object({
   rekening: z.string({
@@ -46,6 +55,8 @@ const FormSchema = z.object({
 });
 
 export default function Pembayaran() {
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  
   const form = useForm({
     resolver: zodResolver(FormSchema),
   });
@@ -73,29 +84,75 @@ export default function Pembayaran() {
       </Card>
 
       <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)] mx-12">Bukti Pembayaran</h2>
+      <div className="mx-12 items-center flex justify-center">
+        <Button variant={"green"} className={"w-full"}>
+          <a href="/uploads/kk.pdf" download>
+              Unduh Bukti Pembayaran
+          </a>
+        </Button>
+      </div>
+      
       <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)] mx-12">Validation Notes</h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="flex flex-col gap-5 p-12 border rounded-xl m-12 bg-[var(--light-cream)]">
-
+            Payment Verified Amount Matches
           </div>
-          <div className="flex ms-auto gap-5 mx-12">
-          <Link href="/manager/verification/data-prestasi" className="ms-auto">
-                  <Button
-                    type="button"
-                    variant="matcha"
-                    className={"w-sm"}
-                  > Batal
-                  </Button>
-            </Link>
-            <Link href="/manager">
-            <Button type="button"
-                      variant="matcha"
-                      className={"w-sm cursor-pointer"}>
-                      Simpan
-            </Button>
-          </Link>
-            </div>
+           <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
+                        <Link href="/manager/verification">
+                        <Button variant={"green"}>
+                            Kembali
+                        </Button>
+                        </Link>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="matcha">Lanjut</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                <AlertDialogTitle>Verifikasi Identitas Pendaftar</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Apakah data yang dimasukkan sudah benar atau lengkap?
+                                </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                <AlertDialogCancel onClick={() => setShowCancelDialog(true)}>Tidak</AlertDialogCancel>
+                                    <Link href="/manager/verification">
+                                        <AlertDialogAction>Ya</AlertDialogAction> 
+                                    </Link>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+
+                        <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                            <AlertDialogTitle>Catatan Perubahan</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Tuliskan catatan untuk pendaftar untuk perbaikan data
+                            </AlertDialogDescription>
+                            <div className="grid w-10/12 sm:w-full gap-6">
+                                <InputGroup>
+                                    <TextareaAutosize
+                                    data-slot="input-group-control"
+                                    className="flex field-sizing-content min-h-32 w-full resize-none rounded-md bg-transparent px-3 py-2.5 text-base transition-[color,box-shadow] outline-none md:text-sm"
+                                    placeholder="Autoresize textarea..."
+                                    />
+                                    <InputGroupAddon align="block-end">
+                                </InputGroupAddon>
+                                </InputGroup>
+                            </div>
+                            </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <Link href="/manager/verification">
+                                        <AlertDialogAction onClick={() => setShowCancelDialog(false)}>
+                                            Simpan
+                                        </AlertDialogAction>
+                                    </Link>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                        </AlertDialog>
+                    </div>
         </form>
       </Form>
     </>

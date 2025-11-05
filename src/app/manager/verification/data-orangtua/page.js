@@ -20,6 +20,26 @@ import Link from 'next/link'
 import { useState } from "react"
 import RegistrationProgress from "@/components/RegistrationProgress";
 
+import { Card } from "@/components/ui/card"
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import TextareaAutosize from "react-textarea-autosize"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+} from "@/components/ui/input-group"
+
 
 const FormSchema = z.object({
   namaAyah: z.string().min(2, { message: "Nama Ayah harus diisi." }),
@@ -45,6 +65,8 @@ const FormSchema = z.object({
 });
 
 export default function DataOrangtua() {
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+
   const [activeForm, setActiveForm] = useState('orangTua')
 
   const form = useForm({
@@ -70,23 +92,37 @@ export default function DataOrangtua() {
 
   return (
     <>
-      <div className="flex items-center gap-2 mx-12 mt-6 pt-12 justify-between  pb-0">
-        <div className="flex gap-5 items-center">
-            <CheckCircle className="text-green-500" />
-            <h2 className="text-xl font-semibold">Data Orang Tua/ Wali</h2>
+      <div className="mx-12 mt-6 grid grid-cols-1 gap-12">
+                
+        <Card className="w-full flex flex-col md:flex-row gap-6 p-8 rounded-2xl shadow-md bg-[var(--light-cream)] justify-between">
+            <div className="flex flex-col p-2 w-full sm:w-2/3 space-y-1 items-start">
+                <h2 className="font-bold text-xl">Faradis Yulianto</h2>
+                <h3 className="text-gray-500">@faradisy20</h3>
+                <p className="text-gray-500">faradisy20@gmail.com</p>
+            </div>
+            <Button variant={"yellow"}>
+                Pending   
+            </Button>  
+        </Card>
+        
+        <div className="flex justify-between">
+          <div className="flex items-center gap-2 pb-0">
+                  <CheckCircle className="text-green-500" />
+                  <h2 className="text-xl font-semibold">Data Orang Tua</h2>
+          </div>
+          <Button
+            type="button"
+            variant="yellow"
+            onClick={() => setActiveForm(activeForm === 'orangTua' ? 'wali' : 'orangTua')}
+          >
+            {activeForm === 'orangTua' 
+              ? 'Data Wali' 
+              : 'Data Orang Tua'}
+          </Button>
         </div>
-        <div className="flex gap-2 mb-6">
-        <Button
-          type="button"
-          variant="yellow"
-          onClick={() => setActiveForm(activeForm === 'orangTua' ? 'wali' : 'orangTua')}
-        >
-          {activeForm === 'orangTua' 
-            ? 'Data Wali' 
-            : 'Data Orang Tua'}
-        </Button>
       </div>
-    </div>
+      
+        
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="flex flex-col gap-5 p-12 border rounded-xl m-12 bg-[var(--light-cream)]">
@@ -97,14 +133,14 @@ export default function DataOrangtua() {
             <FormField control={form.control} name="namaAyah" render={({ field }) => (
               <FormItem>
                 <FormLabel>Nama Ayah Kandung</FormLabel>
-                <FormControl><Input placeholder="Nama lengkap Ayah" {...field} /></FormControl>
+                <FormControl><Input placeholder="Nama lengkap Ayah" {...field} readOnly/></FormControl>
                 <FormMessage />
               </FormItem>
             )}/>
             <FormField control={form.control} name="alamatAyah" render={({ field }) => (
               <FormItem>
                 <FormLabel>Alamat Ayah Kandung</FormLabel>
-                <FormControl><Input placeholder="Alamat lengkap Ayah" {...field} /></FormControl>
+                <FormControl><Input placeholder="Alamat lengkap Ayah" {...field} readOnly/></FormControl>
                 <FormMessage />
               </FormItem>
             )}/>
@@ -112,37 +148,28 @@ export default function DataOrangtua() {
               <FormField control={form.control} name="telpAyah" render={({ field }) => (
                 <FormItem>
                   <FormLabel>No. HP Ayah Kandung</FormLabel>
-                  <FormControl><Input type="tel" placeholder="08..." {...field} /></FormControl>
+                  <FormControl><Input type="tel" placeholder="08..." {...field} readOnly/></FormControl>
                   <FormMessage />
                 </FormItem>
               )}/>
               <FormField control={form.control} name="pekerjaanAyah" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Pekerjaan Ayah</FormLabel>
-                  <FormControl><Input placeholder="Pekerjaan" {...field} /></FormControl>
+                  <FormControl><Input placeholder="Pekerjaan" {...field} readOnly/></FormControl>
                   <FormMessage />
                 </FormItem>
               )}/>
               <FormField control={form.control} name="pendidikanAyah" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Pendidikan Terakhir Ayah</FormLabel>
-                  <FormControl><Input placeholder="SMA/S1/..." {...field} /></FormControl>
+                  <FormControl><Input placeholder="SMA/S1/..." {...field} readOnly/></FormControl>
                   <FormMessage />
                 </FormItem>
               )}/>
               <FormField control={form.control} name="penghasilanAyah" render={({ field }) => (
-                <FormItem>
+                 <FormItem>
                   <FormLabel>Penghasilan Ayah</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger><SelectValue placeholder="Pilih penghasilan" /></SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="<5jt">&lt; 5.000.000</SelectItem>
-                      <SelectItem value="5-10jt">5.000.000 – 9.999.999</SelectItem>
-                      <SelectItem value=">10jt">&gt; 10.000.000</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormControl><Input placeholder="<5.000.000" {...field} readOnly/></FormControl>
                   <FormMessage />
                 </FormItem>
               )}/>
@@ -154,14 +181,14 @@ export default function DataOrangtua() {
             <FormField control={form.control} name="namaIbu" render={({ field }) => (
               <FormItem>
                 <FormLabel>Nama Ibu Kandung</FormLabel>
-                <FormControl><Input placeholder="Nama lengkap Ibu" {...field} /></FormControl>
+                <FormControl><Input placeholder="Nama lengkap Ibu" {...field} readOnly/></FormControl>
                 <FormMessage />
               </FormItem>
             )}/>
             <FormField control={form.control} name="alamatIbu" render={({ field }) => (
               <FormItem>
                 <FormLabel>Alamat Ibu Kandung</FormLabel>
-                <FormControl><Input placeholder="Alamat lengkap Ibu" {...field} /></FormControl>
+                <FormControl><Input placeholder="Alamat lengkap Ibu" {...field} readOnly/></FormControl>
                 <FormMessage />
               </FormItem>
             )}/>
@@ -169,37 +196,28 @@ export default function DataOrangtua() {
               <FormField control={form.control} name="telpIbu" render={({ field }) => (
                 <FormItem>
                   <FormLabel>No. HP Ibu Kandung</FormLabel>
-                  <FormControl><Input type="tel" placeholder="08..." {...field} /></FormControl>
+                  <FormControl><Input type="tel" placeholder="08..." {...field} readOnly/></FormControl>
                   <FormMessage />
                 </FormItem>
               )}/>
               <FormField control={form.control} name="pekerjaanIbu" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Pekerjaan Ibu</FormLabel>
-                  <FormControl><Input placeholder="Pekerjaan" {...field} /></FormControl>
+                  <FormControl><Input placeholder="Pekerjaan" {...field} readOnly/></FormControl>
                   <FormMessage />
                 </FormItem>
               )}/>
               <FormField control={form.control} name="pendidikanIbu" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Pendidikan Terakhir Ibu</FormLabel>
-                  <FormControl><Input placeholder="SMA/S1/..." {...field} /></FormControl>
+                  <FormControl><Input placeholder="SMA/S1/..." {...field} readOnly/></FormControl>
                   <FormMessage />
                 </FormItem>
               )}/>
               <FormField control={form.control} name="penghasilanIbu" render={({ field }) => (
-                <FormItem>
+                 <FormItem>
                   <FormLabel>Penghasilan Ibu</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger><SelectValue placeholder="Pilih penghasilan" /></SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="<5jt">&lt; 5.000.000</SelectItem>
-                      <SelectItem value="5-10jt">5.000.000 – 9.999.999</SelectItem>
-                      <SelectItem value=">10jt">&gt; 10.000.000</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormControl><Input placeholder="<5.000.000" {...field} readOnly/></FormControl>
                   <FormMessage />
                 </FormItem>
               )}/>
@@ -213,55 +231,97 @@ export default function DataOrangtua() {
             <FormField control={form.control} name="namaWali" render={({ field }) => (
                 <FormItem>
                     <FormLabel>Nama Wali</FormLabel>
-                    <FormControl><Input placeholder="Nama lengkap Wali" {...field} /></FormControl>
+                    <FormControl><Input placeholder="Nama lengkap Wali" {...field} readOnly/></FormControl>
                 </FormItem>
             )}/>
             <FormField control={form.control} name="alamatWali" render={({ field }) => (
                 <FormItem>
                     <FormLabel>Alamat Wali</FormLabel>
-                    <FormControl><Input placeholder="Alamat lengkap Wali" {...field} /></FormControl>
+                    <FormControl><Input placeholder="Alamat lengkap Wali" {...field} readOnly/></FormControl>
                 </FormItem>
             )}/>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField control={form.control} name="telpWali" render={({ field }) => (
                     <FormItem>
                         <FormLabel>No. HP Wali</FormLabel>
-                        <FormControl><Input type="tel" placeholder="08..." {...field} /></FormControl>
+                        <FormControl><Input type="tel" placeholder="08..." {...field} readOnly/></FormControl>
                     </FormItem>
                 )}/>
                 <FormField control={form.control} name="pekerjaanWali" render={({ field }) => (
                     <FormItem>
                         <FormLabel>Pekerjaan Wali</FormLabel>
-                        <FormControl><Input placeholder="Pekerjaan" {...field} /></FormControl>
+                        <FormControl><Input placeholder="Pekerjaan" {...field} readOnly/></FormControl>
                     </FormItem>
                 )}/>
                 <FormField control={form.control} name="pendidikanWali" render={({ field }) => (
                     <FormItem>
                         <FormLabel>Pendidikan Terakhir Wali</FormLabel>
-                        <FormControl><Input placeholder="SMA/S1/..." {...field} /></FormControl>
+                        <FormControl><Input placeholder="SMA/S1/..." {...field} readOnly/></FormControl>
                     </FormItem>
                 )}/>
                 <FormField control={form.control} name="penghasilanWali" render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Penghasilan Wali</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                                <SelectTrigger><SelectValue placeholder="Pilih penghasilan" /></SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                <SelectItem value="<5jt">&lt; 5.000.000</SelectItem>
-                                <SelectItem value="5-10jt">5.000.000 – 9.999.999</SelectItem>
-                                <SelectItem value=">10jt">&gt; 10.000.000</SelectItem>
-                            </SelectContent>
-                        </Select>
+                     <FormItem>
+                      <FormLabel>Penghasilan Wali</FormLabel>
+                      <FormControl><Input placeholder="<5.000.000" {...field} readOnly/></FormControl>
+                      <FormMessage />
                     </FormItem>
                 )}/>
             </div>
           </div>
           )}
           </div>
-          <div className="w-full flex items-center justify-end my-12 px-12">
-                        <Link href="/manager/verification/data-akademik" className="w-48"><Button type="submit" variant={"matcha"} className={"w-full"}>Lanjut</Button></Link>
+           <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
+                        <Button variant={"green"}>
+                            Kembali
+                        </Button>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="matcha">Lanjut</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                <AlertDialogTitle>Verifikasi Identitas Pendaftar</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Apakah data yang dimasukkan sudah benar atau lengkap?
+                                </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                <AlertDialogCancel onClick={() => setShowCancelDialog(true)}>Tidak</AlertDialogCancel>
+                                    <Link href="/manager/verification/data-akademik">
+                                        <AlertDialogAction>Ya</AlertDialogAction> 
+                                    </Link>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+
+                        <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                            <AlertDialogTitle>Catatan Perubahan</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Tuliskan catatan untuk pendaftar untuk perbaikan data
+                            </AlertDialogDescription>
+                            <div className="grid w-10/12 sm:w-full gap-6">
+                                <InputGroup>
+                                    <TextareaAutosize
+                                    data-slot="input-group-control"
+                                    className="flex field-sizing-content min-h-32 w-full resize-none rounded-md bg-transparent px-3 py-2.5 text-base transition-[color,box-shadow] outline-none md:text-sm"
+                                    placeholder="Autoresize textarea..."
+                                    />
+                                    <InputGroupAddon align="block-end">
+                                </InputGroupAddon>
+                                </InputGroup>
+                            </div>
+                            </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <Link href="/manager/verification/data-akademik">
+                                        <AlertDialogAction onClick={() => setShowCancelDialog(false)}>
+                                            Simpan
+                                        </AlertDialogAction>
+                                    </Link>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                        </AlertDialog>
                     </div>
         </form>
       </Form>

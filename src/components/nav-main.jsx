@@ -1,6 +1,7 @@
 "use client"
 
-import { ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react"
+import Link from "next/link"
 
 import {
   Collapsible,
@@ -9,7 +10,6 @@ import {
 } from "@/components/ui/collapsible"
 import {
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -18,11 +18,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 
-import Link from 'next/link'
-
-export function NavMain({
-  items
-}) {
+export function NavMain({ items }) {
   return (
     <SidebarGroup>
       <SidebarMenu>
@@ -31,35 +27,53 @@ export function NavMain({
             key={item.title}
             asChild
             defaultOpen={item.isActive}
-            className="group/collapsible">
+            className="group/collapsible"
+          >
             <SidebarMenuItem>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
-                  {item.icon && <item.icon />}
+              {/* Jika item.title === "Statistik", gunakan CollapsibleTrigger */}
+              {item.title === "Statistik" ? (
+                <>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton tooltip={item.title}>
+                      {item.icon && <item.icon />}
+                      <span>{item.title}</span>
+                      <ChevronRight
+                        className="cursor-pointer ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 text-white"
+                      />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {[
+                        { title: "Pendaftar", url: "/manager/statistik/pendaftar" },
+                        { title: "Program Studi", url: "/manager/statistik/program-studi" },
+                        { title: "Keuangan", url: "/manager/statistik/keuangan" },
+                      ].map((sub) => (
+                        <SidebarMenuSubItem key={sub.title}>
+                          <SidebarMenuSubButton asChild>
+                            <Link href={sub.url}>
+                              <span>{sub.title}</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </>
+              ) : (
+                // Jika bukan Statistik, tampilkan tombol biasa langsung ke link
+                <SidebarMenuButton asChild tooltip={item.title}>
                   <Link href={item.url}>
+                    {item.icon && <item.icon />}
                     <span>{item.title}</span>
                   </Link>
-                  {/* <ChevronRight
-                    className="cursor-pointer ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 text-white" /> */}
                 </SidebarMenuButton>
-              </CollapsibleTrigger>
-              {/* <CollapsibleContent>
-                <SidebarMenuSub>
-                  {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton asChild>
-                        <Link href={subItem.url}>
-                          <span>{subItem.title}</span>
-                        </Link>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
-                </SidebarMenuSub>
-              </CollapsibleContent> */}
+              )}
             </SidebarMenuItem>
           </Collapsible>
         ))}
       </SidebarMenu>
     </SidebarGroup>
-  );
+  )
 }

@@ -47,8 +47,28 @@ const data = {
   ],
   navMain: [
   {
-    title: "Data Pendaftar",
+    title: "Dashboard",
     url: "/manager",
+    icon: SquareTerminal,
+    isActive: true,
+    items: [
+      {
+        title: "Semua Pendaftar",
+        url: "/dashboard",
+      },
+      {
+        title: "History Pendaftaran",
+        url: "/pendaftar/history",
+      },
+      {
+        title: "Pengaturan",
+        url: "/pendaftar/settings",
+      },
+    ],
+    },
+    {
+    title: "Data Pendaftar",
+    url: "/manager/pendaftar",
     icon: SquareTerminal,
     isActive: true,
     items: [
@@ -67,8 +87,8 @@ const data = {
     ],
   },
   {
-    title: "Statistika",
-    url: "/manager/statistika",
+    title: "Statistik",
+    url: "/manager/statistik",
     icon: Settings2,
     items: [
       {
@@ -111,6 +131,29 @@ const data = {
         url: "/keuangan/rekap",
       },
     ],
+    },
+  {
+    title: "Broadcast",
+    url: "/manager/broadcast",
+    icon: Wallet,
+    items: [
+      {
+        title: "Laporan Keuangan",
+        url: "/keuangan/laporan",
+      },
+      {
+        title: "Transaksi",
+        url: "/keuangan/transaksi",
+      },
+      {
+        title: "Tagihan",
+        url: "/keuangan/tagihan",
+      },
+      {
+        title: "Rekap",
+        url: "/keuangan/rekap",
+      },
+    ],
   },
 ],
   projects: [
@@ -130,6 +173,7 @@ const data = {
       icon: Map,
     },
   ],
+  
 }
 
 export function ManagerSidebar({

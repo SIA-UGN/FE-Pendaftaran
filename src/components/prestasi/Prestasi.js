@@ -28,8 +28,7 @@ async function getData() {
       amount: 100,
       name: 'Lomba Menghayal',
       sertifikat: "sertifikatLomba.pdf",
-      edit: "edit",
-      hapus: "hapus"
+      lihat: "Lihat",
     },
   ]
 }
