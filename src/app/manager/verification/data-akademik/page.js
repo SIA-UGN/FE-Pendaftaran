@@ -19,6 +19,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link"
 import RegistrationProgress from "@/components/RegistrationProgress";
 
+import { Card } from "@/components/ui/card"
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import TextareaAutosize from "react-textarea-autosize"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+} from "@/components/ui/input-group"
+import { useState } from "react"
+
 const MAX_FILE_SIZE = 5000000; 
 const ACCEPTED_FILE_TYPES = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
 
@@ -41,6 +62,8 @@ const FormSchema = z.object({
 });
 
 export default function DataAkademik() {
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -55,10 +78,24 @@ export default function DataAkademik() {
 
   return (
     <>
-      <div className="flex items-center gap-2 mx-12 mt-6 pt-12 pb-0">
+      <div className="mx-12 mt-6 grid grid-cols-1 gap-12">
+                
+        <Card className="w-full flex flex-col md:flex-row gap-6 p-8 rounded-2xl shadow-md bg-[var(--light-cream)] justify-between">
+            <div className="flex flex-col p-2 w-full sm:w-2/3 space-y-1 items-start">
+                <h2 className="font-bold text-xl">Faradis Yulianto</h2>
+                <h3 className="text-gray-500">@faradisy20</h3>
+                <p className="text-gray-500">faradisy20@gmail.com</p>
+            </div>
+            <Button variant={"yellow"}>
+                Pending   
+            </Button>  
+        </Card>
+        
+        <div className="flex items-center gap-2 pb-0">
                 <CheckCircle className="text-green-500" />
                 <h2 className="text-xl font-semibold">Data Akademik</h2>
-    </div>
+                </div>
+        </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="flex flex-col gap-5 p-12 border rounded-xl m-12 bg-[var(--light-cream)]">
@@ -69,7 +106,7 @@ export default function DataAkademik() {
               <FormItem>
                 <FormLabel>Sekolah Asal</FormLabel>
                 <FormControl>
-                  <Input placeholder="Nama sekolah asal" {...field} />
+                  <Input placeholder="Nama sekolah asal" {...field} readOnly/>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -82,21 +119,13 @@ export default function DataAkademik() {
               control={form.control}
               name="statusKelulusan"
               render={({ field }) => (
-                <FormItem className={"w-full"}>
-                  <FormLabel>Status Kelulusan</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih status kelulusan" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="sudah">Sudah Lulus</SelectItem>
-                      <SelectItem value="belum">Belum Lulus</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
+                <FormItem>
+                <FormLabel>Status Kelulusan</FormLabel>
+                <FormControl>
+                  <Input placeholder="Sudah Lulus" {...field} readOnly/>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
               )}
             />
             </div>
@@ -105,23 +134,13 @@ export default function DataAkademik() {
               control={form.control}
               name="ijazahTerakhir"
               render={({ field }) => (
-                <FormItem className={"w-full"}>
-                  <FormLabel>Ijazah Terakhir</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih ijazah terakhir" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="sma">SMA</SelectItem>
-                      <SelectItem value="smk">SMK</SelectItem>
-                      <SelectItem value="ma">MA</SelectItem>
-                      <SelectItem value="lainnya">Lainnya</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
+                <FormItem>
+                <FormLabel>Ijazah Terakhir</FormLabel>
+                <FormControl>
+                  <Input placeholder="SMA" {...field} readOnly/>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
               )}
             />
           </div>
@@ -132,12 +151,16 @@ export default function DataAkademik() {
             name="uploadIjazah"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Upload Ijazah Terakhir</FormLabel>
-                <FormControl>
-                  <Input type="file" accept=".pdf, .jpg, .jpeg, .png" onChange={(e) => field.onChange(e.target.files)} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+                            <FormLabel>ijazah Terakhir</FormLabel>
+                            <FormControl>
+                                <Button asChild variant={"outline"}>
+                                <a href="/uploads/kk.pdf" download>
+                                    Unduh Ijazah Terakhir
+                                </a>
+                                </Button>
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
             )}
           />
 
@@ -146,12 +169,16 @@ export default function DataAkademik() {
             name="uploadSkl"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Upload SKL (jika ijazah belum keluar)</FormLabel>
-                <FormControl>
-                  <Input type="file" accept=".pdf, .jpg, .jpeg, .png" onChange={(e) => field.onChange(e.target.files)} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+                            <FormLabel>SKL</FormLabel>
+                            <FormControl>
+                                <Button asChild variant={"outline"}>
+                                <a href="/uploads/kk.pdf" download>
+                                    Unduh SKL
+                                </a>
+                                </Button>
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
             )}
           />
           
@@ -160,12 +187,16 @@ export default function DataAkademik() {
             name="uploadTranskrip"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Upload Transkrip Nilai / Rapor 1 Tahun Terakhir</FormLabel>
-                <FormControl>
-                  <Input type="file" accept=".pdf, .jpg, .jpeg, .png" onChange={(e) => field.onChange(e.target.files)} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+                            <FormLabel>Tranksrip Nilai</FormLabel>
+                            <FormControl>
+                                <Button asChild variant={"outline"}>
+                                <a href="/uploads/kk.pdf" download>
+                                    Unduh Tranksrip Nilai
+                                </a>
+                                </Button>
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
             )}
           />
 
@@ -174,12 +205,16 @@ export default function DataAkademik() {
             name="uploadUn"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Upload Nilai Ujian Nasional</FormLabel>
-                <FormControl>
-                  <Input type="file" accept=".pdf, .jpg, .jpeg, .png" onChange={(e) => field.onChange(e.target.files)} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+                            <FormLabel>Ujian Nasional</FormLabel>
+                            <FormControl>
+                                <Button asChild variant={"outline"}>
+                                <a href="/uploads/kk.pdf" download>
+                                    Unduh Nilai Ujian Nasional
+                                </a>
+                                </Button>
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
             )}
           />
 
@@ -188,18 +223,72 @@ export default function DataAkademik() {
             name="uploadSertifikat"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Upload Sertifikat / Surat Rekomendasi (Opsional)</FormLabel>
-                <FormControl>
-                  <Input type="file" accept=".pdf, .jpg, .jpeg, .png" onChange={(e) => field.onChange(e.target.files)} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+                            <FormLabel>Sertifikat/ Surat Rekomendasi</FormLabel>
+                            <FormControl>
+                                <Button asChild variant={"outline"}>
+                                <a href="/uploads/kk.pdf" download>
+                                    Unduh Sertifikat/Surat Rekomendasi
+                                </a>
+                                </Button>
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
             )}
           />
 
           </div>
-          <div className="w-full flex items-center justify-end my-12 px-12">
-                        <Link href="/manager/verification/data-prestasi" className="w-48"><Button type="submit" variant={"matcha"} className={"w-full"}>Lanjut</Button></Link>
+          <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
+                        <Button variant={"green"}>
+                            Kembali
+                        </Button>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="matcha">Lanjut</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                <AlertDialogTitle>Verifikasi Identitas Pendaftar</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Apakah data yang dimasukkan sudah benar atau lengkap?
+                                </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                <AlertDialogCancel onClick={() => setShowCancelDialog(true)}>Tidak</AlertDialogCancel>
+                                    <Link href="/manager/verification/data-prestasi">
+                                        <AlertDialogAction>Ya</AlertDialogAction> 
+                                    </Link>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+
+                        <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                            <AlertDialogTitle>Catatan Perubahan</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Tuliskan catatan untuk pendaftar untuk perbaikan data
+                            </AlertDialogDescription>
+                            <div className="grid w-10/12 sm:w-full gap-6">
+                                <InputGroup>
+                                    <TextareaAutosize
+                                    data-slot="input-group-control"
+                                    className="flex field-sizing-content min-h-32 w-full resize-none rounded-md bg-transparent px-3 py-2.5 text-base transition-[color,box-shadow] outline-none md:text-sm"
+                                    placeholder="Autoresize textarea..."
+                                    />
+                                    <InputGroupAddon align="block-end">
+                                </InputGroupAddon>
+                                </InputGroup>
+                            </div>
+                            </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <Link href="/manager/verification/data-prestasi">
+                                        <AlertDialogAction onClick={() => setShowCancelDialog(false)}>
+                                            Simpan
+                                        </AlertDialogAction>
+                                    </Link>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                        </AlertDialog>
                     </div>
         </form>
       </Form>

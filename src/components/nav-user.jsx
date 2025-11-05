@@ -79,8 +79,8 @@ export function NavUser({ user }) {
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">Admin</span>
-                <span className="truncate text-xs">admin@sia.com</span>
+                <span className="truncate font-medium">Manager</span>
+                <span className="truncate text-xs">manager@sia.com</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -100,8 +100,8 @@ export function NavUser({ user }) {
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate font-medium">Manager</span>
+                  <span className="truncate text-xs">manager@sia.com</span>
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -111,8 +111,8 @@ export function NavUser({ user }) {
             <DropdownMenuItem
               onClick={handleLogout}
               disabled={loading}
-              className="text-red-800 focus:text-red-800 fw-bold cursor-pointer hover:bg-[var(--yellow)]">
-              <LogOut />
+              className="bg-red-800 fw-bold cursor-pointer hover:bg-red-500 text-white">
+              <LogOut className="text-white"/>
               {loading ? "Logging out..." : "Log out"}
             </DropdownMenuItem>
           </DropdownMenuContent>

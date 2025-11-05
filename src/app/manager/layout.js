@@ -34,7 +34,7 @@ export default function DashboardLayout({ children }) {
           </Breadcrumb>
         </header>
 
-        <main className="flex flex-1 flex-col gap-4 p-4 pt-0 bg-muted/30 min-h-screen mt-12">
+        <main className="flex flex-1 flex-col gap-4 p-4 pt-0 bg-muted/30 min-h-screen mt-18">
           {children}
         </main>
       </SidebarInset>

@@ -37,9 +37,9 @@ export default function RegistrationProgress() {
   const steps = [
     { href: "/pendaftaran/data-diri", label: "Data Diri", key: "data-diri", progress: 0 },
     { href: "/pendaftaran/data-alamat", label: "Data Alamat", key: "data-alamat", progress: 18 },
-    { href: "/pendaftaran/data-akademik", label: "Data Akademik", key: "data-akademik", progress: 36 },
-    { href: "/pendaftaran/data-prestasi", label: "Data Prestasi", key: "data-prestasi", progress: 52 },
-    { href: "/pendaftaran/data-orangtua", label: "Data Orang Tua", key: "data-orangtua", progress: 70 },
+    { href: "/pendaftaran/data-orangtua", label: "Data Orang Tua", key: "data-orangtua", progress: 34 },
+    { href: "/pendaftaran/data-akademik", label: "Data Akademik", key: "data-akademik", progress: 52 },
+    { href: "/pendaftaran/data-prestasi", label: "Data Prestasi", key: "data-prestasi", progress: 68 },
     { href: "/pendaftaran/pembayaran", label: "Data Pembayaran", key: "pembayaran", progress: 86 },
   ]
 
@@ -69,44 +69,42 @@ export default function RegistrationProgress() {
   }
 
   return (
-    <div className="w-full max-w-11/12 p-4 flex flex-col items-center gap-12 mx-auto my-12">
+    <div className="sm:w-full w-0  h-0 sm:h-full max-w-11/12 p-0 sm:p-4 flex flex-col items-center gap-12 m-0 sm:mx-auto sm:my-12 sm:mb-6">
       <div className="flex flex-col gap-5 w-full items-center justify-center">
         <div className="flex gap-5 w-full flex-col-reverse">
+        {/* === Progress bar === */}
+        <div className="w-full relative hidden sm:grid grid-cols-6 gap-12 rounded-full">
+          {/* garis abu-abu (dasar) */}
+          <div className="absolute top-1/2 left-[7%] right-[7%] transform -translate-y-1/2 h-[4px] bg-gray-200 rounded-full z-0"></div>
           
-          {/* === Progress bar === */}
-          <div className="w-full relative grid grid-cols-6 gap-12 border border-green-500 rounded-full">
-            {/* garis abu-abu (dasar) */}
-            <div className="absolute left-23 top-1/2 transform -translate-y-1/2 w-[86%] h-[4px] bg-gray-200 rounded-full z-0"></div>
-            
-            {/* garis hijau progress dinamis */}
-            <div
-              className="absolute left-23 top-1/2 transform -translate-y-1/2 h-[4px] bg-green-500 rounded-full z-0 transition-all duration-500"
-              style={{ width: `${progressPercent}%` }}
-            ></div>
-
-            {/* ikon step */}
-            {steps.map((step, index) => {
-              const color = getColor(index)
-              const colorClass =
-                color === "green"
-                  ? "text-green-500"
-                  : color === "yellow"
-                  ? "text-yellow-500"
-                  : "text-red-500"
-
-              return (
-                <div
-                  key={step.key}
-                  className="h-12 flex justify-center items-center w-full z-10"
-                >
-                  <CheckCircle className={`${colorClass} bg-white`} />
-                </div>
-              )
-            })}
-          </div>
+          {/* garis hijau progress dinamis */}
+          <div
+            className="absolute top-1/2 left-[7%] transform -translate-y-1/2 h-[4px] bg-green-500 rounded-full z-0 transition-all duration-500"
+            style={{ width: `${progressPercent}%` }}
+          ></div>
+          
+          {/* ikon step */}
+          {steps.map((step, index) => {
+            const color = getColor(index)
+            const colorClass =
+              color === "green"
+                ? "text-green-500"
+                : color === "yellow"
+                ? "text-yellow-500"
+                : "text-red-500"
+            return (
+              <div
+                key={step.key}
+                className="h-8 flex justify-center items-center w-full z-10"
+              >
+                <CheckCircle className={`${colorClass} bg-white`} />
+              </div>
+            )
+          })}
+        </div>
 
           {/* === Step boxes === */}
-          <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-12">
+          <div className="w-full none hidden md:grid grid-cols-6 gap-6 items-center">
             {steps.map((step, index) => {
               const color = getColor(index)
               const borderClass =
@@ -119,7 +117,7 @@ export default function RegistrationProgress() {
               return (
                 <Link key={step.key} href={step.href}>
                   <div
-                    className={`h-24 border rounded-lg p-4 flex items-center justify-center transition-all duration-300 ${borderClass}`}
+                    className={`h-12 min-h-fit border rounded-lg p-4 flex items-center justify-center transition-all duration-300 ${borderClass}`}
                   >
                     <span>{step.label}</span>
                   </div>

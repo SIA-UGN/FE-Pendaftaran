@@ -19,35 +19,35 @@ const students = [
     name: "Andi Saputra",
     email: "andi.saputra@example.com",
     major: "Teknik Informatika",
-    status: "Lulus",
+    status: "Approved",
   },
   {
     id: "MHS002",
     name: "Budi Santoso",
     email: "budi.santoso@example.com",
     major: "Manajemen",
-    status: "Lulus",
+    status: "Rejected",
   },
   {
     id: "MHS003",
     name: "Citra Lestari",
     email: "citra.lestari@example.com",
     major: "Desain Komunikasi Visual",
-    status: "Lulus",
+    status: "Approved",
   },
   {
     id: "MHS004",
     name: "Dewi Anggraini",
     email: "dewi.anggraini@example.com",
     major: "Akuntansi",
-    status: "Lulus",
+    status: "Rejected",
   },
   {
     id: "MHS005",
     name: "Eka Pratama",
     email: "eka.pratama@example.com",
     major: "Hukum",
-    status: "Lulus",
+    status: "Approved",
   },
 ];
 
@@ -62,7 +62,7 @@ export function ApplicantTable() {
           <TableHead>Email</TableHead>
           <TableHead>Jurusan</TableHead>
           <TableHead>Status</TableHead>
-          <TableHead className="text-right">Aksi</TableHead>
+          <TableHead className="text-right">Verifikasi</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -74,9 +74,9 @@ export function ApplicantTable() {
             <TableCell>{student.major}</TableCell>
             <TableCell>{student.status}</TableCell>
             <TableCell className="text-right">
-              <Link href="/manager/profile">
-              <Button size="sm" variant="outline">
-                Lihat
+              <Link href="/manager/verification">
+              <Button size="sm" variant="yellow">
+                Verifikasi
               </Button>
               </Link>
             </TableCell>

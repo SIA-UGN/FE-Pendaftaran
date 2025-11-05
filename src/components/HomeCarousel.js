@@ -41,17 +41,17 @@ export default function HomeCarousel() {
         {images.map((image, index) => (
           <CarouselItem key={index}>
             <div className="w-full">
-              <Card className={"w-full h-[90vh] rounded-none p-0"}>
+              <Card className="w-full h-[90vh] rounded-none p-0">
                 <CardContent className="flex items-center justify-center w-full h-full p-0 relative">
                   <img
                     src={image.url}
                     alt={`Slide ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 flex bg-black/40 text-white px-24">
-                    <div className="flex flex-col justify-center items-start my-auto">
-                      <p className="text-6xl font-bold mb-2 w-xl">{image.heading}</p>
-                      <p className="text-md w-2xl text-white/80">{image.subheading}</p>
+                  <div className="absolute inset-0 flex bg-black/40 text-white px-4 sm:px-8 md:px-12 lg:px-16 xl:px-24">
+                    <div className="flex flex-col justify-center items-start my-auto max-w-4xl">
+                      <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-2 leading-tight">{image.heading}</p>
+                      <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 leading-relaxed">{image.subheading}</p>
                     </div>
                   </div>
                 </CardContent>

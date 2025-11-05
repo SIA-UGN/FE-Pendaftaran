@@ -22,32 +22,29 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { toast } from "sonner";
 import { getCookie } from "cookies-next";
 import RegistrationProgress from "@/components/RegistrationProgress";
-
-const FormSchema = z.object({
-    namaLengkap: z.string().min(2, {
-        message: "Nama Lengkap harus memiliki setidaknya 2 karakter.",
-    }),
-    email: z.string().email({
-        message: "Silakan masukkan alamat email yang valid.",
-    }),
-    jenisKelamin: z.string().min(1, { message: "Jenis Kelamin wajib diisi." }),
-    agama: z.string().min(1, { message: "Agama wajib diisi." }),
-    noPonsel: z.string().min(10, { message: "Nomor Ponsel tidak valid." }),
-    tempatLahir: z.string().min(1, { message: "Tempat Lahir wajib diisi." }),
-    tanggalLahir: z.string().min(1, { message: "Tanggal Lahir wajib diisi." }),
-    nik: z.string().length(16, { message: "NIK harus 16 digit." }),
-    ktp: z.any().optional(),
-    noAkta: z.string().min(1, { message: "Nomor Akta wajib diisi." }),
-    akta: z.any().optional(),
-    noKK: z.string().length(16, { message: "Nomor KK harus 16 digit." }),
-    kk: z.any().optional(),
-    kewarganegaraan: z.string().min(1, { message: "Kewarganegaraan wajib diisi." }),
-    anakKe: z.string().min(1, { message: "Anak ke berapa wajib diisi." }),
-    jumlahSaudara: z.string().min(1, { message: "Jumlah saudara wajib diisi." }),
-});
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { useState } from "react"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+} from "@/components/ui/input-group"
+import TextareaAutosize from "react-textarea-autosize"
+import {Card} from "@/components/ui/card"
 
 export default function DataDiri() {
     const router = useRouter();
+    const [showCancelDialog, setShowCancelDialog] = useState(false);
 
 async function onSubmit(data) {
   console.log("📤 Data dikirim:", data);
@@ -123,7 +120,6 @@ async function onSubmit(data) {
 }
     
     const form = useForm({
-        resolver: zodResolver(FormSchema),
         defaultValues: {
             namaLengkap: "",
             email: "",
@@ -143,10 +139,24 @@ async function onSubmit(data) {
 
     return (
         <ProtectedRoute>
+            
+        <div className="mx-12 mt-6 grid grid-cols-1 gap-12">
+                
+        <Card className="w-full flex flex-col md:flex-row gap-6 p-8 rounded-2xl shadow-md bg-[var(--light-cream)] justify-between">
+            <div className="flex flex-col p-2 w-full sm:w-2/3 space-y-1 items-start">
+                <h2 className="font-bold text-xl">Faradis Yulianto</h2>
+                <h3 className="text-gray-500">@faradisy20</h3>
+                <p className="text-gray-500">faradisy20@gmail.com</p>
+            </div>
+            <Button variant={"yellow"}>
+                Pending   
+            </Button>  
+        </Card>
         
-        <div className="flex items-center gap-2 mx-12 mt-6 pt-12  pb-0">
+        <div className="flex items-center gap-2 pb-0">
                 <CheckCircle className="text-green-500" />
-                <h2 className="text-xl font-semibold">Data Diri</h2>
+                <h2 className="text-xl font-semibold">Identitas Pendaftar</h2>
+                </div>
         </div>
 
             <Form {...form}>
@@ -159,7 +169,7 @@ async function onSubmit(data) {
                             <FormItem>
                                 <FormLabel>Nama Lengkap</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Nama Lengkap" {...field} />
+                                    <Input placeholder="Faradis Yulianto" {...field} readOnly />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -173,7 +183,7 @@ async function onSubmit(data) {
                             <FormItem>
                                 <FormLabel>Email</FormLabel>
                                 <FormControl>
-                                    <Input type="email" placeholder="Email" {...field} />
+                                    <Input type="email" placeholder="faradisy20@gmail.com" {...field} readOnly/>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -188,7 +198,7 @@ async function onSubmit(data) {
                                 <FormItem> 
                                     <FormLabel>Jenis Kelamin</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Jenis Kelamin" {...field} />
+                                        <Input placeholder="Laki-laki" {...field} readOnly/>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -202,7 +212,7 @@ async function onSubmit(data) {
                                 <FormItem>
                                     <FormLabel>Agama</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Agama" {...field} />
+                                        <Input placeholder="Islam" {...field}readOnly />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -216,7 +226,7 @@ async function onSubmit(data) {
                                 <FormItem>
                                     <FormLabel>Nomer Ponsel</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="08xxxxxxxx" {...field} />
+                                        <Input placeholder="085876270545" {...field} readOnly/>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -230,7 +240,7 @@ async function onSubmit(data) {
                                 <FormItem>
                                     <FormLabel>Tempat Lahir</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Tempat Lahir" {...field} />
+                                        <Input placeholder="Magelang" {...field} readOnly/>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -244,7 +254,7 @@ async function onSubmit(data) {
                                 <FormItem>
                                     <FormLabel>Tanggal Lahir</FormLabel>
                                     <FormControl>
-                                        <Input type="date" {...field} />
+                                        <Input type="text" {...field} placeholder="12/12/2025" readOnly/>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -258,7 +268,7 @@ async function onSubmit(data) {
                                 <FormItem>
                                     <FormLabel>NIK</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="NIK" {...field} />
+                                        <Input placeholder="123123123123" {...field} readOnly/>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -266,19 +276,23 @@ async function onSubmit(data) {
                         />
                     </div>
 
-                    <FormField
+                     <FormField
                         control={form.control}
                         name="ktp"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>KTP / KITAS</FormLabel>
-                                <FormControl>
-                                    <Input type="file" onChange={(e) => field.onChange(e.target.files)} />
-                                </FormControl>
-                                <FormMessage />
+                            <FormLabel>KTP / KITAS</FormLabel>
+                            <FormControl>
+                                <Button asChild variant={"outline"}>
+                                <a href="/uploads/kk.pdf" download>
+                                    Unduh KTP
+                                </a>
+                                </Button>
+                            </FormControl>
+                            <FormMessage />
                             </FormItem>
                         )}
-                    />
+                        />
 
                     <FormField
                         control={form.control}
@@ -287,26 +301,30 @@ async function onSubmit(data) {
                             <FormItem>
                                 <FormLabel>Nomor Registrasi Akta Lahir</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Nomor Akta" {...field} />
+                                    <Input placeholder="123123123123" {...field} readOnly/>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
 
-                    <FormField
+                     <FormField
                         control={form.control}
                         name="akta"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Akta Kelahiran</FormLabel>
-                                <FormControl>
-                                    <Input type="file" onChange={(e) => field.onChange(e.target.files)} />
-                                </FormControl>
-                                <FormMessage />
+                            <FormLabel>Akta Kelahiran</FormLabel>
+                            <FormControl>
+                                <Button asChild variant={"outline"}>
+                                <a href="/uploads/kk.pdf" download>
+                                    Unduh Akta Kelahiran
+                                </a>
+                                </Button>
+                            </FormControl>
+                            <FormMessage />
                             </FormItem>
                         )}
-                    />
+                        />
 
                     <FormField
                         control={form.control}
@@ -315,7 +333,7 @@ async function onSubmit(data) {
                             <FormItem>
                                 <FormLabel>Nomor Kartu Keluarga</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Nomor KK" {...field} />
+                                    <Input placeholder="12312312313" {...field} readOnly/>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -323,17 +341,21 @@ async function onSubmit(data) {
                     />
 
                     <FormField
-                        control={form.control}
-                        name="kk"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Kartu Keluarga</FormLabel>
-                                <FormControl>
-                                    <Input type="file" onChange={(e) => field.onChange(e.target.files)} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
+                    control={form.control}
+                    name="kk"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Kartu Keluarga</FormLabel>
+                        <FormControl>
+                            <Button asChild variant={"outline"}>
+                            <a href="/uploads/kk.pdf" download>
+                                Unduh Kartu Keluarga
+                            </a>
+                            </Button>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
                     />
 
                     <FormField
@@ -343,7 +365,7 @@ async function onSubmit(data) {
                             <FormItem>
                                 <FormLabel>Kewarganegaraan</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="WNI/WNA" {...field} />
+                                    <Input placeholder="WNI" {...field} readOnly/>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -358,7 +380,7 @@ async function onSubmit(data) {
                                 <FormItem>
                                     <FormLabel>Anak ke Berapa</FormLabel>
                                     <FormControl>
-                                        <Input type="number" placeholder="1" {...field} />
+                                        <Input type="number" placeholder="3" {...field} readOnly/>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -372,7 +394,7 @@ async function onSubmit(data) {
                                 <FormItem>
                                     <FormLabel>Jumlah Saudara Kandung</FormLabel>
                                     <FormControl>
-                                        <Input type="number" placeholder="0" {...field} />
+                                        <Input type="number" placeholder="2" {...field} readOnly />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -380,10 +402,60 @@ async function onSubmit(data) {
                         />
                     </div>
                     </div>
-                    <div className="w-full flex items-center justify-end my-12 px-12">
-                    <Button type="submit" variant={"matcha"} className={"w-48"}>
-                        Lanjut
-                    </Button>
+                    <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
+                        <Link href="/manager/verification">
+                        <Button variant={"green"}>
+                            Kembali
+                        </Button>
+                        </Link>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="matcha">Lanjut</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                <AlertDialogTitle>Verifikasi Identitas Pendaftar</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Apakah data yang dimasukkan sudah benar atau lengkap?
+                                </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                <AlertDialogCancel onClick={() => setShowCancelDialog(true)}>Tidak</AlertDialogCancel>
+                                    <Link href="/manager/verification/data-alamat">
+                                        <AlertDialogAction>Ya</AlertDialogAction> 
+                                    </Link>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+
+                        <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                            <AlertDialogTitle>Catatan Perubahan</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Tuliskan catatan untuk pendaftar untuk perbaikan data
+                            </AlertDialogDescription>
+                            <div className="grid w-10/12 sm:w-full gap-6">
+                                <InputGroup>
+                                    <TextareaAutosize
+                                    data-slot="input-group-control"
+                                    className="flex field-sizing-content min-h-32 w-full resize-none rounded-md bg-transparent px-3 py-2.5 text-base transition-[color,box-shadow] outline-none md:text-sm"
+                                    placeholder="Autoresize textarea..."
+                                    />
+                                    <InputGroupAddon align="block-end">
+                                </InputGroupAddon>
+                                </InputGroup>
+                            </div>
+                            </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <Link href="/manager/verification/data-alamat">
+                                        <AlertDialogAction onClick={() => setShowCancelDialog(false)}>
+                                            Simpan
+                                        </AlertDialogAction>
+                                    </Link>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                        </AlertDialog>
                     </div>
                 </form>
             </Form>

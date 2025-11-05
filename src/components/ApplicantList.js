@@ -26,15 +26,17 @@ export default function ApplicantList() {
         <>     
             <div className="flex gap-5 my-6 w-full">
                 <InputGroup>
-                    <InputGroupInput placeholder="Search..." />
+                    <InputGroupInput placeholder="Cari berdasarkan nama, nomor peserta, dsb.." />
                     <InputGroupAddon>
                     <SearchIcon />
                     </InputGroupAddon>
                 </InputGroup>
                 <DropdownMenu>
-                <Button variant="green" className={"rounded-lg"}>
-                <DropdownMenuTrigger>Cari Akun Berdasarkan Data</DropdownMenuTrigger>
-                    </Button>
+                    <DropdownMenuTrigger>
+                        <Button variant={"outline"}>
+                            Cari Akun Berdasarkan Data
+                        </Button>
+                    </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     <DropdownMenuItem>Fahmi</DropdownMenuItem>
                     <DropdownMenuItem>Faradis</DropdownMenuItem>
