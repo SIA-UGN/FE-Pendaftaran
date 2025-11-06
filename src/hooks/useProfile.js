@@ -33,9 +33,27 @@ export const useUploadAvatar = () => {
 
   return useMutation({
     mutationFn: profileService.uploadAvatar,
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
+
+      try {
+        const profileResponse = await profileService.getProfile();
+        const updatedUser = profileResponse.data?.data?.user;
+
+        if (updatedUser) {
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+
+          window.dispatchEvent(
+            new CustomEvent("userUpdated", {
+              detail: updatedUser,
+            })
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching updated profile:", error);
+      }
+
       toast.success("Avatar berhasil diupload");
     },
     onError: (error) => {
@@ -51,9 +69,27 @@ export const useDeleteAvatar = () => {
 
   return useMutation({
     mutationFn: profileService.deleteAvatar,
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
+
+      try {
+        const profileResponse = await profileService.getProfile();
+        const updatedUser = profileResponse.data?.data?.user;
+
+        if (updatedUser) {
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+
+          window.dispatchEvent(
+            new CustomEvent("userUpdated", {
+              detail: updatedUser,
+            })
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching updated profile:", error);
+      }
+
       toast.success("Avatar berhasil dihapus");
     },
     onError: (error) => {

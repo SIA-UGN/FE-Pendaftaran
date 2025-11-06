@@ -31,30 +31,52 @@ import { useLogout } from "@/hooks/useAuth";
 export default function Navbar() {
   const router = useRouter();
   const logoutMutation = useLogout();
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [mobileProfilOpen, setMobileProfilOpen] = useState(false);
-  const [hasNotification, setHasNotification] = useState(true);
 
   useEffect(() => {
-    const loadUser = () => {
-      try {
-        const token = localStorage.getItem("access_token");
-        const storedUser = localStorage.getItem("user");
+    const updateUserData = () => {
+      const token = localStorage.getItem("access_token");
+      const userStr = localStorage.getItem("user");
 
-        if (!token || !storedUser) throw new Error("No token");
-
-        setIsLoggedIn(true);
-        setUser(JSON.parse(storedUser));
-      } catch (err) {
-        console.log("User not logged in", err);
+      if (token && userStr) {
+        try {
+          const userData = JSON.parse(userStr);
+          setUser(userData);
+          setIsLoggedIn(true);
+        } catch (error) {
+          console.error("Error parsing user data:", error);
+          setIsLoggedIn(false);
+          setUser(null);
+        }
+      } else {
         setIsLoggedIn(false);
         setUser(null);
       }
     };
 
-    loadUser();
+    // Initial load
+    updateUserData();
+
+    // Listen to custom event untuk auto-update avatar di tab yang sama
+    const handleUserUpdate = (event) => {
+      if (event.detail) {
+        setUser(event.detail);
+        setIsLoggedIn(true);
+      } else {
+        updateUserData();
+      }
+    };
+
+    window.addEventListener("userUpdated", handleUserUpdate);
+    window.addEventListener("storage", updateUserData); // Untuk antar tab
+
+    return () => {
+      window.removeEventListener("userUpdated", handleUserUpdate);
+      window.removeEventListener("storage", updateUserData);
+    };
   }, []);
 
   const handleLogout = () => {
@@ -65,18 +87,17 @@ export default function Navbar() {
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
-    setMobileProfilOpen(false);
   };
 
   return (
     <nav className="w-full flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-12 bg-[var(--green)] z-[1000] fixed top-0 border-b-2 border-[var(--yellow)]">
       <div className="py-3 sm:py-4 flex items-center gap-2 sm:gap-3">
         <Link href="/" className="flex items-center gap-2 sm:gap-3">
-          <Image 
-            src="/logo.svg" 
-            width={45} 
-            height={56} 
-            alt="Logo" 
+          <Image
+            src="/logo.svg"
+            width={45}
+            height={56}
+            alt="Logo"
             className="w-[45px] h-[56px] sm:w-[50px] sm:h-[62px] md:w-[60px] md:h-[75px]"
           />
           <p className="text-[var(--cream)] font-medium text-sm sm:text-base md:text-lg leading-tight hidden sm:block max-w-[150px] md:max-w-[200px]">
@@ -148,8 +169,8 @@ export default function Navbar() {
               <DropdownMenuTrigger>
                 <Avatar>
                   <AvatarImage
-                    src="https://github.com/shadcn.png"
-                    alt="avatar"
+                    src={user?.avatar_url || "/default-avatar-male.webp"}
+                    alt={user?.name || "User avatar"}
                   />
                   <AvatarFallback>
                     {user?.name?.charAt(0)?.toUpperCase() || "U"}
@@ -161,7 +182,7 @@ export default function Navbar() {
                 alignOffset={14}
                 className="z-[2000]"
               >
-                <DropdownMenuLabel>{user?.name}</DropdownMenuLabel>
+                <DropdownMenuLabel>{user?.name || "User"}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/profil">Profil</Link>
@@ -169,7 +190,6 @@ export default function Navbar() {
                 <DropdownMenuItem asChild>
                   <Link href="/pendaftaran">Pendaftaran</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>Ubah Password</DropdownMenuItem>
                 <DropdownMenuItem onClick={handleLogout}>
                   Logout
                 </DropdownMenuItem>
@@ -184,9 +204,6 @@ export default function Navbar() {
             Login
           </Link>
         )}
-        <button onClick={toggleMobileMenu} className="text-white cursor-pointer p-1">
-          {isMobileMenuOpen ? <X size={24} className="sm:w-7 sm:h-7" /> : <Menu size={24} className="sm:w-7 sm:h-7" />}
-        </button>
       </div>
 
       <AnimatePresence>
@@ -198,32 +215,95 @@ export default function Navbar() {
             transition={{ duration: 0.25, ease: "easeOut" }}
             className="absolute top-[calc(100%+2px)] left-0 w-full bg-[var(--green)] text-white flex flex-col lg:hidden z-[999] border-t border-[var(--yellow)]/20 shadow-lg max-h-[calc(100vh-80px)] overflow-y-auto"
           >
-            <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
+            <Link
+              href="/"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="px-6 py-3 hover:bg-white/10 transition-colors"
+            >
               Home
             </Link>
-            <Link href="/#sejarah" onClick={() => setIsMobileMenuOpen(false)}>
+            <Link
+              href="/#sejarah"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="px-6 py-3 hover:bg-white/10 transition-colors"
+            >
               Sejarah
             </Link>
-            <Link href="/#visi-misi" onClick={() => setIsMobileMenuOpen(false)}>
+            <Link
+              href="/#visi-misi"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="px-6 py-3 hover:bg-white/10 transition-colors"
+            >
               Visi-Misi
             </Link>
-            <Link href="#" onClick={() => setIsMobileMenuOpen(false)}>
+            <Link
+              href="#"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="px-6 py-3 hover:bg-white/10 transition-colors"
+            >
               Pimpinan Universitas
             </Link>
             <Link
               href="/pendaftaran"
               onClick={() => setIsMobileMenuOpen(false)}
+              className="px-6 py-3 hover:bg-white/10 transition-colors"
             >
               Pendaftaran
             </Link>
 
             {isLoggedIn ? (
               <>
-                <span>Welcome, {user?.name}</span>
-                <button onClick={handleLogout}>Logout</button>
+                <div className="px-6 py-3 border-t border-white/20">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Avatar className="w-10 h-10">
+                      <AvatarImage
+                        src={user?.avatar_url || "/default-avatar-male.webp"}
+                        alt={user?.name || "User avatar"}
+                      />
+                      <AvatarFallback>
+                        {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="font-medium">{user?.name || "User"}</span>
+                  </div>
+                </div>
+                <Link
+                  href="/profil"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="px-6 py-3 hover:bg-white/10 transition-colors"
+                >
+                  Profil
+                </Link>
+                <Link
+                  href="/pendaftaran"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="px-6 py-3 hover:bg-white/10 transition-colors"
+                >
+                  Pendaftaran
+                </Link>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="px-6 py-3 hover:bg-white/10 transition-colors text-left"
+                >
+                  Logout
+                </button>
               </>
             ) : (
-              <Button onClick={() => router.push("/login")}>Login</Button>
+              <div className="px-6 py-3">
+                <Button
+                  onClick={() => {
+                    router.push("/login");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  variant="secondary"
+                  className="w-full"
+                >
+                  Login
+                </Button>
+              </div>
             )}
           </motion.div>
         )}
