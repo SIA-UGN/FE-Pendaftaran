@@ -18,7 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { CardContent, Card } from "@/components/ui/card";
 
-import { Info } from 'lucide-react'
+import { Info } from "lucide-react";
 
 // 🧩 Schema Validasi
 const FormSchema = z.object({
@@ -68,25 +68,38 @@ export default function TambahManajer() {
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="flex flex-col items-center px-4 sm:px-8 max-w-11/12 mt-12 w-full">
-            <h2 className="text-3xl sm:text-2xl font-semibold mb-6 mt-6 border-b-2 border-black pb-2 text-[var(--green)] w-full">
-                Pendaftaran Manajer Baru
-            </h2>
+        <h2 className="text-3xl sm:text-2xl font-semibold mb-6 mt-6 border-b-2 border-black pb-2 text-[var(--green)] w-full">
+          Pendaftaran Manajer Baru
+        </h2>
         <Card className="rounded-lg shadow-md flex flex-row gap-2 min-h-0.5 p-6 w-full mx-6 bg-[#E6EEE9] hover:bg-[#E6EEE9]">
-            <CardContent className=" flex flex-col gap-5 w-full">
-                <h2 className="scroll-m-20 border-b-1 pb-2 text-3xl tracking-tight first:mt-0 flex items-center gap-2 border-gray-500"><Info />Informasi Tahapan</h2>
-                <div className="pl-6 flex flex-col gap-2">
-                    <p className="leading-7 flex items-center gap-2"> Masukkan data manajer baru pada form</p>
-                    <p className="leading-7 flex items-center gap-2">Pilih hak akses untuk manajer baru</p>
-                    <p className="leading-7 flex items-center gap-2">Periksa kembali data manajer sebelum disimpan dan mengirimkan email aktivasi</p>
-                </div>
-            </CardContent>
+          <CardContent className=" flex flex-col gap-5 w-full">
+            <h2 className="scroll-m-20 border-b-1 pb-2 text-3xl tracking-tight first:mt-0 flex items-center gap-2 border-gray-500">
+              <Info />
+              Informasi Tahapan
+            </h2>
+            <div className="pl-6 flex flex-col gap-2">
+              <p className="leading-7 flex items-center gap-2">
+                {" "}
+                Masukkan data manajer baru pada form
+              </p>
+              <p className="leading-7 flex items-center gap-2">
+                Pilih hak akses untuk manajer baru
+              </p>
+              <p className="leading-7 flex items-center gap-2">
+                Periksa kembali data manajer sebelum disimpan dan mengirimkan
+                email aktivasi
+              </p>
+            </div>
+          </CardContent>
         </Card>
-        </div>
+      </div>
 
       <div className="flex flex-col items-center px-4 sm:px-8 max-w-11/12 my-12 w-full">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full">
-            
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6 w-full"
+          >
             {/* === BAGIAN 1: DATA MANAJER === */}
             <h2 className="text-3xl sm:text-2xl font-semibold mb-6 mt-12 w-full border-b-2 border-black pb-2 text-[var(--green)]">
               Validasi Data Manajer Baru
@@ -128,7 +141,11 @@ export default function TambahManajer() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="email@example.com" {...field} />
+                      <Input
+                        type="email"
+                        placeholder="email@example.com"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -147,15 +164,22 @@ export default function TambahManajer() {
                     <FormMessage />
                   </FormItem>
                 )}
-                          />
-                          
+              />
             </div>
 
             <div className="w-full flex items-center justify-end gap-2">
-              <Button type="submit" variant={"matcha"} className={"w-48 rounded-md"}>
+              <Button
+                type="submit"
+                variant={"matcha"}
+                className={"w-48 rounded-md"}
+              >
                 Kembali
               </Button>
-              <Button type="submit" variant={"matcha"} className={"w-48 rounded-md"}>
+              <Button
+                type="submit"
+                variant={"matcha"}
+                className={"w-48 rounded-md"}
+              >
                 Lanjut
               </Button>
             </div>

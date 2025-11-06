@@ -38,7 +38,6 @@ export default function Login() {
     });
   }
 
-
   return (
     <div className="flex items-center gap-6 w-screen h-screen justify-center bg-[url('/auth.png')] bg-cover ">
       <Card className="w-3/4 w-m-7/8 max-w-11/12 flex flex-col md:flex-row gap-2 p-12 md:p-0 h-full md:h-3/4 relative rounded-[5vw] bg-white">

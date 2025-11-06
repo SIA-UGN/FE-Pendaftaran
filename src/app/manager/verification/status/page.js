@@ -1,7 +1,3 @@
 export default function Status() {
-    return (
-        <>
-            Ini Halaman Status
-        </>
-    )
+  return <>Ini Halaman Status</>;
 }

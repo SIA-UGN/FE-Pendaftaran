@@ -1,11 +1,8 @@
-"use client"
+"use client";
 
-import { ManagerSidebar } from "@/components/manager-sidebar"
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar"
-import { Separator } from "@/components/ui/separator"
+import { ManagerSidebar } from "@/components/manager-sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,8 +10,8 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { SidebarTrigger } from "@/components/ui/sidebar"
+} from "@/components/ui/breadcrumb";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export default function DashboardLayout({ children }) {
   return (
@@ -27,7 +24,14 @@ export default function DashboardLayout({ children }) {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="#" className={"font-semibold text-2xl text-[var(--green)] hover:var-[var(--green)]"}>Dashboard</BreadcrumbLink>
+                <BreadcrumbLink
+                  href="#"
+                  className={
+                    "font-semibold text-2xl text-[var(--green)] hover:var-[var(--green)]"
+                  }
+                >
+                  Dashboard
+                </BreadcrumbLink>
               </BreadcrumbItem>
               {/* <BreadcrumbSeparator className="hidden md:block" /> */}
             </BreadcrumbList>
@@ -39,5 +43,5 @@ export default function DashboardLayout({ children }) {
         </main>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

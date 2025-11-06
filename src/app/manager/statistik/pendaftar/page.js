@@ -1,7 +1,3 @@
 export default function ApplicantStatistic() {
-    return (
-        <>
-            Ini Statistik Pendaftar
-        </>
-    )
+  return <>Ini Statistik Pendaftar</>;
 }
