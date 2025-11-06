@@ -37,7 +37,7 @@ export function TeamSwitcher({ teams }) {
           <Link href="/" className="cursor-pointer">
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent w-fit h-fit"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent w-fit h-fit focus:bg-transparent"
             >
               <div className="flex aspect-square size-12 items-center justify-center rounded-lg overflow-hidden">
                 <Image

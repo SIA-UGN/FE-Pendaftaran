@@ -1,13 +1,12 @@
 import { Card } from "@/components/ui/card";
 import ApplicantList from "@/components/dashboard/ApplicantList";
+import { Heading } from "@/components/Heading";
 
 export default function ApplicantInformation() {
   return (
     <>
       <div className="flex flex-col items-center px-4 sm:px-8 max-w-11/12 my-12 w-full gap-3">
-        <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
-          Data Verifikasi Dokumen Pendaftar
-        </h2>
+        <Heading title={"Data Verifikasi Dokumen Pendaftar"} />
         <div className="grid grid-cols-3 w-full gap-12">
           <Card className="flex items-center justify-center p-6 flex-col w-full stroke-black gap-2  h-[160px]">
             <span className="font-bold text-4xl text-green-700">80</span>

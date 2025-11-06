@@ -1,14 +1,13 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Heading } from "@/components/Heading";
 
 export default function Keuangan() {
   return (
     <>
       <div className="flex flex-col items-center justify-center gap-6">
         <div className="flex flex-col items-center px-4 sm:px-8 max-w-11/12 mt-12 w-full gap-6 pb-12">
-          <h2 className="text-3xl sm:text-2xl font-semibold mb-6 mt-6 border-b-2 border-black pb-2 text-[var(--green)] w-full">
-            Keuangan
-          </h2>
+          <Heading title={"Keuangan"} />
           <Card className="flex items-center justify-center p-6 flex-col w-1/2 gap-2 h-[160px] m-auto">
             <span className="font-bold text-4xl text-[var(--green)]">
               Rp3.000.000
@@ -16,9 +15,7 @@ export default function Keuangan() {
             <span className="text-lg text-gray-500">Total Income</span>
           </Card>
 
-          <h2 className="text-3xl sm:text-2xl font-semibold mb-6 mt-6 border-b-2 border-black pb-2 text-[var(--green)] w-full">
-            Recent Income
-          </h2>
+          <Heading title={"Recent Income"} />
           <Card className={"flex flex-col gap-2 w-full px-12 py-6"}>
             <h1 className="font-bold text-lg text-[var(--green)]">
               Accepted Verification
