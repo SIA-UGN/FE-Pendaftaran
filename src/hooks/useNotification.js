@@ -45,7 +45,7 @@ export const useMarkAllAsRead = () => {
     mutationFn: notificationService.markAllAsRead,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      toast.success("All notifications marked as read");
+      toast.success("Semua notifikasi telah ditandai sebagai dibaca");
     },
   });
 };
@@ -57,7 +57,7 @@ export const useDeleteNotification = () => {
     mutationFn: notificationService.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      toast.success("Notification deleted");
+      toast.success("Notifikasi berhasil dihapus");
     },
   });
 };
@@ -69,7 +69,7 @@ export const useClearReadNotifications = () => {
     mutationFn: notificationService.clearRead,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      toast.success("Read notifications cleared");
+      toast.success("Notifikasi yang sudah dibaca berhasil dihapus");
     },
   });
 };

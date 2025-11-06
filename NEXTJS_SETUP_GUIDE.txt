@@ -230,7 +230,7 @@ export const useLogin = () => {
       
       if (!data || !data.user) {
         console.error('Invalid response structure:', response);
-        toast.error('Login failed. Invalid response from server.');
+        toast.error('Login gagal. Respons server tidak valid');
         return;
       }
       
@@ -244,7 +244,7 @@ export const useLogin = () => {
       // Update AuthContext state
       updateUser(data.user);
       
-      toast.success('Login successful');
+      toast.success('Login berhasil');
       
       // Role-based redirect
       const userRoles = data.user.roles || [];
@@ -266,7 +266,7 @@ export const useLogin = () => {
       
       const message = error.response?.data?.message || 
                      error.response?.data?.errors?.email?.[0] || 
-                     'Login failed. Please try again.';
+                     'Login gagal';
       toast.error(message);
     },
   });
@@ -287,7 +287,7 @@ export const useRegister = () => {
       localStorage.setItem('user', JSON.stringify(data.user));
       queryClient.setQueryData(['auth', 'user'], data.user);
       updateUser(data.user);
-      toast.success('Registration successful');
+      toast.success('Registrasi berhasil');
       router.push('/pendaftaran');
     },
     onError: (error) => {
@@ -295,7 +295,7 @@ export const useRegister = () => {
       
       const message = error.response?.data?.message || 
                      error.response?.data?.errors?.email?.[0] || 
-                     'Registration failed. Please try again.';
+                     'Registrasi gagal';
       toast.error(message);
     },
   });
@@ -314,7 +314,7 @@ export const useLogout = () => {
       localStorage.removeItem('user');
       queryClient.clear();
       clearUser(); // Clear AuthContext state
-      toast.success('Logout successful');
+      toast.success('Logout berhasil');
       router.push('/');
     },
     onError: (error) => {
@@ -331,7 +331,7 @@ export const useForgotPassword = () => {
   return useMutation({
     mutationFn: authService.forgotPassword,
     onSuccess: (data) => {
-      toast.success('Password reset link has been sent to your email!');
+      toast.success('Link reset password telah dikirim ke email Anda');
       if (process.env.NODE_ENV === 'development' && data?.data?.reset_token) {
         console.log('Reset token (dev only):', data.data.reset_token);
       }
@@ -339,7 +339,7 @@ export const useForgotPassword = () => {
     onError: (error) => {
       if (!error.response || error.response?.status >= 500) return;
       
-      const message = error?.response?.data?.message || 'Failed to send reset email';
+      const message = error?.response?.data?.message || 'Gagal mengirim email reset password';
       toast.error(message);
     },
   });
@@ -351,13 +351,13 @@ export const useResetPassword = () => {
   return useMutation({
     mutationFn: authService.resetPassword,
     onSuccess: () => {
-      toast.success('Password reset successfully! Please login with your new password.');
+      toast.success('Password berhasil direset. Silakan login dengan password baru Anda');
       router.push('/login');
     },
     onError: (error) => {
       if (!error.response || error.response?.status >= 500) return;
       
-      const message = error?.response?.data?.message || 'Failed to reset password';
+      const message = error?.response?.data?.message || 'Gagal mereset password';
       toast.error(message);
     },
   });
@@ -367,12 +367,12 @@ export const useChangePassword = () => {
   return useMutation({
     mutationFn: authService.changePassword,
     onSuccess: () => {
-      toast.success('Password changed successfully!');
+      toast.success('Password berhasil diubah');
     },
     onError: (error) => {
       if (!error.response || error.response?.status >= 500) return;
       
-      const message = error?.response?.data?.message || 'Failed to change password';
+      const message = error?.response?.data?.message || 'Gagal mengubah password';
       toast.error(message);
     },
   });
@@ -412,15 +412,15 @@ export const useRegistrationStep = (step) => {
       mutationFn: registrationService.savePersonalIdentity,
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: ['registration'] });
-        toast.success('Personal identity saved!');
+        toast.success('Identitas personal berhasil disimpan');
         if (data.data?.can_access_next_step) {
           router.push('/registration/address-information');
         } else {
-          toast.warning('Please complete all required fields before continuing.');
+          toast.warning('Harap lengkapi semua field yang wajib diisi');
         }
       },
       onError: (error) => {
-        const message = error?.response?.data?.message || 'Failed to save personal identity';
+        const message = error?.response?.data?.message || 'Gagal menyimpan identitas personal';
         toast.error(message);
       },
     }),
@@ -428,15 +428,15 @@ export const useRegistrationStep = (step) => {
       mutationFn: registrationService.saveAddressInformation,
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: ['registration'] });
-        toast.success('Address information saved!');
+        toast.success('Informasi alamat berhasil disimpan');
         if (data.data?.can_access_next_step) {
           router.push('/registration/academic-background');
         } else {
-          toast.warning('Please complete all required fields before continuing.');
+          toast.warning('Harap lengkapi semua field yang wajib diisi');
         }
       },
       onError: (error) => {
-        const message = error?.response?.data?.message || 'Failed to save address information';
+        const message = error?.response?.data?.message || 'Gagal menyimpan informasi alamat';
         toast.error(message);
       },
     }),
@@ -444,15 +444,15 @@ export const useRegistrationStep = (step) => {
       mutationFn: registrationService.saveAcademicBackground,
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: ['registration'] });
-        toast.success('Academic background saved!');
+        toast.success('Latar belakang akademik berhasil disimpan');
         if (data.data?.can_access_next_step) {
           router.push('/registration/family-data');
         } else {
-          toast.warning('Please complete all required fields before continuing.');
+          toast.warning('Harap lengkapi semua field yang wajib diisi');
         }
       },
       onError: (error) => {
-        const message = error?.response?.data?.message || 'Failed to save academic background';
+        const message = error?.response?.data?.message || 'Gagal menyimpan latar belakang akademik';
         toast.error(message);
       },
     }),
@@ -460,15 +460,15 @@ export const useRegistrationStep = (step) => {
       mutationFn: registrationService.saveFamilyData,
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: ['registration'] });
-        toast.success('Family data saved!');
+        toast.success('Data keluarga berhasil disimpan');
         if (data.data?.can_access_next_step) {
           router.push('/registration/achievements');
         } else {
-          toast.warning('Please complete all required fields before continuing.');
+          toast.warning('Harap lengkapi semua field yang wajib diisi');
         }
       },
       onError: (error) => {
-        const message = error?.response?.data?.message || 'Failed to save family data';
+        const message = error?.response?.data?.message || 'Gagal menyimpan data keluarga';
         toast.error(message);
       },
     }),
@@ -476,15 +476,15 @@ export const useRegistrationStep = (step) => {
       mutationFn: registrationService.saveAchievements,
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: ['registration'] });
-        toast.success('Achievements saved!');
+        toast.success('Prestasi berhasil disimpan');
         if (data.data?.can_submit || data.data?.can_access_next_step) {
           router.push('/registration/review');
         } else {
-          toast.warning('Please complete all required fields before continuing.');
+          toast.warning('Harap lengkapi semua field yang wajib diisi');
         }
       },
       onError: (error) => {
-        const message = error?.response?.data?.message || 'Failed to save achievements';
+        const message = error?.response?.data?.message || 'Gagal menyimpan prestasi';
         toast.error(message);
       },
     }),
@@ -501,11 +501,11 @@ export const useSubmitRegistration = () => {
     mutationFn: registrationService.submitRegistration,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['registration'] });
-      toast.success('Registration submitted successfully!');
+      toast.success('Pendaftaran berhasil diajukan');
       router.push('/payment');
     },
     onError: (error) => {
-      const message = error?.response?.data?.message || 'Failed to submit registration';
+      const message = error?.response?.data?.message || 'Gagal mengajukan pendaftaran';
       toast.error(message);
     },
   });
@@ -626,7 +626,7 @@ export const useMarkAllAsRead = () => {
     mutationFn: notificationService.markAllAsRead,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      toast.success('All notifications marked as read');
+      toast.success('Semua notifikasi telah ditandai sebagai dibaca');
     },
   });
 };
@@ -638,7 +638,7 @@ export const useDeleteNotification = () => {
     mutationFn: notificationService.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      toast.success('Notification deleted');
+      toast.success('Notifikasi berhasil dihapus');
     },
   });
 };
@@ -650,7 +650,7 @@ export const useClearReadNotifications = () => {
     mutationFn: notificationService.clearRead,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      toast.success('Read notifications cleared');
+      toast.success('Notifikasi yang sudah dibaca berhasil dihapus');
     },
   });
 };
@@ -681,10 +681,10 @@ export const useUpdateProfile = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       queryClient.invalidateQueries({ queryKey: ['auth', 'user'] });
-      toast.success('Profile updated successfully!');
+      toast.success('Profil berhasil diperbarui');
     },
     onError: (error) => {
-      const message = error?.response?.data?.message || 'Failed to update profile';
+      const message = error?.response?.data?.message || 'Gagal memperbarui profil';
       toast.error(message);
     },
   });
@@ -699,10 +699,10 @@ export const useUploadAvatar = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       queryClient.invalidateQueries({ queryKey: ['auth', 'user'] });
-      toast.success('Avatar uploaded successfully!');
+      toast.success('Avatar berhasil diupload');
     },
     onError: (error) => {
-      const message = error?.response?.data?.message || 'Failed to upload avatar';
+      const message = error?.response?.data?.message || 'Gagal mengupload avatar';
       toast.error(message);
     },
   });
@@ -717,10 +717,10 @@ export const useDeleteAvatar = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       queryClient.invalidateQueries({ queryKey: ['auth', 'user'] });
-      toast.success('Avatar deleted successfully!');
+      toast.success('Avatar berhasil dihapus');
     },
     onError: (error) => {
-      const message = error?.response?.data?.message || 'Failed to delete avatar';
+      const message = error?.response?.data?.message || 'Gagal menghapus avatar';
       toast.error(message);
     },
   });
@@ -756,7 +756,7 @@ export const useCreatePayment = () => {
     mutationFn: paymentService.createPayment,
     onSuccess: () => {
       queryClient.invalidateQueries(['payment', 'my']);
-      toast.success('Payment created! Please transfer and upload proof.');
+      toast.success('Pembayaran berhasil dibuat. Silakan transfer dan upload bukti');
     },
   });
 };
@@ -769,10 +769,10 @@ export const useUploadPaymentProof = () => {
       paymentService.uploadProof(paymentId, formData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payment', 'my'] });
-      toast.success('Payment proof uploaded! Waiting for verification.');
+      toast.success('Bukti pembayaran berhasil diupload. Menunggu verifikasi');
     },
     onError: (error) => {
-      const message = error?.response?.data?.message || 'Failed to upload payment proof';
+      const message = error?.response?.data?.message || 'Gagal mengupload bukti pembayaran';
       toast.error(message);
     },
   });
@@ -826,10 +826,10 @@ export const useCreateAnnouncement = () => {
     mutationFn: announcementService.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['announcements'] });
-      toast.success('Announcement created successfully!');
+      toast.success('Pengumuman berhasil dibuat');
     },
     onError: (error) => {
-      const message = error?.response?.data?.message || 'Failed to create announcement';
+      const message = error?.response?.data?.message || 'Gagal membuat pengumuman';
       toast.error(message);
     },
   });
@@ -907,13 +907,13 @@ export const useVerifyApplicant = () => {
       queryClient.invalidateQueries({ queryKey: ['manager', 'dashboard'] });
       
       const status = data.data.registration.status;
-      const message = status === 'approved' ? 'Registration approved successfully!' : 
-                     status === 'rejected' ? 'Registration rejected.' : 
-                     'Registration status updated.';
+      const message = status === 'approved' ? 'Pendaftaran berhasil disetujui' : 
+                     status === 'rejected' ? 'Pendaftaran berhasil ditolak' : 
+                     'Status pendaftaran berhasil diperbarui';
       toast.success(message);
     },
     onError: (error) => {
-      const message = error?.response?.data?.message || 'Failed to update registration status';
+      const message = error?.response?.data?.message || 'Gagal memperbarui status pendaftaran';
       toast.error(message);
     },
   });
@@ -931,12 +931,12 @@ export const useSetGraduationStatus = () => {
       queryClient.invalidateQueries({ queryKey: ['manager', 'dashboard'] });
       
       const status = data.data.registration.graduation_status;
-      const message = status === 'graduated' ? 'Student marked as graduated! 🎉' : 
-                     'Graduation status updated.';
+      const message = status === 'graduated' ? 'Pendaftar berhasil ditandai sebagai lulusan 🎉' : 
+                     'Status kelulusan berhasil diperbarui';
       toast.success(message);
     },
     onError: (error) => {
-      const message = error?.response?.data?.message || 'Failed to update graduation status';
+      const message = error?.response?.data?.message || 'Gagal memperbarui status kelulusan';
       toast.error(message);
     },
   });
@@ -964,12 +964,12 @@ export const useVerifyPayment = () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
       
       const status = data.data.payment.status;
-      const message = status === 'verified' ? 'Payment verified successfully!' : 
-                     'Payment rejected.';
+      const message = status === 'verified' ? 'Pembayaran berhasil diverifikasi' : 
+                     'Pembayaran ditolak';
       toast.success(message);
     },
     onError: (error) => {
-      const message = error?.response?.data?.message || 'Failed to verify payment';
+      const message = error?.response?.data?.message || 'Gagal memverifikasi pembayaran';
       toast.error(message);
     },
   });
@@ -994,10 +994,10 @@ export const useCreateBroadcastNotification = () => {
       queryClient.invalidateQueries({ queryKey: ['manager', 'notifications'] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] }); // For applicants
       
-      toast.success(`Broadcast sent to ${data.data.target_count} users!`);
+      toast.success(`Broadcast berhasil dikirim ke ${data.data.target_count} pengguna`);
     },
     onError: (error) => {
-      const message = error?.response?.data?.message || 'Failed to send broadcast notification';
+      const message = error?.response?.data?.message || 'Gagal mengirim notifikasi broadcast';
       toast.error(message);
     },
   });

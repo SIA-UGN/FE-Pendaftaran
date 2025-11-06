@@ -39,16 +39,16 @@ export const useVerifyApplicant = () => {
       const status = data.data.registration.status;
       const message =
         status === "approved"
-          ? "Registration approved successfully"
+          ? "Pendaftaran berhasil disetujui"
           : status === "rejected"
-          ? "Registration rejected successfully"
-          : "Registration status updated";
+          ? "Pendaftaran berhasil ditolak"
+          : "Status pendaftaran berhasil diperbarui";
       toast.success(message);
     },
     onError: (error) => {
       const message =
         error?.response?.data?.message ||
-        "Failed to update registration status";
+        "Gagal memperbarui status pendaftaran";
       toast.error(message);
     },
   });
@@ -67,13 +67,13 @@ export const useSetGraduationStatus = () => {
       const status = data.data.registration.graduation_status;
       const message =
         status === "graduated"
-          ? "Applicant marked as graduated successfully"
-          : "Applicant graduation status updated";
+          ? "Pendaftar berhasil ditandai sebagai lulusan"
+          : "Status kelulusan pendaftar berhasil diperbarui";
       toast.success(message);
     },
     onError: (error) => {
       const message =
-        error?.response?.data?.message || "Failed to update graduation status";
+        error?.response?.data?.message || "Gagal memperbarui status kelulusan";
       toast.error(message);
     },
   });
@@ -103,13 +103,13 @@ export const useVerifyPayment = () => {
       const status = data.data.payment.status;
       const message =
         status === "verified"
-          ? "Payment verified successfully"
-          : "Payment rejected";
+          ? "Pembayaran berhasil diverifikasi"
+          : "Pembayaran ditolak";
       toast.success(message);
     },
     onError: (error) => {
       const message =
-        error?.response?.data?.message || "Failed to verify payment";
+        error?.response?.data?.message || "Gagal memverifikasi pembayaran";
       toast.error(message);
     },
   });
@@ -133,13 +133,13 @@ export const useCreateBroadcastNotification = () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
 
       toast.success(
-        `Broadcast sent to ${data.data.recipient_count} recipients successfully`
+        `Broadcast berhasil dikirim ke ${data.data.recipient_count} penerima`
       );
     },
     onError: (error) => {
       const message =
         error?.response?.data?.message ||
-        "Failed to send broadcast notification";
+        "Gagal mengirim notifikasi broadcast";
       toast.error(message);
     },
   });

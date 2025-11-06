@@ -18,11 +18,11 @@ export const useUpdateProfile = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
-      toast.success("Profile updated successfully");
+      toast.success("Profil berhasil diperbarui");
     },
     onError: (error) => {
       const message =
-        error?.response?.data?.message || "Failed to update profile";
+        error?.response?.data?.message || "Gagal memperbarui profil";
       toast.error(message);
     },
   });
@@ -36,11 +36,11 @@ export const useUploadAvatar = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
-      toast.success("Avatar uploaded successfully");
+      toast.success("Avatar berhasil diupload");
     },
     onError: (error) => {
       const message =
-        error?.response?.data?.message || "Failed to upload avatar";
+        error?.response?.data?.message || "Gagal mengupload avatar";
       toast.error(message);
     },
   });
@@ -54,11 +54,11 @@ export const useDeleteAvatar = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
-      toast.success("Avatar deleted successfully");
+      toast.success("Avatar berhasil dihapus");
     },
     onError: (error) => {
       const message =
-        error?.response?.data?.message || "Failed to delete avatar";
+        error?.response?.data?.message || "Gagal menghapus avatar";
       toast.error(message);
     },
   });

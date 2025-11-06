@@ -14,7 +14,7 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
     const userStr = localStorage.getItem("user");
 
     if (!token) {
-      toast.error("Please login to access this page");
+      toast.error("Silakan login untuk mengakses halaman ini");
       router.push("/login");
       return;
     }
@@ -27,7 +27,7 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
         const hasAccess = allowedRoles.some((role) => userRoles.includes(role));
 
         if (!hasAccess) {
-          toast.error("You don't have permission to access this page");
+          toast.error("Anda tidak memiliki izin untuk mengakses halaman ini");
 
           if (userRoles.includes("admin")) {
             router.push("/dashboard");

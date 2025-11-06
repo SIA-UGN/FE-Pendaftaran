@@ -28,16 +28,17 @@ export const useRegistrationStep = (step) => {
       mutationFn: registrationService.savePersonalIdentity,
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: ["registration"] });
-        toast.success("Personal identity saved successfully.");
+        toast.success("Identitas personal berhasil disimpan");
         if (data.data?.can_access_next_step) {
           router.push("/registration/address-information");
         } else {
-          toast.warning("Please complete all required fields.");
+          toast.warning("Harap lengkapi semua field yang wajib diisi");
         }
       },
       onError: (error) => {
         const message =
-          error?.response?.data?.message || "Failed to save personal identity.";
+          error?.response?.data?.message ||
+          "Gagal menyimpan identitas personal";
         toast.error(message);
       },
     }),
@@ -45,17 +46,16 @@ export const useRegistrationStep = (step) => {
       mutationFn: registrationService.saveAddressInformation,
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: ["registration"] });
-        toast.success("Address information saved successfully.");
+        toast.success("Informasi alamat berhasil disimpan");
         if (data.data?.can_access_next_step) {
           router.push("/registration/academic-background");
         } else {
-          toast.warning("Please complete all required fields.");
+          toast.warning("Harap lengkapi semua field yang wajib diisi");
         }
       },
       onError: (error) => {
         const message =
-          error?.response?.data?.message ||
-          "Failed to save address information.";
+          error?.response?.data?.message || "Gagal menyimpan informasi alamat";
         toast.error(message);
       },
     }),
@@ -63,17 +63,17 @@ export const useRegistrationStep = (step) => {
       mutationFn: registrationService.saveAcademicBackground,
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: ["registration"] });
-        toast.success("Academic background saved successfully.");
+        toast.success("Latar belakang akademik berhasil disimpan");
         if (data.data?.can_access_next_step) {
           router.push("/registration/family-data");
         } else {
-          toast.warning("Please complete all required fields.");
+          toast.warning("Harap lengkapi semua field yang wajib diisi");
         }
       },
       onError: (error) => {
         const message =
           error?.response?.data?.message ||
-          "Failed to save academic background.";
+          "Gagal menyimpan latar belakang akademik";
         toast.error(message);
       },
     }),
@@ -81,16 +81,16 @@ export const useRegistrationStep = (step) => {
       mutationFn: registrationService.saveFamilyData,
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: ["registration"] });
-        toast.success("Family data saved successfully.");
+        toast.success("Data keluarga berhasil disimpan");
         if (data.data?.can_access_next_step) {
           router.push("/registration/achievements");
         } else {
-          toast.warning("Please complete all required fields.");
+          toast.warning("Harap lengkapi semua field yang wajib diisi");
         }
       },
       onError: (error) => {
         const message =
-          error?.response?.data?.message || "Failed to save family data.";
+          error?.response?.data?.message || "Gagal menyimpan data keluarga";
         toast.error(message);
       },
     }),
@@ -98,16 +98,16 @@ export const useRegistrationStep = (step) => {
       mutationFn: registrationService.saveAchievements,
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: ["registration"] });
-        toast.success("Achievements saved successfully.");
+        toast.success("Prestasi berhasil disimpan");
         if (data.data?.can_submit) {
           router.push("/registration/review");
         } else {
-          toast.warning("Please complete all required fields.");
+          toast.warning("Harap lengkapi semua field yang wajib diisi");
         }
       },
       onError: (error) => {
         const message =
-          error?.response?.data?.message || "Failed to save achievements.";
+          error?.response?.data?.message || "Gagal menyimpan prestasi";
         toast.error(message);
       },
     }),
@@ -124,12 +124,12 @@ export const useSubmitRegistration = () => {
     mutationFn: registrationService.submitRegistration,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["registration"] });
-      toast.success("Registration submitted successfully.");
+      toast.success("Pendaftaran berhasil diajukan");
       router.push("/payment");
     },
     onError: (error) => {
       const message =
-        error?.response?.data?.message || "Failed to submit registration.";
+        error?.response?.data?.message || "Gagal mengajukan pendaftaran";
       toast.error(message);
     },
   });
@@ -151,12 +151,12 @@ export const useUpdateRegistrationStatus = () => {
     mutationFn: ({ id, data }) => registrationService.updateStatus(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["registrations"] });
-      toast.success("Registration status updated successfully.");
+      toast.success("Status pendaftaran berhasil diperbarui");
     },
     onError: (error) => {
       const message =
         error?.response?.data?.message ||
-        "Failed to update registration status.";
+        "Gagal memperbarui status pendaftaran";
       toast.error(message);
     },
   });
