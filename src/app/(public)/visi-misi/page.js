@@ -13,7 +13,7 @@ export default function VisiMisi() {
             Visi Misi Universitas Global Nusantara
           </h2>
           <div className="flex flex-col w-full gap-5 items-center">
-            <div className="relative w-1/2 h-96 sm:h-96">
+            <div className="relative w-full md:w-1/2 h-96 sm:h-96">
               <Image
                 src="/auth.png"
                 alt="sejarah"
@@ -21,9 +21,9 @@ export default function VisiMisi() {
                 className="object-cover"
               />
             </div>
-            <Card className={"p-8 items-center gap-2"}>
+            <Card className={"w-[100%] md:w-full p-8 items-center gap-2 h-fit"}>
               <p className="font-bold text-[var(--green)] text-4xl">Visi</p>
-              <p className="text-center w-2xl text-md text-gray-500">
+              <p className="text-center w-fit lg:w-2xl text-md text-gray-500">
                 Universitas Global Nusantara hadir untuk melanjutkan tradisi
                 keilmuan pesantren yang berpadu dengan sistem pendidikan modern,
                 sehingga mampu melahirkan generasi yang berkarakter, berilmu,
@@ -40,7 +40,7 @@ export default function VisiMisi() {
               dan pergerakan intelektual. Kehadiran universitas di Yogyakarta
               bertujuan untuk:
             </p>
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card className={"p-4 gap-2"}>
                 <p className="font-bold text-[var(--green)] text-xl">
                   Melanjutkan Tradisi Keilmuan Pesantren

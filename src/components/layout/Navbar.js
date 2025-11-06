@@ -210,9 +210,9 @@ export default function Navbar() {
             <nav className="flex flex-col divide-y divide-[var(--yellow)]/10">
               {[
                 { href: "/", label: "Home" },
-                { href: "/#sejarah", label: "Sejarah" },
-                { href: "/#visi-misi", label: "Visi-Misi" },
-                { href: "#", label: "Pimpinan Universitas" },
+                { href: "/sejarah", label: "Sejarah" },
+                { href: "/visi-misi", label: "Visi-Misi" },
+                { href: "/pimpinan-universitas", label: "Pimpinan Universitas" },
                 { href: "/pendaftaran", label: "Pendaftaran" },
               ].map((item) => (
                 <Link

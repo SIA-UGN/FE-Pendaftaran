@@ -77,7 +77,7 @@ export default function Pimpinan() {
               className="flex w-full gap-5 flex-col md:flex-row"
               key={item.nama}
             >
-              <div className="relative w-96 h-96 rounded-xl">
+              <div className="relative w-full md:w-96 h-96 rounded-xl">
                 <Image
                   src="/auth.png"
                   alt="sejarah"
@@ -93,7 +93,7 @@ export default function Pimpinan() {
                   {item.posisi}
                 </span>
 
-                <span className="text-sm text-gray-500 w-2xl">
+                <span className="text-sm text-gray-500 w-fit md:w-2xl">
                   {item.deskripsi}
                 </span>
                 <span className="text-gray-500">Contact: {item.nomor}</span>
