@@ -8,11 +8,7 @@ import {
   LogOut,
   Sparkles,
 } from "lucide-react";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,8 +42,8 @@ export function NavUser({ user }) {
       await fetch("http://localhost:8000/api/auth/logout", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${token}`,
-          "Accept": "application/json",
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
         },
       });
 
@@ -71,7 +67,8 @@ export function NavUser({ user }) {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-[var(--yellow)] data-[state=open]:text-white rounded-lg">
+              className="data-[state=open]:bg-[var(--yellow)] data-[state=open]:text-white rounded-lg"
+            >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback className="rounded-lg">
@@ -90,7 +87,8 @@ export function NavUser({ user }) {
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg bg-[var(--yellow)] text-white"
             side={isMobile ? "bottom" : "right"}
             align="end"
-            sideOffset={4}>
+            sideOffset={4}
+          >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
@@ -111,8 +109,9 @@ export function NavUser({ user }) {
             <DropdownMenuItem
               onClick={handleLogout}
               disabled={loading}
-              className="bg-red-800 fw-bold cursor-pointer hover:bg-red-500 text-white">
-              <LogOut className="text-white"/>
+              className="bg-red-800 fw-bold cursor-pointer hover:bg-red-500 text-white"
+            >
+              <LogOut className="text-white" />
               {loading ? "Logging out..." : "Log out"}
             </DropdownMenuItem>
           </DropdownMenuContent>

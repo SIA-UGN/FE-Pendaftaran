@@ -45,7 +45,10 @@ const majors = [
 ];
 
 export function MajorTable() {
-  const totalApplicants = majors.reduce((sum, major) => sum + major.applicants, 0);
+  const totalApplicants = majors.reduce(
+    (sum, major) => sum + major.applicants,
+    0
+  );
 
   return (
     <Table>

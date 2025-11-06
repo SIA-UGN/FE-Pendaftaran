@@ -1,6 +1,3 @@
 export default function Statistics() {
-    return (
-        <>
-        </>
-    )
+  return <></>;
 }

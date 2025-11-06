@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 
-import Link from "next/link"
+import Link from "next/link";
 
 const managers = [
   {
@@ -69,9 +69,9 @@ export function ManajerTable() {
             <TableCell>{manager.verifications}</TableCell>
             <TableCell className="text-right">
               <Link href="/dashboard/manajer/profile">
-              <Button size="sm" variant="outline">
-                Lihat
-              </Button>
+                <Button size="sm" variant="outline">
+                  Lihat
+                </Button>
               </Link>
             </TableCell>
           </TableRow>

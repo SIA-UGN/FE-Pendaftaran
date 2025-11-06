@@ -7,7 +7,11 @@ import { User } from "lucide-react";
 import { getCookie } from "cookies-next";
 
 export default function InformasiProfil() {
-  const [user, setUser] = useState({ name: "", email: "", picture: "/logo.jpg" });
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    picture: "/logo.jpg",
+  });
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -18,8 +22,8 @@ export default function InformasiProfil() {
         const res = await fetch("http://localhost:8000/api/auth/user", {
           method: "GET",
           headers: {
-            "Accept": "application/json",
-            "Authorization": `Bearer ${token}`,
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
           },
         });
 

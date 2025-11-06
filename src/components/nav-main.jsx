@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { ChevronRight } from "lucide-react"
-import Link from "next/link"
+import { ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+} from "@/components/ui/collapsible";
 import {
   SidebarGroup,
   SidebarMenu,
@@ -16,7 +16,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 export function NavMain({ items }) {
   return (
@@ -37,18 +37,25 @@ export function NavMain({ items }) {
                     <SidebarMenuButton tooltip={item.title}>
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
-                      <ChevronRight
-                        className="cursor-pointer ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 text-white"
-                      />
+                      <ChevronRight className="cursor-pointer ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 text-white" />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
 
                   <CollapsibleContent>
                     <SidebarMenuSub>
                       {[
-                        { title: "Pendaftar", url: "/dashboard/statistik/pendaftar" },
-                        { title: "Program Studi", url: "/dashboard/statistik/program-studi" },
-                        { title: "Keuangan", url: "/dashboard/statistik/keuangan" },
+                        {
+                          title: "Pendaftar",
+                          url: "/dashboard/statistik/pendaftar",
+                        },
+                        {
+                          title: "Program Studi",
+                          url: "/dashboard/statistik/program-studi",
+                        },
+                        {
+                          title: "Keuangan",
+                          url: "/dashboard/statistik/keuangan",
+                        },
                       ].map((sub) => (
                         <SidebarMenuSubItem key={sub.title}>
                           <SidebarMenuSubButton asChild>
@@ -75,5 +82,5 @@ export function NavMain({ items }) {
         ))}
       </SidebarMenu>
     </SidebarGroup>
-  )
+  );
 }

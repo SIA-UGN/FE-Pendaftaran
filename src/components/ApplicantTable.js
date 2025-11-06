@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import Link from "next/link"
+import Link from "next/link";
 
 const students = [
   {
@@ -54,7 +54,9 @@ const students = [
 export function ApplicantTable() {
   return (
     <Table>
-      <TableCaption>Daftar mahasiswa Universitas Global Nusantara.</TableCaption>
+      <TableCaption>
+        Daftar mahasiswa Universitas Global Nusantara.
+      </TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead className="w-[100px]">ID</TableHead>
@@ -75,9 +77,9 @@ export function ApplicantTable() {
             <TableCell>{student.status}</TableCell>
             <TableCell className="text-right">
               <Link href="/manager/verification">
-              <Button size="sm" variant="yellow">
-                Verifikasi
-              </Button>
+                <Button size="sm" variant="yellow">
+                  Verifikasi
+                </Button>
               </Link>
             </TableCell>
           </TableRow>

@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import { Pie, PieChart, Tooltip, Cell, ResponsiveContainer } from "recharts"
+import { Pie, PieChart, Tooltip, Cell, ResponsiveContainer } from "recharts";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 
 const chartData = [
-  { name: "Lulus", value: 12, color: "#22c55e" },        // green-800
-  { name: "Tidak Lulus", value: 23, color: "#ef4444" },  // red-800
-  { name: "Pending", value: 4, color: "#facc15" },       // yellow-400
-]
+  { name: "Lulus", value: 12, color: "#22c55e" }, // green-800
+  { name: "Tidak Lulus", value: 23, color: "#ef4444" }, // red-800
+  { name: "Pending", value: 4, color: "#facc15" }, // yellow-400
+];
 
 export function ChartPieLegend() {
   return (
@@ -63,5 +63,5 @@ export function ChartPieLegend() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

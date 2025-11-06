@@ -1,15 +1,15 @@
-import Image from 'next/image'
-import { Card } from '@/components/ui/card'
+import Image from "next/image";
+import { Card } from "@/components/ui/card";
 
 export default function Ketentuan() {
-    return (
-        <div className="flex flex-col items-center pt-4 pb-16 max-w-11/12 w-full">
-                    <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
-                      Ketentuan
-                    </h2>
-            <div className='flex gap-5 w-full'>
-            <Card className="p-5">
-                       <ul className="list-disc list-inside space-y-4 text-gray-700 leading-relaxed">
+  return (
+    <div className="flex flex-col items-center pt-4 pb-16 max-w-11/12 w-full">
+      <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
+        Ketentuan
+      </h2>
+      <div className="flex gap-5 w-full">
+        <Card className="p-5">
+          <ul className="list-disc list-inside space-y-4 text-gray-700 leading-relaxed">
             <li>
               Satu NIK hanya dapat dipakai untuk membuat satu akun pendaftaran.
               Pastikan Saudara memasukkan NIK yang benar, bukan Nomor Kartu
@@ -21,8 +21,8 @@ export default function Ketentuan() {
             </li>
             <li>
               Email yang dipergunakan untuk membuat akun merupakan email
-              personal yang aktif karena semua komunikasi seleksi akan
-              dilakukan melalui email tersebut.
+              personal yang aktif karena semua komunikasi seleksi akan dilakukan
+              melalui email tersebut.
             </li>
             <li>
               Satu alamat email hanya dapat digunakan untuk satu kali pembuatan
@@ -57,8 +57,8 @@ export default function Ketentuan() {
               atau program studi tujuan Saudara.
             </li>
           </ul>
-                </Card>
-            </div>
-        </div>
-    )
+        </Card>
+      </div>
+    </div>
+  );
 }
