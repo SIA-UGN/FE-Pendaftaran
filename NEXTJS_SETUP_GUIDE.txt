@@ -611,7 +611,7 @@ export const useMarkAsRead = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (id) => notificationService.markAsRead(id),
+    mutationFn: notificationService.markAsRead,
     onSuccess: () => {
       // Invalidate all notification queries
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
@@ -635,7 +635,7 @@ export const useDeleteNotification = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (id) => notificationService.delete(id),
+    mutationFn: notificationService.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       toast.success('Notification deleted');
@@ -677,7 +677,7 @@ export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (data) => profileService.updateProfile(data),
+    mutationFn: profileService.updateProfile,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       queryClient.invalidateQueries({ queryKey: ['auth', 'user'] });
@@ -695,7 +695,7 @@ export const useUploadAvatar = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (file) => profileService.uploadAvatar(file),
+    mutationFn: profileService.uploadAvatar,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       queryClient.invalidateQueries({ queryKey: ['auth', 'user'] });
@@ -823,7 +823,7 @@ export const useCreateAnnouncement = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (data) => announcementService.create(data),
+    mutationFn: announcementService.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['announcements'] });
       toast.success('Announcement created successfully!');
@@ -866,7 +866,7 @@ export const managerService = {
 # hooks/useManager.js
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { managerService } from '@/services/managerService';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 // Dashboard hook
 export const useManagerDashboard = () => {
@@ -989,7 +989,7 @@ export const useCreateBroadcastNotification = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (data) => managerService.createBroadcastNotification(data),
+    mutationFn: managerService.createBroadcastNotification,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['manager', 'notifications'] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] }); // For applicants
@@ -1036,7 +1036,7 @@ export const adminService = {
 # hooks/useAdmin.js
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminService } from '@/services/adminService';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 // Dashboard hook
 export const useAdminDashboard = () => {
