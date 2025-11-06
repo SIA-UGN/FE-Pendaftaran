@@ -1,4 +1,4 @@
-import ApplicantInformation from "@/components/ApplicantInformation";
+import ApplicantInformation from "@/components/dashboard/ApplicantInformation";
 
 export default function Pendaftar() {
   return (

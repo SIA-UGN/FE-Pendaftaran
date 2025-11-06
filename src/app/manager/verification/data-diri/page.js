@@ -21,7 +21,7 @@ import Link from "next/link";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { toast } from "sonner";
 import { getCookie } from "cookies-next";
-import RegistrationProgress from "@/components/RegistrationProgress";
+import RegistrationProgress from "@/components/registrations/RegistrationProgress";
 import {
   AlertDialog,
   AlertDialogAction,

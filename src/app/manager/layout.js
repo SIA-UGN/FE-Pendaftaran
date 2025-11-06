@@ -1,6 +1,6 @@
 "use client";
 
-import { ManagerSidebar } from "@/components/manager-sidebar";
+import { ManagerSidebar } from "@/components/manager/manager-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import {

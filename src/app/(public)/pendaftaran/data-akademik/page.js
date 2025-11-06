@@ -23,7 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import RegistrationProgress from "@/components/RegistrationProgress";
+import RegistrationProgress from "@/components/registrations/RegistrationProgress";
 
 const MAX_FILE_SIZE = 5000000;
 const ACCEPTED_FILE_TYPES = [

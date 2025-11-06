@@ -1,6 +1,6 @@
 "use client";
 
-import PenambahanManajer from "@/components/PenambahanManajer";
+import PenambahanManajer from "@/components/admin/PenambahanManajer";
 import {
   Form,
   FormControl,

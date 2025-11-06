@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import AccountInformation from "@/components/AccountInformation";
-import ApplicantInformation from "@/components/ApplicantInformation";
+import AccountInformation from "@/components/dashboard/AccountInformation";
+import ApplicantInformation from "@/components/dashboard/ApplicantInformation";
 import ManajerList from "@/components/ManajerList";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 

@@ -1,4 +1,4 @@
-import HomeCarousel from "@/components/HomeCarousel";
+import HomeCarousel from "@/components/landing-page/HomeCarousel";
 import Image from "next/image";
 
 import { Card } from "@/components/ui/card";

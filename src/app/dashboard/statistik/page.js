@@ -1,4 +1,4 @@
-import { ChartPieLegend } from "@/components/ChartPieLegend";
+import { ChartPieLegend } from "@/components/dashboard/ChartPieLegend";
 
 export default function Statistika() {
   return (

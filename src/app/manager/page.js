@@ -1,5 +1,5 @@
-import AccountInformation from "@/components/AccountInformation";
-import NotificationManager from "@/components/NotificationManager";
+import AccountInformation from "@/components/dashboard/AccountInformation";
+import NotificationManager from "@/components/manager/NotificationManager";
 
 export default function Dashboard() {
   return (

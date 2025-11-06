@@ -19,7 +19,7 @@ import { SearchIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-import { ApplicantTable } from "@/components/ApplicantTable";
+import { ApplicantTable } from "@/components/dashboard/ApplicantTable";
 
 export default function ApplicantList() {
   return (

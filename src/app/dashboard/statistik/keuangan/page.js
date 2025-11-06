@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { ChartPieLegend } from "@/components/ChartPieLegend";
+import { ChartPieLegend } from "@/components/dashboard/ChartPieLegend";
 
 export default function Page() {
   return (

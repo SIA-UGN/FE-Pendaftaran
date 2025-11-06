@@ -3,7 +3,7 @@ import Link from "next/link";
 import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Prestasi from "@/components/prestasi/Prestasi";
-import RegistrationProgress from "@/components/RegistrationProgress";
+import RegistrationProgress from "@/components/registrations/RegistrationProgress";
 import ConfirmDialogClient from "../data-prestasi/ConfirmDialogClient";
 
 export default async function DataPrestasi() {

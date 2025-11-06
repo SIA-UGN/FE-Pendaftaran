@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import RegistrationProgress from "@/components/RegistrationProgress";
+import RegistrationProgress from "@/components/registrations/RegistrationProgress";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Clock } from "lucide-react";
 
 import ApplicantAnnouncement from "@/components/ApplicantAnnouncement";
-import EmailPicker from "@/components/EmailPicker";
+import EmailPicker from "@/components/registrations/EmailPicker";
 import Link from "next/link";
 
 export default function Status() {

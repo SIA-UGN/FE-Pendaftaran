@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import ApplicantList from "@/components/ApplicantList";
+import ApplicantList from "@/components/dashboard/ApplicantList";
 
 export default function ApplicantInformation() {
   return (
