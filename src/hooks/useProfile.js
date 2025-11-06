@@ -14,7 +14,7 @@ export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data) => profileService.updateProfile(data),
+    mutationFn: profileService.updateProfile,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
@@ -32,7 +32,7 @@ export const useUploadAvatar = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (file) => profileService.uploadAvatar(file),
+    mutationFn: profileService.uploadAvatar,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       queryClient.invalidateQueries({ queryKey: ["auth", "user"] });

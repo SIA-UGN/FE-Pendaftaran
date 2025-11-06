@@ -14,7 +14,7 @@ export const useCreateAnnouncement = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data) => announcementService.create(data),
+    mutationFn: announcementService.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["announcements"] });
       toast.success("Announcement created successfully");
