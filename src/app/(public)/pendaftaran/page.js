@@ -1,34 +1,70 @@
-import ProtectedRoute from "@/components/ProtectedRoute";
+"use client";
 
+import ProtectedRoute from "@/components/ProtectedRoute";
 import InformasiPendaftaran from "@/components/InformasiPendaftaran";
 import InformasiProfil from "@/components/InformasiProfil";
 import RegistrationProgress from "@/components/RegistrationProgress";
 import UrutanTahapan from "@/components/UrutanTahapan";
-import Ketentuan from "@/components/Ketentuan"
+import Ketentuan from "@/components/Ketentuan";
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { useRegistrationProgress } from "@/hooks/useRegistration";
+import toast from "react-hot-toast";
 
 export default function PendaftaranPage() {
-    return (
-        <ProtectedRoute>
-            <div className="py-12 flex items-center w-screen justify-center flex-col gap-5 max-w-10/12 mx-auto">
-                <InformasiPendaftaran />
-                {/* <InformasiProfil /> */}
-                <RegistrationProgress />
-                <UrutanTahapan />
-                <Ketentuan />
-                <div className="w-10/12">
-                    <Link href="/pendaftaran/data-diri" className={"w-lg ms-auto mb-12"}>
-                        <Button
-                            type="button"
-                            variant="green"
-                            className={"w-full"}
-                        > Lanjut
-                        </Button>
-                    </Link>
-                </div>
-            </div>
-        </ProtectedRoute>
-    )
+  const router = useRouter();
+  const { data: progressData, isLoading, isError } = useRegistrationProgress();
+
+  const stepRoutes = {
+    1: "/pendaftaran/data-diri",
+    2: "/pendaftaran/data-alamat",
+    3: "/pendaftaran/data-akademik",
+    4: "/pendaftaran/data-orangtua",
+    5: "/pendaftaran/data-prestasi",
+  };
+
+  const getNextIncompleteStep = () => {
+    if (!progressData?.data) return "/pendaftaran/data-diri";
+
+    const { completed_steps = [], accessible_steps = [] } = progressData.data;
+
+    for (let step = 1; step <= 5; step++) {
+      if (!completed_steps.includes(step) && accessible_steps.includes(step)) {
+        return stepRoutes[step];
+      }
+    }
+
+    if (completed_steps.length === 5) {
+      return "/pendaftaran/pembayaran";
+    }
+
+    return "/pendaftaran/data-diri";
+  };
+
+  const handleContinue = () => {
+    const nextRoute = getNextIncompleteStep();
+    router.push(nextRoute);
+  };
+
+  return (
+    <ProtectedRoute>
+      <div className="py-12 flex items-center w-screen justify-center flex-col gap-5 max-w-10/12 mx-auto">
+        <InformasiPendaftaran />
+        <RegistrationProgress />
+        <UrutanTahapan />
+        <Ketentuan />
+        <div className="w-10/12">
+          <Button
+            type="button"
+            variant="green"
+            className={"w-full"}
+            onClick={handleContinue}
+          >
+            Lanjut
+          </Button>
+        </div>
+      </div>
+    </ProtectedRoute>
+  );
 }

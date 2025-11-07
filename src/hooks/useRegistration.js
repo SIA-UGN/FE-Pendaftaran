@@ -7,7 +7,7 @@ export const useRegistrationProgress = () => {
   return useQuery({
     queryKey: ["registration", "progress"],
     queryFn: registrationService.getProgress,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 2 * 60 * 1000,
   });
 };
 
@@ -15,7 +15,7 @@ export const useMyRegistration = () => {
   return useQuery({
     queryKey: ["registration", "my"],
     queryFn: registrationService.getMyRegistration,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 };
 
