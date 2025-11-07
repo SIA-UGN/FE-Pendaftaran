@@ -1,10 +1,10 @@
 "use client";
 
-import AccountInformation from "@/components/dashboard/AccountInformation";
-import RegistrantInformation from "@/components/RegistrantInformation";
-import ApplicantInformation from "@/components/dashboard/ApplicantInformation";
-import Statistics from "@/components/Statistics";
-import Keuangan from "@/components/Keuangan";
+// import AccountInformation from "@/components/dashboard/AccountInformation";
+// import RegistrantInformation from "@/components/RegistrantInformation";
+// import ApplicantInformation from "@/components/dashboard/ApplicantInformation";
+// import Statistics from "@/components/Statistics";
+// import Keuangan from "@/components/Keuangan";
 import { MajorTable } from "@/components/MajorTable";
 
 import { Card } from "@/components/ui/card";

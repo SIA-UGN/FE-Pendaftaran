@@ -185,7 +185,7 @@ export default function Navbar() {
           ) : (
             <Link
               href="/login"
-              className="text-[var(--cream)] bg-white font-bold text-md hover:bg-[var(--yellow)] hover:text-white px-4 rounded-lg py-2"
+              className="text-[var(--cream)] font-bold text-md hover:bg-[var(--yellow)]"
             >
               Login
             </Link>

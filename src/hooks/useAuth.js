@@ -33,7 +33,7 @@ export const useLogin = () => {
 
       if (!data || !data.user) {
         console.error("Invalid response structure:", response);
-        toast.error("Login failed. Invalid response from server.");
+        toast.error("Login gagal. Respons tidak valid dari server.");
         return;
       }
 
@@ -41,12 +41,14 @@ export const useLogin = () => {
       localStorage.setItem("user", JSON.stringify(data.user));
       queryClient.setQueryData(["auth", "user"], data.user);
       updateUser(data.user);
-      toast.success("Login successful");
+      toast.success("Login berhasil");
 
       const userRoles = data.user.roles || [];
 
-      if (userRoles.includes("admin") || userRoles.includes("manager")) {
-        router.push("/admin/registrations");
+      if (userRoles.includes("admin")) {
+        router.push("/dashboard");
+      } else if (userRoles.includes("manager")) {
+        router.push("/manager");
       } else if (
         userRoles.includes("applicant") ||
         userRoles.includes("student")
@@ -62,7 +64,7 @@ export const useLogin = () => {
       const message =
         error.response?.data?.message ||
         error.response?.data?.errors?.email?.[0] ||
-        "Login failed. Please try again.";
+        "Login gagal. Silakan coba lagi.";
       toast.error(message);
     },
   });
@@ -82,7 +84,7 @@ export const useRegister = () => {
       localStorage.setItem("user", JSON.stringify(data.user));
       queryClient.setQueryData(["auth", "user"], data.user);
       updateUser(data.user);
-      toast.success("Registration successful");
+      toast.success("Registrasi berhasil");
       router.push("/pendaftaran");
     },
     onError: (error) => {
@@ -91,7 +93,7 @@ export const useRegister = () => {
       const message =
         error.response?.data?.message ||
         error.response?.data?.errors?.email?.[0] ||
-        "Registration failed. Please try again.";
+        "Registrasi gagal. Silakan coba lagi.";
       toast.error(message);
     },
   });
@@ -109,7 +111,7 @@ export const useLogout = () => {
       localStorage.removeItem("user");
       queryClient.clear();
       clearUser();
-      toast.success("Logout successful");
+      toast.success("Logout berhasil");
       router.push("/");
     },
     onError: (error) => {
@@ -126,7 +128,7 @@ export const useForgotPassword = () => {
   return useMutation({
     mutationFn: authService.forgotPassword,
     onSuccess: (data) => {
-      toast.success("Password reset link has been sent to your email!");
+      toast.success("Link reset password telah dikirim ke email Anda!");
       if (process.env.NODE_ENV === "development" && data?.data?.reset_token) {
         console.log("Reset token (dev only):", data.data.reset_token);
       }
@@ -135,7 +137,7 @@ export const useForgotPassword = () => {
       if (!error.response || error.response?.status >= 500) return;
 
       const message =
-        error?.response?.data?.message || "Failed to send password reset link.";
+        error?.response?.data?.message || "Gagal mengirim link reset password.";
       toast.error(message);
     },
   });
@@ -147,14 +149,14 @@ export const useResetPassword = () => {
   return useMutation({
     mutationFn: authService.resetPassword,
     onSuccess: () => {
-      toast.success("Password has been reset successfully!");
+      toast.success("Password berhasil direset!");
       router.push("/login");
     },
     onError: (error) => {
       if (!error.response || error.response?.status >= 500) return;
 
       const message =
-        error?.response?.data?.message || "Failed to reset password.";
+        error?.response?.data?.message || "Gagal mereset password.";
       toast.error(message);
     },
   });
@@ -164,13 +166,13 @@ export const useChangePassword = () => {
   return useMutation({
     mutationFn: authService.changePassword,
     onSuccess: () => {
-      toast.success("Password has been changed successfully!");
+      toast.success("Password berhasil diubah!");
     },
     onError: (error) => {
       if (!error.response || error.response?.status >= 500) return;
 
       const message =
-        error?.response?.data?.message || "Failed to change password.";
+        error?.response?.data?.message || "Gagal mengubah password.";
       toast.error(message);
     },
   });

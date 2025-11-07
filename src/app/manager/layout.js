@@ -27,6 +27,7 @@ export default function DashboardLayout({ children }) {
   const pageTitle = getPageTitle(pathname);
 
   return (
+    // <ProtectedRoute allowedRoles={["manager"]}>
     <SidebarProvider>
       <ManagerSidebar />
       <SidebarInset>
