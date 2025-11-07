@@ -69,7 +69,7 @@ export default function RegisterPage() {
             </Link>
           </div>
         </div>
-        <div className="w-full flex items-center justify-end">
+        <div className="w-full flex items-center justify-end bg-white  rounded-[5vw]">
           <div className="py-6 w-full md:w-5/8 h-full flex flex-col justify-center gap-4 md:px-12">
             <CardHeader className={"text-center"}>
               <CardTitle className={"font-bold text-4xl"}>REGISTER</CardTitle>

@@ -94,25 +94,20 @@ export default function Navbar() {
         </button>
       </div>
 
-      <div className="hidden md:flex gap-6 h-full  items-stretch">
-        <div className="hidden md:flex h-full items-center">
-          {" "}
-          <NavigationMenu className="h-full">
-            {" "}
-            <NavigationMenuList className="w-fit h-full flex items-center">
-              {" "}
-              <NavigationMenuItem className="h-full flex items-center">
+      <div className="hidden md:flex gap-6">
+        <div className="hidden md:flex">
+          <NavigationMenu>
+            <NavigationMenuList className="w-fit">
+              <NavigationMenuItem>
                 <NavigationMenuLink
                   asChild
-                  className={`${navigationMenuTriggerStyle()} h-full flex items-center`}
+                  className={navigationMenuTriggerStyle()}
                 >
                   <Link href="/">Home</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
-              <NavigationMenuItem className="h-full flex items-center">
-                <NavigationMenuTrigger className="h-full flex items-center">
-                  Profil
-                </NavigationMenuTrigger>{" "}
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Profil</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[200px] gap-4 text-center">
                     <li>
@@ -134,10 +129,10 @@ export default function Navbar() {
                   </ul>
                 </NavigationMenuContent>
               </NavigationMenuItem>
-              <NavigationMenuItem className="h-full flex items-center">
+              <NavigationMenuItem>
                 <NavigationMenuLink
                   asChild
-                  className={`${navigationMenuTriggerStyle()} h-full flex items-center`} // ✅
+                  className={navigationMenuTriggerStyle()}
                 >
                   <Link href="/pendaftaran">Pendaftaran</Link>
                 </NavigationMenuLink>
@@ -185,7 +180,7 @@ export default function Navbar() {
           ) : (
             <Link
               href="/login"
-              className="text-[var(--cream)] font-bold text-md hover:bg-[var(--yellow)]"
+              className="text-[var(--cream)] font-bold text-md hover:bg-[var(--yellow)] px-4 py-2 bg-white rounded-lg hover:text-white"
             >
               Login
             </Link>
@@ -217,10 +212,7 @@ export default function Navbar() {
                 { href: "/", label: "Home" },
                 { href: "/sejarah", label: "Sejarah" },
                 { href: "/visi-misi", label: "Visi-Misi" },
-                {
-                  href: "/pimpinan-universitas",
-                  label: "Pimpinan Universitas",
-                },
+                { href: "/pimpinan-universitas", label: "Pimpinan Universitas" },
                 { href: "/pendaftaran", label: "Pendaftaran" },
               ].map((item) => (
                 <Link
