@@ -3,8 +3,9 @@ import { NextResponse } from "next/server";
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  //   protected routes
-  const protectedRoutes = ["/dashboard", "/registration", "/payment", "/admin"];
+  // Only protect server-side routes (API routes)
+  // Client-side routes protected by ProtectedRoute component
+  const protectedRoutes = ["/api/protected"];
   const authRoutes = [
     "/login",
     "/register",
@@ -41,7 +42,19 @@ export async function middleware(request) {
       );
 
       if (response.ok) {
-        return NextResponse.redirect(new URL("/dashboard", request.url));
+        const userData = await response.json();
+        const userRoles = userData.data?.user?.roles || [];
+
+        if (userRoles.includes("admin")) {
+          return NextResponse.redirect(new URL("/dashboard", request.url));
+        } else if (userRoles.includes("manager")) {
+          return NextResponse.redirect(new URL("/manager", request.url));
+        } else if (
+          userRoles.includes("applicant") ||
+          userRoles.includes("student")
+        ) {
+          return NextResponse.redirect(new URL("/pendaftaran", request.url));
+        }
       }
     } catch (error) {
       console.log("Token validation error:", error);

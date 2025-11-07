@@ -25,7 +25,7 @@ export const useCreatePayment = () => {
     mutationFn: paymentService.createPayment,
     onSuccess: () => {
       queryClient.invalidateQueries(["payment", "my"]);
-      toast.success("Payment created successfully, please proceed to payment.");
+      toast.success("Pembayaran berhasil dibuat, silakan lanjutkan pembayaran");
     },
   });
 };
@@ -38,13 +38,11 @@ export const useUploadPaymentProof = () => {
       paymentService.uploadProof(paymentId, formData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["payment", "my"] });
-      toast.success(
-        "Payment proof uploaded successfully. Waiting for verification."
-      );
+      toast.success("Bukti pembayaran berhasil diupload. Menunggu verifikasi");
     },
     onError: (error) => {
       const message =
-        error?.response?.data?.message || "Failed to upload payment proof.";
+        error?.response?.data?.message || "Gagal mengupload bukti pembayaran";
       toast.error(message);
     },
   });
@@ -66,11 +64,11 @@ export const useVerifyPayment = () => {
     mutationFn: ({ id, data }) => paymentService.verifyPayment(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["payments"] });
-      toast.success("Payment verified successfully.");
+      toast.success("Pembayaran berhasil diverifikasi");
     },
     onError: (error) => {
       const message =
-        error?.response?.data?.message || "Failed to verify payment.";
+        error?.response?.data?.message || "Gagal memverifikasi pembayaran";
       toast.error(message);
     },
   });

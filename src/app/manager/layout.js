@@ -15,9 +15,11 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import ProtectedRoute from "@/components/ProtectedRoute"
 
 export default function DashboardLayout({ children }) {
   return (
+    <ProtectedRoute allowedRoles={["manager"]}>
     <SidebarProvider>
       <ManagerSidebar />
       <SidebarInset>
@@ -39,5 +41,6 @@ export default function DashboardLayout({ children }) {
         </main>
       </SidebarInset>
     </SidebarProvider>
+    </ProtectedRoute>
   )
 }

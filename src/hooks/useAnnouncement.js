@@ -14,14 +14,14 @@ export const useCreateAnnouncement = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data) => announcementService.create(data),
+    mutationFn: announcementService.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["announcements"] });
-      toast.success("Announcement created successfully");
+      toast.success("Pengumuman berhasil dibuat");
     },
     onError: (error) => {
       const message =
-        error?.response?.data?.message || "Failed to create announcement";
+        error?.response?.data?.message || "Gagal membuat pengumuman";
       toast.error(message);
     },
   });
