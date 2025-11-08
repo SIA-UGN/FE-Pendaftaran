@@ -47,7 +47,7 @@ export default function Navbar() {
           setUser(userData);
           setIsLoggedIn(true);
         } catch (error) {
-          console.error("Error parsing user data:", error);
+          localStorage.removeItem("user");
           setIsLoggedIn(false);
           setUser(null);
         }
@@ -57,21 +57,24 @@ export default function Navbar() {
       }
     };
 
-    // Initial load
     updateUserData();
 
-    // Listen to custom event untuk auto-update avatar di tab yang sama
     const handleUserUpdate = (event) => {
       if (event.detail) {
-        setUser(event.detail);
-        setIsLoggedIn(true);
+        try {
+          setUser(event.detail);
+          setIsLoggedIn(true);
+          localStorage.setItem("user", JSON.stringify(event.detail));
+        } catch (error) {
+          // Silent fail - localStorage error won't affect UI
+        }
       } else {
         updateUserData();
       }
     };
 
     window.addEventListener("userUpdated", handleUserUpdate);
-    window.addEventListener("storage", updateUserData); // Untuk antar tab
+    window.addEventListener("storage", updateUserData);
 
     return () => {
       window.removeEventListener("userUpdated", handleUserUpdate);
