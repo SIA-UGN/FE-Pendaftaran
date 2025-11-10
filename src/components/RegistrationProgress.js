@@ -35,13 +35,13 @@ export default function RegistrationProgress() {
       href: "/pendaftaran/data-orangtua",
       label: "Data Orang Tua",
       key: "data-orangtua",
-      step_number: 4,
+      step_number: 3,
     },
     {
       href: "/pendaftaran/data-akademik",
       label: "Data Akademik",
       key: "data-akademik",
-      step_number: 3,
+      step_number: 4,
     },
     {
       href: "/pendaftaran/data-prestasi",
@@ -56,15 +56,10 @@ export default function RegistrationProgress() {
   const getStepStatus = (stepNumber) => {
     if (!progressData?.data) return "locked";
 
-    const {
-      completed_steps = [],
-      accessible_steps = [],
-      current_step,
-    } = progressData.data;
+    const { completed_steps = [], accessible_steps = [] } = progressData.data;
 
     if (completed_steps.includes(stepNumber)) return "completed";
-    if (current_step === stepNumber) return "active";
-    if (accessible_steps.includes(stepNumber)) return "unlocked";
+    if (accessible_steps.includes(stepNumber)) return "accessible";
     return "locked";
   };
 
@@ -79,25 +74,18 @@ export default function RegistrationProgress() {
           icon: <CheckCircle className="text-green-500 bg-white" />,
           clickable: true,
         };
-      case "active":
+      case "accessible":
         return {
-          border: "border-yellow-500 bg-yellow-50",
-          text: "text-yellow-500",
-          icon: <CheckCircle className="text-yellow-500 bg-white" />,
-          clickable: true,
-        };
-      case "unlocked":
-        return {
-          border: "border-blue-500 bg-blue-50",
-          text: "text-blue-500",
-          icon: <CheckCircle className="text-blue-500 bg-white" />,
+          border: "border-red-500 bg-red-50",
+          text: "text-red-500",
+          icon: <CheckCircle className="text-red-500 bg-white" />,
           clickable: true,
         };
       case "locked":
         return {
-          border: "border-red-500 bg-red-50",
-          text: "text-red-500",
-          icon: <Lock className="text-red-500 bg-white" />,
+          border: "border-yellow-500 bg-yellow-50",
+          text: "text-yellow-500",
+          icon: <Lock className="text-yellow-500 bg-white" />,
           clickable: false,
         };
       default:
@@ -119,7 +107,10 @@ export default function RegistrationProgress() {
   };
 
   const progressPercent = progressData?.data?.completed_steps
-    ? (progressData.data.completed_steps.length / steps.length) * 100
+    ? Math.min(
+        (progressData.data.completed_steps.length / steps.length) * 100,
+        86
+      )
     : 0;
 
   if (isLoading) {

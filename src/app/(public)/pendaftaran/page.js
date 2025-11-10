@@ -19,13 +19,15 @@ export default function PendaftaranPage() {
   const stepRoutes = {
     1: "/pendaftaran/data-diri",
     2: "/pendaftaran/data-alamat",
-    3: "/pendaftaran/data-akademik",
-    4: "/pendaftaran/data-orangtua",
+    3: "/pendaftaran/data-orangtua",
+    4: "/pendaftaran/data-akademik",
     5: "/pendaftaran/data-prestasi",
   };
 
   const getNextIncompleteStep = () => {
-    if (!progressData?.data) return "/pendaftaran/data-diri";
+    if (isError || !progressData?.data) {
+      return "/pendaftaran/data-diri";
+    }
 
     const { completed_steps = [], accessible_steps = [] } = progressData.data;
 
