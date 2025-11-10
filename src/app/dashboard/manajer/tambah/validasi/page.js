@@ -1,198 +1,173 @@
 "use client";
 
-import PenambahanManajer from "@/components/admin/PenambahanManajer";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Info, CheckCircle2 } from "lucide-react";
+import { Heading } from "@/components/Heading";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-
-import { CardContent, Card } from "@/components/ui/card";
-
-import { Info } from "lucide-react";
-
-import { Heading } from "@/components/Heading";
-
-// 🧩 Schema Validasi
-const FormSchema = z.object({
-  namaLengkap: z.string().min(3, "Nama lengkap minimal 3 karakter"),
-  username: z.string().min(3, "Username minimal 3 karakter"),
-  email: z.string().email("Format email tidak valid"),
-  noHandphone: z
-    .string()
-    .min(10, "Nomor handphone minimal 10 digit")
-    .regex(/^0\d+$/, "Nomor harus diawali dengan 0 dan hanya angka"),
-  hakAkses: z.array(z.string()).min(1, "Pilih minimal satu hak akses"),
-});
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 export default function TambahManajer() {
-  const form = useForm({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      namaLengkap: "",
-      username: "",
-      email: "",
-      noHandphone: "",
-      hakAkses: [],
-    },
-  });
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [openSuccess, setOpenSuccess] = useState(false);
 
-  const onSubmit = async (data) => {
-    console.log("Data dikirim:", data);
-
-    try {
-      const res = await fetch("/api/manajer", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!res.ok) throw new Error("Gagal menambahkan manajer");
-
-      const result = await res.json();
-      alert("Manajer berhasil ditambahkan ✅");
-      console.log("Response:", result);
-    } catch (err) {
-      console.error(err);
-      alert("Terjadi kesalahan saat menambahkan manajer ❌");
-    }
+  const handleConfirm = () => {
+    setOpenConfirm(false);
+    setTimeout(() => {
+      setOpenSuccess(true);
+    }, 200); // memberi sedikit jeda agar transisi dialog terasa halus
   };
 
   return (
     <div className="flex flex-col items-center justify-center">
+      {/* 🔹 Bagian Pengingat */}
       <div className="flex flex-col items-center px-4 sm:px-8 max-w-6xl mt-12 w-full">
         <Heading title={"Pendaftaran Manajer Baru"} />
 
-        {/* Kartu Informasi */}
         <Card
           className="
-                  rounded-lg shadow-md 
-                  flex flex-col sm:flex-row gap-4 
-                  p-4 sm:p-6 lg:p-8 
-                  w-full 
-                  bg-[var(--light-cream)] 
-                  border border-gray-300
-                "
+            rounded-lg shadow-md 
+            flex flex-col sm:flex-row gap-4 
+            p-4 sm:p-6 lg:p-8 
+            w-full 
+            bg-[var(--light-cream)] 
+            border border-gray-300
+          "
         >
           <CardContent className="flex flex-col gap-4 sm:gap-5 w-full p-0">
-            {/* Subjudul */}
             <h2
               className="
-                      scroll-m-20 pb-2 border-b border-gray-500 
-                      text-2xl sm:text-3xl font-semibold tracking-tight 
-                      first:mt-0 flex items-center gap-2 text-gray-800
-                    "
+                scroll-m-20 pb-2 border-b border-gray-500 
+                text-2xl sm:text-3xl font-semibold tracking-tight 
+                first:mt-0 flex items-center gap-2 text-gray-800
+              "
             >
               <Info className="w-6 h-6 sm:w-7 sm:h-7 text-gray-700" />
               Pengingat
             </h2>
 
-            {/* Isi Konten */}
             <div className="pl-3 sm:pl-6 flex flex-col gap-2 sm:gap-3 text-gray-700">
               <p className="leading-7 flex items-start sm:items-center gap-2 text-sm sm:text-base">
-                Pastikan data manajer baru sudah benar sebelum data disimpan dan sistem akan mengirimkan aktivasi akun melalui email manajer
+                Pastikan data manajer baru sudah benar sebelum data disimpan dan
+                sistem akan mengirimkan aktivasi akun melalui email manajer.
               </p>
             </div>
           </CardContent>
         </Card>
       </div>
 
+      {/* 🔹 Bagian Validasi Data */}
       <div className="flex flex-col items-center px-4 sm:px-8 max-w-6xl my-12 w-full">
         <Heading title={"Validasi Data Manajer Baru"} />
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6 w-full"
-          >
-            <div className="flex flex-col gap-5 p-12 border rounded-xl bg-[var(--light-cream)]">
-              <FormField
-                control={form.control}
-                name="namaLengkap"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nama Lengkap</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Nama Lengkap" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Username" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-6 w-full">
+          <div className="flex flex-col gap-5 p-6 sm:p-10 border rounded-xl bg-[var(--light-cream)]">
+            <div>
+              <label className="block font-medium mb-1">Nama Lengkap</label>
+              <Input placeholder="Nama Lengkap" readOnly value="John Doe" />
+            </div>
 
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="email@example.com"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div>
+              <label className="block font-medium mb-1">Username</label>
+              <Input placeholder="Username" readOnly value="johnmanager" />
+            </div>
 
-              <FormField
-                control={form.control}
-                name="noHandphone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nomor Handphone</FormLabel>
-                    <FormControl>
-                      <Input type="tel" placeholder="08xxxxxxxx" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            <div>
+              <label className="block font-medium mb-1">Email</label>
+              <Input
+                type="email"
+                placeholder="email@example.com"
+                readOnly
+                value="john@example.com"
               />
             </div>
 
-            <div className="w-full flex items-center justify-end gap-2">
-              <Button
-                type="submit"
-                variant={"yellow"}
-                className={"w-48 rounded-md"}
-              >
-                Kembali
-              </Button>
-              <Button
-                type="submit"
-                variant={"green"}
-                className={"w-48 rounded-md"}
-              >
-                Konfirmasi
-              </Button>
+            <div>
+              <label className="block font-medium mb-1">Nomor Handphone</label>
+              <Input
+                type="tel"
+                placeholder="08xxxxxxxx"
+                readOnly
+                value="081234567890"
+              />
             </div>
-          </form>
-        </Form>
+          </div>
+
+          <div className="w-full flex flex-col sm:flex-row items-center justify-end gap-3 sm:gap-4 mt-4">
+            <Button
+              type="button"
+              variant={"yellow"}
+              className="w-full sm:w-48 rounded-md"
+            >
+              Kembali
+            </Button>
+
+            {/* 🔸 Alert Dialog Pertama - Konfirmasi */}
+            <AlertDialog open={openConfirm} onOpenChange={setOpenConfirm}>
+              <AlertDialogTrigger asChild>
+                <Button
+                  type="button"
+                  variant={"green"}
+                  className="w-full sm:w-48 rounded-md"
+                >
+                  Konfirmasi
+                </Button>
+              </AlertDialogTrigger>
+
+              <AlertDialogContent className="max-w-md">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Konfirmasi Data</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Apakah Anda yakin ingin menyimpan data manajer baru ini?
+                    Pastikan semua informasi sudah benar sebelum melanjutkan.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Batal</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleConfirm}>
+                    Ya, Simpan
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            {/* 🔸 Alert Dialog Kedua - Ucapan Selamat */}
+            <AlertDialog open={openSuccess} onOpenChange={setOpenSuccess}>
+              <AlertDialogContent className="max-w-md text-center">
+                <AlertDialogHeader className="flex flex-col items-center">
+                  <CheckCircle2 className="w-12 h-12 text-green-600 mb-3" />
+                  <AlertDialogTitle className="text-2xl font-semibold">
+                    Selamat!
+                  </AlertDialogTitle>
+                  <AlertDialogDescription className="text-base text-gray-600 mt-2">
+                    Data manajer baru berhasil disimpan dan aktivasi akun telah
+                    dikirim ke email yang terdaftar.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className="flex justify-center">
+                  <AlertDialogAction
+                    onClick={() => setOpenSuccess(false)}
+                    className="w-32"
+                  >
+                    Tutup
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </form>
       </div>
     </div>
   );
