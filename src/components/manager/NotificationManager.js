@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/Heading";
+import Link from "next/link"
 
 export default function NotificationManager() {
   return (
@@ -13,9 +14,12 @@ export default function NotificationManager() {
           >
             Lihat Notifikasi
           </Button>
-          <Button variant={"green"} className={"rounded-lg text-lg h-12"}>
-            Buat Notifikasi
-          </Button>
+          <Link href="/manager/broadcast">
+            <Button variant={"green"} className={"rounded-lg text-lg h-12"}>
+              Buat Notifikasi
+            </Button>
+          </Link>
+          
         </div>
       </div>
     </>

@@ -13,18 +13,21 @@ export default function Page() {
         Rincian
       </h2>
 
-      <div className="grid grid-cols-1 w-10/12 gap-12">
-        <Card className="flex items-center justify-center p-6 flex-col w-full stroke-black gap-2">
-          <span className="font-bold text-4xl text-[var(--green)]">80</span>
-          <span className="text-lg text-gray-500">Lulus</span>
+      <div className="grid grid-cols-1 w-full gap-12">
+        <Card className="flex items-start justify-center p-6 flex-col w-full stroke-black gap-2">
+          <span className="font-bold text-xl text-[var(--green)]">Teknik Informatika</span>
+          <span className="text-md text-gray-500">500 Pendaftar</span>
+          <span className="text-md text-gray-500">Program studi dengan peminat terbanyak</span>
         </Card>
-        <Card className="flex items-center justify-center p-6 flex-col w-full stroke-black gap-2">
-          <span className="font-bold text-4xl text-[var(--green)]">80</span>
-          <span className="text-lg text-gray-500">Lulus</span>
+        <Card className="flex items-start justify-center p-6 flex-col w-full stroke-black gap-2">
+          <span className="font-bold text-xl text-[var(--green)]">Sistem Informasi</span>
+          <span className="text-md text-gray-500">310 Pendaftar</span>
+          <span className="text-md text-gray-500">Program studi dengan peminat tersedikit</span>
         </Card>
-        <Card className="flex items-center justify-center p-6 flex-col w-full stroke-black gap-2">
-          <span className="font-bold text-4xl text-[var(--green)]">30</span>
-          <span className="text-lg text-gray-500">Ditolak</span>
+        <Card className="flex items-start justify-center p-6 flex-col w-full stroke-black gap-2">
+          <span className="font-bold text-xl text-[var(--green)]">Ilmu Komputer</span>
+          <span className="text-md text-gray-500">450 Pendaftar</span>
+          <span className="text-md text-gray-500">Program studi dengan peminat terbanyak kedua</span>
         </Card>
       </div>
     </div>

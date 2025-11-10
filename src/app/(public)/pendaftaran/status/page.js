@@ -11,7 +11,7 @@ import EmailPicker from "@/components/registrations/EmailPicker";
 import Link from "next/link";
 
 export default function Status() {
-  const [status, setStatus] = useState("Rejected"); // "Accepted" | "Rejected" | "Pending"
+  const [status, setStatus] = useState("Accepted"); // "Accepted" | "Rejected" | "Pending"
 
   const dataStatus = [
     { title: "Data Diri", status: "Accepted" },

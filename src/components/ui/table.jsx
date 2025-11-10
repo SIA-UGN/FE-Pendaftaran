@@ -37,7 +37,7 @@ function TableBody({
   return (
     <tbody
       data-slot="table-body"
-      className={cn("[&_tr:last-child]:border-0 bg-[var(--light-cream)]/10", className)}
+      className={cn("[&_tr:last-child]:border-0 bg-white", className)}
       {...props} />
   );
 }
@@ -49,7 +49,7 @@ function TableFooter({
   return (
     <tfoot
       data-slot="table-footer"
-      className={cn("bg-muted/50 border-t font-medium [&>tr]:last:border-b-0", className)}
+      className={cn("bg-white border-t font-medium [&>tr]:last:border-b-0 rounded-b-2xl", className)}
       {...props} />
   );
 }

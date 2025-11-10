@@ -1,82 +1,43 @@
 "use client";
 
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Card } from "@/components/ui/card";
 
 const majors = [
   {
-    code: "TI-001",
+    rank: 1,
     name: "Teknik Informatika",
-    faculty: "Fakultas Teknik",
-    applicants: 145,
+    applicants: 504,
   },
   {
-    code: "SI-002",
+    rank: 2,
+    name: "Ilmu Komputer",
+    applicants: 430,
+  },
+  {
+    rank: 3,
     name: "Sistem Informasi",
-    faculty: "Fakultas Teknik",
-    applicants: 98,
-  },
-  {
-    code: "AK-003",
-    name: "Akuntansi",
-    faculty: "Fakultas Ekonomi",
-    applicants: 127,
-  },
-  {
-    code: "MN-004",
-    name: "Manajemen",
-    faculty: "Fakultas Ekonomi",
-    applicants: 156,
-  },
-  {
-    code: "HK-005",
-    name: "Ilmu Hukum",
-    faculty: "Fakultas Hukum",
-    applicants: 89,
+    applicants: 201,
   },
 ];
 
 export function MajorTable() {
-  const totalApplicants = majors.reduce(
-    (sum, major) => sum + major.applicants,
-    0
-  );
-
   return (
-    <Table>
-      <TableCaption>Daftar jurusan Universitas Global Nusantara.</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Kode Jurusan</TableHead>
-          <TableHead>Nama Jurusan</TableHead>
-          <TableHead>Fakultas</TableHead>
-          <TableHead>Jumlah Pendaftar</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
+    <div className="mx-auto space-y-2 w-full">
+      <Card
+        className={`flex justify-between items-center rounded-xl shadow-sm px-4 py-5 text-sm font-medium bg-gradient-to-r from-yellow-300 to-yellow-200 border-2 w-full`}
+      >
         {majors.map((major, index) => (
-          <TableRow key={index}>
-            <TableCell className="font-medium">{major.code}</TableCell>
-            <TableCell>{major.name}</TableCell>
-            <TableCell>{major.faculty}</TableCell>
-            <TableCell>{major.applicants}</TableCell>
-          </TableRow>
+          <div className="flex w-full justify-between" key={index}>
+            <div className="flex items-center gap-3">
+              <span className="text-gray-800 font-semibold w-5 text-right">
+                {major.rank}
+              </span>
+              <span className="text-gray-900">{major.name}</span>
+            </div>
+            <span className="text-gray-800">{major.applicants} pendaftar</span>
+          </div>
         ))}
-      </TableBody>
-      <TableFooter>
-        <TableRow>
-          <TableCell colSpan={3}>Total Pendaftar</TableCell>
-          <TableCell>{totalApplicants}</TableCell>
-        </TableRow>
-      </TableFooter>
-    </Table>
+      </Card>
+    </div>
   );
 }
