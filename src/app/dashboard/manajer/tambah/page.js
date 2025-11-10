@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Heading } from "@/components/Heading";
 
 import Link from "next/link";
 
@@ -64,20 +65,16 @@ export default function TambahManajer() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center justify-center ">
       <PenambahanManajer />
 
-      <div className="flex flex-col items-center px-4 sm:px-8 max-w-11/12 my-12 w-full">
+      <div className="flex flex-col items-center px-4 sm:px-8 max-w-6xl my-12 w-full">
+        <Heading title={"Data Manajer Baru"} />
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-6 w-full"
           >
-            {/* === BAGIAN 1: DATA MANAJER === */}
-            <h2 className="text-3xl sm:text-2xl font-semibold mb-6 mt-12 w-full border-b-2 border-black pb-2 text-[var(--green)]">
-              Data Manajer Baru
-            </h2>
-
             <div className="flex flex-col gap-5 p-12 border rounded-xl bg-[var(--light-cream)]">
               <FormField
                 control={form.control}
@@ -141,22 +138,22 @@ export default function TambahManajer() {
             </div>
 
             <div className="w-full flex items-center justify-end gap-2">
+              <Button
+                type="submit"
+                variant={"yellow"}
+                className={"w-48 rounded-md"}
+              >
+                Kembali
+              </Button>
               <Link href="/dashboard/manajer/tambah/validasi">
                 <Button
                   type="submit"
-                  variant={"matcha"}
+                  variant={"green"}
                   className={"w-48 rounded-md"}
                 >
-                  Kembali
+                  Lanjut
                 </Button>
               </Link>
-              <Button
-                type="submit"
-                variant={"matcha"}
-                className={"w-48 rounded-md"}
-              >
-                Lanjut
-              </Button>
             </div>
           </form>
         </Form>

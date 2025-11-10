@@ -1,96 +1,85 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
-const students = [
+const applicants = [
   {
-    id: "MHS001",
-    name: "Andi Saputra",
-    email: "andi.saputra@example.com",
-    major: "Teknik Informatika",
+    id: 1,
+    number: "1700325147831124",
+    name: "Fahmi Rahman",
     status: "Approved",
   },
   {
-    id: "MHS002",
-    name: "Budi Santoso",
-    email: "budi.santoso@example.com",
-    major: "Manajemen",
+    id: 2,
+    number: "1700325147831124",
+    name: "Faradis Nurul",
+    status: "Pending",
+  },
+  {
+    id: 3,
+    number: "1700325147831124",
+    name: "Khay Pratama",
     status: "Rejected",
   },
   {
-    id: "MHS003",
-    name: "Citra Lestari",
-    email: "citra.lestari@example.com",
-    major: "Desain Komunikasi Visual",
-    status: "Approved",
-  },
-  {
-    id: "MHS004",
-    name: "Dewi Anggraini",
-    email: "dewi.anggraini@example.com",
-    major: "Akuntansi",
-    status: "Rejected",
-  },
-  {
-    id: "MHS005",
-    name: "Eka Pratama",
-    email: "eka.pratama@example.com",
-    major: "Hukum",
+    id: 4,
+    number: "1700325147831124",
+    name: "Riris Anjani",
     status: "Approved",
   },
 ];
 
 export function ApplicantTable() {
   return (
-    <Table>
-      <TableCaption>
-        Daftar mahasiswa Universitas Global Nusantara.
-      </TableCaption>
+    <Table className="w-full text-sm">
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[100px]">ID</TableHead>
-          <TableHead>Nama</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead>Jurusan</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead className="text-right">Verifikasi</TableHead>
+          <TableHead className="w-[60px] text-center">ID</TableHead>
+          <TableHead className="w-[150px] text-center">Nomor Peserta</TableHead>
+          <TableHead>Nama Peserta</TableHead>
+          <TableHead className="text-center">Status</TableHead>
+          <TableHead className="text-center">Lihat</TableHead>
         </TableRow>
       </TableHeader>
+
       <TableBody>
-        {students.map((student) => (
-          <TableRow key={student.id}>
-            <TableCell className="font-medium">{student.id}</TableCell>
-            <TableCell>{student.name}</TableCell>
-            <TableCell>{student.email}</TableCell>
-            <TableCell>{student.major}</TableCell>
-            <TableCell>{student.status}</TableCell>
-            <TableCell className="text-right">
-              <Link href="/manager/verification">
-                <Button size="sm" variant="yellow">
-                  Verifikasi
-                </Button>
-              </Link>
+        {applicants.map((applicant) => (
+          <TableRow key={applicant.id}>
+            <TableCell className="text-center font-medium">{applicant.id}</TableCell>
+            <TableCell className="text-center">{applicant.number}</TableCell>
+            <TableCell>{applicant.name}</TableCell>
+            <TableCell className="text-center">
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                  applicant.status === "Approved"
+                    ? "bg-green-100 text-green-700"
+                    : applicant.status === "Rejected"
+                    ? "bg-red-100 text-red-700"
+                    : "bg-yellow-100 text-yellow-700"
+                }`}
+              >
+                {applicant.status}
+              </span>
+            </TableCell>
+            <TableCell className="text-center">
+              <Button
+                variant="yellow"
+                className="text-sm font-medium text-[var(--green)] hover:bg-[var(--green)] hover:text-white transition-all rounded-md"
+              >
+                Lihat
+              </Button>
             </TableCell>
           </TableRow>
         ))}
       </TableBody>
-      <TableFooter>
-        <TableRow>
-          <TableCell colSpan={5}>Total Mahasiswa</TableCell>
-          <TableCell className="text-right">{students.length}</TableCell>
-        </TableRow>
-      </TableFooter>
     </Table>
   );
 }
