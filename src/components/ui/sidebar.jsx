@@ -606,8 +606,8 @@ function SidebarMenuSub({
       data-slot="sidebar-menu-sub"
       data-sidebar="menu-sub"
       className={cn(
-        "border-sidebar-border mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l px-2.5 py-0.5",
-        "group-data-[collapsible=icon]:hidden text-white",
+        "border-sidebar-border mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l px-2.5",
+        "group-data-[collapsible=icon]:hidden text-white py-2",
         className
       )}
       {...props} />
@@ -643,8 +643,8 @@ function SidebarMenuSubButton({
       data-size={size}
       data-active={isActive}
       className={cn(
-        "text-white ring-sidebar-ring hover:bg-[var(--yellow)] py-2 hover:text-white active:bg-[var(--yellow)] active:text-white [&>svg]:text-[var(--yellow)] flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 outline-hidden focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 focus:bg-[var(--yellow)]" ,
-        "data-[active=true]:bg-[var(--yellow)] data-[active=true]:text-[var(--yellow)]",
+        "text-white ring-sidebar-ring hover:bg-green-800 active:bg-green-800 active:text-white [&>svg]:text-[var(--yellow)] flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 outline-hidden focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 focus:bg-green-800 py-4" ,
+        "data-[active=true]:bg-green-800 data-[active=true]:text-[var(--yellow)]",
         size === "sm" && "text-xs",
         size === "md" && "text-sm",
         "group-data-[collapsible=icon]:hidden",
