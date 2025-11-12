@@ -1,6 +1,8 @@
 "use client";
 
-import { Info, AlertCircle, XCircle, CheckCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -14,7 +16,6 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -23,15 +24,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import RegistrationProgress from "@/components/registrations/RegistrationProgress";
-
-const MAX_FILE_SIZE = 5000000;
-const ACCEPTED_FILE_TYPES = [
-  "application/pdf",
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-];
+import ProtectedRoute from "@/components/ProtectedRoute";
+import toast from "react-hot-toast";
+import RegistrationProgress from "@/components/RegistrationProgress";
+import {
+  useRegistrationProgress,
+  useMyRegistration,
+  useStoreAcademicBackground,
+} from "@/hooks/useRegistration";
+import { uploadFile } from "@/services/uploadService";
 
 const FormSchema = z.object({
   sekolahAsal: z.string().min(3, { message: "Nama sekolah asal wajib diisi." }),
@@ -41,55 +42,145 @@ const FormSchema = z.object({
   ijazahTerakhir: z.string({
     required_error: "Ijazah terakhir harus dipilih.",
   }),
-  uploadIjazah: z
-    .any()
-    .refine((files) => files?.length == 1, "File ijazah wajib diupload.")
-    .refine(
-      (files) => files?.[0]?.size <= MAX_FILE_SIZE,
-      `Ukuran file maksimal 5MB.`
-    )
-    .refine(
-      (files) => ACCEPTED_FILE_TYPES.includes(files?.[0]?.type),
-      "Format file harus .pdf, .jpg, atau .png"
-    ),
-  uploadSkl: z.any().optional(),
-  uploadTranskrip: z
-    .any()
-    .refine(
-      (files) => files?.length == 1,
-      "File transkrip/rapor wajib diupload."
-    )
-    .refine(
-      (files) => files?.[0]?.size <= MAX_FILE_SIZE,
-      `Ukuran file maksimal 5MB.`
-    ),
-  uploadUn: z
-    .any()
-    .refine((files) => files?.length == 1, "File nilai UN wajib diupload.")
-    .refine(
-      (files) => files?.[0]?.size <= MAX_FILE_SIZE,
-      `Ukuran file maksimal 5MB.`
-    ),
-  uploadSertifikat: z.any().optional(),
+  fileSertifikat: z.string().optional(),
+  fileSuratKelulusan: z.string().optional(),
+  fileTranskrip: z.string().optional(),
+  fileUjianNasional: z.string().optional(),
+  fileTesSeleksi: z.string().optional(),
 });
 
 export default function DataAkademik() {
+  const router = useRouter();
+  const { data: progressData, isLoading: progressLoading } =
+    useRegistrationProgress();
+  const { data: registrationData, refetch } = useMyRegistration();
+  const storeMutation = useStoreAcademicBackground();
+  const [isUploading, setIsUploading] = useState(false);
+
+  const progress = progressData?.data;
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       sekolahAsal: "",
+      statusKelulusan: "",
+      ijazahTerakhir: "",
+      fileSertifikat: "",
+      fileSuratKelulusan: "",
+      fileTranskrip: "",
+      fileUjianNasional: "",
+      fileTesSeleksi: "",
     },
   });
 
-  function onSubmit(data) {
-    console.log(data);
-    alert(
-      "You submitted the following values:\n" + JSON.stringify(data, null, 2)
+  useEffect(() => {
+    if (!progressLoading && progress) {
+      const accessibleSteps = progress.accessible_steps || [];
+
+      if (!accessibleSteps.includes(4)) {
+        toast.error("Silakan selesaikan tahapan sebelumnya terlebih dahulu");
+        router.push("/pendaftaran");
+      }
+    }
+  }, [progress, progressLoading, router]);
+
+  useEffect(() => {
+    if (registrationData?.data?.registration?.academicRecord) {
+      const academic = registrationData.data.registration.academicRecord;
+      form.reset({
+        sekolahAsal: academic.school_origin || "",
+        statusKelulusan: academic.graduation_status || "",
+        ijazahTerakhir: academic.last_certificate || "",
+        fileSertifikat: academic.certification_file || "",
+        fileSuratKelulusan: academic.graduation_letter_file || "",
+        fileTranskrip: academic.transcript_file || "",
+        fileUjianNasional: academic.national_exam_file || "",
+        fileTesSeleksi: academic.selection_test_file || "",
+      });
+    }
+  }, [registrationData, form]);
+
+  const handleFileUpload = async (file, fieldName) => {
+    if (!file) return null;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Ukuran file maksimal 5MB");
+      return null;
+    }
+
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+    ];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Format file harus PDF, JPG, atau PNG");
+      return null;
+    }
+
+    setIsUploading(true);
+    try {
+      const typeMap = {
+        fileSertifikat: "certificate",
+        fileSuratKelulusan: "graduation_letter",
+        fileTranskrip: "transcript",
+        fileUjianNasional: "national_exam",
+        fileTesSeleksi: "selection_test",
+      };
+
+      const response = await uploadFile(file, typeMap[fieldName]);
+
+      if (response.success) {
+        toast.success(`File ${file.name} berhasil diupload`);
+        return response.url;
+      } else {
+        toast.error("Gagal upload file");
+        return null;
+      }
+    } catch (error) {
+      toast.error(
+        `Gagal upload file: ${error.response?.data?.message || error.message}`
+      );
+      return null;
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  async function onSubmit(data) {
+    const payload = {
+      academic: {
+        school_origin: data.sekolahAsal,
+        graduation_status: data.statusKelulusan,
+        last_certificate: data.ijazahTerakhir,
+        certification_file: data.fileSertifikat || null,
+        graduation_letter_file: data.fileSuratKelulusan || null,
+        transcript_file: data.fileTranskrip || null,
+        national_exam_file: data.fileUjianNasional || null,
+        selection_test_file: data.fileTesSeleksi || null,
+      },
+    };
+
+    storeMutation.mutate(payload);
+  }
+
+  if (progressLoading) {
+    return (
+      <ProtectedRoute>
+        <div className="max-w-7xl mx-auto p-12">
+          <div className="animate-pulse">Memuat...</div>
+        </div>
+      </ProtectedRoute>
     );
   }
 
   return (
-    <>
+    <ProtectedRoute>
       <div className="max-w-7xl mx-auto">
         <RegistrationProgress />
         <div className="flex items-center gap-2 mx-4 sm:mx-6 md:mx-8 lg:mx-12 mt-4 sm:mt-6 mb-6">
@@ -134,8 +225,12 @@ export default function DataAkademik() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="sudah">Sudah Lulus</SelectItem>
-                            <SelectItem value="belum">Belum Lulus</SelectItem>
+                            <SelectItem value="graduated">
+                              Sudah Lulus
+                            </SelectItem>
+                            <SelectItem value="not_graduated">
+                              Belum Lulus
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -163,7 +258,7 @@ export default function DataAkademik() {
                             <SelectItem value="sma">SMA</SelectItem>
                             <SelectItem value="smk">SMK</SelectItem>
                             <SelectItem value="ma">MA</SelectItem>
-                            <SelectItem value="lainnya">Lainnya</SelectItem>
+                            <SelectItem value="other">Lainnya</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -173,122 +268,179 @@ export default function DataAkademik() {
                 </div>
               </div>
 
-              <FormField
-                control={form.control}
-                name="uploadIjazah"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Upload Ijazah Terakhir</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        accept=".pdf, .jpg, .jpeg, .png"
-                        onChange={(e) => field.onChange(e.target.files)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-4 mt-6">
+                <h3 className="font-semibold text-base">Upload Dokumen</h3>
+                <p className="text-sm text-gray-600">
+                  Format file: PDF, JPG, PNG (Max 5MB)
+                </p>
 
-              <FormField
-                control={form.control}
-                name="uploadSkl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Upload SKL (jika ijazah belum keluar)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        accept=".pdf, .jpg, .jpeg, .png"
-                        onChange={(e) => field.onChange(e.target.files)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="fileSertifikat"
+                  render={({ field: { onChange, value, ...field } }) => (
+                    <FormItem>
+                      <FormLabel>File Ijazah / Sertifikat</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const url = await handleFileUpload(
+                                file,
+                                "fileSertifikat"
+                              );
+                              onChange(url);
+                            }
+                          }}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="uploadTranskrip"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Upload Transkrip Nilai / Rapor 1 Tahun Terakhir
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        accept=".pdf, .jpg, .jpeg, .png"
-                        onChange={(e) => field.onChange(e.target.files)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="fileSuratKelulusan"
+                  render={({ field: { onChange, value, ...field } }) => (
+                    <FormItem>
+                      <FormLabel>File Surat Keterangan Lulus (SKL)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const url = await handleFileUpload(
+                                file,
+                                "fileSuratKelulusan"
+                              );
+                              onChange(url);
+                            }
+                          }}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="uploadUn"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Upload Nilai Ujian Nasional</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        accept=".pdf, .jpg, .jpeg, .png"
-                        onChange={(e) => field.onChange(e.target.files)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="fileTranskrip"
+                  render={({ field: { onChange, value, ...field } }) => (
+                    <FormItem>
+                      <FormLabel>File Transkrip Nilai / Rapor</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const url = await handleFileUpload(
+                                file,
+                                "fileTranskrip"
+                              );
+                              onChange(url);
+                            }
+                          }}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="uploadSertifikat"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Upload Sertifikat / Surat Rekomendasi (Opsional)
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        accept=".pdf, .jpg, .jpeg, .png"
-                        onChange={(e) => field.onChange(e.target.files)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="fileUjianNasional"
+                  render={({ field: { onChange, value, ...field } }) => (
+                    <FormItem>
+                      <FormLabel>File Nilai Ujian Nasional</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const url = await handleFileUpload(
+                                file,
+                                "fileUjianNasional"
+                              );
+                              onChange(url);
+                            }
+                          }}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="fileTesSeleksi"
+                  render={({ field: { onChange, value, ...field } }) => (
+                    <FormItem>
+                      <FormLabel>File Hasil Tes Seleksi</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const url = await handleFileUpload(
+                                file,
+                                "fileTesSeleksi"
+                              );
+                              onChange(url);
+                            }
+                          }}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
             <div className="w-full flex items-center justify-end my-6 sm:my-8 md:my-10 lg:my-12 px-4 sm:px-6 md:px-8 lg:px-12">
               <Link href="/pendaftaran">
                 <Button
-                  type="submit"
+                  type="button"
                   variant={"yellow"}
                   className={"w-full sm:w-48"}
                 >
                   Kembali
                 </Button>
               </Link>
-              <Link
-                href="/pendaftaran/data-prestasi"
-                className="w-full sm:w-48"
+              <Button
+                type="submit"
+                variant={"matcha"}
+                className={"w-full sm:w-48"}
+                disabled={storeMutation.isPending || isUploading}
               >
-                <Button type="submit" variant={"matcha"} className={"w-full"}>
-                  Lanjut
-                </Button>
-              </Link>
+                {isUploading
+                  ? "Mengupload..."
+                  : storeMutation.isPending
+                  ? "Menyimpan..."
+                  : "Lanjut"}
+              </Button>
             </div>
           </form>
         </Form>
       </div>
-    </>
+    </ProtectedRoute>
   );
 }

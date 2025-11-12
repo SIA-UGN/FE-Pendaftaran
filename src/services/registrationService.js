@@ -1,28 +1,22 @@
 import apiClient from "@/lib/api";
 
 export const registrationService = {
-  // track progress
   getProgress: () => apiClient.get("/registration/progress"),
   getMyRegistration: () => apiClient.get("/registration/my"),
 
-  //   multi-step registration
-  savePersonalIdentity: (data) =>
-    apiClient.post("registration/personal-identity", { profile: data }),
-  saveAddressInformation: (data) =>
-    apiClient.post("/registration/address-information", { address: data }),
-  saveAcademicBackground: (data) =>
-    apiClient.post("/registration/academic-background", { academic: data }),
-  saveFamilyData: (data) => apiClient.post("/registration/family-data", data),
-  saveAchievements: (data) =>
-    apiClient.post("/registration/achievements", { achievements: data }),
+  storePersonalIdentity: (data) =>
+    apiClient.post("/registration/personal-identity", data),
+  storeAddressInformation: (data) =>
+    apiClient.post("/registration/address-information", data),
+  storeAcademicBackground: (data) =>
+    apiClient.post("/registration/academic-background", data),
+  storeFamilyData: (data) => apiClient.post("/registration/family-data", data),
+  storeAchievements: (data) =>
+    apiClient.post("/registration/achievements", data),
 
-  //   all in one registration
   store: (data) => apiClient.post("/registration", data),
-
-  //   final submit
   submitRegistration: () => apiClient.post("/registration/submit"),
 
-  // admin endpoints
   getAllRegistrations: (params) => apiClient.get("/registrations", { params }),
   getRegistration: (id) => apiClient.get(`/registrations/${id}`),
   updateStatus: (id, data) =>

@@ -1,13 +1,14 @@
 "use client";
 
-import { Info, AlertCircle, XCircle, CheckCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -16,7 +17,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import RegistrationProgress from "@/components/registrations/RegistrationProgress";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import toast from "react-hot-toast";
+import RegistrationProgress from "@/components/RegistrationProgress";
+import {
+  useRegistrationProgress,
+  useMyRegistration,
+  useStoreAddressInformation,
+} from "@/hooks/useRegistration";
 
 const FormSchema = z.object({
   provinsi: z.string().min(1, { message: "Provinsi wajib diisi." }),
@@ -34,6 +42,18 @@ const FormSchema = z.object({
 });
 
 export default function DataAlamat() {
+  const router = useRouter();
+  const { data: progressData, isLoading: progressLoading } =
+    useRegistrationProgress();
+  const { data: registrationData, refetch } = useMyRegistration();
+  const storeMutation = useStoreAddressInformation();
+
+  const progress = progressData?.data;
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -47,15 +67,59 @@ export default function DataAlamat() {
     },
   });
 
-  function onSubmit(data) {
-    console.log(data);
-    alert(
-      "You submitted the following values:\n" + JSON.stringify(data, null, 2)
+  useEffect(() => {
+    if (!progressLoading && progress) {
+      const accessibleSteps = progress.accessible_steps || [];
+
+      if (!accessibleSteps.includes(2)) {
+        toast.error("Silakan selesaikan tahapan sebelumnya terlebih dahulu");
+        router.push("/pendaftaran");
+      }
+    }
+  }, [progress, progressLoading, router]);
+
+  useEffect(() => {
+    if (registrationData?.data?.registration?.address) {
+      const address = registrationData.data.registration.address;
+      form.reset({
+        provinsi: address.province || "",
+        kota: address.city_regency || "",
+        kecamatan: address.district || "",
+        kelurahan: address.village || "",
+        kodePos: address.postal_code || "",
+        namaDusun: address.hamlet || "",
+        alamatLengkap: address.full_address || "",
+      });
+    }
+  }, [registrationData, form]);
+
+  async function onSubmit(data) {
+    const payload = {
+      address: {
+        province: data.provinsi,
+        city_regency: data.kota,
+        district: data.kecamatan,
+        village: data.kelurahan,
+        postal_code: data.kodePos,
+        hamlet: data.namaDusun,
+        full_address: data.alamatLengkap,
+      },
+    };
+
+    storeMutation.mutate(payload);
+  }
+  if (progressLoading) {
+    return (
+      <ProtectedRoute>
+        <div className="max-w-7xl mx-auto p-12">
+          <div className="animate-pulse">Memuat...</div>
+        </div>
+      </ProtectedRoute>
     );
   }
 
   return (
-    <>
+    <ProtectedRoute>
       <div className="max-w-7xl mx-auto">
         <RegistrationProgress />
 
@@ -174,25 +238,25 @@ export default function DataAlamat() {
             <div className="w-full flex items-center justify-end my-6 sm:my-8 md:my-10 lg:my-12 px-4 sm:px-6 md:px-8 lg:px-12">
               <Link href="/pendaftaran">
                 <Button
-                  type="submit"
+                  type="button"
                   variant={"yellow"}
                   className={"w-full sm:w-48"}
                 >
                   Kembali
                 </Button>
               </Link>
-              <Link
-                href="/pendaftaran/data-orangtua"
-                className="w-full sm:w-48"
+              <Button
+                type="submit"
+                variant={"matcha"}
+                className={"w-full sm:w-48"}
+                disabled={storeMutation.isPending}
               >
-                <Button type="submit" variant={"matcha"} className={"w-full"}>
-                  Lanjut
-                </Button>
-              </Link>
+                {storeMutation.isPending ? "Menyimpan..." : "Lanjut"}
+              </Button>
             </div>
           </form>
         </Form>
       </div>
-    </>
+    </ProtectedRoute>
   );
 }

@@ -1,6 +1,8 @@
-"use client"; // <-- Diperlukan untuk form interaktif
+"use client";
 
-import { Info, AlertCircle, XCircle, CheckCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -14,7 +16,6 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -23,17 +24,23 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useState } from "react";
-import RegistrationProgress from "@/components/registrations/RegistrationProgress";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import toast from "react-hot-toast";
+import RegistrationProgress from "@/components/RegistrationProgress";
+import {
+  useRegistrationProgress,
+  useMyRegistration,
+  useStoreFamilyData,
+} from "@/hooks/useRegistration";
 
 const FormSchema = z.object({
   namaAyah: z.string().min(2, { message: "Nama Ayah harus diisi." }),
   alamatAyah: z.string().min(5, { message: "Alamat Ayah harus diisi." }),
   telpAyah: z.string().min(10, { message: "No. HP Ayah tidak valid." }),
   pekerjaanAyah: z.string().min(2, { message: "Pekerjaan Ayah harus diisi." }),
-  pendidikanAyah: z
-    .string()
-    .min(2, { message: "Pendidikan Ayah harus diisi." }),
+  pendidikanAyah: z.string({
+    required_error: "Pendidikan Ayah harus dipilih.",
+  }),
   penghasilanAyah: z.string({
     required_error: "Penghasilan Ayah harus dipilih.",
   }),
@@ -42,7 +49,9 @@ const FormSchema = z.object({
   alamatIbu: z.string().min(5, { message: "Alamat Ibu harus diisi." }),
   telpIbu: z.string().min(10, { message: "No. HP Ibu tidak valid." }),
   pekerjaanIbu: z.string().min(2, { message: "Pekerjaan Ibu harus diisi." }),
-  pendidikanIbu: z.string().min(2, { message: "Pendidikan Ibu harus diisi." }),
+  pendidikanIbu: z.string({
+    required_error: "Pendidikan Ibu harus dipilih.",
+  }),
   penghasilanIbu: z.string({
     required_error: "Penghasilan Ibu harus dipilih.",
   }),
@@ -56,7 +65,18 @@ const FormSchema = z.object({
 });
 
 export default function DataOrangtua() {
+  const router = useRouter();
   const [activeForm, setActiveForm] = useState("orangTua");
+  const { data: progressData, isLoading: progressLoading } =
+    useRegistrationProgress();
+  const { data: registrationData, refetch } = useMyRegistration();
+  const storeMutation = useStoreFamilyData();
+
+  const progress = progressData?.data;
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
@@ -66,23 +86,105 @@ export default function DataOrangtua() {
       telpAyah: "",
       pekerjaanAyah: "",
       pendidikanAyah: "",
+      penghasilanAyah: "",
       namaIbu: "",
       alamatIbu: "",
       telpIbu: "",
       pekerjaanIbu: "",
       pendidikanIbu: "",
+      penghasilanIbu: "",
+      namaWali: "",
+      alamatWali: "",
+      telpWali: "",
+      pekerjaanWali: "",
+      pendidikanWali: "",
+      penghasilanWali: "",
     },
   });
 
-  function onSubmit(data) {
-    console.log(data);
-    alert(
-      "You submitted the following values:\n" + JSON.stringify(data, null, 2)
+  useEffect(() => {
+    if (!progressLoading && progress) {
+      const accessibleSteps = progress.accessible_steps || [];
+
+      if (!accessibleSteps.includes(3)) {
+        toast.error("Silakan selesaikan tahapan sebelumnya terlebih dahulu");
+        router.push("/pendaftaran");
+      }
+    }
+  }, [progress, progressLoading, router]);
+
+  useEffect(() => {
+    if (registrationData?.data?.registration?.family) {
+      const family = registrationData.data.registration.family;
+      form.reset({
+        namaAyah: family.father_name || "",
+        alamatAyah: family.father_address || "",
+        telpAyah: family.father_phone || "",
+        pekerjaanAyah: family.father_occupation || "",
+        pendidikanAyah: family.father_education || "",
+        penghasilanAyah: family.father_income || "",
+        namaIbu: family.mother_name || "",
+        alamatIbu: family.mother_address || "",
+        telpIbu: family.mother_phone || "",
+        pekerjaanIbu: family.mother_occupation || "",
+        pendidikanIbu: family.mother_education || "",
+        penghasilanIbu: family.mother_income || "",
+        namaWali: family.guardian_name || "",
+        alamatWali: family.guardian_address || "",
+        telpWali: family.guardian_phone || "",
+        pekerjaanWali: family.guardian_occupation || "",
+        pendidikanWali: family.guardian_education || "",
+        penghasilanWali: family.guardian_income || "",
+      });
+    }
+  }, [registrationData, form]);
+
+  async function onSubmit(data) {
+    const payload = {
+      father: {
+        name: data.namaAyah,
+        address: data.alamatAyah,
+        phone: data.telpAyah,
+        occupation: data.pekerjaanAyah,
+        education: data.pendidikanAyah,
+        income: data.penghasilanAyah,
+      },
+      mother: {
+        name: data.namaIbu,
+        address: data.alamatIbu,
+        phone: data.telpIbu,
+        occupation: data.pekerjaanIbu,
+        education: data.pendidikanIbu,
+        income: data.penghasilanIbu,
+      },
+    };
+
+    if (data.namaWali) {
+      payload.guardian = {
+        name: data.namaWali,
+        address: data.alamatWali || null,
+        phone: data.telpWali || null,
+        occupation: data.pekerjaanWali || null,
+        education: data.pendidikanWali || null,
+        income: data.penghasilanWali || null,
+      };
+    }
+
+    storeMutation.mutate(payload);
+  }
+
+  if (progressLoading) {
+    return (
+      <ProtectedRoute>
+        <div className="max-w-7xl mx-auto p-12">
+          <div className="animate-pulse">Memuat...</div>
+        </div>
+      </ProtectedRoute>
     );
   }
 
   return (
-    <>
+    <ProtectedRoute>
       <div className="max-w-7xl mx-auto">
         <RegistrationProgress />
         <div className="flex items-center gap-2 m-12 mt-6 justify-between">
@@ -177,9 +279,30 @@ export default function DataOrangtua() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Pendidikan Terakhir Ayah</FormLabel>
-                            <FormControl>
-                              <Input placeholder="SMA/S1/..." {...field} />
-                            </FormControl>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Pilih pendidikan" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="sd">SD</SelectItem>
+                                <SelectItem value="smp">SMP</SelectItem>
+                                <SelectItem value="sma">SMA/SMK</SelectItem>
+                                <SelectItem value="d1">D1</SelectItem>
+                                <SelectItem value="d2">D2</SelectItem>
+                                <SelectItem value="d3">D3</SelectItem>
+                                <SelectItem value="s1">Sarjana (S1)</SelectItem>
+                                <SelectItem value="s2">
+                                  Magister (S2)
+                                </SelectItem>
+                                <SelectItem value="s3">Doktor (S3)</SelectItem>
+                                <SelectItem value="lainnya">Lainnya</SelectItem>
+                              </SelectContent>
+                            </Select>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -200,13 +323,13 @@ export default function DataOrangtua() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="<5jt">
+                                <SelectItem value="below_5m">
                                   &lt; 5.000.000
                                 </SelectItem>
-                                <SelectItem value="5-10jt">
+                                <SelectItem value="5m_to_10m">
                                   5.000.000 – 9.999.999
                                 </SelectItem>
-                                <SelectItem value=">10jt">
+                                <SelectItem value="above_10m">
                                   &gt; 10.000.000
                                 </SelectItem>
                               </SelectContent>
@@ -288,9 +411,30 @@ export default function DataOrangtua() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Pendidikan Terakhir Ibu</FormLabel>
-                            <FormControl>
-                              <Input placeholder="SMA/S1/..." {...field} />
-                            </FormControl>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Pilih pendidikan" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="sd">SD</SelectItem>
+                                <SelectItem value="smp">SMP</SelectItem>
+                                <SelectItem value="sma">SMA/SMK</SelectItem>
+                                <SelectItem value="d1">D1</SelectItem>
+                                <SelectItem value="d2">D2</SelectItem>
+                                <SelectItem value="d3">D3</SelectItem>
+                                <SelectItem value="s1">Sarjana (S1)</SelectItem>
+                                <SelectItem value="s2">
+                                  Magister (S2)
+                                </SelectItem>
+                                <SelectItem value="s3">Doktor (S3)</SelectItem>
+                                <SelectItem value="lainnya">Lainnya</SelectItem>
+                              </SelectContent>
+                            </Select>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -311,13 +455,13 @@ export default function DataOrangtua() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="<5jt">
+                                <SelectItem value="below_5m">
                                   &lt; 5.000.000
                                 </SelectItem>
-                                <SelectItem value="5-10jt">
+                                <SelectItem value="5m_to_10m">
                                   5.000.000 – 9.999.999
                                 </SelectItem>
-                                <SelectItem value=">10jt">
+                                <SelectItem value="above_10m">
                                   &gt; 10.000.000
                                 </SelectItem>
                               </SelectContent>
@@ -390,9 +534,28 @@ export default function DataOrangtua() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Pendidikan Terakhir Wali</FormLabel>
-                          <FormControl>
-                            <Input placeholder="SMA/S1/..." {...field} />
-                          </FormControl>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih pendidikan" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="sd">SD</SelectItem>
+                              <SelectItem value="smp">SMP</SelectItem>
+                              <SelectItem value="sma">SMA/SMK</SelectItem>
+                              <SelectItem value="d1">D1</SelectItem>
+                              <SelectItem value="d2">D2</SelectItem>
+                              <SelectItem value="d3">D3</SelectItem>
+                              <SelectItem value="s1">Sarjana (S1)</SelectItem>
+                              <SelectItem value="s2">Magister (S2)</SelectItem>
+                              <SelectItem value="s3">Doktor (S3)</SelectItem>
+                              <SelectItem value="lainnya">Lainnya</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </FormItem>
                       )}
                     />
@@ -412,13 +575,13 @@ export default function DataOrangtua() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="<5jt">
+                              <SelectItem value="below_5m">
                                 &lt; 5.000.000
                               </SelectItem>
-                              <SelectItem value="5-10jt">
+                              <SelectItem value="5m_to_10m">
                                 5.000.000 – 9.999.999
                               </SelectItem>
-                              <SelectItem value=">10jt">
+                              <SelectItem value="above_10m">
                                 &gt; 10.000.000
                               </SelectItem>
                             </SelectContent>
@@ -433,22 +596,25 @@ export default function DataOrangtua() {
             <div className="w-full flex items-center justify-end my-12 px-12">
               <Link href="/pendaftaran">
                 <Button
-                  type="submit"
+                  type="button"
                   variant={"yellow"}
                   className={"w-full sm:w-48"}
                 >
                   Kembali
                 </Button>
               </Link>
-              <Link href="/pendaftaran/data-akademik" className="w-48">
-                <Button type="submit" variant={"matcha"} className={"w-full"}>
-                  Lanjut
-                </Button>
-              </Link>
+              <Button
+                type="submit"
+                variant={"matcha"}
+                className={"w-full sm:w-48"}
+                disabled={storeMutation.isPending}
+              >
+                {storeMutation.isPending ? "Menyimpan..." : "Lanjut"}
+              </Button>
             </div>
           </form>
         </Form>
       </div>
-    </>
+    </ProtectedRoute>
   );
 }

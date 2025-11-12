@@ -43,18 +43,48 @@ export default function Navbar() {
         const token = localStorage.getItem("access_token");
         const storedUser = localStorage.getItem("user");
 
-        if (!token || !storedUser) throw new Error("No token");
-
-        setIsLoggedIn(true);
-        setUser(JSON.parse(storedUser));
-      } catch (err) {
-        console.log("User not logged in", err);
+      if (token && userStr) {
+        try {
+          const userData = JSON.parse(userStr);
+          setUser(userData);
+          setIsLoggedIn(true);
+        } catch (error) {
+          localStorage.removeItem("user");
+          setIsLoggedIn(false);
+          setUser(null);
+        }
+      } else {
         setIsLoggedIn(false);
         setUser(null);
+        }
+      } catch (error) {
+        // Silent fail - localStorage error won't affect UI
       }
     };
 
-    loadUser();
+    updateUserData();
+
+    const handleUserUpdate = (event) => {
+      if (event.detail) {
+        try {
+          setUser(event.detail);
+          setIsLoggedIn(true);
+          localStorage.setItem("user", JSON.stringify(event.detail));
+        } catch (error) {
+          // Silent fail - localStorage error won't affect UI
+        }
+      } else {
+        updateUserData();
+      }
+    };
+
+    window.addEventListener("userUpdated", handleUserUpdate);
+    window.addEventListener("storage", updateUserData);
+
+    return () => {
+      window.removeEventListener("userUpdated", handleUserUpdate);
+      window.removeEventListener("storage", updateUserData);
+    };
   }, []);
 
   const handleLogout = () => {

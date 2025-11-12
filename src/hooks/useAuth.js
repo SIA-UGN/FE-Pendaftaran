@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { authService } from "@/services/authService";
+import { profileService } from "@/services/profileService";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -32,16 +33,29 @@ export const useLogin = () => {
       const data = response.data.data;
 
       if (!data || !data.user) {
-        console.error("Invalid response structure:", response);
         toast.error("Login gagal. Respons tidak valid dari server.");
         return;
       }
 
       localStorage.setItem("access_token", data.access_token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      queryClient.setQueryData(["auth", "user"], data.user);
-      updateUser(data.user);
-      toast.success("Login berhasil");
+
+      try {
+        const userDataToStore = {
+          id: data.user.id,
+          name: data.user.name,
+          email: data.user.email,
+          roles: data.user.roles || [],
+          avatar_url: data.user.avatar_url || null,
+        };
+
+        localStorage.setItem("user", JSON.stringify(userDataToStore));
+        queryClient.setQueryData(["auth", "user"], userDataToStore);
+        updateUser(userDataToStore);
+
+        window.dispatchEvent(
+          new CustomEvent("userUpdated", { detail: userDataToStore })
+        );
+      } catch (error) {}
 
       const userRoles = data.user.roles || [];
 
@@ -57,6 +71,38 @@ export const useLogin = () => {
       } else {
         router.push("/");
       }
+
+      setTimeout(() => {
+        profileService
+          .getProfile()
+          .then((profileResponse) => {
+            const fullUserData =
+              profileResponse.data?.data?.user ||
+              profileResponse.data?.data ||
+              profileResponse.data;
+
+            if (fullUserData && fullUserData.id) {
+              const completeUserData = {
+                id: fullUserData.id,
+                name: fullUserData.name,
+                email: fullUserData.email,
+                roles: fullUserData.roles || [],
+                avatar_url: fullUserData.avatar_url || null,
+              };
+
+              localStorage.setItem("user", JSON.stringify(completeUserData));
+              queryClient.setQueryData(["auth", "user"], completeUserData);
+              updateUser(completeUserData);
+
+              window.dispatchEvent(
+                new CustomEvent("userUpdated", { detail: completeUserData })
+              );
+            }
+          })
+          .catch(() => {});
+      }, 500);
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Login berhasil");
     },
     onError: (error) => {
       if (!error.response || error.response?.status >= 500) return;
@@ -129,9 +175,6 @@ export const useForgotPassword = () => {
     mutationFn: authService.forgotPassword,
     onSuccess: (data) => {
       toast.success("Link reset password telah dikirim ke email Anda!");
-      if (process.env.NODE_ENV === "development" && data?.data?.reset_token) {
-        console.log("Reset token (dev only):", data.data.reset_token);
-      }
     },
     onError: (error) => {
       if (!error.response || error.response?.status >= 500) return;

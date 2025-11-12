@@ -1,43 +1,52 @@
-import { Card } from "@/components/ui/card";
+"use client";
 
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
+import { useEffect } from "react";
+import { columns } from "./Column";
+import { DataTable } from "./Data-Table";
+import { useMyRegistration } from "@/hooks/useRegistration";
 
-import { columns, Payment } from "./Column"
-import { DataTable } from "./Data-Table"
+export default function Prestasi() {
+  const { data: registrationData, isLoading, refetch } = useMyRegistration();
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
-import { ScrollArea } from "@/components/ui/scroll-area"
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-5 border rounded-xl m-12 bg-[var(--light-cream)] p-8">
+        <div className="animate-pulse">Memuat data prestasi...</div>
+      </div>
+    );
+  }
 
-async function getData() {
-  return [
-    {
-      id: "728ed52f",
-      amount: 100,
-      name: 'Lomba Menghayal',
-      sertifikat: "sertifikatLomba.pdf",
-      lihat: "Lihat",
-    },
-  ]
-}
+  const achievements = registrationData?.data?.registration?.achievements || [];
 
-export default async function Prestasi() {
-  const data = await getData()
+  const data = achievements.map((item) => ({
+    id: item.id?.toString() || "",
+    achievement_name: item.achievement_name,
+    year: item.year,
+    type: item.type,
+    level: item.level,
+    organizer: item.organizer,
+    rank: item.rank,
+    certificate_file: item.certificate_file,
+  }));
+
   return (
     <div className="flex flex-col gap-5 border rounded-xl m-12 bg-[var(--light-cream)]">
-        <DataTable columns={columns} data={data} className={"w-full p-4 bg-white"} />
+      {data.length === 0 ? (
+        <div className="p-8 text-center text-gray-500">
+          Belum ada data prestasi. Silakan klik tombol "Tambah" untuk
+          menambahkan prestasi.
+        </div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={data}
+          className={"w-full p-4 bg-white"}
+        />
+      )}
     </div>
   );
 }
