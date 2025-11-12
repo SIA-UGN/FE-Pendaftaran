@@ -34,9 +34,7 @@ export default function Profile() {
         </Button>
       </div>
       {/* Status Kelulusan Pendaftar */}
-      <h2 className="text-3xl sm:text-2xl font-semibold mb-2 mt-6 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
-        Status Kelulusan Pendaftar
-      </h2>
+      <Heading title={"Status Kelulusan Pendaftar"} />
       <div className="w-full">
         <Button variant={"green"} className={"w-full rounded-lg"}>
           Lulus
@@ -46,7 +44,7 @@ export default function Profile() {
       <Heading title={"Nominal Masuk"} />
 
       <div className="w-full">
-        <Button variant={"green"} className={"w-full rounded-lg"}>
+        <Button variant={"yellow"} className={"w-full rounded-lg"}>
           Rp500.000,-
         </Button>
       </div>

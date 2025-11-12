@@ -75,7 +75,7 @@ export default function TambahManajer() {
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-6 w-full"
           >
-            <div className="flex flex-col gap-5 p-12 border rounded-xl bg-[var(--light-cream)]">
+            <div className="flex flex-col gap-5 p-12 border rounded-xl bg-[var(--yellow)]">
               <FormField
                 control={form.control}
                 name="namaLengkap"
@@ -84,20 +84,6 @@ export default function TambahManajer() {
                     <FormLabel>Nama Lengkap</FormLabel>
                     <FormControl>
                       <Input placeholder="Nama Lengkap" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Username" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -124,12 +110,40 @@ export default function TambahManajer() {
 
               <FormField
                 control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Username" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="noHandphone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nomor Handphone</FormLabel>
+                    <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="tel" placeholder="08xxxxxxxx" {...field} />
+                      <Input type="password" placeholder="........." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="noHandphone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input type="confirm-password" placeholder="........." {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

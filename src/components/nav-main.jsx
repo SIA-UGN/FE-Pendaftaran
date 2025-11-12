@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
+import { Triangle } from "lucide-react";
 import Link from "next/link";
 
 import {
@@ -18,6 +18,10 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 
+import { UserRound } from "lucide-react";
+import { GraduationCap } from "lucide-react";
+import { Banknote } from "lucide-react";
+
 export function NavMain({ items }) {
   return (
     <SidebarGroup>
@@ -34,10 +38,24 @@ export function NavMain({ items }) {
               {item.title === "Statistik" ? (
                 <>
                   <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip={item.title}>
+                    <SidebarMenuButton tooltip={item.title} className="group/button">
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
-                      <ChevronRight className="cursor-pointer ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 text-white" />
+
+                      <Triangle
+                        fill="currentColor"
+                        stroke="none"
+                        className="
+                          cursor-pointer ml-auto
+                          transition-transform duration-200
+                          rotate-90
+                          group-data-[state=open]/collapsible:rotate-180
+                          fill-[var(--yellow)]
+                          group-hover/button:fill-[var(--green)]
+                          group-focus/button:fill-[var(--green)]
+                          
+                        "
+                      />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
 
@@ -45,21 +63,25 @@ export function NavMain({ items }) {
                     <SidebarMenuSub>
                       {[
                         {
-                          title: "Pendaftar",
+                          title: "Statistika Pendaftar",
                           url: "/dashboard/statistik/pendaftar",
+                          icon: UserRound,
                         },
                         {
-                          title: "Program Studi",
+                          title: "Statistika Prodi",
                           url: "/dashboard/statistik/program-studi",
+                          icon: GraduationCap,
                         },
                         {
-                          title: "Keuangan",
+                          title: "Statistika Keuangan",
                           url: "/dashboard/statistik/keuangan",
+                          icon: Banknote,
                         },
                       ].map((sub) => (
                         <SidebarMenuSubItem key={sub.title}>
                           <SidebarMenuSubButton asChild>
                             <Link href={sub.url}>
+                              <sub.icon className="text-white"/>
                               <span>{sub.title}</span>
                             </Link>
                           </SidebarMenuSubButton>

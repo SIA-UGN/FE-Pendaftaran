@@ -34,7 +34,6 @@ export function NavUser({ user }) {
   const handleLogout = () => {
     logoutMutation.mutate();
     setIsLoggedIn(false);
-    setUser(null);
   };
 
   return (

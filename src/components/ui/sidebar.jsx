@@ -452,11 +452,11 @@ function SidebarMenuItem({
 }
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-sidebar-ring transition-[width,height,padding] hover:bg-[var(--green)]-accent hover:text-white focus-visible:ring-2 active:bg-[var(--green)]-accent active:text-white disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-[var(--green)]-accent data-[active=true]:font-medium data-[active=true]:text-white data-[state=open]:hover:bg-[var(--green)]-accent data-[state=open]:hover:white group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 text-white",
+  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-sidebar-ring transition-[width,height,padding] hover:bg-[var(--green)]-accent hover:text-white focus-visible:ring-2 active:bg-[var(--green)]-accent disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-[var(--green)]-accent data-[active=true]:font-medium data-[active=true]:text-white data-[state=open]:hover:bg-[var(--green)]-accent data-[state=open]:hover:white group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 text-white",
   {
     variants: {
       variant: {
-        default: "hover:bg-[var(--yellow)] hover:text-white cursor-pointer rounded-none focus:bg-[var(--yellow)] p-4 py-6",
+        default: "hover:bg-[var(--yellow)] hover:text-[var(--green)] cursor-pointer rounded-none focus:bg-[var(--yellow)] focus:text-[var(--green)] p-4 py-6 font-semibold",
         outline:
           "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-[var(--green)]-accent hover:text-white hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
       },
@@ -606,7 +606,7 @@ function SidebarMenuSub({
       data-slot="sidebar-menu-sub"
       data-sidebar="menu-sub"
       className={cn(
-        "border-sidebar-border mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l px-2.5",
+        "border-sidebar-border mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 px-2.5",
         "group-data-[collapsible=icon]:hidden text-white py-2",
         className
       )}

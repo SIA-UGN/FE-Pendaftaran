@@ -72,7 +72,7 @@ export default function TambahManajer() {
         <Heading title={"Validasi Data Manajer Baru"} />
 
         <form onSubmit={(e) => e.preventDefault()} className="space-y-6 w-full">
-          <div className="flex flex-col gap-5 p-6 sm:p-10 border rounded-xl bg-[var(--light-cream)]">
+          <div className="flex flex-col gap-5 p-6 sm:p-10 border rounded-xl bg-[var(--yellow)]">
             <div>
               <label className="block font-medium mb-1">Nama Lengkap</label>
               <Input placeholder="Nama Lengkap" readOnly value="John Doe" />
@@ -94,9 +94,9 @@ export default function TambahManajer() {
             </div>
 
             <div>
-              <label className="block font-medium mb-1">Nomor Handphone</label>
+              <label className="block font-medium mb-1">Password</label>
               <Input
-                type="tel"
+                type="password"
                 placeholder="08xxxxxxxx"
                 readOnly
                 value="081234567890"

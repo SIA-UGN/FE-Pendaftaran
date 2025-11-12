@@ -1,18 +1,15 @@
 "use client";
 
 import * as React from "react";
-import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
-} from "lucide-react";
+import { LayoutDashboard } from "lucide-react";
+import { UsersRound } from "lucide-react";
+import { FilePlus } from "lucide-react";
+import { WalletMinimal } from "lucide-react";
+import { UserRoundCog } from "lucide-react";
+import { ChartLine } from "lucide-react";
+import { Frame } from "lucide-react";
+import { PieChart } from "lucide-react";
+import { Map } from "lucide-react";
 
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
@@ -47,88 +44,36 @@ const data = {
     {
       title: "Dashboard",
       url: "/dashboard",
-      icon: SquareTerminal,
+      icon: LayoutDashboard,
       isActive: true,
-      items: [
-        {
-          title: "Semua Pendaftar",
-          url: "/dashboard",
-        },
-        {
-          title: "History Pendaftaran",
-          url: "/pendaftar/history",
-        },
-        {
-          title: "Pengaturan",
-          url: "/pendaftar/settings",
-        },
-      ],
     },
     {
-      title: "Pendaftar & Manager",
+      title: "Data Pendaftar & Manager",
       url: "/dashboard/data",
-      icon: SquareTerminal,
+      icon: UsersRound,
       isActive: true,
-      items: [
-        {
-          title: "Semua Pendaftar",
-          url: "/dashboard",
-        },
-        {
-          title: "History Pendaftaran",
-          url: "/pendaftar/history",
-        },
-        {
-          title: "Pengaturan",
-          url: "/pendaftar/settings",
-        },
-      ],
     },
     {
-      title: "Tambahkan Manager",
+      title: "Edit Form Pendaftaran",
+      url: "/dashboard/edit/pendaftaran",
+      icon: FilePlus,
+      isActive: true,
+    },
+    {
+      title: "Edit Metode Pembayaran",
+      url: "/dashboard/edit/pembayaran",
+      icon: WalletMinimal,
+      isActive: true,
+    },
+    {
+      title: "Pendaftaran Manager",
       url: "/dashboard/manajer/tambah",
-      icon: Settings2,
-      items: [
-        {
-          title: "Data Umum",
-          url: "/dashboard/statistika",
-        },
-        {
-          title: "Statistik Tim",
-          url: "/statistika/team",
-        },
-        {
-          title: "Tagihan",
-          url: "/statistika/billing",
-        },
-        {
-          title: "Batas Penggunaan",
-          url: "/statistika/limits",
-        },
-      ],
+      icon: UserRoundCog,
     },
     {
       title: "Statistik",
       url: "/dashboard/statistik",
-      icon: Wallet,
-      items: [
-        {
-          title: "Laporan Keuangan",
-          url: "/keuangan/laporan",
-        },
-        {
-          title: "Transaksi",
-          url: "/keuangan/transaksi",
-        },
-        {
-          title: "Tagihan",
-          url: "/keuangan/tagihan",
-        },
-        {
-          title: "Rekap",
-          url: "/keuangan/rekap",
-        },
-      ],
+      icon: ChartLine,
     },
   ],
   projects: [
@@ -156,7 +101,7 @@ export function AppSidebar({ ...props }) {
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
-      <DropdownMenuSeparator />
+      <DropdownMenuSeparator className={"bg-[var(--yellow)]"}/>
       <SidebarContent>
         <NavMain items={data.navMain} />
         {/* <NavProjects projects={data.projects} /> */}

@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/Heading";
-import { IdCard, UserRound, WalletMinimal } from "lucide-react";
+import { IdCard, UserRound, WalletMinimal, ImageIcon } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,11 +19,13 @@ import Link from "next/link";
 import { useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import { InputGroup, InputGroupAddon } from "@/components/ui/input-group";
+import Image from "next/image";
 
 export default function Keuangan() {
   const [openFirst, setOpenFirst] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [openCancel, setOpenCancel] = useState(false);
+  const [openBukti, setOpenBukti] = useState(false);
 
   return (
     <>
@@ -36,6 +38,7 @@ export default function Keuangan() {
           </div>
           <Button variant={"yellow"}>Pending</Button>
         </Card>
+
         <Heading title={"Rincian Pembayaran"} />
         <Card
           className={
@@ -61,14 +64,47 @@ export default function Keuangan() {
 
         <Heading title={"Bukti Pembayaran"} />
 
-        <Card
-          className={
-            "w-full items-center justify-center border-2 border-dashed border-white-400 "
-          }
-          variant="green"
-        >
-          Bukti Pembayaran
-        </Card>
+        {/* === BUKTI PEMBAYARAN CARD + DIALOG === */}
+        <AlertDialog open={openBukti} onOpenChange={setOpenBukti}>
+          <AlertDialogTrigger asChild>
+            <Card
+              className={
+                "w-full flex flex-col items-center justify-center border-2 border-dashed border-white-400 cursor-pointer transition hover:bg-[var(--green)]/90"
+              }
+              variant="green"
+            >
+              <div className="flex flex-col items-center gap-2 py-10">
+                <ImageIcon className="w-8 h-8 " />
+                <span className="">Lihat Bukti Pembayaran</span>
+              </div>
+            </Card>
+          </AlertDialogTrigger>
+
+          <AlertDialogContent className="max-w-xl">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Bukti Pembayaran</AlertDialogTitle>
+              <AlertDialogDescription>
+                Berikut adalah foto bukti pembayaran yang telah diunggah.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+
+            <div className="flex justify-center my-4">
+              <Image
+                src="/bukti-pembayaran.jpg" // Ganti dengan URL atau path gambar dinamis
+                alt="Bukti Pembayaran"
+                className="rounded-lg shadow-md object-contain"
+                width={400}
+                height={400}
+              />
+            </div>
+
+            <AlertDialogFooter>
+              <AlertDialogAction onClick={() => setOpenBukti(false)}>
+                Tutup
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         <Heading title={"Validation Notes"} />
 
@@ -87,6 +123,8 @@ export default function Keuangan() {
             >
               Kembali
             </Button>
+
+            {/* === DIALOG VERIFIKASI === */}
             <AlertDialog open={openFirst} onOpenChange={setOpenFirst}>
               <AlertDialogTrigger asChild>
                 <Button
@@ -115,6 +153,7 @@ export default function Keuangan() {
               </AlertDialogContent>
             </AlertDialog>
 
+            {/* === DIALOG BERHASIL === */}
             <AlertDialog open={openConfirm} onOpenChange={setOpenConfirm}>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -125,16 +164,14 @@ export default function Keuangan() {
                 </AlertDialogHeader>
 
                 <AlertDialogFooter>
-                  <AlertDialogAction
-                    onClick={() => setOpenConfirm(false)}
-                  >
+                  <AlertDialogAction onClick={() => setOpenConfirm(false)}>
                     Kembali
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
 
-            {/* === DIALOG KONFIRMASI PEMBATALAN (nested) === */}
+            {/* === DIALOG PEMBATALAN === */}
             <AlertDialog open={openCancel} onOpenChange={setOpenCancel}>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -153,9 +190,7 @@ export default function Keuangan() {
                 </AlertDialogHeader>
 
                 <AlertDialogFooter>
-                  <AlertDialogAction
-                    onClick={() => setOpenCancel(false)}
-                  >
+                  <AlertDialogAction onClick={() => setOpenCancel(false)}>
                     Kembali
                   </AlertDialogAction>
                 </AlertDialogFooter>
