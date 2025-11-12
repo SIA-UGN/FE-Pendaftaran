@@ -22,35 +22,20 @@ import { useRouter } from "next/navigation";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useLogout } from "@/hooks/useAuth";
 
 export function NavUser({ user }) {
+  const logoutMutation = useLogout();
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+
   const { isMobile } = useSidebar();
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  async function handleLogout() {
-    try {
-      setLoading(true);
-      const token = getCookie("access_token");
-
-      await fetch("http://localhost:8000/api/auth/logout", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      });
-
-      deleteCookie("access_token");
-      deleteCookie("role");
-
-      router.push("/");
-    } catch (error) {
-      console.error("Logout gagal:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
+  const handleLogout = () => {
+    logoutMutation.mutate();
+    setIsLoggedIn(false);
+    setUser(null);
+  };
 
   return (
     <SidebarMenu>

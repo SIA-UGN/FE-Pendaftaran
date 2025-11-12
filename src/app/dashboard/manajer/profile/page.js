@@ -1,16 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
+import { Heading } from "@/components/Heading";
 
 export default function Profile() {
   return (
     <div className="flex flex-col items-center px-4 sm:px-8 max-w-11/12 my-12 w-full gap-3 mx-auto">
       {/* Akun Manajer */}
-      <h2 className="text-3xl sm:text-2xl font-semibold mb-2 mt-6 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
-        Akun Manajer
-      </h2>
+      <Heading title={"Akun Manajer"} variant="first"/>
       {/* Profile Picture, Full Name, Username, Email, Last Online */}
-      <Card className="w-full flex flex-col sm:flex-row gap-6 p-8 rounded-2xl shadow-md bg-white">
+      <Card className="w-full flex flex-col sm:flex-row gap-6 p-8 rounded-2xl shadow-md bg-[var(--light-cream)]/50">
         <Image
           alt="Profile banner Faradis Yulianto"
           src="/logo.jpg"
@@ -27,12 +26,10 @@ export default function Profile() {
       </Card>
 
       {/* Akun Pendaftar Terkelola */}
-      <h2 className="text-3xl sm:text-2xl font-semibold mb-2 mt-6 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
-        Akun Pendaftar Terkelola
-      </h2>
+      <Heading title={"Akun Pendaftar Terkelola"} />
       {/* Jmlah Akun */}
       <div className="w-full">
-        <Button variant={"green"} className={"w-full rounded-md"} disabled>
+        <Button variant={"green"} className={"w-full rounded-md text-white"}>
           14 Akun
         </Button>
       </div>
@@ -47,7 +44,7 @@ export default function Profile() {
         <Button variant={"green"} className={"rounded-md w-1/4"}>
           Perbarui Akun
         </Button>
-        <Button variant={"green"} className={"rounded-md w-1/4"}>
+        <Button className={"rounded-md w-1/4 bg-red-600 hover:bg-red-700"}>
           Hapus Akun
         </Button>
       </div>

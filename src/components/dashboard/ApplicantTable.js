@@ -10,6 +10,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import Link from "next/link";
+
 const applicants = [
   {
     id: 1,
@@ -70,12 +72,14 @@ export function ApplicantTable() {
               </span>
             </TableCell>
             <TableCell className="text-center">
+              <Link href={`/dashboard/profile`}>
               <Button
                 variant="yellow"
                 className="text-sm font-medium text-[var(--green)] hover:bg-[var(--green)] hover:text-white transition-all rounded-md"
               >
                 Lihat
-              </Button>
+                </Button>
+              </Link>
             </TableCell>
           </TableRow>
         ))}

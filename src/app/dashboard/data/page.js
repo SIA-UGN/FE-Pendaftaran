@@ -7,6 +7,7 @@ import ManajerList from "@/components/ManajerList";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Heading } from "@/components/Heading";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState("pendaftar");
@@ -67,10 +68,12 @@ export default function Page() {
           <div className="flex flex-col items-center px-3 sm:px-8 max-w-[90rem] my-8 sm:my-12 w-full">
             <Heading title={"Data Manajer"} />
             <ManajerList />
-            <div className="w-full py-4 justify-end flex">
-              <Button variant={"green"}>
-                Tambahkan Manajer
-              </Button>
+            <div className="w-full py-4 justify-end flex mt-12">
+              <Link href="/dashboard/manajer/tambah">
+                <Button variant={"green"} className={"rounded-lg"}>
+                  Tambahkan Manajer
+                </Button>
+              </Link>
             </div>
           </div>
         )}

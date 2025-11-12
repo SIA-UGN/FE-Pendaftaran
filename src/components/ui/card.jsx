@@ -4,16 +4,25 @@ import { cn } from "@/lib/utils"
 
 function Card({
   className,
+  variant = "default",
   ...props
 }) {
+  const variantClasses = {
+    default: "bg-[var(--light-cream)] border-gray-200 text-black",
+    yellow: "bg-[var(--yellow)] border-yellow-300 text-[var(--green)]",
+    green: "bg-[var(--green)] border-green-300 text-white",
+  };
+
   return (
     <div
       data-slot="card"
       className={cn(
-        "text-card-foreground flex flex-col gap-6 rounded-2xl border py-6 shadow-md bg-[var(--light-cream-card)] ",
+        "flex flex-col gap-6 rounded-2xl border py-6 shadow-md transition-colors duration-200",
+        variantClasses[variant],
         className
       )}
-      {...props} />
+      {...props}
+    />
   );
 }
 

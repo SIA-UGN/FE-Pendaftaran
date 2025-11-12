@@ -15,6 +15,8 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import Image from "next/image";
 
 export default function DashboardLayout({ children }) {
+
+  
   return (
     <SidebarProvider>
       <AppSidebar />

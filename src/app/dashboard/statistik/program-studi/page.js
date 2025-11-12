@@ -1,17 +1,14 @@
 import { Card } from "@/components/ui/card";
 import { ChartPieLegend } from "@/components/dashboard/ChartPieLegend";
+import { Heading } from "@/components/Heading";
 
 export default function Page() {
   return (
-    <div className="flex flex-col items-center px-4 sm:px-8 max-w-11/12 my-12 w-full gap-3 mx-auto">
-      <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)] mt-12">
-        Program Studi
-      </h2>
+    <div className="flex flex-col items-center px-4 sm:px-8 max-w-6xl my-12 w-full gap-3 mx-auto">
+      <Heading title={"Program Studi"} />
       <ChartPieLegend />
 
-      <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)] mt-12">
-        Rincian
-      </h2>
+      <Heading title={"Rincian"} />
 
       <div className="grid grid-cols-1 w-full gap-12">
         <Card className="flex items-start justify-center p-6 flex-col w-full stroke-black gap-2">

@@ -14,11 +14,26 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 const managers = [
-  { name: "Ahmad Fauzi" },
-  { name: "Bella Pratiwi" },
-  { name: "Cahyo Nugroho" },
-  { name: "Dian Lestari" },
-  { name: "Eko Prasetyo" },
+  {
+    name: "Ahmad Fauzi",
+    email: "ahmadfauzi@gmail.com",
+   },
+  {
+    name: "Bella Pratiwi",
+    email: "ahmadfauzi@gmail.com",
+   },
+  {
+    name: "Cahyo Nugroho",
+    email: "ahmadfauzi@gmail.com",
+   },
+  {
+    name: "Dian Lestari",
+    email: "ahmadfauzi@gmail.com", 
+   },
+  {
+    name: "Eko Prasetyo",
+    email: "ahmadfauzi@gmail.com",
+   },
 ];
 
 export function ManajerTable() {
@@ -29,6 +44,7 @@ export function ManajerTable() {
         <TableRow>
           <TableHead className="text-center w-[80px]">No</TableHead>
           <TableHead>Nama</TableHead>
+          <TableHead>Email</TableHead>
           <TableHead className="text-center w-[120px]">Lihat</TableHead>
           <TableHead className="text-center w-[120px]">Hapus</TableHead>
         </TableRow>
@@ -39,8 +55,9 @@ export function ManajerTable() {
           <TableRow key={index}>
             <TableCell className="text-center font-medium">{index + 1}</TableCell>
             <TableCell>{manager.name}</TableCell>
+            <TableCell>{manager.email}</TableCell>
             <TableCell className="text-center">
-              <Link href={`/dashboard/manajer/profile/${index + 1}`}>
+              <Link href={`/dashboard/manajer/profile`}>
                 <Button
                   size="sm"
                   variant="yellow"
