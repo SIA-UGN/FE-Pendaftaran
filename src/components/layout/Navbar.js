@@ -38,10 +38,9 @@ export default function Navbar() {
   const [hasNotification, setHasNotification] = useState(true);
 
   useEffect(() => {
-    const loadUser = () => {
-      try {
-        const token = localStorage.getItem("access_token");
-        const storedUser = localStorage.getItem("user");
+    const updateUserData = () => {
+      const token = localStorage.getItem("access_token");
+      const userStr = localStorage.getItem("user");
 
       if (token && userStr) {
         try {
@@ -56,9 +55,6 @@ export default function Navbar() {
       } else {
         setIsLoggedIn(false);
         setUser(null);
-        }
-      } catch (error) {
-        // Silent fail - localStorage error won't affect UI
       }
     };
 
@@ -70,9 +66,7 @@ export default function Navbar() {
           setUser(event.detail);
           setIsLoggedIn(true);
           localStorage.setItem("user", JSON.stringify(event.detail));
-        } catch (error) {
-          // Silent fail - localStorage error won't affect UI
-        }
+        } catch (error) {}
       } else {
         updateUserData();
       }
@@ -95,7 +89,6 @@ export default function Navbar() {
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
-    setMobileProfilOpen(false);
   };
 
   return (
@@ -242,7 +235,10 @@ export default function Navbar() {
                 { href: "/", label: "Home" },
                 { href: "/sejarah", label: "Sejarah" },
                 { href: "/visi-misi", label: "Visi-Misi" },
-                { href: "/pimpinan-universitas", label: "Pimpinan Universitas" },
+                {
+                  href: "/pimpinan-universitas",
+                  label: "Pimpinan Universitas",
+                },
                 { href: "/pendaftaran", label: "Pendaftaran" },
               ].map((item) => (
                 <Link

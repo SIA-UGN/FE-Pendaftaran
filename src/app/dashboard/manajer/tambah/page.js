@@ -17,51 +17,54 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Heading } from "@/components/Heading";
 
+import { useCreateManager } from "@/hooks/useAdmin";
+
+import { useRouter } from "next/navigation";
+
 import Link from "next/link";
 
-// 🧩 Schema Validasi
 const FormSchema = z.object({
   namaLengkap: z.string().min(3, "Nama lengkap minimal 3 karakter"),
   username: z.string().min(3, "Username minimal 3 karakter"),
   email: z.string().email("Format email tidak valid"),
-  noHandphone: z
+  noRegistrasi: z
     .string()
-    .min(10, "Nomor handphone minimal 10 digit")
+    .min(10, "Nomor registrasi minimal 10 digit")
     .regex(/^0\d+$/, "Nomor harus diawali dengan 0 dan hanya angka"),
-  hakAkses: z.array(z.string()).min(1, "Pilih minimal satu hak akses"),
 });
 
 export default function TambahManajer() {
+  const router = useRouter();
+
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       namaLengkap: "",
       username: "",
       email: "",
-      noHandphone: "",
-      hakAkses: [],
+      noRegistrasi: "",
     },
   });
 
-  const onSubmit = async (data) => {
-    console.log("Data dikirim:", data);
+  const { mutate: createManager, isLoading } = useCreateManager();
 
-    try {
-      const res = await fetch("/api/manajer", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+  const onSubmit = (data) => {
+    // Map form fields to backend
+    const payload = {
+      name: data.namaLengkap,
+      email: data.email,
+      username: data.username,
+      nomor_registrasi: data.noRegistrasi,
+    };
 
-      if (!res.ok) throw new Error("Gagal menambahkan manajer");
-
-      const result = await res.json();
-      alert("Manajer berhasil ditambahkan ✅");
-      console.log("Response:", result);
-    } catch (err) {
-      console.error(err);
-      alert("Terjadi kesalahan saat menambahkan manajer ❌");
-    }
+    createManager(payload, {
+      onSuccess: () => {
+        router.push({
+          pathname: "/dashboard/manajer/tambah/validasi",
+          query: { ...payload },
+        });
+      },
+    });
   };
 
   return (
@@ -124,26 +127,12 @@ export default function TambahManajer() {
 
               <FormField
                 control={form.control}
-                name="noHandphone"
+                name="noRegistrasi"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>Nomor Registrasi</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="........." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="noHandphone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <FormControl>
-                      <Input type="confirm-password" placeholder="........." {...field} />
+                      <Input placeholder="Nomor Registrasi" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -153,21 +142,21 @@ export default function TambahManajer() {
 
             <div className="w-full flex items-center justify-end gap-2">
               <Button
-                type="submit"
-                variant={"yellow"}
-                className={"w-48 rounded-md"}
+                type="button"
+                variant="yellow"
+                onClick={() => router.back()}
+                className={"w-48 rounded-2xl"}
               >
                 Kembali
               </Button>
-              <Link href="/dashboard/manajer/tambah/validasi">
-                <Button
-                  type="submit"
-                  variant={"green"}
-                  className={"w-48 rounded-md"}
-                >
-                  Lanjut
-                </Button>
-              </Link>
+              <Button
+                type="submit"
+                variant={"green"}
+                className={"w-48 rounded-2xl"}
+                disabled={isLoading}
+              >
+                {isLoading ? "Menyimpan..." : "Lanjut"}
+              </Button>
             </div>
           </form>
         </Form>

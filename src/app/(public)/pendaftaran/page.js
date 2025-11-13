@@ -1,11 +1,11 @@
 "use client";
 
 import ProtectedRoute from "@/components/ProtectedRoute";
-import InformasiPendaftaran from "@/components/InformasiPendaftaran";
+import InformasiPendaftaran from "@/components/registrations/InformasiPendaftaran";
 import InformasiProfil from "@/components/InformasiProfil";
-import RegistrationProgress from "@/components/RegistrationProgress";
-import UrutanTahapan from "@/components/UrutanTahapan";
-import Ketentuan from "@/components/Ketentuan";
+import RegistrationProgress from "@/components/registrations/RegistrationProgress";
+import UrutanTahapan from "@/components/registrations/UrutanTahapan";
+import Ketentuan from "@/components/registrations/Ketentuan";
 
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";

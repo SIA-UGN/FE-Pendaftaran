@@ -5,8 +5,23 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from "@/components/ui/button";
 import { SearchIcon, ChevronDown } from "lucide-react";
 import { ManajerTable } from "@/components/ManajerTable";
+import { useManagers } from "@/hooks/useAdmin";
 
 export default function ManajerList() {
+  const { data, isLoading, isError, error } = useManagers();
+
+  if (isLoading) return <div>Loading...</div>;
+
+  if (isError)
+    return (
+      <div>
+        Error fetching managers: {error.response?.data?.message || error.message}
+      </div>
+    );
+
+  const dataManager = data.data.data.managers;
+  console.log(dataManager);
+
   return (
     <>
       {/* Bagian Pencarian & Filter */}
@@ -33,17 +48,18 @@ export default function ManajerList() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem className="cursor-pointer">Fahmi</DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">Faradis</DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">Khay</DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">Riris</DropdownMenuItem>
+            {
+              dataManager.map((manager) => (
+                <DropdownMenuItem key={manager.id} className="cursor-pointer">{manager.name}</DropdownMenuItem>
+              ))
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
       {/* Tabel Manajer */}
       <div className="w-full overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-        <ManajerTable />
+        <ManajerTable data={dataManager} />
       </div>
     </>
   );

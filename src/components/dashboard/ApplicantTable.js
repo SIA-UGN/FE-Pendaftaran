@@ -39,7 +39,14 @@ const applicants = [
   },
 ];
 
-export function ApplicantTable() {
+export function ApplicantTable({ Data }) {
+  // const data = Data.data;
+  const data = applicants;
+  const pagination = data.pagination;
+
+  console.log(data);
+  console.log(pagination);
+
   return (
     <Table className="w-full text-sm">
       <TableHeader>
@@ -53,7 +60,7 @@ export function ApplicantTable() {
       </TableHeader>
 
       <TableBody>
-        {applicants.map((applicant) => (
+        {data.map((applicant) => (
           <TableRow key={applicant.id}>
             <TableCell className="text-center font-medium">{applicant.id}</TableCell>
             <TableCell className="text-center">{applicant.number}</TableCell>
@@ -72,7 +79,7 @@ export function ApplicantTable() {
               </span>
             </TableCell>
             <TableCell className="text-center">
-              <Link href={`/dashboard/profile`}>
+              <Link href={`/dashboard/profile?id=${applicant.id}`}>
               <Button
                 variant="yellow"
                 className="text-sm font-medium text-[var(--green)] hover:bg-[var(--green)] hover:text-white transition-all rounded-md"

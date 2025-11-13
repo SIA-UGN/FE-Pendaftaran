@@ -55,7 +55,7 @@ const data = {
     },
     {
       title: "Edit Form Pendaftaran",
-      url: "/dashboard/edit/pendaftaran",
+      url: "/dashboard/edit/pendaftaran/data-diri",
       icon: FilePlus,
       isActive: true,
     },

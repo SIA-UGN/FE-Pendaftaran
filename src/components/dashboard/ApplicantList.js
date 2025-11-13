@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { SearchIcon, ChevronDown } from "lucide-react";
 import { ApplicantTable } from "@/components/dashboard/ApplicantTable";
 
-export default function ApplicantList() {
+export default function ApplicantList({data}) {
   return (
     <>
       {/* Bagian Pencarian & Filter */}
@@ -33,17 +33,18 @@ export default function ApplicantList() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem className="cursor-pointer">Fahmi</DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">Faradis</DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">Khay</DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">Riris</DropdownMenuItem>
+            {
+              data.map((applicant) => (
+                <DropdownMenuItem key={applicant.id} className="cursor-pointer">{applicant.name}</DropdownMenuItem>
+              ))
+            }
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
       {/* Tabel Pendaftar */}
       <div className="w-full overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-        <ApplicantTable />
+        <ApplicantTable Data={data} />
       </div>
     </>
   );

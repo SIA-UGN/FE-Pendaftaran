@@ -3,7 +3,19 @@ import ApplicantList from "@/components/dashboard/ApplicantList";
 import { Heading } from "@/components/Heading";
 import { StatCard } from "../StatCard";
 
-export default function ApplicantInformation() {
+export default function ApplicantInformation({
+  Approved,
+  Rejected,
+  Pending,
+  Lulus,
+  TidakLulus,
+  VerificationTable,
+  GraduationTable
+}) {
+
+  console.log(VerificationTable.data);
+  console.log(GraduationTable.data);
+
   return (
     <>
       {/* Bagian Verifikasi Dokumen */}
@@ -17,14 +29,20 @@ export default function ApplicantInformation() {
             grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
           "
         >
-          <StatCard value={"80"} label={"Approved"} />
-          <StatCard value={"30"} label={"Rejected"} />
-          <StatCard value={"37"} label={"Pending"} />
+          <StatCard value={Approved} label={"Approved"} />
+          <StatCard value={Rejected} label={"Rejected"} />
+          <StatCard value={Pending} label={"Pending"} />
         </div>
 
         {/* Daftar Pendaftar */}
         <div className="w-full mt-6 sm:mt-8">
-          <ApplicantList />
+          {VerificationTable.data.length === 0 ? (
+            <p className="text-center text-gray-500 mt-6">Tidak ada data pendaftar untuk ditampilkan.</p> 
+          ) : (     
+            <ApplicantList data={VerificationTable.data} />
+          )
+          
+          }
         </div>
       </div>
 
@@ -39,13 +57,19 @@ export default function ApplicantInformation() {
             grid-cols-1 sm:grid-cols-2
           "
         >
-          <StatCard value={"80"} label={"Lulus"} />
-          <StatCard value={"37"} label={"Tidak Lulus"} />
+          <StatCard value={Lulus} label={"Lulus"} />
+          <StatCard value={TidakLulus} label={"Tidak Lulus"} />
         </div>
 
         {/* Daftar Pendaftar */}
         <div className="w-full mt-6 sm:mt-8">
-          <ApplicantList />
+          {
+            GraduationTable.data.length === 0 ? (
+              <p className="text-center text-gray-500 mt-6">Tidak ada data pendaftar untuk ditampilkan.</p> 
+            ) : (     
+              <ApplicantList data={GraduationTable.data} />
+            )
+          }
         </div>
       </div>
     </>
