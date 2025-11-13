@@ -116,7 +116,13 @@ export function ManajerTable({ data }) {
                     </Button>
                     <Button
                       className="bg-red-600 hover:bg-red-700"
-                      onClick={deleteManager}
+                      onClick={() => {
+                        deleteManager(manager.id, {
+                          onSuccess: () => {
+                            setOpen(false);
+                          },
+                        });
+                      }}
                       disabled={deleteLoading}
                     >
                       {deleteLoading ? "Menghapus..." : "Hapus"}

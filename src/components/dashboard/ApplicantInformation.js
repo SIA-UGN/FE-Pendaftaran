@@ -1,7 +1,9 @@
 import { Card } from "@/components/ui/card";
 import ApplicantList from "@/components/dashboard/ApplicantList";
+import GraduationList from "@/components/dashboard/GraduationList";
 import { Heading } from "@/components/Heading";
 import { StatCard } from "../StatCard";
+import { ApplicantTable } from "./ApplicantTable";
 
 export default function ApplicantInformation({
   Approved,
@@ -39,7 +41,7 @@ export default function ApplicantInformation({
           {VerificationTable.data.length === 0 ? (
             <p className="text-center text-gray-500 mt-6">Tidak ada data pendaftar untuk ditampilkan.</p> 
           ) : (     
-            <ApplicantList data={VerificationTable.data} />
+            <ApplicantList data={VerificationTable} />
           )
           
           }
@@ -64,10 +66,10 @@ export default function ApplicantInformation({
         {/* Daftar Pendaftar */}
         <div className="w-full mt-6 sm:mt-8">
           {
-            GraduationTable.data.length === 0 ? (
+            VerificationTable.data.length === 0 ? (
               <p className="text-center text-gray-500 mt-6">Tidak ada data pendaftar untuk ditampilkan.</p> 
             ) : (     
-              <ApplicantList data={GraduationTable.data} />
+              <GraduationList data={VerificationTable} />
             )
           }
         </div>

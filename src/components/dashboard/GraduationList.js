@@ -4,12 +4,11 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/in
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { SearchIcon, ChevronDown } from "lucide-react";
-import { ApplicantTable } from "@/components/dashboard/ApplicantTable";
+import { GraduationTable } from "@/components/dashboard/GraduationTable";
 
-export default function ApplicantList({ data }) {
+export default function GraduationList({ data }) {
   console.log(data)
   const applicants = data.data;
-  console.log(applicants);
 
   return (
     <>
@@ -48,7 +47,7 @@ export default function ApplicantList({ data }) {
 
       {/* Tabel Pendaftar */}
       <div className="w-full overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-        <ApplicantTable data={applicants} />
+        <GraduationTable data={applicants} />
       </div>
     </>
   );

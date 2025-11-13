@@ -39,7 +39,7 @@ const applicants = [
   },
 ];
 
-export function ApplicantTable({ data }) {
+export function GraduationTable({ data }) {
   // const data = Data.data;
   // const pagination = data.pagination;
 
@@ -67,14 +67,14 @@ export function ApplicantTable({ data }) {
             <TableCell className="text-center">
               <span
                 className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  applicant.status === "approved"
+                  applicant.graduation_status === "graduated"
                     ? "bg-green-100 text-green-700"
                     : applicant.status === "rejected"
                     ? "bg-red-100 text-red-700"
                     : "bg-yellow-100 text-yellow-700"
                 }`}
               >
-                {applicant.status}
+                {applicant.graduation_status}
               </span>
             </TableCell>
             <TableCell className="text-center">
