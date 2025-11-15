@@ -1,0 +1,1134 @@
+================================================================================
+                    BACKEND PAYMENT SYSTEM - COMPLETE CODE
+                          Laravel 10/11 Compatible
+================================================================================
+
+Instruksi:
+1. Copy semua file di bawah ini ke lokasi yang sesuai di backend Laravel Anda
+2. Jalankan migration: php artisan migrate
+3. Update routes di api.php
+4. Test endpoints dengan Postman/Thunder Client
+
+================================================================================
+================================================================================
+
+
+================================================================================
+FILE 1: app/Http/Controllers/Api/PaymentController.php
+================================================================================
+
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Payment;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+class PaymentController extends Controller
+{
+    /**
+     * Get payment information for current user
+     * 
+     * Endpoint: GET /api/payment/my
+     * Headers: Authorization: Bearer {token}
+     * 
+     * Response:
+     * {
+     *   "status": "success",
+     *   "data": {
+     *     "payment": {
+     *       "id": 1,
+     *       "student_name": "Faradis Yulianto",
+     *       "registration_number": "REG-2024-001",
+     *       "amount": 300000,
+     *       "status": "pending",
+     *       "deadline": "2024-12-31T23:59:59Z",
+     *       "bank_accounts": [...]
+     *     }
+     *   }
+     * }
+     */
+    public function getMyPayment(Request $request)
+    {
+        try {
+            $user = $request->user();
+            $registration = $user->registration;
+
+            if (!$registration) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Registration not found'
+                ], 404);
+            }
+
+            // Cek apakah sudah selesai isi data (step 1-5)
+            if ($registration->current_step < 5) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Please complete all registration steps first (step 1-5)'
+                ], 403);
+            }
+
+            // Ambil atau buat payment record
+            $payment = $registration->payment;
+            
+            if (!$payment) {
+                // Auto-create payment saat pertama kali akses
+                $payment = Payment::create([
+                    'registration_id' => $registration->id,
+                    'amount' => 300000, // Fixed amount Rp 300.000
+                    'status' => 'pending',
+                    'deadline' => now()->addDays(3), // 3 hari untuk bayar
+                ]);
+
+                Log::info('Payment record auto-created', [
+                    'registration_id' => $registration->id,
+                    'payment_id' => $payment->id
+                ]);
+            }
+
+            // Placeholder bank accounts (hardcoded untuk sementara)
+            $bankAccounts = [
+                [
+                    'id' => 1,
+                    'bank_name' => 'Bank BCA',
+                    'account_number' => '1234567890',
+                    'account_holder' => 'Universitas Global Nusantara',
+                ],
+                [
+                    'id' => 2,
+                    'bank_name' => 'Bank BNI',
+                    'account_number' => '0987654321',
+                    'account_holder' => 'Universitas Global Nusantara',
+                ],
+                [
+                    'id' => 3,
+                    'bank_name' => 'Bank Mandiri',
+                    'account_number' => '1122334455',
+                    'account_holder' => 'Universitas Global Nusantara',
+                ],
+            ];
+
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'payment' => [
+                        'id' => $payment->id,
+                        'student_name' => $registration->profile->full_name ?? 'N/A',
+                        'registration_number' => $registration->registration_number,
+                        'amount' => (float) $payment->amount,
+                        'status' => $payment->status,
+                        'deadline' => $payment->deadline?->toIso8601String(),
+                        'rejection_reason' => $payment->rejection_reason,
+                        'payment_proof' => $payment->payment_proof,
+                        'uploaded_at' => $payment->uploaded_at?->toIso8601String(),
+                        'verified_at' => $payment->verified_at?->toIso8601String(),
+                        'bank_accounts' => $bankAccounts,
+                    ]
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to get payment info', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to get payment info: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Upload payment proof
+     * 
+     * Endpoint: POST /api/payment/upload-proof
+     * Headers: Authorization: Bearer {token}
+     * Body: {
+     *   "payment_proof": "/storage/documents/payment/123_proof.jpg"
+     * }
+     * 
+     * Response:
+     * {
+     *   "status": "success",
+     *   "message": "Payment proof uploaded successfully",
+     *   "data": {
+     *     "payment": {
+     *       "id": 1,
+     *       "status": "waiting_verification",
+     *       "payment_proof": "/storage/documents/payment/123_proof.jpg",
+     *       "uploaded_at": "2024-12-31T10:30:00Z"
+     *     }
+     *   }
+     * }
+     */
+    public function uploadPaymentProof(Request $request)
+    {
+        try {
+            // Validasi input
+            $validated = $request->validate([
+                'payment_proof' => 'required|string|max:500',
+            ]);
+
+            $user = $request->user();
+            $registration = $user->registration;
+
+            if (!$registration) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Registration not found'
+                ], 404);
+            }
+
+            $payment = $registration->payment;
+
+            if (!$payment) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Payment record not found. Please refresh the page.'
+                ], 404);
+            }
+
+            // Cek apakah sudah expired
+            if ($payment->deadline && now()->isAfter($payment->deadline)) {
+                $payment->update(['status' => 'expired']);
+                
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Payment deadline has expired'
+                ], 403);
+            }
+
+            // Cek apakah status memungkinkan untuk upload
+            if (!in_array($payment->status, ['pending', 'rejected'])) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Payment status does not allow upload. Current status: ' . $payment->status
+                ], 403);
+            }
+
+            DB::beginTransaction();
+
+            try {
+                // Update payment record dengan URL yang sudah di-upload
+                $payment->update([
+                    'payment_proof' => $validated['payment_proof'],
+                    'status' => 'waiting_verification',
+                    'uploaded_at' => now(),
+                ]);
+
+                // Update registration status
+                $registration->update([
+                    'status' => 'waiting_payment_verification',
+                    'current_step' => 6,
+                ]);
+
+                DB::commit();
+
+                Log::info('Payment proof uploaded', [
+                    'payment_id' => $payment->id,
+                    'registration_id' => $registration->id,
+                    'proof_url' => $validated['payment_proof']
+                ]);
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Payment proof uploaded successfully',
+                    'data' => [
+                        'payment' => [
+                            'id' => $payment->id,
+                            'status' => $payment->status,
+                            'payment_proof' => $payment->payment_proof,
+                            'uploaded_at' => $payment->uploaded_at->toIso8601String(),
+                        ]
+                    ]
+                ], 200);
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to upload payment proof', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to upload payment proof: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get payment status only (optional endpoint)
+     * 
+     * Endpoint: GET /api/payment/status
+     * Headers: Authorization: Bearer {token}
+     * 
+     * Response:
+     * {
+     *   "status": "success",
+     *   "data": {
+     *     "status": "waiting_verification",
+     *     "uploaded_at": "2024-12-31T10:30:00Z"
+     *   }
+     * }
+     */
+    public function getPaymentStatus(Request $request)
+    {
+        try {
+            $user = $request->user();
+            $registration = $user->registration;
+            $payment = $registration?->payment;
+
+            if (!$payment) {
+                return response()->json([
+                    'status' => 'success',
+                    'data' => [
+                        'status' => 'pending',
+                        'uploaded_at' => null,
+                        'verified_at' => null,
+                    ]
+                ], 200);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'status' => $payment->status,
+                    'uploaded_at' => $payment->uploaded_at?->toIso8601String(),
+                    'verified_at' => $payment->verified_at?->toIso8601String(),
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to get payment status', [
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to get payment status'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get payment info (alias untuk getMyPayment)
+     * 
+     * Endpoint: GET /api/payment/info
+     */
+    public function getPaymentInfo(Request $request)
+    {
+        return $this->getMyPayment($request);
+    }
+}
+
+
+================================================================================
+FILE 2: app/Models/Payment.php
+================================================================================
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Payment extends Model
+{
+    use HasFactory;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'payments';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'registration_id',
+        'amount',
+        'status',
+        'payment_proof',
+        'rejection_reason',
+        'deadline',
+        'uploaded_at',
+        'verified_at',
+        'verified_by',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'amount' => 'decimal:2',
+        'deadline' => 'datetime',
+        'uploaded_at' => 'datetime',
+        'verified_at' => 'datetime',
+    ];
+
+    /**
+     * Status constants
+     */
+    const STATUS_PENDING = 'pending';
+    const STATUS_WAITING_VERIFICATION = 'waiting_verification';
+    const STATUS_VERIFIED = 'verified';
+    const STATUS_REJECTED = 'rejected';
+    const STATUS_EXPIRED = 'expired';
+
+    /**
+     * Get all available statuses
+     *
+     * @return array
+     */
+    public static function getStatuses()
+    {
+        return [
+            self::STATUS_PENDING,
+            self::STATUS_WAITING_VERIFICATION,
+            self::STATUS_VERIFIED,
+            self::STATUS_REJECTED,
+            self::STATUS_EXPIRED,
+        ];
+    }
+
+    /**
+     * Relasi ke Registration (One-to-One)
+     * Setiap payment milik satu registration
+     */
+    public function registration()
+    {
+        return $this->belongsTo(Registration::class);
+    }
+
+    /**
+     * Relasi ke User yang melakukan verifikasi (One-to-One)
+     * Admin yang verify payment
+     */
+    public function verifiedBy()
+    {
+        return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    /**
+     * Check if payment is expired
+     *
+     * @return bool
+     */
+    public function isExpired()
+    {
+        if (!$this->deadline) {
+            return false;
+        }
+
+        return now()->isAfter($this->deadline);
+    }
+
+    /**
+     * Check if payment can be uploaded (pending or rejected dan belum expired)
+     *
+     * @return bool
+     */
+    public function canUpload()
+    {
+        return in_array($this->status, [self::STATUS_PENDING, self::STATUS_REJECTED]) 
+               && !$this->isExpired();
+    }
+
+    /**
+     * Check if payment is pending
+     *
+     * @return bool
+     */
+    public function isPending()
+    {
+        return $this->status === self::STATUS_PENDING;
+    }
+
+    /**
+     * Check if payment is waiting verification
+     *
+     * @return bool
+     */
+    public function isWaitingVerification()
+    {
+        return $this->status === self::STATUS_WAITING_VERIFICATION;
+    }
+
+    /**
+     * Check if payment is verified
+     *
+     * @return bool
+     */
+    public function isVerified()
+    {
+        return $this->status === self::STATUS_VERIFIED;
+    }
+
+    /**
+     * Check if payment is rejected
+     *
+     * @return bool
+     */
+    public function isRejected()
+    {
+        return $this->status === self::STATUS_REJECTED;
+    }
+
+    /**
+     * Scope untuk filter by status
+     */
+    public function scopeByStatus($query, $status)
+    {
+        return $query->where('status', $status);
+    }
+
+    /**
+     * Scope untuk payment yang expired
+     */
+    public function scopeExpired($query)
+    {
+        return $query->where('status', self::STATUS_PENDING)
+                     ->where('deadline', '<', now());
+    }
+
+    /**
+     * Scope untuk payment yang waiting verification
+     */
+    public function scopeWaitingVerification($query)
+    {
+        return $query->where('status', self::STATUS_WAITING_VERIFICATION);
+    }
+}
+
+
+================================================================================
+FILE 3: database/migrations/2024_11_10_000001_create_payments_table.php
+================================================================================
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('payments', function (Blueprint $table) {
+            $table->id();
+            
+            // Foreign key ke registrations table
+            $table->foreignId('registration_id')
+                  ->constrained('registrations')
+                  ->onDelete('cascade');
+            
+            // Payment details
+            $table->decimal('amount', 10, 2)->default(300000);
+            
+            // Status: pending, waiting_verification, verified, rejected, expired
+            $table->enum('status', [
+                'pending', 
+                'waiting_verification', 
+                'verified', 
+                'rejected', 
+                'expired'
+            ])->default('pending');
+            
+            // Payment proof (URL dari upload)
+            $table->string('payment_proof', 500)->nullable();
+            
+            // Rejection reason (jika ditolak admin)
+            $table->text('rejection_reason')->nullable();
+            
+            // Deadline untuk upload bukti bayar
+            $table->timestamp('deadline')->nullable();
+            
+            // Kapan user upload bukti
+            $table->timestamp('uploaded_at')->nullable();
+            
+            // Kapan admin verify
+            $table->timestamp('verified_at')->nullable();
+            
+            // Admin yang verify
+            $table->foreignId('verified_by')
+                  ->nullable()
+                  ->constrained('users')
+                  ->onDelete('set null');
+            
+            $table->timestamps();
+            
+            // Indexes untuk performance
+            $table->index('registration_id');
+            $table->index('status');
+            $table->index(['status', 'deadline']);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('payments');
+    }
+};
+
+
+================================================================================
+FILE 4: UPDATE app/Models/Registration.php (TAMBAHKAN INI)
+================================================================================
+
+INSTRUKSI: Buka file app/Models/Registration.php yang sudah ada
+Tambahkan kode berikut:
+
+1. Di bagian FILLABLE, tambahkan status baru (jika belum ada):
+
+    protected $fillable = [
+        // ... existing fields ...
+        'status',
+        'current_step',
+        // ... other fields ...
+    ];
+
+2. Tambahkan CONSTANTS untuk status baru (setelah existing constants):
+
+    // Existing constants
+    const STATUS_DRAFT = 'draft';
+    const STATUS_PENDING = 'pending';
+    
+    // ✅ TAMBAHKAN INI (status baru untuk payment):
+    const STATUS_WAITING_PAYMENT_VERIFICATION = 'waiting_payment_verification';
+    const STATUS_PAID = 'paid';
+    
+    // Existing status
+    const STATUS_APPROVED = 'approved';
+    const STATUS_REJECTED = 'rejected';
+
+3. Tambahkan RELATIONSHIP ke Payment (di bagian relationships):
+
+    /**
+     * Relasi ke Payment (One-to-One)
+     * Setiap registration punya satu payment record
+     */
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
+    }
+
+4. OPSIONAL - Tambahkan helper method:
+
+    /**
+     * Check if registration can access payment page
+     */
+    public function canAccessPayment()
+    {
+        return $this->current_step >= 5;
+    }
+
+    /**
+     * Check if payment is completed
+     */
+    public function hasCompletedPayment()
+    {
+        return $this->payment && $this->payment->isVerified();
+    }
+
+
+================================================================================
+FILE 5: routes/api.php (TAMBAHKAN ROUTES INI)
+================================================================================
+
+INSTRUKSI: Buka file routes/api.php yang sudah ada
+Tambahkan routes payment di dalam middleware auth:sanctum
+
+use App\Http\Controllers\Api\PaymentController;
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    
+    // ... existing routes ...
+    
+    // ============================================
+    // PAYMENT ROUTES (✅ TAMBAHKAN INI)
+    // ============================================
+    Route::prefix('payment')->group(function () {
+        // Get payment info for current user
+        Route::get('/my', [PaymentController::class, 'getMyPayment']);
+        
+        // Alias endpoint (opsional)
+        Route::get('/info', [PaymentController::class, 'getPaymentInfo']);
+        
+        // Upload payment proof
+        Route::post('/upload-proof', [PaymentController::class, 'uploadPaymentProof']);
+        
+        // Get payment status only (opsional)
+        Route::get('/status', [PaymentController::class, 'getPaymentStatus']);
+    });
+    
+    // ... existing routes ...
+});
+
+
+================================================================================
+FILE 6: UPDATE database/migrations/xxxx_update_registrations_status.php (OPTIONAL)
+================================================================================
+
+INSTRUKSI: Jika enum status di registrations table belum include status payment,
+buat migration baru untuk update enum:
+
+php artisan make:migration update_registrations_status_for_payment
+
+Isi migration:
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        // Update enum untuk status di registrations table
+        DB::statement("ALTER TABLE registrations MODIFY COLUMN status ENUM(
+            'draft',
+            'pending',
+            'waiting_payment_verification',
+            'paid',
+            'approved',
+            'rejected'
+        ) DEFAULT 'draft'");
+    }
+
+    public function down(): void
+    {
+        // Rollback ke enum lama
+        DB::statement("ALTER TABLE registrations MODIFY COLUMN status ENUM(
+            'draft',
+            'pending',
+            'approved',
+            'rejected'
+        ) DEFAULT 'draft'");
+    }
+};
+
+
+================================================================================
+FILE 7: TESTING - test_payment_endpoints.txt
+================================================================================
+
+POSTMAN/THUNDER CLIENT TESTING:
+
+1. GET Payment Info
+   -------------------
+   Method: GET
+   URL: http://localhost:8000/api/payment/my
+   Headers:
+     Authorization: Bearer {your_token}
+     Accept: application/json
+   
+   Expected Response (200):
+   {
+     "status": "success",
+     "data": {
+       "payment": {
+         "id": 1,
+         "student_name": "Faradis Yulianto",
+         "registration_number": "REG-2024-001",
+         "amount": 300000,
+         "status": "pending",
+         "deadline": "2024-12-31T23:59:59.000000Z",
+         "rejection_reason": null,
+         "payment_proof": null,
+         "uploaded_at": null,
+         "verified_at": null,
+         "bank_accounts": [
+           {
+             "id": 1,
+             "bank_name": "Bank BCA",
+             "account_number": "1234567890",
+             "account_holder": "Universitas Global Nusantara"
+           },
+           {
+             "id": 2,
+             "bank_name": "Bank BNI",
+             "account_number": "0987654321",
+             "account_holder": "Universitas Global Nusantara"
+           },
+           {
+             "id": 3,
+             "bank_name": "Bank Mandiri",
+             "account_number": "1122334455",
+             "account_holder": "Universitas Global Nusantara"
+           }
+         ]
+       }
+     }
+   }
+
+2. POST Upload Payment Proof
+   ----------------------------
+   Method: POST
+   URL: http://localhost:8000/api/payment/upload-proof
+   Headers:
+     Authorization: Bearer {your_token}
+     Content-Type: application/json
+     Accept: application/json
+   
+   Body (JSON):
+   {
+     "payment_proof": "/storage/documents/payment/1234567890_proof.jpg"
+   }
+   
+   Expected Response (200):
+   {
+     "status": "success",
+     "message": "Payment proof uploaded successfully",
+     "data": {
+       "payment": {
+         "id": 1,
+         "status": "waiting_verification",
+         "payment_proof": "/storage/documents/payment/1234567890_proof.jpg",
+         "uploaded_at": "2024-11-10T12:30:45.000000Z"
+       }
+     }
+   }
+
+3. GET Payment Status
+   --------------------
+   Method: GET
+   URL: http://localhost:8000/api/payment/status
+   Headers:
+     Authorization: Bearer {your_token}
+     Accept: application/json
+   
+   Expected Response (200):
+   {
+     "status": "success",
+     "data": {
+       "status": "waiting_verification",
+       "uploaded_at": "2024-11-10T12:30:45.000000Z",
+       "verified_at": null
+     }
+   }
+
+
+================================================================================
+FILE 8: INSTALLATION INSTRUCTIONS
+================================================================================
+
+LANGKAH-LANGKAH INSTALASI BACKEND PAYMENT:
+
+1. COPY FILES
+   -----------
+   - Copy PaymentController.php ke: app/Http/Controllers/Api/
+   - Copy Payment.php ke: app/Models/
+   - Copy migration file ke: database/migrations/
+   
+2. UPDATE EXISTING FILES
+   ----------------------
+   - Update app/Models/Registration.php (tambahkan relation & constants)
+   - Update routes/api.php (tambahkan payment routes)
+
+3. RUN MIGRATION
+   --------------
+   cd /path/to/laravel-project
+   php artisan migrate
+   
+   Atau jika ingin refresh (HATI-HATI: hapus semua data):
+   php artisan migrate:fresh
+
+4. CHECK MIGRATION
+   ----------------
+   php artisan migrate:status
+   
+   Pastikan tabel "payments" sudah ada dengan status "Ran"
+
+5. CLEAR CACHE
+   ------------
+   php artisan config:clear
+   php artisan cache:clear
+   php artisan route:clear
+
+6. CHECK ROUTES
+   -------------
+   php artisan route:list --path=payment
+   
+   Output yang diharapkan:
+   GET|HEAD   api/payment/my ................... PaymentController@getMyPayment
+   GET|HEAD   api/payment/info ................ PaymentController@getPaymentInfo
+   POST       api/payment/upload-proof ........ PaymentController@uploadPaymentProof
+   GET|HEAD   api/payment/status .............. PaymentController@getPaymentStatus
+
+7. TEST DENGAN POSTMAN
+   --------------------
+   - Import collection dari test_payment_endpoints.txt
+   - Test GET /api/payment/my
+   - Test POST /api/payment/upload-proof
+   - Test GET /api/payment/status
+
+8. CHECK DATABASE
+   --------------
+   Buka MySQL/phpMyAdmin dan cek:
+   - Tabel "payments" sudah ada
+   - Structure kolom sesuai migration
+   - Foreign key ke "registrations" sudah ada
+
+9. CHECK LOGS (jika error)
+   ------------------------
+   tail -f storage/logs/laravel.log
+   
+   Atau buka di: storage/logs/laravel-{date}.log
+
+
+================================================================================
+FILE 9: TROUBLESHOOTING
+================================================================================
+
+COMMON ISSUES & SOLUTIONS:
+
+1. ERROR: "Class 'App\Models\Payment' not found"
+   SOLUTION:
+   - Pastikan Payment.php ada di app/Models/
+   - Run: composer dump-autoload
+   - Clear cache: php artisan config:clear
+
+2. ERROR: "Table 'payments' doesn't exist"
+   SOLUTION:
+   - Check migration sudah run: php artisan migrate:status
+   - Run migration: php artisan migrate
+   - Check database connection di .env
+
+3. ERROR: "Registration not found"
+   SOLUTION:
+   - User belum punya registration record
+   - Pastikan user sudah isi data step 1-5
+   - Check tabel registrations, pastikan ada record dengan user_id yang login
+
+4. ERROR: "Please complete all registration steps first"
+   SOLUTION:
+   - current_step di tabel registrations masih < 5
+   - User harus selesaikan step 1-5 dulu
+   - Update current_step di database untuk testing:
+     UPDATE registrations SET current_step = 5 WHERE user_id = {your_user_id};
+
+5. ERROR: 500 Internal Server Error
+   SOLUTION:
+   - Check laravel.log: storage/logs/laravel.log
+   - Enable debug di .env: APP_DEBUG=true
+   - Check database connection
+   - Check semua required fields ada
+
+6. ERROR: "Column not found: status"
+   SOLUTION:
+   - Migration belum jalan
+   - Atau nama kolom salah
+   - Re-run migration: php artisan migrate:rollback && php artisan migrate
+
+7. ERROR: Foreign key constraint fails
+   SOLUTION:
+   - Tabel registrations belum ada
+   - Atau registration_id tidak valid
+   - Check foreign key di migration
+
+8. Frontend tidak menerima data bank_accounts
+   SOLUTION:
+   - Check response format sesuai dengan yang diexpect frontend
+   - Bank accounts sudah hardcoded di controller, pastikan format array benar
+   - Check browser console untuk detail error
+
+
+================================================================================
+FILE 10: DATABASE STRUCTURE
+================================================================================
+
+TABEL: payments
+---------------
+
++------------------+----------------------+------+-----+---------+----------------+
+| Field            | Type                 | Null | Key | Default | Extra          |
++------------------+----------------------+------+-----+---------+----------------+
+| id               | bigint unsigned      | NO   | PRI | NULL    | auto_increment |
+| registration_id  | bigint unsigned      | NO   | MUL | NULL    |                |
+| amount           | decimal(10,2)        | NO   |     | 300000  |                |
+| status           | enum(...)            | NO   | MUL | pending |                |
+| payment_proof    | varchar(500)         | YES  |     | NULL    |                |
+| rejection_reason | text                 | YES  |     | NULL    |                |
+| deadline         | timestamp            | YES  | MUL | NULL    |                |
+| uploaded_at      | timestamp            | YES  |     | NULL    |                |
+| verified_at      | timestamp            | YES  |     | NULL    |                |
+| verified_by      | bigint unsigned      | YES  | MUL | NULL    |                |
+| created_at       | timestamp            | YES  |     | NULL    |                |
+| updated_at       | timestamp            | YES  |     | NULL    |                |
++------------------+----------------------+------+-----+---------+----------------+
+
+STATUS VALUES:
+- pending: Belum upload bukti bayar
+- waiting_verification: Sudah upload, menunggu admin verify
+- verified: Sudah diverifikasi admin, pembayaran valid
+- rejected: Ditolak admin, harus upload ulang
+- expired: Melewati deadline
+
+FOREIGN KEYS:
+- registration_id → registrations(id) ON DELETE CASCADE
+- verified_by → users(id) ON DELETE SET NULL
+
+INDEXES:
+- PRIMARY KEY (id)
+- INDEX (registration_id)
+- INDEX (status)
+- INDEX (status, deadline)
+
+
+================================================================================
+FILE 11: API FLOW DIAGRAM
+================================================================================
+
+FLOW PAYMENT SYSTEM:
+
+1. User selesai isi data step 1-5
+   ↓
+2. current_step = 5, status = 'pending'
+   ↓
+3. User klik menu "Pembayaran"
+   ↓
+4. Frontend hit: GET /api/payment/my
+   ↓
+5. Backend cek: apakah payment record sudah ada?
+   - Tidak ada → Auto-create payment record (status: pending)
+   - Sudah ada → Return existing payment
+   ↓
+6. Frontend tampilkan:
+   - Ringkasan pembayaran (nama, nomor, amount)
+   - Countdown timer (deadline)
+   - Info rekening bank (3 bank)
+   - Form upload bukti bayar
+   ↓
+7. User upload file di frontend
+   ↓
+8. Frontend upload file via POST /api/upload (existing endpoint)
+   ↓
+9. Get URL hasil upload: /storage/documents/payment/xxx.jpg
+   ↓
+10. Frontend hit: POST /api/payment/upload-proof
+    Body: { "payment_proof": "/storage/documents/payment/xxx.jpg" }
+    ↓
+11. Backend:
+    - Update payment.payment_proof
+    - Update payment.status = 'waiting_verification'
+    - Update registration.status = 'waiting_payment_verification'
+    - Update registration.current_step = 6
+    ↓
+12. Frontend show success message
+    ↓
+13. User tunggu verifikasi admin (1x24 jam)
+    ↓
+14. Admin login → lihat list payment waiting verification
+    ↓
+15. Admin verify payment:
+    - Approve → status = 'verified'
+    - Reject → status = 'rejected' (user bisa upload ulang)
+    ↓
+16. User bisa cek status di halaman status pendaftaran
+
+
+================================================================================
+FILE 12: SECURITY NOTES
+================================================================================
+
+KEAMANAN YANG SUDAH DIIMPLEMENTASI:
+
+1. AUTHENTICATION
+   - Semua endpoint butuh token (auth:sanctum middleware)
+   - Token di-generate saat login
+   - Token disimpan di localStorage frontend
+
+2. AUTHORIZATION
+   - User hanya bisa akses payment milik sendiri
+   - Menggunakan $request->user()->registration
+   - Tidak bisa akses payment user lain
+
+3. VALIDATION
+   - Input di-validate sebelum proses
+   - payment_proof wajib string max 500 char
+   - Check status sebelum allow upload
+
+4. DATA INTEGRITY
+   - Foreign key constraint ke registrations
+   - Cascade delete jika registration dihapus
+   - Transaction untuk update atomik
+
+5. ERROR HANDLING
+   - Try-catch untuk semua operation
+   - Logging semua error ke storage/logs
+   - Rollback transaction jika ada error
+
+6. RATE LIMITING (opsional, bisa ditambahkan)
+   - Limit upload ke X kali per jam
+   - Prevent spam upload
+
+REKOMENDASI TAMBAHAN:
+
+1. Tambahkan rate limiting:
+   Route::middleware(['auth:sanctum', 'throttle:5,1'])->group(...)
+
+2. Validasi file size di backend juga (redundant validation):
+   - Cek file size dari URL
+   - Cek file extension
+
+3. Encrypt sensitive data:
+   - Rejection reason
+   - Admin notes
+
+4. Audit log:
+   - Log semua perubahan status
+   - Log siapa yang verify
+   - Timestamp setiap action
+
+
+================================================================================
+SELESAI - BACKEND PAYMENT SYSTEM COMPLETE
+================================================================================
+
+File ini berisi semua kode yang diperlukan untuk implementasi payment system
+di backend Laravel. Copy dan paste sesuai instruksi di setiap section.
+
+Jika ada pertanyaan atau error, cek bagian TROUBLESHOOTING atau hubungi
+developer frontend.
+
+Last Updated: 2024-11-10
+Version: 1.0.0
+Author: GitHub Copilot AI Assistant
+Project: Universitas Global Nusantara - Sistem Informasi Akademik
+
+================================================================================

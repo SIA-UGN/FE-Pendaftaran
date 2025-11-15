@@ -9,6 +9,10 @@ export const paymentService = {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
+  getPaymentInfo: () => apiClient.get("/payment/info"),
+  uploadPaymentProof: (data) => apiClient.post("/payment/upload-proof", data),
+  getPaymentStatus: () => apiClient.get("/payment/status"),
+  getPaymentHistory: () => apiClient.get("/payment/history"),
 
   // admin
   getAllPayments: (params) => apiClient.get("/payments", { params }),

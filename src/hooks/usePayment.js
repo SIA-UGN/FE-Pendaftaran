@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { paymentService } from "@/services/paymentService";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export const useMyPayment = () => {
   return useQuery({
@@ -72,4 +73,67 @@ export const useVerifyPayment = () => {
       toast.error(message);
     },
   });
+};
+
+// Hook untuk halaman pembayaran dengan fitur lengkap
+export const usePayment = () => {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const { data: rawPaymentData, isLoading } = useQuery({
+    queryKey: ["payment", "info"],
+    queryFn: async () => {
+      const response = await paymentService.getMyPayment();
+      return {
+        ...response.data,
+        ...(response.data.payment || {}),
+        payment: response.data.payment,
+        paymentStatus: response.data.payment?.status || "pending",
+      };
+    },
+    staleTime: 30 * 1000, // 30 detik
+    retry: 1,
+  });
+
+  const uploadMutation = useMutation({
+    mutationFn: async ({ file, paymentId }) => {
+      const formData = new FormData();
+      formData.append("payment_proof", file);
+      return paymentService.uploadProof(paymentId, formData);
+    },
+    onSuccess: () => {
+      toast.success(
+        "Bukti pembayaran berhasil di-upload! Menunggu verifikasi admin."
+      );
+      queryClient.invalidateQueries({ queryKey: ["payment"] });
+      queryClient.invalidateQueries({ queryKey: ["registration"] });
+    },
+    onError: (error) => {
+      toast.error(
+        error.response?.data?.message || "Gagal mengupload bukti pembayaran"
+      );
+    },
+  });
+
+  const paymentStatus =
+    rawPaymentData?.paymentStatus ||
+    rawPaymentData?.payment?.status ||
+    "pending";
+  const paymentData = rawPaymentData;
+
+  const uploadProof = async (file, paymentId) => {
+    const actualPaymentId = paymentId || paymentData?.id;
+    return uploadMutation.mutateAsync({
+      file,
+      paymentId: actualPaymentId,
+    });
+  };
+
+  return {
+    paymentData,
+    paymentStatus,
+    uploadProof,
+    isLoading,
+    isUploading: uploadMutation.isPending,
+  };
 };
