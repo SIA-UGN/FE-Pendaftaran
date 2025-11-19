@@ -1,5 +1,7 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/Heading";
@@ -20,23 +22,36 @@ import { useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import { InputGroup, InputGroupAddon } from "@/components/ui/input-group";
 import Image from "next/image";
+import { usePaymentVerification } from "@/hooks/useAdmin";
 
 export default function Keuangan() {
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  
   const [openFirst, setOpenFirst] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [openCancel, setOpenCancel] = useState(false);
   const [openBukti, setOpenBukti] = useState(false);
+
+  const { data: paymentData, isLoading, isError, error } = usePaymentVerification(id);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error: {error.message}</div>;
+
+  const data = paymentData?.data;
+
+  console.log(data)
 
   return (
     <>
       <div className="flex flex-col items-center justify-center gap-6 max-w-6xl mx-auto my-12 w-full">
         <Card className="w-full flex flex-col md:flex-row gap-6 p-8 rounded-2xl shadow-md bg-[var(--light-cream)] justify-between">
           <div className="flex flex-col p-2 w-full sm:w-2/3 space-y-1 items-start">
-            <h2 className="font-bold text-xl">Faradis Yulianto</h2>
-            <h3 className="text-gray-500">@faradisy20</h3>
-            <p className="text-gray-500">faradisy20@gmail.com</p>
+            <h2 className="font-bold text-xl">{data.data.user.name}</h2>
+            <h3 className="text-gray-500">{data.data.user.registration_number}</h3>
+            <p className="text-gray-500">{data.data.user.email}</p>
           </div>
-          <Button variant={"yellow"}>Pending</Button>
+          <Button variant={"yellow"}>{data.status}</Button>
         </Card>
 
         <Heading title={"Rincian Pembayaran"} />
@@ -49,15 +64,15 @@ export default function Keuangan() {
           <div className="flex flex-col">
             <div className="flex gap-3">
               <UserRound />
-              <span className="text-md">Nama Pengguna: </span>
+              <span className="text-md">Nama Pengguna: {data.data.payment_details.sender_name} </span>
             </div>
             <div className="flex gap-3">
               <IdCard />
-              <span className="text-md">Nomor Pendaftaran: </span>
+              <span className="text-md">Nomor Pendaftaran: {data.data.payment_details.registration_number}</span>
             </div>
             <div className="flex gap-3">
               <WalletMinimal />
-              <span className="text-md">Rp500.000,-</span>
+              <span className="text-md">{data.data.payment_details.amount}</span>
             </div>
           </div>
         </Card>
@@ -90,7 +105,7 @@ export default function Keuangan() {
 
             <div className="flex justify-center my-4">
               <Image
-                src="/bukti-pembayaran.jpg" // Ganti dengan URL atau path gambar dinamis
+                src={data.data.payment.payment_proof_url} // Ganti dengan URL atau path gambar dinamis
                 alt="Bukti Pembayaran"
                 className="rounded-lg shadow-md object-contain"
                 width={400}
