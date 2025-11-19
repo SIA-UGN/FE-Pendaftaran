@@ -42,7 +42,7 @@ export default function Page() {
         <Heading title={"Pendaftar & Manajer"} variant="first" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-10 lg:mb-12">
           <Card className="flex items-center justify-center p-4 sm:p-6 lg:p-8 flex-col stroke-black gap-2 min-h-[140px] sm:min-h-[160px] border border-black shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <span className="font-bold text-3xl sm:text-4xl lg:text-5xl">
+            <span className="font-bold text-3xl sm:text-4xl lg:text-4xl">
               {totalApplicants}
             </span>
             <span className="text-sm sm:text-base lg:text-lg text-gray-500">
@@ -50,7 +50,7 @@ export default function Page() {
             </span>
           </Card>
           <Card className="flex items-center justify-center p-4 sm:p-6 lg:p-8 flex-col stroke-black gap-2 min-h-[140px] sm:min-h-[160px] border border-black shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <span className="font-bold text-3xl sm:text-4xl lg:text-5xl">
+            <span className="font-bold text-3xl sm:text-4xl lg:text-4xl">
               {totalManagers}
             </span>
             <span className="text-sm sm:text-base lg:text-lg text-gray-500">
@@ -59,19 +59,18 @@ export default function Page() {
           </Card>
         </div>
 
-        {/* Section: Quick Status */}
         <Heading title={"Quick Status"} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-10 lg:mb-12">
           <Card className="flex items-center justify-center p-4 sm:p-6 lg:p-8 flex-col stroke-black gap-3 sm:gap-5 min-h-[140px] sm:min-h-[160px] border border-black shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
             <span className="font-bold text-2xl sm:text-3xl lg:text-4xl text-center break-all">
-              Rp {revenue?.toLocaleString("id-ID") || "0"}
+              Rp {Number(revenue).toLocaleString("id-ID")}
             </span>
             <span className="text-sm sm:text-base lg:text-lg text-gray-500 text-center">
               Total Pendapatan
             </span>
           </Card>
           <Card className="flex items-center justify-center p-4 sm:p-6 lg:p-8 flex-col stroke-black gap-3 sm:gap-5 min-h-[140px] sm:min-h-[160px] border border-black shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <span className="font-bold text-3xl sm:text-4xl lg:text-5xl">
+            <span className="font-bold text-3xl sm:text-4xl lg:text-4xl">
               {growthPercentage}%
             </span>
             <span className="text-sm sm:text-base lg:text-lg text-gray-500">
@@ -80,9 +79,8 @@ export default function Page() {
           </Card>
         </div>
 
-        {/* Section: Prodi Pendaftar */}
         <Heading title={"Prodi Pendaftar"} />
-        <div className="w-full overflow-x-auto px-4 sm:px-0">
+        <div className="w-full overflow-x-auto px-0">
           <div className="sm:min-w-0">
             <MajorTable top_programs={top_programs} />
           </div>

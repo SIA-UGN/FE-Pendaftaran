@@ -14,7 +14,7 @@ export function MajorTable({ top_programs }) {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-0">
+    <div className="w-full mx-auto px-0">
       <div className="space-y-2 sm:space-y-3">
         {top_programs.map((major, index) => (
           <Card
@@ -32,6 +32,7 @@ export function MajorTable({ top_programs }) {
           >
             {/* Left side: Rank & Program Name */}
             <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 flex-1 min-w-0">
+              <span>{index + 1}</span>
               <span className="text-gray-800 font-bold text-sm sm:text-base lg:text-lg 
               w-4 sm:w-5 lg:w-6 text-center flex-shrink-0">
                 {major.rank}
@@ -46,7 +47,7 @@ export function MajorTable({ top_programs }) {
             <span className="text-gray-800 font-semibold text-right whitespace-nowrap 
             text-xs sm:text-sm lg:text-base ml-2 sm:ml-4 flex-shrink-0">
               <span className="hidden xs:inline">{major.count} pendaftar</span>
-              <span className="inline xs:hidden">{major.count}</span>
+              <span className="inline xs:hidden">{major.count} pendaftar</span>
             </span>
           </Card>
         ))}

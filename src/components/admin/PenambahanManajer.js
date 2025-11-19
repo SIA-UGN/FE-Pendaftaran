@@ -6,7 +6,7 @@ export default function InformasiPendaftaran() {
   return (
     <div className="flex flex-col items-center w-full px-3 sm:px-6 lg:px-8 mt-8 sm:mt-12 max-w-6xl">
       {/* Judul Halaman */}
-      <Heading title={"Pendaftaran Manajer Baru"} />
+      <Heading title={"Pendaftaran Manajer Baru"} variant="first"/>
 
       {/* Kartu Informasi */}
       <Card
