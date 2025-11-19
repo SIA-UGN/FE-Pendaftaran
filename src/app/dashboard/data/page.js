@@ -119,7 +119,7 @@ export default function Page() {
           {activeTab === "manajer" && (
             <div className="w-full animate-in fade-in duration-300">
               <div className="flex flex-col items-center w-full">
-                <Heading title={"Data Manajer"} />
+                <Heading title={"Data Manajer"} variant={"first"} />
 
                 <div className="w-full">
                   <ManajerList />
