@@ -22,40 +22,55 @@ import { useRouter } from "next/navigation";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useLogout } from "@/hooks/useAuth";
+import { useLogout, useAuth } from "@/hooks/useAuth";
 
-export function NavUser({ user }) {
+export function NavUser() {
   const logoutMutation = useLogout();
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-
   const { isMobile } = useSidebar();
+  const { data: user, isLoading, isError, error } = useAuth(); // ambil data user
   const [loading, setLoading] = useState(false);
 
   const handleLogout = () => {
-    logoutMutation.mutate();
-    setIsLoggedIn(false);
+    setLoading(true);
+    logoutMutation.mutate({
+      onSuccess: () => {
+        setLoading(false);
+      },
+      onError: () => {
+        setLoading(false);
+      },
+    });
   };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error: {error?.message}</div>;
 
   return (
     <SidebarMenu>
-      {/* Profil User */}
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="hover:bg-green-800 data-[state=open]:bg-green-800 data-[state=open]:text-white rounded-lg text-white" group
+              className="hover:bg-green-800 data-[state=open]:bg-green-800 data-[state=open]:text-white rounded-lg text-white"
+              group
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                {/* <AvatarImage src={user.avatar} alt={user.name} /> */}
-                <AvatarFallback className="rounded-lg text-black">
-                  {"U"}
-                </AvatarFallback>
+                {user?.avatar ? (
+                  <AvatarImage src={user.avatar} alt={user.name} />
+                ) : (
+                  <AvatarFallback className="rounded-lg text-black">
+                    {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                  </AvatarFallback>
+                )}
               </Avatar>
+
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium hover:text-white">{"Manager"}</span>
+                <span className="truncate font-medium text-white">
+                  {user?.name || "User"}
+                </span>
                 <span className="truncate text-xs text-gray-300">
-                  {"manager@sia.com"}
+                  {user?.email || "user@example.com"}
                 </span>
               </div>
             </SidebarMenuButton>
@@ -63,7 +78,6 @@ export function NavUser({ user }) {
         </DropdownMenu>
       </SidebarMenuItem>
 
-      {/* Tombol Logout di bawah profil */}
       <SidebarMenuItem className="mt-3">
         <Button
           onClick={handleLogout}
