@@ -15,6 +15,7 @@ export default function Page() {
 
   console.log(data.data.data);
   const chartData = data.data.data.donut_chart;
+  console.log(chartData)
   const summary = data.data.data.summary;
   const yearly_income = data.data.data.yearly_income;
   const comparison = data.data.data.comparison;
@@ -24,7 +25,7 @@ export default function Page() {
   return (
     <div className="flex flex-col items-center px-4 sm:px-8 max-w-6xl my-12 w-full gap-8 mx-auto">
       {/* Heading Keuangan */}
-      <Heading title={"Keuangan"} />
+      <Heading title={"Keuangan"} variant="first"/>
 
       {/* Pie Chart */}
       <div className="w-full flex justify-center">

@@ -37,7 +37,7 @@ const renderActiveShape = (props) => {
         x={cx}
         y={cy - 15}
         textAnchor="middle"
-        className="text-2xl font-bold"
+        className="text-xl sm:text-2xl font-bold"
         fill={fill}
       >
         {value}
@@ -46,7 +46,7 @@ const renderActiveShape = (props) => {
         x={cx}
         y={cy + 5}
         textAnchor="middle"
-        className="text-sm font-medium"
+        className="text-xs sm:text-sm font-medium"
         fill="#6b7280"
       >
         {payload.name}
@@ -84,7 +84,7 @@ const renderActiveShape = (props) => {
 };
 
 export function ChartPiePayment({ data }) {
-  const [activeIndex, setActiveIndex] = useState(1);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   console.log(data.verified);
   console.log(data.rejected);
@@ -100,22 +100,26 @@ export function ChartPiePayment({ data }) {
 
   return (
     <Card className="flex flex-col w-full shadow-md gap-0">
-      {data.approved === 0 && data.rejected === 0 && data.pending === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12 text-center text-gray-600">
-          <p className="text-lg font-medium">
+      {data.verified === 0 && data.rejected === 0 && data.pending === 0 ? (
+        <div className="flex flex-col items-center justify-center py-12 text-center text-gray-600 px-4">
+          <p className="text-base sm:text-lg font-medium">
             Belum ada data pendaftar terdata.
           </p>
         </div>
       ) : (
         <>
-          <CardHeader className="items-center pb-0">
-            <CardTitle>Statistik Penerimaan Mahasiswa</CardTitle>
-            <CardDescription>Januari – Juni 2024</CardDescription>
+          <CardHeader className="items-center pb-0 px-4 sm:px-6">
+            <CardTitle className="text-lg sm:text-xl lg:text-2xl text-center">
+              Statistik Penerimaan Mahasiswa
+            </CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
+              Januari – Juni 2024
+            </CardDescription>
           </CardHeader>
 
-          <CardContent className="flex flex-col items-center justify-center pt-6">
+          <CardContent className="flex flex-col items-center justify-center pt-4 sm:pt-6 px-4 sm:px-6">
             {/* Chart */}
-            <div className="w-full max-w-[600px] aspect-square">
+            <div className="w-full max-w-[280px] sm:max-w-[400px] lg:max-w-[600px] aspect-square">
               <ResponsiveContainer>
                 <PieChart>
                   <Pie
@@ -149,23 +153,29 @@ export function ChartPiePayment({ data }) {
             </div>
 
             {/* Legend */}
-            <div className="flex justify-center gap-4 mt-4">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 lg:gap-4 mt-4 sm:mt-6 max-w-full">
               {chartData.map((item) => (
                 <div key={item.name} className="flex items-center gap-2">
                   <span
-                    className="w-3 h-3 rounded-full"
+                    className="w-3 h-3 rounded-full flex-shrink-0"
                     style={{ backgroundColor: item.color }}
                   />
-                  <span className="text-sm text-gray-600">{item.name}</span>
+                  <span className="text-xs sm:text-sm text-gray-600">
+                    {item.name}
+                  </span>
                 </div>
               ))}
             </div>
 
             {/* Total */}
-            <div className="mt-6 inline-flex items-center gap-2 bg-gray-50 rounded-full px-6 py-2 border border-gray-200">
-              <span className="text-sm text-gray-600 font-medium">Total</span>
-              <span className="text-xl font-bold text-gray-800">{total}</span>
-              <span className="text-sm text-gray-500">orang</span>
+            <div className="mt-4 sm:mt-6 inline-flex items-center gap-2 bg-gray-50 rounded-full px-4 sm:px-6 py-2 border border-gray-200">
+              <span className="text-xs sm:text-sm text-gray-600 font-medium">
+                Total
+              </span>
+              <span className="text-lg sm:text-xl font-bold text-gray-800">
+                {total}
+              </span>
+              <span className="text-xs sm:text-sm text-gray-500">orang</span>
             </div>
           </CardContent>
         </>

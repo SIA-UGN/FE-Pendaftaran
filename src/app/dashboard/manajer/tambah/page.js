@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,17 +20,17 @@ import { useCreateManager } from "@/hooks/useAdmin";
 
 import { useRouter } from "next/navigation";
 
-import Link from "next/link";
-
-const FormSchema = z.object({
-  namaLengkap: z.string().min(3, "Nama lengkap minimal 3 karakter"),
-  username: z.string().min(3, "Username minimal 3 karakter"),
-  email: z.string().email("Format email tidak valid"),
-  noRegistrasi: z
-    .string()
-    .min(10, "Nomor registrasi minimal 10 digit")
-    .regex(/^0\d+$/, "Nomor harus diawali dengan 0 dan hanya angka"),
-});
+const FormSchema = z
+  .object({
+    name: z.string().min(3, "Nama lengkap minimal 3 karakter"),
+    email: z.string().email("Format email tidak valid"),
+    password: z.string().min(8, "Password minimal 8 karakter"),
+    passwordConfirmation: z.string().min(8, "Password minimal 8 karakter"),
+  })
+  .refine((data) => data.password === data.passwordConfirmation, {
+    message: "Password tidak cocok",
+    path: ["passwordConfirmation"],
+  });
 
 export default function TambahManajer() {
   const router = useRouter();
@@ -39,10 +38,10 @@ export default function TambahManajer() {
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      namaLengkap: "",
-      username: "",
+      name: "",
       email: "",
-      noRegistrasi: "",
+      password: "",
+      passwordConfirmation: "",
     },
   });
 
@@ -51,44 +50,47 @@ export default function TambahManajer() {
   const onSubmit = (data) => {
     // Map form fields to backend
     const payload = {
-      name: data.namaLengkap,
+      name: data.name,
       email: data.email,
-      username: data.username,
-      nomor_registrasi: data.noRegistrasi,
+      password: data.password,
+      password_confirmation: data.passwordConfirmation,
     };
 
     createManager(payload, {
       onSuccess: () => {
-        router.push({
-          pathname: "/dashboard/manajer/tambah/validasi",
-          query: { ...payload },
-        });
+        router.push("/dashboard/manajer");
       },
     });
   };
 
   return (
-    <div className="flex flex-col items-center justify-center ">
+    <div className="flex flex-col items-center justify-center">
       <PenambahanManajer />
 
-      <div className="flex flex-col items-center px-4 sm:px-8 max-w-6xl my-12 w-full">
-        <Heading title={"Data Manajer Baru"} />
+      <div className="flex flex-col items-center px-4 sm:px-6 lg:px-8 max-w-6xl my-6 sm:my-8 lg:my-12 w-full">
+        <Heading title="Data Manajer Baru" />
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6 w-full"
+            className="space-y-4 sm:space-y-6 w-full"
           >
-            <div className="flex flex-col gap-5 p-12 border rounded-xl bg-[var(--yellow)]">
+            <div className="flex flex-col gap-4 sm:gap-5 p-4 sm:p-8 lg:p-12 border rounded-lg sm:rounded-xl bg-[var(--yellow)]">
               <FormField
                 control={form.control}
-                name="namaLengkap"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nama Lengkap</FormLabel>
+                    <FormLabel className="text-sm sm:text-base">
+                      Nama Lengkap
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="Nama Lengkap" {...field} />
+                      <Input
+                        placeholder="Nama Lengkap"
+                        className="text-sm sm:text-base"
+                        {...field}
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-xs sm:text-sm" />
                   </FormItem>
                 )}
               />
@@ -98,64 +100,81 @@ export default function TambahManajer() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel className="text-sm sm:text-base">
+                      Email
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="email"
                         placeholder="email@example.com"
+                        className="text-sm sm:text-base"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-xs sm:text-sm" />
                   </FormItem>
                 )}
               />
 
               <FormField
                 control={form.control}
-                name="username"
+                name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Username</FormLabel>
+                    <FormLabel className="text-sm sm:text-base">
+                      Password
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="Username" {...field} />
+                      <Input
+                        type="password"
+                        placeholder="Minimal 8 karakter"
+                        className="text-sm sm:text-base"
+                        {...field}
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-xs sm:text-sm" />
                   </FormItem>
                 )}
               />
 
               <FormField
                 control={form.control}
-                name="noRegistrasi"
+                name="passwordConfirmation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nomor Registrasi</FormLabel>
+                    <FormLabel className="text-sm sm:text-base">
+                      Konfirmasi Password
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="Nomor Registrasi" {...field} />
+                      <Input
+                        type="password"
+                        placeholder="Ulangi password"
+                        className="text-sm sm:text-base"
+                        {...field}
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-xs sm:text-sm" />
                   </FormItem>
                 )}
               />
             </div>
 
-            <div className="w-full flex items-center justify-end gap-2">
+            <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3">
               <Button
                 type="button"
                 variant="yellow"
                 onClick={() => router.back()}
-                className={"w-48 rounded-2xl"}
+                className="w-full sm:w-40 lg:w-48 rounded-xl sm:rounded-2xl text-sm sm:text-base py-2 sm:py-3"
               >
                 Kembali
               </Button>
               <Button
                 type="submit"
-                variant={"green"}
-                className={"w-48 rounded-2xl"}
+                variant="green"
+                className="w-full sm:w-40 lg:w-48 rounded-xl sm:rounded-2xl text-sm sm:text-base py-2 sm:py-3"
                 disabled={isLoading}
               >
-                {isLoading ? "Menyimpan..." : "Lanjut"}
+                {isLoading ? "Menyimpan..." : "Tambah Manajer"}
               </Button>
             </div>
           </form>

@@ -20,7 +20,7 @@ export default function Page() {
 
   return (
     <div className="flex flex-col items-center px-4 sm:px-8 max-w-6xl my-12 w-full gap-3 mx-auto">
-      <Heading title={"Profil Pendaftar"} />
+      <Heading title={"Profil Pendaftar"} variant={"first"} />
       <ChartPieApplicant data={chartData} />
 
       <Heading title={"Rincian Data Terverifikasi"} />
