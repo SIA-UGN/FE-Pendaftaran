@@ -12,11 +12,13 @@ export default function ApplicantInformation({
   Lulus,
   TidakLulus,
   VerificationTable,
-  GraduationTable
+  GraduationTable,
+  type
 }) {
 
   console.log(VerificationTable.data);
   console.log(GraduationTable.data);
+  console.log(`type : ${type}`)
 
   return (
     <>
@@ -41,7 +43,7 @@ export default function ApplicantInformation({
           {VerificationTable.data.length === 0 ? (
             <p className="text-center text-gray-500 mt-6">Tidak ada data pendaftar untuk ditampilkan.</p> 
           ) : (     
-            <ApplicantList data={VerificationTable} />
+              <ApplicantList data={VerificationTable} type={type} />
           )
           
           }
@@ -69,7 +71,7 @@ export default function ApplicantInformation({
             VerificationTable.data.length === 0 ? (
               <p className="text-center text-gray-500 mt-6">Tidak ada data pendaftar untuk ditampilkan.</p> 
             ) : (     
-              <GraduationList data={VerificationTable} />
+                <GraduationList data={VerificationTable} type={type} />
             )
           }
         </div>

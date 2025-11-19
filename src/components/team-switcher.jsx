@@ -24,11 +24,11 @@ import Link from "next/link";
 
 export function TeamSwitcher({ teams }) {
   const { isMobile } = useSidebar();
-  const [activeTeam, setActiveTeam] = React.useState(teams[0]);
+  // const [activeTeam, setActiveTeam] = React.useState(teams[0]);
 
-  if (!activeTeam) {
-    return null;
-  }
+  // if (!activeTeam) {
+  //   return null;
+  // }
 
   return (
     <SidebarMenu>
@@ -50,7 +50,7 @@ export function TeamSwitcher({ teams }) {
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight text-wrap">
                 <span className="truncate font-semibold text-[var(--yellow)] text-wrap text-md">
-                  {activeTeam.name}
+                  Universitas Global Nusantara
                 </span>
                 {/* <span className="truncate text-xs">{activeTeam.plan}</span> */}
               </div>
@@ -66,7 +66,7 @@ export function TeamSwitcher({ teams }) {
             <DropdownMenuLabel className="text-muted-foreground text-xs">
               Teams
             </DropdownMenuLabel>
-            {teams.map((team, index) => (
+            {/* {teams.map((team, index) => (
               <DropdownMenuItem
                 key={team.name}
                 onClick={() => setActiveTeam(team)}
@@ -84,7 +84,7 @@ export function TeamSwitcher({ teams }) {
                 {team.name}
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>
-            ))}
+            ))} */}
             <DropdownMenuSeparator />
             <DropdownMenuItem className="gap-2 p-2">
               <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">

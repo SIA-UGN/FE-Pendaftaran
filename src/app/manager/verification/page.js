@@ -1,5 +1,7 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+
 import Image from "next/image";
 
 import { Card } from "@/components/ui/card";
@@ -14,9 +16,72 @@ import {
   InputGroupAddon,
   InputGroupButton,
 } from "@/components/ui/input-group";
+import { useApplicantDetail, useSetGraduationStatus } from "@/hooks/useManager";
+
+import { useVerifyApplicant } from "@/hooks/useManager";
 
 export default function Profile() {
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  const user_id = searchParams.get("user_id");
+
+  console.log(id);
+
   const [statusVerification, setStatusVerification] = useState("Pending");
+
+  const { mutate: setRegistrationStatus, isLoading: isRegistrationLoading } =
+    useVerifyApplicant();
+
+  const handleRegistration = async (statusType, note) => {
+    const payload = {
+      id: Number(id),
+      data: {
+        status: statusType,
+        ...(statusType === "rejected" && { notes: note }),
+      },
+    };
+
+    console.log("Sending:", payload);
+
+    await setRegistrationStatus(payload);
+  };
+
+  const {
+    data: applicantData,
+    isLoading: isApplicantLoading,
+    isError: isApplicantError,
+    error: applicantError,
+  } = useApplicantDetail(id);
+
+  const { mutate: setGraduationStatus, isLoading: isGraduationLoading } =
+    useSetGraduationStatus();
+
+  if (isApplicantLoading) return <div>Loading applicant...</div>;
+  if (isApplicantError)
+    return <div>Error loading applicant: {applicantError.message}</div>;
+
+  console.log(applicantData);
+
+  const applicant = applicantData?.data?.data;
+
+  if (!applicant) {
+    return <div>Applicant not found</div>;
+  }
+
+  const handleGraduation = (statusType) => {
+    console.log(statusType);
+    console.log(applicant.user.status);
+    setGraduationStatus({
+      id: Number(id),
+      data: {
+        graduation_status: statusType,
+      },
+    });
+    console.log("Sending:", {
+      id: Number(id),
+      data: { graduation_status: statusType },
+    });
+  };
 
   return (
     <div className="flex flex-col items-center px-4 sm:px-8 max-w-11/12 my-12 w-full gap-3 mx-auto">
@@ -34,15 +99,22 @@ export default function Profile() {
           className="w-full sm:w-1/4 h-[300px] rounded-xl object-cover"
         />
         <div className="flex flex-col p-2 w-full sm:w-2/3 space-y-1 items-start">
-          <h2 className="font-bold text-xl">Faradis Yulianto</h2>
-          <h3 className="text-gray-500">@faradisy20</h3>
-          <p className="text-gray-500">faradisy20@gmail.com</p>
-          <p className="text-gray-500 text-sm">Last online 7 days ago</p>
+          <h2 className="font-bold text-xl">{applicant.user.name}</h2>
+          <h3 className="text-gray-500">
+            {applicant.user.registration_number}
+          </h3>
+          <p className="text-gray-500">{applicant.user.email}</p>
+          <p className="text-gray-500 text-sm">
+            {applicant.verification_status} | {applicant.graduation_status}
+          </p>
         </div>
       </Card>
 
       {/* Status Verifikasi Pendaftar */}
-      {statusVerification === "Pending" && (
+      {(applicant.verification_status === "pending" ||
+        applicant.verification_status === "revision_needed" ||
+        applicant.verification_status === "under_review" ||
+        applicant.verification_status === "submitted") && (
         <>
           <h2 className="text-3xl sm:text-2xl font-semibold mb-2 mt-6 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
             Status Verifikasi Pendaftar
@@ -53,7 +125,7 @@ export default function Profile() {
             </Button>
           </div>
           <div className="w-full flex justify-end">
-            <Link href="/manager/verification/data-diri">
+            <Link href={`/manager/verification/data-diri?id=${id}`}>
               <Button variant={"green"} className={"w-sm"}>
                 Verifikasi Data
               </Button>
@@ -69,7 +141,7 @@ export default function Profile() {
         </>
       )}
 
-      {statusVerification === "Rejected" && (
+      {applicant.verification_status === "rejected" && (
         <>
           <h2 className="text-3xl sm:text-2xl font-semibold mb-2 mt-6 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
             Status Verifikasi Pendaftar
@@ -79,13 +151,6 @@ export default function Profile() {
               Rejected
             </Button>
           </div>
-          <div className="w-full flex justify-end">
-            <Link href="/manager/verification/data-diri">
-              <Button variant={"green"} className={"w-sm"}>
-                Verifikasi Data
-              </Button>
-            </Link>
-          </div>
           <h2 className="text-3xl sm:text-2xl font-semibold mb-2 mt-6 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
             Status Kelulusan Pendaftar
           </h2>
@@ -94,29 +159,10 @@ export default function Profile() {
             kelulusan. Silahkan verifikasi ulang data pendaftar yang sudah
             diperbaiki.
           </p>
-          <div className="w-full flex flex-col gap-2 items-center justify-center">
-            <div className="grid w-10/12 sm:w-full gap-6">
-              <InputGroup>
-                <TextareaAutosize
-                  data-slot="input-group-control"
-                  className="flex field-sizing-content min-h-32 w-full resize-none rounded-md bg-transparent px-3 py-2.5 text-base transition-[color,box-shadow] outline-none md:text-sm"
-                  placeholder="Autoresize textarea..."
-                />
-                <InputGroupAddon align="block-end"></InputGroupAddon>
-              </InputGroup>
-            </div>
-          </div>
-          <div className="w-full flex justify-end">
-            <Link href="/manager/verification/data-diri">
-              <Button variant={"green"} className={"w-sm"}>
-                Verifikasi Data
-              </Button>
-            </Link>
-          </div>
         </>
       )}
 
-      {statusVerification === "Accepted" && (
+      {applicant.verification_status === "approved" && (
         <>
           <h2 className="text-3xl sm:text-2xl font-semibold mb-2 mt-6 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
             Status Verifikasi Pendaftar
@@ -131,13 +177,25 @@ export default function Profile() {
           </h2>
           <p>Silahkan tentukan apakah pendaftar lulus atau tidak</p>
           <div className="w-lg flex flex-col gap-2">
-            <Button variant={"green"} className={"w-full "}>
-              Lihat Data
-            </Button>
-            <Button variant={"green"} className={"w-full "}>
+            <Link href={`/manager/verification/data-diri?id=${id}`}>
+              <Button variant={"green"} className={"w-full "}>
+                Lihat Data
+              </Button>
+            </Link>
+            <Button
+              variant={"green"}
+              className={"w-full "}
+              onClick={() => handleGraduation("graduated")}
+              disabled={isGraduationLoading}
+            >
               Lulus
             </Button>
-            <Button variant={"green"} className={"w-full "}>
+            <Button
+              variant={"green"}
+              className={"w-full "}
+              onClick={() => handleGraduation("not_graduated")}
+              disabled={isGraduationLoading}
+            >
               Tidak Lulus
             </Button>
           </div>

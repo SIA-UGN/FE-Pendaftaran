@@ -5,7 +5,7 @@ import Link from "next/link"
 export default function NotificationManager() {
   return (
     <>
-      <div className="flex flex-col items-center px-4 sm:px-8 max-w-11/12 my-12 w-full gap-3">
+      <div className="flex flex-col items-center px-4 sm:px-8 max-w-6xl my-12 w-full gap-3 mx-auto">
         <Heading title={"Notification Manager"} />
         <div className="grid grid-cols-2 gap-6">
           <Button
@@ -15,7 +15,7 @@ export default function NotificationManager() {
             Lihat Notifikasi
           </Button>
           <Link href="/manager/broadcast">
-            <Button variant={"green"} className={"rounded-lg text-lg h-12"}>
+            <Button variant={"green"} className={"rounded-lg text-lg h-12 w-full"}>
               Buat Notifikasi
             </Button>
           </Link>

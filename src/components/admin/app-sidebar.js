@@ -28,18 +28,6 @@ import { Wallet } from "lucide-react";
 
 // This is sample data.
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "Universitas Global Nusantara",
-      logo: "/logo.jpg",
-      plan: "Enterprise",
-    },
-  ],
   navMain: [
     {
       title: "Dashboard",
@@ -99,7 +87,7 @@ export function AppSidebar({ ...props }) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher/>
       </SidebarHeader>
       <DropdownMenuSeparator className={"bg-[var(--yellow)]"}/>
       <SidebarContent>

@@ -1,5 +1,7 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+
 import { Info, AlertCircle, XCircle, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -44,6 +46,11 @@ import {
   InputGroupButton,
 } from "@/components/ui/input-group";
 import { useState } from "react";
+import {
+  usePaymentVerification,
+  useVerifyApplicant,
+  useVerifyPayment,
+} from "@/hooks/useManager";
 
 const FormSchema = z.object({
   rekening: z.string({
@@ -62,19 +69,78 @@ const FormSchema = z.object({
     ),
 });
 
+import { useRouter } from "next/navigation";
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
 export default function Pembayaran() {
-  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const router = useRouter();
+
+  const { mutate: setPaymentStatus, isLoading: isPaymentLoading } =
+    useVerifyPayment();
+
+  const { mutate: setRegistrationStatus, isLoading: isRegistrationLoading } =
+    useVerifyApplicant();
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  const user_id = searchParams.get("user_id");
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
   });
 
-  function onSubmit(data) {
-    console.log(data);
-    alert(
-      "You submitted the following values:\n" + JSON.stringify(data, null, 2)
-    );
-  }
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [showPaymentRejectDialog, setShowPaymentRejectDialog] = useState(false);
+  const [showRegistrationDialog, setShowRegistrationDialog] = useState(false);
+  const [showRegistrationActionDialog, setShowRegistrationActionDialog] =
+    useState(false);
+  const [showRevisionDialog, setShowRevisionDialog] = useState(false);
+  const [paymentRejectionNote, setPaymentRejectionNote] = useState("");
+
+  console.log(id);
+  const { data, isLoading, isError, error } = usePaymentVerification(id);
+
+  if (isLoading) return <div>Loading payment...</div>;
+  if (isError) return <div>Error loading payment: {error.message}</div>;
+
+  console.log(data);
+
+  const paymentData = data.data.data;
+
+  console.log(paymentData);
+
+  const handleRegistration = async (statusType, note = "") => {
+    const payload = {
+      id: Number(id),
+      data: {
+        status: statusType,
+        ...(note && { notes: note }),
+      },
+    };
+
+    console.log("Sending Registration:", payload);
+
+    await setRegistrationStatus(payload);
+  };
+
+  const handlePayment = async (statusType, note = "") => {
+    const payload = {
+      id: Number(id),
+      data: {
+        status: statusType,
+        ...(note && { verification_notes: note }),
+      },
+    };
+
+    console.log("Sending Payment:", payload);
+
+    await setPaymentStatus(payload);
+  };
 
   return (
     <>
@@ -90,10 +156,10 @@ export default function Pembayaran() {
           Ringkasan Pembayaran
         </h1>
         <div className="ms-6 gap-4">
-          <p>Nama Pengguna</p>
-          <p>Nomor Pengguna</p>
-          <p>Rp 300.000</p>
-          <p>Metode Pembayaran</p>
+          <p>{paymentData.user_info.name}</p>
+          <p>{paymentData.user_info.registration_number}</p>
+          <p>{paymentData.payment_summary.amount}</p>
+          <p>{paymentData.payment_summary.payment_method}</p>
         </div>
       </Card>
 
@@ -102,7 +168,7 @@ export default function Pembayaran() {
       </h2>
       <div className="mx-12 items-center flex justify-center">
         <Button variant={"green"} className={"w-full"}>
-          <a href="/uploads/kk.pdf" download>
+          <a href={`/${paymentData.payment_proof.download_url}`} download>
             Unduh Bukti Pembayaran
           </a>
         </Button>
@@ -112,72 +178,267 @@ export default function Pembayaran() {
         Validation Notes
       </h2>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="space-y-6">
           <div className="flex flex-col gap-5 p-12 border rounded-xl m-12 bg-[var(--light-cream)]">
-            Payment Verified Amount Matches
+            {paymentData.validation_notes}
           </div>
           <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
             <Link href="/manager/verification">
               <Button variant={"green"}>Kembali</Button>
             </Link>
-            <AlertDialog>
+
+            {/* Dialog 1: Verifikasi Pembayaran */}
+            <AlertDialog
+              open={showPaymentDialog}
+              onOpenChange={setShowPaymentDialog}
+            >
               <AlertDialogTrigger asChild>
                 <Button variant="matcha">Lanjut</Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Verifikasi Identitas Pendaftar
-                  </AlertDialogTitle>
+                  <AlertDialogTitle>Verifikasi Pembayaran</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Apakah data yang dimasukkan sudah benar atau lengkap?
+                    Apakah bukti pembayaran sudah sesuai dan valid?
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel onClick={() => setShowCancelDialog(true)}>
+                  <AlertDialogCancel
+                    onClick={() => {
+                      setShowPaymentDialog(false);
+                      setShowPaymentRejectDialog(true);
+                    }}
+                    disabled={isPaymentLoading}
+                  >
                     Tidak
                   </AlertDialogCancel>
-                  <Link href="/manager/verification">
-                    <AlertDialogAction>Ya</AlertDialogAction>
-                  </Link>
+                  <AlertDialogAction
+                    disabled={isPaymentLoading}
+                    onClick={async () => {
+                      await handlePayment(
+                        "verified",
+                        "Pembayaran Anda telah terverifikasi!"
+                      );
+                      setShowPaymentDialog(false);
+                      setShowRegistrationDialog(true);
+                    }}
+                  >
+                    Ya, Sesuai
+                  </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
 
+            {/* Dialog 2: Input Pesan Penolakan Pembayaran */}
             <AlertDialog
-              open={showCancelDialog}
-              onOpenChange={setShowCancelDialog}
+              open={showPaymentRejectDialog}
+              onOpenChange={setShowPaymentRejectDialog}
             >
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Catatan Perubahan</AlertDialogTitle>
+                  <AlertDialogTitle>
+                    Alasan Penolakan Pembayaran
+                  </AlertDialogTitle>
                   <AlertDialogDescription>
-                    Tuliskan catatan untuk pendaftar untuk perbaikan data
+                    Masukkan alasan mengapa pembayaran tidak sesuai
                   </AlertDialogDescription>
-                  <div className="grid w-10/12 sm:w-full gap-6">
-                    <InputGroup>
-                      <TextareaAutosize
-                        data-slot="input-group-control"
-                        className="flex field-sizing-content min-h-32 w-full resize-none rounded-md bg-transparent px-3 py-2.5 text-base transition-[color,box-shadow] outline-none md:text-sm"
-                        placeholder="Autoresize textarea..."
-                      />
-                      <InputGroupAddon align="block-end"></InputGroupAddon>
-                    </InputGroup>
-                  </div>
+                </AlertDialogHeader>
+                <div className="my-4">
+                  <TextareaAutosize
+                    className="w-full min-h-24 p-3 border rounded-md resize-none"
+                    placeholder="Contoh: Nominal pembayaran tidak sesuai, bukti pembayaran tidak jelas, dll..."
+                    value={paymentRejectionNote}
+                    onChange={(e) => setPaymentRejectionNote(e.target.value)}
+                  />
+                </div>
+                <AlertDialogFooter>
+                  <AlertDialogCancel
+                    onClick={() => {
+                      setPaymentRejectionNote("");
+                      setShowPaymentRejectDialog(false);
+                    }}
+                  >
+                    Batal
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    disabled={isPaymentLoading || !paymentRejectionNote.trim()}
+                    onClick={async () => {
+                      await handlePayment("rejected", paymentRejectionNote);
+                      setShowPaymentRejectDialog(false);
+                      setShowRegistrationDialog(true);
+                    }}
+                  >
+                    Lanjut ke Verifikasi Pendaftaran
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Dialog 3: Verifikasi Pendaftaran */}
+            <AlertDialog
+              open={showRegistrationDialog}
+              onOpenChange={setShowRegistrationDialog}
+            >
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Verifikasi Data Pendaftaran
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Apakah data pendaftaran yang dimasukkan sudah benar dan
+                    lengkap?
+                  </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <Link href="/manager/verification">
-                    <AlertDialogAction
-                      onClick={() => setShowCancelDialog(false)}
-                    >
-                      Simpan
-                    </AlertDialogAction>
-                  </Link>
+                  <AlertDialogCancel
+                    onClick={() => {
+                      setShowRegistrationDialog(false);
+                      setShowRegistrationActionDialog(true);
+                    }}
+                    disabled={isRegistrationLoading}
+                  >
+                    Tidak Sesuai
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    disabled={isRegistrationLoading}
+                    onClick={async () => {
+                      await handleRegistration(
+                        "approved",
+                        "Selamat! Pendaftaran Anda telah disetujui."
+                      );
+                      setShowRegistrationDialog(false);
+                      router.push(`/manager/verification?id=${id}`);
+                    }}
+                  >
+                    Ya, Sesuai
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Dialog 3.5: Pilih Tolak atau Revisi */}
+            <AlertDialog
+              open={showRegistrationActionDialog}
+              onOpenChange={setShowRegistrationActionDialog}
+            >
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Pilih Tindakan</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Apakah Anda ingin menolak pendaftaran atau meminta revisi
+                    data?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel
+                    onClick={async () => {
+                      await handleRegistration(
+                        "rejected",
+                        "Mohon maaf, pendaftaran Anda ditolak."
+                      );
+                      setShowRegistrationActionDialog(false);
+                      router.push(`/manager/verification?id=${id}`);
+                    }}
+                    disabled={isRegistrationLoading}
+                  >
+                    Tolak Pendaftaran
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => {
+                      setShowRegistrationActionDialog(false);
+                      setShowRevisionDialog(true);
+                    }}
+                    disabled={isRegistrationLoading}
+                  >
+                    Minta Revisi
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Dialog 4: Catatan Revisi Pendaftaran */}
+            <AlertDialog
+              open={showRevisionDialog}
+              onOpenChange={setShowRevisionDialog}
+            >
+              <AlertDialogContent className="max-h-[85vh] overflow-y-auto w-[95vw] sm:w-full">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Catatan Revisi Pendaftaran
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Tambahkan catatan revisi untuk setiap bagian data pendaftar
+                    yang perlu diperbaiki.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+
+                <div className="w-full mt-4">
+                  <Accordion type="multiple" className="w-full">
+                    {[
+                      { key: "identity", label: "Catatan Identitas Pendaftar" },
+                      { key: "address", label: "Catatan Alamat Pendaftar" },
+                      { key: "parents", label: "Catatan Data Orang Tua" },
+                      { key: "academic", label: "Catatan Data Akademik" },
+                      { key: "achievement", label: "Catatan Prestasi" },
+                      { key: "payment", label: "Catatan Pembayaran" },
+                    ].map((item) => (
+                      <AccordionItem key={item.key} value={item.key}>
+                        <AccordionTrigger>{item.label}</AccordionTrigger>
+                        <AccordionContent>
+                          <TextareaAutosize
+                            id={`notes-${item.key}`}
+                            className="w-full min-h-24 mt-2 p-3 border rounded-md resize-none"
+                            placeholder={`Tulis ${item.label.toLowerCase()}...`}
+                          />
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </div>
+
+                <AlertDialogFooter>
+                  <AlertDialogCancel
+                    onClick={() => setShowRevisionDialog(false)}
+                  >
+                    Batal
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    disabled={isRegistrationLoading}
+                    onClick={async () => {
+                      const sections = [
+                        "identity",
+                        "address",
+                        "parents",
+                        "academic",
+                        "achievement",
+                        "payment",
+                      ];
+
+                      const notes = sections
+                        .map((key) => {
+                          const value = document.querySelector(
+                            `#notes-${key}`
+                          )?.value;
+                          return value ? `• ${value}` : null;
+                        })
+                        .filter(Boolean)
+                        .join("\n");
+
+                      console.log("Notes collected:", notes);
+
+                      await handleRegistration("revision_needed", notes);
+
+                      setShowRevisionDialog(false);
+                      router.push(`/manager/verification?id=${id}`);
+                    }}
+                  >
+                    Simpan dan Kirim Revisi
+                  </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
           </div>
-        </form>
+        </div>
       </Form>
     </>
   );

@@ -22,7 +22,7 @@ import { UserRound } from "lucide-react";
 import { GraduationCap } from "lucide-react";
 import { Banknote } from "lucide-react";
 
-export function NavMain({ items }) {
+export function NavMain({ items, type }) {
   return (
     <SidebarGroup>
       <SidebarMenu>
@@ -64,17 +64,17 @@ export function NavMain({ items }) {
                       {[
                         {
                           title: "Statistika Pendaftar",
-                          url: "/dashboard/statistik/pendaftar",
+                          url: type === "manager" ? "/manager/statistik/pendaftar" : "/dashboard/statistik/pendaftar",
                           icon: UserRound,
                         },
                         {
                           title: "Statistika Prodi",
-                          url: "/dashboard/statistik/program-studi",
+                          url: type === "manager" ? "/manager/statistik/program-studi" : "/dashboard/statistik/program-studi",
                           icon: GraduationCap,
                         },
                         {
                           title: "Statistika Keuangan",
-                          url: "/dashboard/statistik/keuangan",
+                          url: type === "manager" ? "/manager/statistik/keuangan" : "/dashboard/statistik/keuangan",
                           icon: Banknote,
                         },
                       ].map((sub) => (

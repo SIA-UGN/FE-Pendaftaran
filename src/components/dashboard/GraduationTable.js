@@ -12,34 +12,7 @@ import {
 
 import Link from "next/link";
 
-const applicants = [
-  {
-    id: 1,
-    number: "1700325147831124",
-    name: "Fahmi Rahman",
-    status: "Approved",
-  },
-  {
-    id: 2,
-    number: "1700325147831124",
-    name: "Faradis Nurul",
-    status: "Pending",
-  },
-  {
-    id: 3,
-    number: "1700325147831124",
-    name: "Khay Pratama",
-    status: "Rejected",
-  },
-  {
-    id: 4,
-    number: "1700325147831124",
-    name: "Riris Anjani",
-    status: "Approved",
-  },
-];
-
-export function GraduationTable({ data }) {
+export function GraduationTable({ data, type }) {
   // const data = Data.data;
   // const pagination = data.pagination;
 
@@ -54,14 +27,14 @@ export function GraduationTable({ data }) {
           <TableHead className="w-[150px] text-center">Nomor Peserta</TableHead>
           <TableHead>Nama Peserta</TableHead>
           <TableHead className="text-center">Status</TableHead>
-          <TableHead className="text-center">Lihat</TableHead>
+          <TableHead className="text-center">{type == "manager" ? ("Verifikasi") : ("Lihat")}</TableHead>
         </TableRow>
       </TableHeader>
 
       <TableBody>
         {data.map((applicant) => (
           <TableRow key={applicant.id}>
-            <TableCell className="text-center font-medium">{applicant.id}</TableCell>
+            <TableCell className="text-center font-medium">{applicant.user_id}</TableCell>
             <TableCell className="text-center">{applicant.registration_number}</TableCell>
             <TableCell>{applicant.user.name}</TableCell>
             <TableCell className="text-center">
@@ -78,12 +51,12 @@ export function GraduationTable({ data }) {
               </span>
             </TableCell>
             <TableCell className="text-center">
-              <Link href={`/dashboard/profile?id=${applicant.id}`}>
+              <Link href={type == "manager" ? (`/manager/verification?id=${applicant.id}`) : (`/dashboard/verification?id=${applicant.id}`)}>
               <Button
                 variant="yellow"
                 className="text-sm font-medium text-[var(--green)] hover:bg-[var(--green)] hover:text-white transition-all rounded-md"
               >
-                Lihat
+                {type == "manager" ? ("Verifikasi") : ("Lihat")}
                 </Button>
               </Link>
             </TableCell>

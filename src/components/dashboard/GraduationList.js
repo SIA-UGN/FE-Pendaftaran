@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { SearchIcon, ChevronDown } from "lucide-react";
 import { GraduationTable } from "@/components/dashboard/GraduationTable";
 
-export default function GraduationList({ data }) {
+export default function GraduationList({ data, type }) {
   console.log(data)
   const applicants = data.data;
 
@@ -47,7 +47,7 @@ export default function GraduationList({ data }) {
 
       {/* Tabel Pendaftar */}
       <div className="w-full overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-        <GraduationTable data={applicants} />
+        <GraduationTable data={applicants} type={type} />
       </div>
     </>
   );

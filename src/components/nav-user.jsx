@@ -44,18 +44,18 @@ export function NavUser({ user }) {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="hover:bg-green-800 data-[state=open]:bg-green-800 data-[state=open]:text-white rounded-lg"
+              className="hover:bg-green-800 data-[state=open]:bg-green-800 data-[state=open]:text-white rounded-lg text-white" group
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">
-                  {user.name?.charAt(0).toUpperCase() || "U"}
+                {/* <AvatarImage src={user.avatar} alt={user.name} /> */}
+                <AvatarFallback className="rounded-lg text-black">
+                  {"U"}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name || "Manager"}</span>
+                <span className="truncate font-medium hover:text-white">{"Manager"}</span>
                 <span className="truncate text-xs text-gray-300">
-                  {user.email || "manager@sia.com"}
+                  {"manager@sia.com"}
                 </span>
               </div>
             </SidebarMenuButton>

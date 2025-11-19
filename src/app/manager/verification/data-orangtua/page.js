@@ -1,5 +1,7 @@
 "use client"; // <-- Diperlukan untuk form interaktif
 
+import { useSearchParams } from "next/navigation";
+
 import { Info, AlertCircle, XCircle, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,6 +48,8 @@ import {
   InputGroupButton,
 } from "@/components/ui/input-group";
 
+import { useApplicantDetail } from "@/hooks/useManager";
+
 const FormSchema = z.object({
   namaAyah: z.string().min(2, { message: "Nama Ayah harus diisi." }),
   alamatAyah: z.string().min(5, { message: "Alamat Ayah harus diisi." }),
@@ -78,6 +82,10 @@ const FormSchema = z.object({
 export default function DataOrangtua() {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
 
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  const user_id = searchParams.get("user_id");
+
   const [activeForm, setActiveForm] = useState("orangTua");
 
   const form = useForm({
@@ -96,23 +104,36 @@ export default function DataOrangtua() {
     },
   });
 
-  function onSubmit(data) {
-    console.log(data);
-    alert(
-      "You submitted the following values:\n" + JSON.stringify(data, null, 2)
-    );
-  }
+  const {
+    data: applicantData,
+    isLoading: isApplicantLoading,
+    isError: isApplicantError,
+    error: applicantError,
+  } = useApplicantDetail(id);
+
+  if (isApplicantLoading) return <div>Loading applicant...</div>;
+  if (isApplicantError)
+    return <div>Error loading applicant: {applicantError.message}</div>;
+
+  const applicant = applicantData?.data?.data;
+
+  const father = applicant.steps.father;
+  const mother = applicant.steps.mother;
+
+  console.log(id);
 
   return (
     <>
       <div className="mx-12 mt-6 grid grid-cols-1 gap-12">
         <Card className="w-full flex flex-col md:flex-row gap-6 p-8 rounded-2xl shadow-md bg-[var(--light-cream)] justify-between">
           <div className="flex flex-col p-2 w-full sm:w-2/3 space-y-1 items-start">
-            <h2 className="font-bold text-xl">Faradis Yulianto</h2>
-            <h3 className="text-gray-500">@faradisy20</h3>
-            <p className="text-gray-500">faradisy20@gmail.com</p>
+            <h2 className="font-bold text-xl">{applicant.user.name}</h2>
+            <h3 className="text-gray-500">
+              {applicant.user.registration_number}
+            </h3>
+            <p className="text-gray-500">{applicant.user.email}</p>
           </div>
-          <Button variant={"yellow"}>Pending</Button>
+          <Button variant={"yellow"}>{applicant.user.status}</Button>
         </Card>
 
         <div className="flex justify-between">
@@ -133,7 +154,7 @@ export default function DataOrangtua() {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form className="space-y-8">
           <div className="flex flex-col gap-5 p-12 border rounded-xl m-12 bg-[var(--light-cream)]">
             {activeForm === "orangTua" && (
               <>
@@ -147,7 +168,7 @@ export default function DataOrangtua() {
                         <FormLabel>Nama Ayah Kandung</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Nama lengkap Ayah"
+                            placeholder={father.name}
                             {...field}
                             readOnly
                           />
@@ -164,7 +185,7 @@ export default function DataOrangtua() {
                         <FormLabel>Alamat Ayah Kandung</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Alamat lengkap Ayah"
+                            placeholder={father.address}
                             {...field}
                             readOnly
                           />
@@ -183,7 +204,7 @@ export default function DataOrangtua() {
                           <FormControl>
                             <Input
                               type="tel"
-                              placeholder="08..."
+                              placeholder={father.phone}
                               {...field}
                               readOnly
                             />
@@ -200,7 +221,7 @@ export default function DataOrangtua() {
                           <FormLabel>Pekerjaan Ayah</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Pekerjaan"
+                              placeholder={father.occupation}
                               {...field}
                               readOnly
                             />
@@ -216,11 +237,7 @@ export default function DataOrangtua() {
                         <FormItem>
                           <FormLabel>Pendidikan Terakhir Ayah</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="SMA/S1/..."
-                              {...field}
-                              readOnly
-                            />
+                            <Input placeholder={father.education} readOnly />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -234,7 +251,7 @@ export default function DataOrangtua() {
                           <FormLabel>Penghasilan Ayah</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="<5.000.000"
+                              placeholder={father.income}
                               {...field}
                               readOnly
                             />
@@ -256,7 +273,7 @@ export default function DataOrangtua() {
                         <FormLabel>Nama Ibu Kandung</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Nama lengkap Ibu"
+                            placeholder={mother.name}
                             {...field}
                             readOnly
                           />
@@ -273,7 +290,7 @@ export default function DataOrangtua() {
                         <FormLabel>Alamat Ibu Kandung</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Alamat lengkap Ibu"
+                            placeholder={mother.address}
                             {...field}
                             readOnly
                           />
@@ -292,7 +309,7 @@ export default function DataOrangtua() {
                           <FormControl>
                             <Input
                               type="tel"
-                              placeholder="08..."
+                              placeholder={mother.phone}
                               {...field}
                               readOnly
                             />
@@ -309,7 +326,7 @@ export default function DataOrangtua() {
                           <FormLabel>Pekerjaan Ibu</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Pekerjaan"
+                              placeholder={mother.occupation}
                               {...field}
                               readOnly
                             />
@@ -326,7 +343,7 @@ export default function DataOrangtua() {
                           <FormLabel>Pendidikan Terakhir Ibu</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="SMA/S1/..."
+                              placeholder={mother.education}
                               {...field}
                               readOnly
                             />
@@ -343,7 +360,7 @@ export default function DataOrangtua() {
                           <FormLabel>Penghasilan Ibu</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="<5.000.000"
+                              placeholder={mother.income}
                               {...field}
                               readOnly
                             />
@@ -454,62 +471,9 @@ export default function DataOrangtua() {
           </div>
           <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
             <Button variant={"green"}>Kembali</Button>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="matcha">Lanjut</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Verifikasi Identitas Pendaftar
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Apakah data yang dimasukkan sudah benar atau lengkap?
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel onClick={() => setShowCancelDialog(true)}>
-                    Tidak
-                  </AlertDialogCancel>
-                  <Link href="/manager/verification/data-akademik">
-                    <AlertDialogAction>Ya</AlertDialogAction>
-                  </Link>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-
-            <AlertDialog
-              open={showCancelDialog}
-              onOpenChange={setShowCancelDialog}
-            >
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Catatan Perubahan</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Tuliskan catatan untuk pendaftar untuk perbaikan data
-                  </AlertDialogDescription>
-                  <div className="grid w-10/12 sm:w-full gap-6">
-                    <InputGroup>
-                      <TextareaAutosize
-                        data-slot="input-group-control"
-                        className="flex field-sizing-content min-h-32 w-full resize-none rounded-md bg-transparent px-3 py-2.5 text-base transition-[color,box-shadow] outline-none md:text-sm"
-                        placeholder="Autoresize textarea..."
-                      />
-                      <InputGroupAddon align="block-end"></InputGroupAddon>
-                    </InputGroup>
-                  </div>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <Link href="/manager/verification/data-akademik">
-                    <AlertDialogAction
-                      onClick={() => setShowCancelDialog(false)}
-                    >
-                      Simpan
-                    </AlertDialogAction>
-                  </Link>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <Link href={`/manager/verification/data-akademik?id=${id}`}>
+              <Button variant="matcha">Lanjut</Button>
+            </Link>
           </div>
         </form>
       </Form>

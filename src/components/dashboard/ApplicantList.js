@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { SearchIcon, ChevronDown } from "lucide-react";
 import { ApplicantTable } from "@/components/dashboard/ApplicantTable";
 
-export default function ApplicantList({ data }) {
+export default function ApplicantList({ data, type }) {
   console.log(data)
   const applicants = data.data;
   console.log(applicants);
@@ -48,7 +48,7 @@ export default function ApplicantList({ data }) {
 
       {/* Tabel Pendaftar */}
       <div className="w-full overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-        <ApplicantTable data={applicants} />
+        <ApplicantTable data={applicants} type={type} />
       </div>
     </>
   );

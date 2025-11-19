@@ -42,18 +42,12 @@ const data = {
       icon: Users,
     },
     {
-      title: "Statistik",
-      url: "/manager/statistik",
-      icon: BarChart3,
-    },
-    {
-      title: "Keuangan",
-      url: "/manager/keuangan",
-      icon: Wallet,
+      title: "Broadcast",
+      url: "/manager/broadcast",
+      icon: Users,
     },
   ],
 };
-
 
 export function ManagerSidebar({ ...props }) {
   return (
@@ -63,7 +57,7 @@ export function ManagerSidebar({ ...props }) {
       </SidebarHeader>
       <DropdownMenuSeparator />
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={data.navMain} type={"manager"} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
