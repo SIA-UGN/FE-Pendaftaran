@@ -2,6 +2,7 @@ import HomeCarousel from "@/components/landing-page/HomeCarousel";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Heading } from "@/components/Heading";
 
 const data = [
   {
@@ -77,32 +78,56 @@ export default function Fakultas() {
     <>
       <div>
         <HomeCarousel />
-        <div className="flex flex-col items-center py-16 pb-16 px-4 sm:px-8 max-w-10/12 mx-auto">
-          <h2 className="text-4xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
-            Fakultas & Program Studi Universitas Global Nusantara
-          </h2>
-          {data.map((data, index) => (
-            <>
-              <h2 className="text-3xl sm:text-2xl font-semibold mb-2 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)] mt-6">
-                {data.fakultas}
-              </h2>
-              <div className="w-full mb-4">{data.deskripsi}</div>
+        <div className="flex flex-col items-center py-8 sm:py-12 lg:py-16 pb-8 sm:pb-12 lg:pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <Heading
+            title="Fakultas & Program Studi Universitas Global Nusantara"
+            variant="first"
+          />
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {data["prodi"].map((prodi, index) => (
-                  <Card key={index} className="grid grid-cols-1 p-4 gap-3">
-                    <h2 className="text-2xl sm:text-xl font-semibold w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
-                      {prodi.nama}
-                    </h2>
-                    <p className="text-sm text-gray-500">{prodi.deskripsi}</p>
-                    <Button variant={"green"} className={"w-4/10"}>
-                      Selengkapnya
-                    </Button>
-                  </Card>
-                ))}
+          {/* Fakultas Sections */}
+          <div className="flex flex-col gap-8 sm:gap-10 lg:gap-12 w-full">
+            {data.map((fakultas, index) => (
+              <div key={index} className="w-full">
+                {/* Fakultas Title */}
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold w-full border-b-2 border-gray-300 pb-3 text-[var(--green)] mt-6 sm:mt-8 mb-4 sm:mb-5">
+                  {fakultas.fakultas}
+                </h2>
+
+                {/* Fakultas Description */}
+                <p className="w-full mb-6 sm:mb-8 text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
+                  {fakultas.deskripsi}
+                </p>
+
+                {/* Program Studi Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+                  {fakultas.prodi.map((prodi, prodiIndex) => (
+                    <Card
+                      key={prodiIndex}
+                      className="flex flex-col p-4 sm:p-5 lg:p-6 gap-3 sm:gap-4 hover:shadow-lg transition-shadow"
+                    >
+                      {/* Prodi Title */}
+                      <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold border-b-2 border-gray-200 pb-2 text-[var(--green)]">
+                        {prodi.nama}
+                      </h3>
+
+                      {/* Prodi Description */}
+                      <p className="text-xs sm:text-sm lg:text-base text-gray-500 leading-relaxed flex-grow">
+                        {prodi.deskripsi}
+                      </p>
+
+                      {/* Button */}
+                      <Button
+                        variant="green"
+                        className="w-full sm:w-auto text-sm sm:text-base"
+                      >
+                        Selengkapnya
+                      </Button>
+                    </Card>
+                  ))}
+                </div>
               </div>
-            </>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </>

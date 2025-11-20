@@ -1,5 +1,6 @@
 import HomeCarousel from "@/components/landing-page/HomeCarousel";
 import Image from "next/image";
+import { Heading } from "@/components/Heading";
 
 const pimpinan = [
   // REKTOR
@@ -67,38 +68,66 @@ export default function Pimpinan() {
   return (
     <div>
       <HomeCarousel />
-      <div className="flex flex-col items-center py-16 pb-16 px-4 sm:px-8 max-w-10/12 mx-auto">
-        <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
-          Pimpinan Universitas Global Nusantara
-        </h2>
-        <div className="flex flex-col gap-12 w-full mt-12">
+      <div className="flex flex-col items-center py-8 sm:py-12 lg:py-16 pb-8 sm:pb-12 lg:pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <Heading
+          title="Pimpinan Universitas Global Nusantara"
+          variant="first"
+        />
+        <div className="flex flex-col gap-8 sm:gap-10 lg:gap-12 w-full mt-8 sm:mt-10 lg:mt-12">
           {pimpinan.map((item) => (
             <div
-              className="flex w-full gap-5 flex-col md:flex-row"
+              className="flex w-full gap-4 sm:gap-5 lg:gap-6 flex-col md:flex-row items-start"
               key={item.nama}
             >
-              <div className="relative w-full md:w-96 h-96 rounded-xl">
+              {/* Image Section */}
+              <div className="relative w-full md:w-80 lg:w-96 h-64 sm:h-80 md:h-96 rounded-xl overflow-hidden flex-shrink-0 shadow-md">
                 <Image
                   src="/auth.png"
-                  alt="sejarah"
+                  alt={item.nama}
                   fill
-                  className="object-cover rounded-xl"
+                  className="object-cover"
                 />
               </div>
-              <p className="flex flex-col gap-2 w-full">
-                <span className="text-2xl font-bold text-[var(--green)]">
-                  {item.nama}
-                </span>
-                <span className="text-lg font-semibold text-[var(--green)]">
-                  {item.posisi}
-                </span>
 
-                <span className="text-sm text-gray-500 w-fit md:w-2xl">
+              {/* Content Section */}
+              <div className="flex flex-col gap-2 sm:gap-3 w-full">
+                {/* Nama */}
+                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[var(--green)] leading-tight">
+                  {item.nama}
+                </h3>
+
+                {/* Posisi */}
+                <p className="text-base sm:text-lg lg:text-xl font-semibold text-[var(--green)]">
+                  {item.posisi}
+                </p>
+
+                {/* Deskripsi */}
+                <p className="text-sm sm:text-base text-gray-500 leading-relaxed mt-1">
                   {item.deskripsi}
-                </span>
-                <span className="text-gray-500">Contact: {item.nomor}</span>
-                <span className="text-gray-500">Email: {item.email}</span>
-              </p>
+                </p>
+
+                {/* Contact Info */}
+                <div className="flex flex-col gap-1 mt-2 sm:mt-3 text-sm sm:text-base">
+                  <p className="text-gray-600">
+                    <span className="font-medium">Contact:</span>{" "}
+                    <a
+                      href={`tel:${item.nomor}`}
+                      className="text-[var(--green)] hover:underline"
+                    >
+                      {item.nomor}
+                    </a>
+                  </p>
+                  <p className="text-gray-600">
+                    <span className="font-medium">Email:</span>{" "}
+                    <a
+                      href={`mailto:${item.email}`}
+                      className="text-[var(--green)] hover:underline"
+                    >
+                      {item.email}
+                    </a>
+                  </p>
+                </div>
+              </div>
             </div>
           ))}
         </div>
