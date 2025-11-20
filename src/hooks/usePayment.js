@@ -107,6 +107,8 @@ export const usePayment = () => {
       );
       queryClient.invalidateQueries({ queryKey: ["payment"] });
       queryClient.invalidateQueries({ queryKey: ["registration"] });
+
+      router.push("/pendaftaran/status");
     },
     onError: (error) => {
       toast.error(

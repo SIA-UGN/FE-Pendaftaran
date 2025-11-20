@@ -80,6 +80,16 @@ export default function Pembayaran() {
     return () => clearInterval(interval);
   }, [paymentData?.deadline]);
 
+  useEffect(() => {
+    if (
+      !isLoading &&
+      paymentStatus !== "pending" &&
+      paymentStatus !== "rejected"
+    ) {
+      router.push("/pendaftaran/status");
+    }
+  }, [isLoading, paymentStatus, router]);
+
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     toast.success("Nomor rekening berhasil disalin!");
