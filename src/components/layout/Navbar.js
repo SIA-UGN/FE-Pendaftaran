@@ -223,7 +223,6 @@ export default function Navbar() {
                   <DropdownMenuItem asChild>
                     <Link href="/pendaftaran">Pendaftaran</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>Ubah Password</DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout}>
                     Logout
                   </DropdownMenuItem>
@@ -268,6 +267,10 @@ export default function Navbar() {
                 {
                   href: "/pimpinan-universitas",
                   label: "Pimpinan Universitas",
+                },
+                {
+                  href: "/fakultas",
+                  label: "Fakultas",
                 },
                 { href: "/pendaftaran", label: "Pendaftaran" },
               ].map((item) => (

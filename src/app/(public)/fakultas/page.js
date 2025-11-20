@@ -89,7 +89,7 @@ export default function Fakultas() {
             {data.map((fakultas, index) => (
               <div key={index} className="w-full">
                 {/* Fakultas Title */}
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold w-full border-b-2 border-gray-300 pb-3 text-[var(--green)] mt-6 sm:mt-8 mb-4 sm:mb-5">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold w-full border-b-2 border-gray-300 pb-3 text-[var(--green)] mt-6 sm:mt-8 mb-4 sm:mb-5">
                   {fakultas.fakultas}
                 </h2>
 
@@ -116,12 +116,12 @@ export default function Fakultas() {
                       </p>
 
                       {/* Button */}
-                      <Button
+                      {/* <Button
                         variant="green"
                         className="w-full sm:w-auto text-sm sm:text-base"
                       >
                         Selengkapnya
-                      </Button>
+                      </Button> */}
                     </Card>
                   ))}
                 </div>

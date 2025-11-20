@@ -29,7 +29,7 @@ export default function History() {
           {/* Introduction Text */}
           <p className="font-medium text-base sm:text-lg lg:text-xl text-[var(--green)] leading-relaxed">
             Universitas Global Nusantara merupakan lembaga pendidikan tinggi
-            yang berdiri di bawah naungan Yayasan Matholi'ul Huda Yogyakarta.
+            yang berdiri di bawah naungan Yayasan Matholi`ul Huda Yogyakarta.
             Kehadirannya tidak terlepas dari akar sejarah panjang pesantren di
             Kajen, Pati, yang berawal dari perjuangan dan dedikasi para ulama
             pendiri pesantren.
@@ -51,7 +51,7 @@ export default function History() {
               </div>
               <p className="text-gray-500 text-sm sm:text-base leading-relaxed">
                 Kiai Abdussalam mendirikan pesantren yang kemudian dikenal
-                dengan nama Matholi'ul Huda, yang bermakna "sumber petunjuk".
+                dengan nama Matholi`ul Huda, yang bermakna sumber petunjuk.
                 Pesantren ini menjadi cikal bakal dari lembaga-lembaga
                 pendidikan yang berkembang kemudian, termasuk Universitas Global
                 Nusantara.
@@ -72,7 +72,7 @@ export default function History() {
                 Putra Kiai Abdussalam, Kiai Mahfudh, melanjutkan perjuangan
                 dengan merintis pesantren sekitar tahun 1910-an. Beliau adalah
                 ulama yang pernah menimba ilmu di Makkah serta berguru kepada
-                Kiai Hasyim Asy'ari di Tebuireng. Pada awalnya, pesantren yang
+                Kiai Hasyim Asy`ari di Tebuireng. Pada awalnya, pesantren yang
                 dirintis Kiai Mahfudh dikenal dengan nama Putra (akronim dari
                 Gempol–Garut), yang mencerminkan lokasi dan identitas
                 geografisnya.
@@ -93,7 +93,7 @@ export default function History() {
                 Tahun 1963 menandai babak baru dalam sejarah pesantren.
                 Kepemimpinan pesantren dilanjutkan oleh Kiai Sahal Mahfudh, yang
                 kemudian mengganti namanya menjadi Pesantren Maslakul Huda
-                (PMH), bermakna "jalannya petunjuk". Di bawah kepemimpinan
+                (PMH), bermakna jalannya petunjuk. Di bawah kepemimpinan
                 beliau, pesantren mengalami transformasi signifikan, menjalin
                 komunikasi luas dengan masyarakat dan memperluas kiprahnya
                 melalui berbagai lembaga pendidikan formal maupun non-formal.
