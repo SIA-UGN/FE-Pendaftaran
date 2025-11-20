@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
@@ -41,8 +47,8 @@ export default function RegisterPage() {
 
   return (
     <div className="flex items-center gap-6 w-screen h-screen justify-center bg-[url('/auth.png')] bg-cover ">
-      <Card className="w-3/4 w-m-7/8 max-w-11/12 flex flex-col md:flex-row gap-2 p-12 md:p-0 h-full md:h-3/4 relative rounded-[5vw]">
-        <div className="w-full md:w-3/8 min-h-fit h-11/10 bg-[var(--green)] flex items-center justify-between flex-col px-4 gap-4 rounded-[5vw] md:absolute overflow-hidden left-[-10px] md:top-1/2 md:-translate-y-1/2 py-12">
+      <Card className="w-3/4 max-w-11/12 flex flex-col md:flex-row gap-2 p-3 md:p-0 h-fit md:h-3/4 relative rounded-[5vw] bg-white justify-center items-center">
+        <div className="w-full md:w-3/8 min-h-fit h-11/10 bg-[var(--green)] hidden md:flex items-center justify-between flex-col px-4 md:gap-4 rounded-[5vw] md:absolute overflow-hidden left-md:[-10px] md:top-1/2 md:-translate-y-1/2 md:py-12 absolute left-0">
           <div className="flex flex-col items-center gap-2 w-full h-3/4 justify-center">
             <div className="relative w-32 h-32 sm:w-48 sm:h-48 md:w-60 md:h-60 lg:w-72 lg:h-72">
               <Image
@@ -67,12 +73,26 @@ export default function RegisterPage() {
                 Login
               </Button>
             </Link>
+            <Link href="/forgot-password" className="w-8/10 flex-shrink">
+              <Button
+                variant={"yellow"}
+                className={
+                  "w-full rounded-full bg-white text-[var(--green)] hover:bg-white/80"
+                }
+              >
+                Forgot Password
+              </Button>
+            </Link>
           </div>
         </div>
         <div className="w-full flex items-center justify-end bg-white  rounded-[5vw]">
           <div className="py-6 w-full md:w-5/8 h-full flex flex-col justify-center gap-4 md:px-12">
             <CardHeader className={"text-center"}>
-              <CardTitle className={"font-bold text-4xl"}>REGISTER</CardTitle>
+              <CardTitle
+                className={"font-bold text-3xl md:text-4xl text-[var(--green)]"}
+              >
+                REGISTER
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <form className="grid gap-4" onSubmit={handleSubmit}>
@@ -125,13 +145,24 @@ export default function RegisterPage() {
                 </div>
                 <Button
                   type="submit"
-                  className="w-full rounded-full text-white hover:text-white"
+                  className="flex-1 rounded-full text-white hover:text-white"
                   variant={"green"}
                   disabled={registerMutation.isPending}
                 >
                   {registerMutation.isPending ? "Registering..." : "Register"}
                 </Button>
               </form>
+              <CardFooter className="flex justify-center md:hidden gap-1 p-0 mt-3">
+                <div className="text-sm md:text-md flex-col items-center gap-2">
+                  <span>Already have an account?</span>
+                  <a
+                    href={"/login"}
+                    className="font-bold text-[var(--green)]  hover:text-var[(--green)]]/80"
+                  >
+                    Login
+                  </a>
+                </div>
+              </CardFooter>
             </CardContent>
           </div>
         </div>
