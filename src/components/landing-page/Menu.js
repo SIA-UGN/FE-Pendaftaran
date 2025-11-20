@@ -10,7 +10,7 @@ export default function Menu() {
           size={60}
           className="sm:w-[70px] sm:h-[70px] lg:w-[80px] lg:h-[80px] stroke-1 text-[var(--green)]"
         />
-        <span className="text-xl sm:text-2xl font-medium text-[var(--green)] text-center">
+        <span className="text-2xl sm:text-3xl font-medium text-[var(--green)] text-center">
           Profil
         </span>
         <p className="text-gray-500 text-center text-xs sm:text-sm leading-relaxed">
@@ -23,10 +23,10 @@ export default function Menu() {
           size={60}
           className="sm:w-[70px] sm:h-[70px] lg:w-[80px] lg:h-[80px] stroke-1 text-[var(--green)]"
         />
-        <span className="text-xl sm:text-2xl font-medium text-[var(--green)] text-center">
+        <span className="text-2xl sm:text-3xl font-medium text-[var(--green)] text-center">
           Fakultas
         </span>
-        <p className="text-gray-500 text-center text-xs sm:text-sm leading-relaxed">
+        <p className="text-gray-500 text-center text-xs sm:text-sm  leading-relaxed">
           Jelajahi berbagai fakultas dan program studi yang tersedia.
         </p>
       </Card>
@@ -35,7 +35,7 @@ export default function Menu() {
           size={60}
           className="sm:w-[70px] sm:h-[70px] lg:w-[80px] lg:h-[80px] stroke-1 text-[var(--green)]"
         />
-        <span className="text-xl sm:text-2xl font-medium text-[var(--green)] text-center">
+        <span className="text-2xl sm:text-3xl font-medium text-[var(--green)] text-center">
           Pendaftaran
         </span>
         <p className="text-gray-500 text-center text-xs sm:text-sm leading-relaxed">

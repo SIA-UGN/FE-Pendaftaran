@@ -40,7 +40,6 @@ export default function Navbar() {
 
   const {
     data: unreadNotificationsData,
-    isLoading,
     isError,
     error,
   } = useUnreadCount();
@@ -89,7 +88,6 @@ export default function Navbar() {
     };
   }, []);
 
-  if (isLoading) return <div></div>;
   if (isError) return <div>Error: {error.message}</div>;
 
   const unreadNotifications = unreadNotificationsData?.data?.data?.unread_count;

@@ -7,74 +7,18 @@ import { Button } from "@/components/ui/button";
 import { columns } from "../Column";
 import { DataTable } from "../DataTable";
 import { useEffect, useState } from "react";
-
-function getData() {
-  return [
-    {
-      id: "PEN-001",
-      amount: 250000,
-      status: "Lulus",
-      email: "budi.santoso@example.com",
-      name: "Budi Santoso",
-    },
-    {
-      id: "PEN-002",
-      amount: 300000,
-      status: "Lulus",
-      email: "citra.lestari@example.com",
-      name: "Citra Lestari",
-    },
-    {
-      id: "PEN-003",
-      amount: 250000,
-      status: "Lulus",
-      email: "eko.prasetyo@example.com",
-      name: "Eko Prasetyo",
-    },
-    {
-      id: "PEN-004",
-      amount: 500000,
-      status: "Lulus",
-      email: "diana.fitriani@example.com",
-      name: "Diana Fitriani",
-    },
-    {
-      id: "PEN-005",
-      amount: 300000,
-      status: "Lulus",
-      email: "agung.wijaya@example.com",
-      name: "Agung Wijaya",
-    },
-    {
-      id: "PEN-006",
-      amount: 250000,
-      status: "Lulus",
-      email: "rini.susanti@example.com",
-      name: "Rini Susanti",
-    },
-    {
-      id: "PEN-007",
-      amount: 450000,
-      status: "Lulus",
-      email: "farhan.maulana@example.com",
-      name: "Farhan Maulana",
-    },
-  ];
-}
+import { useAnnouncements } from "@/hooks/useAnnouncement";
 
 export default function Announcement() {
   const [data, setData] = useState([]);
   const [isOn, setIsOn] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const result = await getData();
-      setData(result);
+  const { data: announcementData, isLoading, isError, error } = useAnnouncements()
+  
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error : {error.message}</div>
 
-      if (result.length > 0) setIsOn(true);
-    };
-    fetchData();
-  }, []);
+  console.log(announcementData);
 
   return (
     <div className="flex flex-col items-center pt-4 sm:pt-6 lg:pt-8 pb-12 sm:pb-14 lg:pb-16 px-4 sm:px-6 md:px-8 lg:px-12 max-w-7xl mx-auto w-full">

@@ -41,7 +41,7 @@ export default function News() {
         {data.map((item) => (
           <Card
             key={item.title}
-            className="flex flex-col md:flex-row w-full overflow-hidden p-0 bg-white shadow-sm hover:shadow-md transition-shadow"
+            className="flex flex-col md:flex-row w-full overflow-hidden p-0 bg-white shadow-md hover:shadow-lg transition-shadow gap-0 md:gap-6"
           >
             <div className="relative w-full md:w-2/5 lg:w-1/3 h-48 sm:h-56 md:h-auto md:min-h-[250px] lg:min-h-[280px] flex-shrink-0">
               <Image
@@ -57,7 +57,7 @@ export default function News() {
                 <h3 className="font-bold text-lg sm:text-xl lg:text-2xl text-[var(--green)] leading-tight pr-0 sm:pr-4">
                   {item.title}
                 </h3>
-                <span className="text-gray-500 text-xs sm:text-sm flex-shrink-0 order-first sm:order-last">
+                <span className="text-gray-500 text-md flex-shrink-0 order-first sm:order-last">
                   {item.date}
                 </span>
               </div>

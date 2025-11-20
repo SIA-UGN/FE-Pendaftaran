@@ -10,8 +10,6 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { AspectRatio } from "@radix-ui/react-aspect-ratio";
-import { Button } from "@/components/ui/button";
 
 export default function HomeCarousel() {
   const plugin = React.useRef(
@@ -52,10 +50,10 @@ export default function HomeCarousel() {
                   />
                   <div className="absolute inset-0 flex bg-black/40 text-white px-4 sm:px-8 md:px-12 lg:px-16 xl:px-24">
                     <div className="flex flex-col justify-center items-start my-auto max-w-4xl">
-                      <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-2 leading-tight">
+                      <p className="text-4xl lg:text-5xl xl:text-6xl font-bold mb-2 leading-tight text-[var(--cream)]">
                         {image.heading}
                       </p>
-                      <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 leading-relaxed">
+                      <p className="text-ssm sm:text-base md:text-md lg:text-lg text-white/80 leading-relaxed">
                         {image.subheading}
                       </p>
                     </div>
