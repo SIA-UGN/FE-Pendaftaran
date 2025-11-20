@@ -24,11 +24,6 @@ import Link from "next/link";
 
 export function TeamSwitcher({ teams }) {
   const { isMobile } = useSidebar();
-  // const [activeTeam, setActiveTeam] = React.useState(teams[0]);
-
-  // if (!activeTeam) {
-  //   return null;
-  // }
 
   return (
     <SidebarMenu>
@@ -37,7 +32,7 @@ export function TeamSwitcher({ teams }) {
           <Link href="/" className="cursor-pointer">
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent w-fit h-fit focus:bg-transparent"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent w-fit h-fit focus:bg-transparent py-2"
             >
               <div className="flex aspect-square size-12 items-center justify-center rounded-lg overflow-hidden">
                 <Image
@@ -52,47 +47,9 @@ export function TeamSwitcher({ teams }) {
                 <span className="truncate font-semibold text-[var(--yellow)] text-wrap text-md">
                   Universitas Global Nusantara
                 </span>
-                {/* <span className="truncate text-xs">{activeTeam.plan}</span> */}
               </div>
-              {/* <ChevronsUpDown className="ml-auto" /> */}
             </SidebarMenuButton>
           </Link>
-          <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-            align="start"
-            side={isMobile ? "bottom" : "right"}
-            sideOffset={4}
-          >
-            <DropdownMenuLabel className="text-muted-foreground text-xs">
-              Teams
-            </DropdownMenuLabel>
-            {/* {teams.map((team, index) => (
-              <DropdownMenuItem
-                key={team.name}
-                onClick={() => setActiveTeam(team)}
-                className="gap-2 p-2"
-              >
-                <div className="flex size-6 items-center justify-center rounded-md border">
-                  <Image
-                    src={team.logo}
-                    alt={team.name}
-                    width={20}
-                    height={20}
-                    className="rounded-sm object-cover"
-                  />
-                </div>
-                {team.name}
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-              </DropdownMenuItem>
-            ))} */}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
-              <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
-                <Plus className="size-4" />
-              </div>
-              <div className="text-muted-foreground font-medium">Add team</div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>

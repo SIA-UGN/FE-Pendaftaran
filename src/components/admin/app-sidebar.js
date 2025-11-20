@@ -23,10 +23,10 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  SidebarClose
 } from "@/components/ui/sidebar";
-import { Wallet } from "lucide-react";
 
-// This is sample data.
+
 const data = {
   navMain: [
     {
@@ -39,12 +39,6 @@ const data = {
       title: "Data Pendaftar & Manager",
       url: "/dashboard/data",
       icon: UsersRound,
-      isActive: true,
-    },
-    {
-      title: "Edit Form Pendaftaran",
-      url: "/dashboard/edit/pendaftaran/data-diri",
-      icon: FilePlus,
       isActive: true,
     },
     {
@@ -64,35 +58,18 @@ const data = {
       icon: ChartLine,
     },
   ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
 };
 
 export function AppSidebar({ ...props }) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher/>
+        <SidebarClose />
+        <TeamSwitcher />
       </SidebarHeader>
-      <DropdownMenuSeparator className={"bg-[var(--yellow)]"}/>
+      <DropdownMenuSeparator className={"bg-[var(--yellow)] mb-3"} />
       <SidebarContent>
         <NavMain items={data.navMain} />
-        {/* <NavProjects projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

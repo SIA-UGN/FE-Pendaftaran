@@ -2,36 +2,41 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { paymentMethodService } from "@/services/paymentMethodService";
 
-// Ambil semua payment methods
+/* ---------------------------
+   GET ALL PAYMENT METHODS
+---------------------------- */
 export const usePaymentMethods = (params = {}) => {
-  return useQuery(
-    ["paymentMethods", params],
-    () => paymentMethodService.getAll(params),
-    {
-      keepPreviousData: true,
-      staleTime: 1000 * 60 * 5,
-      onError: (error) => toast.error("Error fetching payment methods"),
-    }
-  );
+  return useQuery({
+    queryKey: ["paymentMethods", params],
+    queryFn: () => paymentMethodService.getAll(params),
+    staleTime: 1000 * 60 * 5,
+    placeholderData: (prev) => prev, // sama seperti keepPreviousData
+    onError: () => toast.error("Error fetching payment methods"),
+  });
 };
 
-// Ambil satu payment method
+/* ---------------------------
+   GET SINGLE PAYMENT METHOD
+---------------------------- */
 export const usePaymentMethod = (id) => {
-  return useQuery(
-    ["paymentMethod", id],
-    () => paymentMethodService.getOne(id),
-    {
-      onError: () => toast.error("Error fetching payment method"),
-    }
-  );
+  return useQuery({
+    queryKey: ["paymentMethod", id],
+    queryFn: () => paymentMethodService.getOne(id),
+    enabled: !!id, // biar gak nge-fetch kalau id kosong
+    onError: () => toast.error("Error fetching payment method"),
+  });
 };
 
-// Create payment method
+/* ---------------------------
+   CREATE PAYMENT METHOD
+---------------------------- */
 export const useCreatePaymentMethod = () => {
   const queryClient = useQueryClient();
-  return useMutation(paymentMethodService.create, {
+
+  return useMutation({
+    mutationFn: paymentMethodService.create,
     onSuccess: () => {
-      queryClient.invalidateQueries(["paymentMethods"]);
+      queryClient.invalidateQueries({ queryKey: ["paymentMethods"] });
       toast.success("Payment method created successfully");
     },
     onError: (error) => {
@@ -42,13 +47,17 @@ export const useCreatePaymentMethod = () => {
   });
 };
 
-// Update payment method
+/* ---------------------------
+   UPDATE PAYMENT METHOD
+---------------------------- */
 export const useUpdatePaymentMethod = () => {
   const queryClient = useQueryClient();
-  return useMutation(({ id, data }) => paymentMethodService.update(id, data), {
+
+  return useMutation({
+    mutationFn: ({ id, data }) => paymentMethodService.update(id, data),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries(["paymentMethods"]);
-      queryClient.invalidateQueries(["paymentMethod", variables.id]);
+      queryClient.invalidateQueries({ queryKey: ["paymentMethods"] });
+      queryClient.invalidateQueries({ queryKey: ["paymentMethod", variables.id] });
       toast.success("Payment method updated successfully");
     },
     onError: (error) => {
@@ -59,12 +68,16 @@ export const useUpdatePaymentMethod = () => {
   });
 };
 
-// Delete payment method
+/* ---------------------------
+   DELETE PAYMENT METHOD
+---------------------------- */
 export const useDeletePaymentMethod = () => {
   const queryClient = useQueryClient();
-  return useMutation((id) => paymentMethodService.delete(id), {
+
+  return useMutation({
+    mutationFn: (id) => paymentMethodService.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries(["paymentMethods"]);
+      queryClient.invalidateQueries({ queryKey: ["paymentMethods"] });
       toast.success("Payment method deleted successfully");
     },
     onError: (error) => {

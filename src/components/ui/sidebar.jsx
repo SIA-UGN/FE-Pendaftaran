@@ -2,7 +2,7 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
-import { PanelLeftIcon } from "lucide-react";
+import { PanelLeftIcon, X } from "lucide-react";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -27,7 +27,7 @@ import {
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = "16rem";
-const SIDEBAR_WIDTH_MOBILE = "18rem";
+const SIDEBAR_WIDTH_MOBILE = "100%";
 const SIDEBAR_WIDTH_ICON = "0rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
@@ -186,7 +186,6 @@ function Sidebar({
       data-side={side}
       data-slot="sidebar"
     >
-      {/* Sidebar gap */}
       <div
         data-slot="sidebar-gap"
         className={cn(
@@ -242,6 +241,31 @@ function SidebarTrigger({ className, onClick, ...props }) {
     >
       <PanelLeftIcon className="h-5 w-5 sm:h-6 sm:w-6" />
       <span className="sr-only">Toggle Sidebar</span>
+    </Button>
+  );
+}
+
+function SidebarClose({ className, onClick, ...props }) {
+  const { toggleSidebar } = useSidebar();
+
+  return (
+    <Button
+      data-sidebar="close"
+      data-slot="sidebar-close"
+      variant="ghost"
+      size="icon"
+      className={cn(
+        "h-10 w-10 text-[var(--yellow)] hover:bg-green-800 hover:text-[var(--yellow)] absolute z-10 right-2 top-5 font-bold",
+        className
+      )}
+      onClick={(event) => {
+        onClick?.(event);
+        toggleSidebar();
+      }}
+      {...props}
+    >
+      <X className="h-10 w-10" />
+      <span className="sr-only">Close Sidebar</span>
     </Button>
   );
 }
@@ -634,6 +658,7 @@ function SidebarMenuSubButton({
 
 export {
   Sidebar,
+  SidebarClose,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
