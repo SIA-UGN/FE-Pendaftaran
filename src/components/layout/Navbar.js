@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useLogout } from "@/hooks/useAuth";
+import { useUnreadCount } from "@/hooks/useNotification";
 
 export default function Navbar() {
   const router = useRouter();
@@ -36,6 +37,13 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mobileProfilOpen, setMobileProfilOpen] = useState(false);
   const [hasNotification, setHasNotification] = useState(true);
+
+  const {
+    data: unreadNotificationsData,
+    isLoading,
+    isError,
+    error,
+  } = useUnreadCount();
 
   useEffect(() => {
     const updateUserData = () => {
@@ -80,6 +88,13 @@ export default function Navbar() {
       window.removeEventListener("storage", updateUserData);
     };
   }, []);
+
+  if (isLoading) return <div></div>;
+  if (isError) return <div>Error: {error.message}</div>;
+
+  const unreadNotifications = unreadNotificationsData?.data?.data?.unread_count;
+
+  console.log("Unread notifications", unreadNotifications);
 
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -167,7 +182,24 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-4">
           {isLoggedIn ? (
             <>
-              <Bell className="w-6 h-6 cursor-pointer hover:text-white/90 text-white" />
+              <Link href="/notifikasi" className="relative">
+                <Bell className="w-6 h-6 cursor-pointer hover:text-white/90 text-white" />
+
+                {unreadNotifications > 0 && (
+                  <span
+                    className="
+      absolute -top-1 -right-1 
+      bg-red-600 text-white 
+      text-xs font-bold 
+      rounded-full 
+      w-4 h-4 
+      flex items-center justify-center
+    "
+                  >
+                    {unreadNotifications}
+                  </span>
+                )}
+              </Link>
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Avatar>
