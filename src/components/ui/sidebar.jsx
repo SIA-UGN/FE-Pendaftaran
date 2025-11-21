@@ -255,7 +255,7 @@ function SidebarClose({ className, onClick, ...props }) {
       variant="ghost"
       size="icon"
       className={cn(
-        "h-10 w-10 text-[var(--yellow)] hover:bg-green-800 hover:text-[var(--yellow)] absolute z-10 right-2 top-5 font-bold",
+        "h-10 w-10 text-[var(--yellow)] hover:bg-green-800 hover:text-[var(--yellow)] absolute z-10 right-2 top-5 font-bold md:hidden",
         className
       )}
       onClick={(event) => {

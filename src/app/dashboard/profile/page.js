@@ -66,7 +66,7 @@ export default function Profile() {
       </div>
 
       {/* Nominal Masuk */}
-      {/* <Heading title={"Nominal Masuk"} />
+      <Heading title={"Nominal Masuk"} />
       <div className="w-full">
         <Button
           variant={
@@ -76,10 +76,10 @@ export default function Profile() {
         >
           {data.applicant.payment.nominal}
         </Button>
-      </div> */}
+      </div>
 
       {/* Status Verifikasi Keuangan */}
-      {/* <Heading title={"Status Verifikasi Keuangan"} />
+      <Heading title={"Status Verifikasi Keuangan"} />
       <div className="w-full sm:w-3/4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 justify-center">
         <Button variant="yellow" className="rounded-lg text-sm sm:text-base py-2 sm:py-3">
           {data.applicant.payment.status}
@@ -89,7 +89,7 @@ export default function Profile() {
             Verifikasi
           </Button>
         </Link>
-      </div> */}
+      </div>
     </div>
   );
 }

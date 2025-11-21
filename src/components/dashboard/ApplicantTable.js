@@ -118,8 +118,8 @@ export function ApplicantTable({ data, type }) {
             <Link
               href={
                 type === "manager"
-                  ? `/manager/verification?id=${applicant.id}`
-                  : `/dashboard/profile?id=${applicant.id}`
+                  ? `/manager/verification?id=${applicant.user_id}`
+                  : `/dashboard/profile?id=${applicant.user_id}`
               }
             >
               <Button
@@ -129,12 +129,10 @@ export function ApplicantTable({ data, type }) {
               >
                 {type === "manager" ? (
                   <>
-                    <CheckCircle className="w-4 h-4 mr-1" />
                     Verifikasi
                   </>
                 ) : (
                   <>
-                    <Eye className="w-4 h-4 mr-1" />
                     Lihat
                   </>
                 )}
@@ -271,8 +269,8 @@ export function ApplicantTable({ data, type }) {
                   <Link
                     href={
                       type === "manager"
-                        ? `/manager/verification?id=${applicant.id}`
-                        : `/dashboard/profile?id=${applicant.id}`
+                        ? `/manager/verification?id=${applicant.user_id}`
+                        : `/dashboard/profile?id=${applicant.user_id}`
                     }
                     className="block"
                   >

@@ -87,8 +87,8 @@ export function ChartPieApplicant({ data }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const chartData = [
-    { name: "Lulus", value: data.approved, color: "#22c55e" },
-    { name: "Tidak Lulus", value: data.rejected, color: "#ef4444" },
+    { name: "Approved", value: data.approved, color: "#22c55e" },
+    { name: "Rejected", value: data.rejected, color: "#ef4444" },
     { name: "Pending", value: data.pending, color: "#facc15" },
   ];
 
