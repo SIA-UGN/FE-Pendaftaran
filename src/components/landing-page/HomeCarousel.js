@@ -53,7 +53,7 @@ export default function HomeCarousel() {
                       <p className="text-4xl lg:text-5xl xl:text-6xl font-bold mb-2 leading-tight text-[var(--cream)]">
                         {image.heading}
                       </p>
-                      <p className="text-ssm sm:text-base md:text-md lg:text-lg text-white/80 leading-relaxed">
+                      <p className="text-xsm sm:text-base md:text-md lg:text-lg text-white/80 leading-relaxed">
                         {image.subheading}
                       </p>
                     </div>

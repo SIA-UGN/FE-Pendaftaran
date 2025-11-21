@@ -1,54 +1,40 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-
 import { useRouter } from "next/navigation";
-
-import { Info, AlertCircle, XCircle, CheckCircle } from "lucide-react";
+import { Info, AlertCircle, XCircle, CheckCircle, Eye, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { toast } from "sonner";
-import { getCookie } from "cookies-next";
-import RegistrationProgress from "@/components/registrations/RegistrationProgress";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { useState } from "react";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-} from "@/components/ui/input-group";
-import TextareaAutosize from "react-textarea-autosize";
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 import { useApplicantDetail } from "@/hooks/useManager";
 
 export default function DataDiri() {
   const router = useRouter();
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [openKTP, setOpenKTP] = useState(false);
+  const [openAkta, setOpenAkta] = useState(false);
+  const [openKK, setOpenKK] = useState(false);
 
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
@@ -86,7 +72,6 @@ export default function DataDiri() {
     return <div>Error loading applicant: {applicantError.message}</div>;
 
   const applicant = applicantData?.data?.data;
-
   const data = applicant.steps.student_profile;
 
   console.log(data);
@@ -97,7 +82,9 @@ export default function DataDiri() {
         <Card className="w-full flex flex-col md:flex-row gap-6 p-8 rounded-2xl shadow-md bg-[var(--light-cream)] justify-between">
           <div className="flex flex-col p-2 w-full sm:w-2/3 space-y-1 items-start">
             <h2 className="font-bold text-xl">{applicant.user.name}</h2>
-            <h3 className="text-gray-500">{applicant.user.registration_number}</h3>
+            <h3 className="text-gray-500">
+              {applicant.user.registration_number}
+            </h3>
             <p className="text-gray-500">{applicant.user.email}</p>
           </div>
           <Button variant={"yellow"}>{applicant.user.status}</Button>
@@ -195,7 +182,11 @@ export default function DataDiri() {
                   <FormItem>
                     <FormLabel>Tempat Lahir</FormLabel>
                     <FormControl>
-                      <Input placeholder={data.birth_place} {...field} readOnly />
+                      <Input
+                        placeholder={data.birth_place}
+                        {...field}
+                        readOnly
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -228,7 +219,11 @@ export default function DataDiri() {
                   <FormItem>
                     <FormLabel>NIK</FormLabel>
                     <FormControl>
-                      <Input placeholder={data.family_card_number} {...field} readOnly />
+                      <Input
+                        placeholder={data.family_card_number}
+                        {...field}
+                        readOnly
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -236,6 +231,7 @@ export default function DataDiri() {
               />
             </div>
 
+            {/* KTP Dialog */}
             <FormField
               control={form.control}
               name="ktp"
@@ -243,11 +239,29 @@ export default function DataDiri() {
                 <FormItem>
                   <FormLabel>KTP / KITAS</FormLabel>
                   <FormControl>
-                    <Button asChild variant={"outline"}>
-                      <a href={`/${data.family_card_file}`} download>
-                        Unduh KTP
-                      </a>
-                    </Button>
+                    <Dialog open={openKTP} onOpenChange={setOpenKTP}>
+                      <DialogTrigger asChild>
+                        <Button variant={"outline"} type="button">
+                          <Eye className="w-4 h-4 mr-2" />
+                          Lihat KTP
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+                        <DialogHeader>
+                          <DialogTitle>KTP / KITAS</DialogTitle>
+                          <DialogDescription>
+                            Dokumen identitas pendaftar
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex items-center justify-center p-4">
+                          <img
+                            src={`/${data.family_card_file}`}
+                            alt="KTP"
+                            className="max-w-full h-auto rounded-lg"
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -261,13 +275,18 @@ export default function DataDiri() {
                 <FormItem>
                   <FormLabel>Nomor Registrasi Akta Lahir</FormLabel>
                   <FormControl>
-                    <Input placeholder={data.birth_certificate_number} {...field} readOnly />
+                    <Input
+                      placeholder={data.birth_certificate_number}
+                      {...field}
+                      readOnly
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
+            {/* Akta Dialog */}
             <FormField
               control={form.control}
               name="akta"
@@ -275,11 +294,29 @@ export default function DataDiri() {
                 <FormItem>
                   <FormLabel>Akta Kelahiran</FormLabel>
                   <FormControl>
-                    <Button asChild variant={"outline"}>
-                      <a href={`/${data.birth_certificate_file}`} download>
-                        Unduh Akta Kelahiran
-                      </a>
-                    </Button>
+                    <Dialog open={openAkta} onOpenChange={setOpenAkta}>
+                      <DialogTrigger asChild>
+                        <Button variant={"outline"} type="button">
+                          <Eye className="w-4 h-4 mr-2" />
+                          Lihat Akta Kelahiran
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+                        <DialogHeader>
+                          <DialogTitle>Akta Kelahiran</DialogTitle>
+                          <DialogDescription>
+                            Dokumen akta kelahiran pendaftar
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex items-center justify-center p-4">
+                          <img
+                            src={`/${data.birth_certificate_file}`}
+                            alt="Akta Kelahiran"
+                            className="max-w-full h-auto rounded-lg"
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -293,13 +330,18 @@ export default function DataDiri() {
                 <FormItem>
                   <FormLabel>Nomor Kartu Keluarga</FormLabel>
                   <FormControl>
-                    <Input placeholder={data.family_card_number} {...field} readOnly />
+                    <Input
+                      placeholder={data.family_card_number}
+                      {...field}
+                      readOnly
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
+            {/* KK Dialog */}
             <FormField
               control={form.control}
               name="kk"
@@ -307,11 +349,29 @@ export default function DataDiri() {
                 <FormItem>
                   <FormLabel>Kartu Keluarga</FormLabel>
                   <FormControl>
-                    <Button asChild variant={"outline"}>
-                      <a href={`/${data.family_card_file}`} download>
-                        Unduh Kartu Keluarga
-                      </a>
-                    </Button>
+                    <Dialog open={openKK} onOpenChange={setOpenKK}>
+                      <DialogTrigger asChild>
+                        <Button variant={"outline"} type="button">
+                          <Eye className="w-4 h-4 mr-2" />
+                          Lihat Kartu Keluarga
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+                        <DialogHeader>
+                          <DialogTitle>Kartu Keluarga</DialogTitle>
+                          <DialogDescription>
+                            Dokumen kartu keluarga pendaftar
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex items-center justify-center p-4">
+                          <img
+                            src={`/${data.family_card_file}`}
+                            alt="Kartu Keluarga"
+                            className="max-w-full h-auto rounded-lg"
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -377,7 +437,7 @@ export default function DataDiri() {
               <Button variant={"green"}>Kembali</Button>
             </Link>
             <Link href={`/manager/verification/data-alamat?id=${id}`}>
-                <Button variant="matcha">Lanjut</Button>
+              <Button variant="matcha">Lanjut</Button>
             </Link>
           </div>
         </form>

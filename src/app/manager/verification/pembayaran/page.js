@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 
-import { Info, AlertCircle, XCircle, CheckCircle } from "lucide-react";
+import { Info, AlertCircle, XCircle, CheckCircle, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -27,6 +27,14 @@ import Link from "next/link";
 import RegistrationProgress from "@/components/registrations/RegistrationProgress";
 
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 import {
   AlertDialog,
@@ -78,6 +86,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
+import { Heading } from "@/components/Heading";
+
 export default function Pembayaran() {
   const router = useRouter();
 
@@ -101,6 +111,7 @@ export default function Pembayaran() {
     useState(false);
   const [showRevisionDialog, setShowRevisionDialog] = useState(false);
   const [paymentRejectionNote, setPaymentRejectionNote] = useState("");
+  const [openProof, setOpenProof] = useState(false);
 
   console.log(id);
   const { data, isLoading, isError, error } = usePaymentVerification(id);
@@ -143,14 +154,9 @@ export default function Pembayaran() {
   };
 
   return (
-    <>
-      <div className="flex items-center gap-2 mx-12 mt-6 pt-12  pb-0">
-        <CheckCircle className="text-green-500" />
-        <h2 className="text-xl font-semibold">Pembayaran</h2>
-      </div>
-      <h2 className="text-3xl sm:text-2xl font-semibold mt-12 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)] mx-12">
-        Rincian Pembayaran
-      </h2>
+    <div className="w-full max-w-6xl mx-auto">
+      <Heading title="Pembayaran" />
+      <Heading title={"Rincian Pembayaran"} />
       <Card className={"mx-12 p-6 gap-0"}>
         <h1 className="font-bold text-lg text-[var(--green)] mb-4">
           Ringkasan Pembayaran
@@ -163,23 +169,37 @@ export default function Pembayaran() {
         </div>
       </Card>
 
-      <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)] mx-12">
-        Bukti Pembayaran
-      </h2>
+      <Heading title="Bukti Pembayaran" />
       <div className="mx-12 items-center flex justify-center">
-        <Button variant={"green"} className={"w-full"}>
-          <a href={`/${paymentData.payment_proof.download_url}`} download>
-            Unduh Bukti Pembayaran
-          </a>
-        </Button>
+        <Dialog open={openProof} onOpenChange={setOpenProof}>
+          <DialogTrigger asChild>
+            <Button variant={"green"} className={"w-full"} type="button">
+              <Eye className="w-4 h-4 mr-2" />
+              Lihat Bukti Pembayaran
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+            <DialogHeader>
+              <DialogTitle>Bukti Pembayaran</DialogTitle>
+              <DialogDescription>
+                Dokumen bukti pembayaran pendaftar
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex items-center justify-center p-4">
+              <img
+                src={`/${paymentData.payment_proof.download_url}`}
+                alt="Bukti Pembayaran"
+                className="max-w-full h-auto rounded-lg"
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
-      <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)] mx-12">
-        Validation Notes
-      </h2>
+      <Heading title="Validation Notes" />
       <Form {...form}>
         <div className="space-y-6">
-          <div className="flex flex-col gap-5 p-12 border rounded-xl m-12 bg-[var(--light-cream)]">
+          <div className="flex flex-col gap-5 p-12 border rounded-xl mx-12 bg-[var(--light-cream)]">
             {paymentData.validation_notes}
           </div>
           <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
@@ -440,6 +460,6 @@ export default function Pembayaran() {
           </div>
         </div>
       </Form>
-    </>
+    </div>
   );
 }

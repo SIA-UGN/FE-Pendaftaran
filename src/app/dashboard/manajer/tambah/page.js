@@ -58,7 +58,7 @@ export default function TambahManajer() {
 
     createManager(payload, {
       onSuccess: () => {
-        router.push("/dashboard/manajer");
+        router.push("/dashboard");
       },
     });
   };

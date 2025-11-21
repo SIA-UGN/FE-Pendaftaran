@@ -88,12 +88,12 @@ export default function Profile() {
       
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:justify-center">
-        <Button 
+        {/* <Button 
           variant="green" 
           className="rounded-lg w-full sm:w-1/2 lg:w-1/4 text-sm sm:text-base py-2 sm:py-3"
         >
           Perbarui Akun
-        </Button>
+        </Button> */}
         
         <AlertDialog open={open} onOpenChange={setOpen}>
           {/* Trigger button */}

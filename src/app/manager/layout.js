@@ -19,6 +19,7 @@ function getPageTitle(pathname) {
   if (pathname.startsWith("/manager/pendaftar")) return "Data Pendaftar";
   if (pathname.startsWith("/manager/statistik")) return "Statistik";
   if (pathname.startsWith("/manager/keuangan")) return "Keuangan";
+  if (pathname.startsWith("/manager/broadcast")) return "Broadcast";
   return "Dashboard";
 }
 

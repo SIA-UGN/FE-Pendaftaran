@@ -1,8 +1,8 @@
-"use client"; // <-- Wajib ada untuk menggunakan hooks
+"use client";
 
 import { useSearchParams } from "next/navigation";
 
-import { Info, AlertCircle, XCircle, CheckCircle } from "lucide-react";
+import { Info, AlertCircle, XCircle, CheckCircle, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -28,6 +28,14 @@ import Link from "next/link";
 import RegistrationProgress from "@/components/registrations/RegistrationProgress";
 
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 import {
   AlertDialog,
@@ -107,6 +115,11 @@ export default function DataAkademik() {
   });
 
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [openIjazah, setOpenIjazah] = useState(false);
+  const [openSkl, setOpenSkl] = useState(false);
+  const [openTranskrip, setOpenTranskrip] = useState(false);
+  const [openUn, setOpenUn] = useState(false);
+  const [openSertifikat, setOpenSertifikat] = useState(false);
 
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
@@ -124,7 +137,6 @@ export default function DataAkademik() {
     return <div>Error loading applicant: {applicantError.message}</div>;
 
   const applicant = applicantData?.data?.data;
-
   const data = applicant.steps.academic;
 
   console.log(id);
@@ -210,24 +222,44 @@ export default function DataAkademik() {
               </div>
             </div>
 
+            {/* Ijazah Dialog */}
             <FormField
               control={form.control}
               name="uploadIjazah"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>ijazah Terakhir</FormLabel>
+                  <FormLabel>Ijazah Terakhir</FormLabel>
                   <FormControl>
-                    <Button asChild variant={"outline"}>
-                      <a href={`/${data.certification_file}`} download>
-                        Unduh Ijazah Terakhir
-                      </a>
-                    </Button>
+                    <Dialog open={openIjazah} onOpenChange={setOpenIjazah}>
+                      <DialogTrigger asChild>
+                        <Button variant={"outline"} type="button">
+                          <Eye className="w-4 h-4 mr-2" />
+                          Lihat Ijazah Terakhir
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+                        <DialogHeader>
+                          <DialogTitle>Ijazah Terakhir</DialogTitle>
+                          <DialogDescription>
+                            Dokumen ijazah terakhir pendaftar
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex items-center justify-center p-4">
+                          <img
+                            src={`/${data.certification_file}`}
+                            alt="Ijazah"
+                            className="max-w-full h-auto rounded-lg"
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
+            {/* SKL Dialog */}
             <FormField
               control={form.control}
               name="uploadSkl"
@@ -235,35 +267,78 @@ export default function DataAkademik() {
                 <FormItem>
                   <FormLabel>SKL</FormLabel>
                   <FormControl>
-                    <Button asChild variant={"outline"}>
-                      <a href={`/${data.graduation_letter_file}`} download>
-                        Unduh SKL
-                      </a>
-                    </Button>
+                    <Dialog open={openSkl} onOpenChange={setOpenSkl}>
+                      <DialogTrigger asChild>
+                        <Button variant={"outline"} type="button">
+                          <Eye className="w-4 h-4 mr-2" />
+                          Lihat SKL
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+                        <DialogHeader>
+                          <DialogTitle>
+                            Surat Keterangan Lulus (SKL)
+                          </DialogTitle>
+                          <DialogDescription>
+                            Dokumen SKL pendaftar
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex items-center justify-center p-4">
+                          <img
+                            src={`/${data.graduation_letter_file}`}
+                            alt="SKL"
+                            className="max-w-full h-auto rounded-lg"
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
+            {/* Transkrip Dialog */}
             <FormField
               control={form.control}
               name="uploadTranskrip"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tranksrip Nilai</FormLabel>
+                  <FormLabel>Transkrip Nilai</FormLabel>
                   <FormControl>
-                    <Button asChild variant={"outline"}>
-                      <a href={`/${data.trancript_file}`} download>
-                        Unduh Tranksrip Nilai
-                      </a>
-                    </Button>
+                    <Dialog
+                      open={openTranskrip}
+                      onOpenChange={setOpenTranskrip}
+                    >
+                      <DialogTrigger asChild>
+                        <Button variant={"outline"} type="button">
+                          <Eye className="w-4 h-4 mr-2" />
+                          Lihat Transkrip Nilai
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+                        <DialogHeader>
+                          <DialogTitle>Transkrip Nilai</DialogTitle>
+                          <DialogDescription>
+                            Dokumen transkrip nilai pendaftar
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex items-center justify-center p-4">
+                          <img
+                            src={`/${data.trancript_file}`}
+                            alt="Transkrip"
+                            className="max-w-full h-auto rounded-lg"
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
+            {/* UN Dialog */}
             <FormField
               control={form.control}
               name="uploadUn"
@@ -271,29 +346,71 @@ export default function DataAkademik() {
                 <FormItem>
                   <FormLabel>Ujian Nasional</FormLabel>
                   <FormControl>
-                    <Button asChild variant={"outline"}>
-                      <a href={`/${data.national_exam_file}`} download>
-                        Unduh Nilai Ujian Nasional
-                      </a>
-                    </Button>
+                    <Dialog open={openUn} onOpenChange={setOpenUn}>
+                      <DialogTrigger asChild>
+                        <Button variant={"outline"} type="button">
+                          <Eye className="w-4 h-4 mr-2" />
+                          Lihat Nilai Ujian Nasional
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+                        <DialogHeader>
+                          <DialogTitle>Nilai Ujian Nasional</DialogTitle>
+                          <DialogDescription>
+                            Dokumen nilai UN pendaftar
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex items-center justify-center p-4">
+                          <img
+                            src={`/${data.national_exam_file}`}
+                            alt="UN"
+                            className="max-w-full h-auto rounded-lg"
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
+            {/* Sertifikat Dialog */}
             <FormField
               control={form.control}
               name="uploadSertifikat"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Sertifikat/ Surat Rekomendasi</FormLabel>
+                  <FormLabel>Sertifikat / Surat Rekomendasi</FormLabel>
                   <FormControl>
-                    <Button asChild variant={"outline"}>
-                      <a href={`/${data.selection_test_file}`} download>
-                        Unduh Sertifikat/Surat Rekomendasi
-                      </a>
-                    </Button>
+                    <Dialog
+                      open={openSertifikat}
+                      onOpenChange={setOpenSertifikat}
+                    >
+                      <DialogTrigger asChild>
+                        <Button variant={"outline"} type="button">
+                          <Eye className="w-4 h-4 mr-2" />
+                          Lihat Sertifikat/Surat Rekomendasi
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+                        <DialogHeader>
+                          <DialogTitle>
+                            Sertifikat / Surat Rekomendasi
+                          </DialogTitle>
+                          <DialogDescription>
+                            Dokumen sertifikat atau surat rekomendasi pendaftar
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex items-center justify-center p-4">
+                          <img
+                            src={`/${data.selection_test_file}`}
+                            alt="Sertifikat"
+                            className="max-w-full h-auto rounded-lg"
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -301,7 +418,9 @@ export default function DataAkademik() {
             />
           </div>
           <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
-            <Button variant={"green"}>Kembali</Button>
+            <Link href={`/manager/verification/data-orangtua?id=${id}`}>
+              <Button variant={"green"}>Kembali</Button>
+            </Link>
             <Link href={`/manager/verification/data-prestasi?id=${id}`}>
               <Button variant="matcha">Lanjut</Button>
             </Link>

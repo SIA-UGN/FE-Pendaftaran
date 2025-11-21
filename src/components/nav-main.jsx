@@ -38,7 +38,10 @@ export function NavMain({ items, type }) {
               {item.title === "Statistik" ? (
                 <>
                   <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip={item.title} className="group/button">
+                    <SidebarMenuButton
+                      tooltip={item.title}
+                      className="group/button"
+                    >
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
 
@@ -64,24 +67,33 @@ export function NavMain({ items, type }) {
                       {[
                         {
                           title: "Statistika Pendaftar",
-                          url: type === "manager" ? "/manager/statistik/pendaftar" : "/dashboard/statistik/pendaftar",
+                          url:
+                            type === "manager"
+                              ? "/manager/statistik/pendaftar"
+                              : "/dashboard/statistik/pendaftar",
                           icon: UserRound,
                         },
                         {
                           title: "Statistika Prodi",
-                          url: type === "manager" ? "/manager/statistik/program-studi" : "/dashboard/statistik/program-studi",
+                          url:
+                            type === "manager"
+                              ? "/manager/statistik/program-studi"
+                              : "/dashboard/statistik/program-studi",
                           icon: GraduationCap,
                         },
                         {
                           title: "Statistika Keuangan",
-                          url: type === "manager" ? "/manager/statistik/keuangan" : "/dashboard/statistik/keuangan",
+                          url:
+                            type === "manager"
+                              ? "/manager/statistik/keuangan"
+                              : "/dashboard/statistik/keuangan",
                           icon: Banknote,
                         },
                       ].map((sub) => (
                         <SidebarMenuSubItem key={sub.title}>
                           <SidebarMenuSubButton asChild>
-                            <Link href={sub.url}>
-                              <sub.icon className="text-white"/>
+                            <Link href={sub.url} className="text-white">
+                              <sub.icon className="stroke-white !text-white" />
                               <span>{sub.title}</span>
                             </Link>
                           </SidebarMenuSubButton>

@@ -78,7 +78,7 @@ export default function BroadcastMessage() {
   return (
     <ProtectedRoute>
       <div className="w-full max-w-6xl mx-auto">
-        <div className="flex items-center gap-2 mx-4 sm:mx-8 md:mx-12 mt-4 sm:mt-6 mb-12">
+        <div className="flex items-center gap-2 mx-4 sm:mx-8 md:mx-12 ">
           <Heading title={"Broadcast Notifikasi"} />
         </div>
 
@@ -143,6 +143,7 @@ export default function BroadcastMessage() {
                     <FormControl>
                       <Textarea
                         placeholder="Tulis isi pesan Anda di sini..."
+                        className={"bg-white"}
                         {...field}
                       />
                     </FormControl>
