@@ -260,9 +260,9 @@ export default function Pembayaran() {
         </div>
 
         {/* Status Payment */}
-        <div className="mb-6">
+        {/* <div className="mb-6">
           <StatusBadge status={paymentStatus} />
-        </div>
+        </div> */}
 
         {/* Alert Deadline */}
         {!isExpired && paymentStatus === "pending" && (
