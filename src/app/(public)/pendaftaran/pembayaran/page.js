@@ -50,8 +50,6 @@ export default function Pembayaran() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
 
-  console.log(paymentData);
-
   useEffect(() => {
     if (paymentData?.payment_method_id) {
       setSelectedPaymentMethod(paymentData.payment_method_id);
