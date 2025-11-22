@@ -12,6 +12,9 @@ import {
   XCircle,
   Info,
   Loader2,
+  CreditCard,
+  Banknote,
+  Wallet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,13 +27,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import RegistrationProgress from "@/components/RegistrationProgress";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { usePayment } from "@/hooks/usePayment";
 import { useMyRegistration } from "@/hooks/useRegistration";
-import { set } from "zod";
 
 export default function Pembayaran() {
   const router = useRouter();
@@ -44,6 +48,20 @@ export default function Pembayaran() {
   const [uploading, setUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+
+  console.log(paymentData);
+
+  useEffect(() => {
+    if (paymentData?.payment_method_id) {
+      setSelectedPaymentMethod(paymentData.payment_method_id);
+    } else if (
+      !selectedPaymentMethod &&
+      paymentData?.available_payment_methods?.length > 0
+    ) {
+      setSelectedPaymentMethod(paymentData.available_payment_methods[0].id);
+    }
+  }, [paymentData, selectedPaymentMethod]);
 
   // Countdown timer
   useEffect(() => {
@@ -92,7 +110,7 @@ export default function Pembayaran() {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    toast.success("Nomor rekening berhasil disalin!");
+    toast.success("Data pembayaran berhasil disalin!");
   };
 
   const handleFileSelect = (e) => {
@@ -144,6 +162,26 @@ export default function Pembayaran() {
     setIsDialogOpen(false);
     setUploadSuccess(false);
     setIsUploading(false);
+  };
+
+  const selectedMethod = paymentData?.available_payment_methods?.find(
+    (method) => method.id === selectedPaymentMethod
+  );
+
+  const getPaymentIcon = (methodType) => {
+    if (
+      methodType &&
+      (methodType.includes("bank") || methodType.includes("transfer"))
+    ) {
+      return <Banknote className="w-4 h-4" />;
+    } else if (
+      methodType &&
+      (methodType.includes("wallet") || methodType.includes("e-wallet"))
+    ) {
+      return <Wallet className="w-4 h-4" />;
+    } else {
+      return <CreditCard className="w-4 h-4" />;
+    }
   };
 
   const StatusBadge = ({ status }) => {
@@ -325,40 +363,96 @@ export default function Pembayaran() {
               </Card>
             )}
 
+            {/* Pemilihan Metode Pembayaran */}
+            {paymentData?.available_payment_methods?.length > 1 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    {getPaymentIcon("payment")}
+                    <span>Pilih Metode Pembayaran</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <RadioGroup
+                    value={selectedPaymentMethod?.toString()}
+                    onValueChange={(value) =>
+                      setSelectedPaymentMethod(Number(value))
+                    }
+                    className="grid grid-cols-1 gap-3"
+                  >
+                    {paymentData?.available_payment_methods?.map((method) => (
+                      <div
+                        key={method.id}
+                        className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-colors ${
+                          selectedPaymentMethod === method.id
+                            ? "border-green-500 bg-green-50"
+                            : "border-gray-200 hover:bg-gray-50"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <RadioGroupItem
+                            value={method.id.toString()}
+                            id={`method-${method.id}`}
+                          />
+                          <div className="flex flex-col">
+                            <span className="font-medium">
+                              {method.bank_name}
+                            </span>
+                            <span className="text-sm text-muted-foreground">
+                              a.n {method.account_holder}
+                            </span>
+                            <span className="text-sm font-mono">
+                              {method.account_number}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {getPaymentIcon(method.method_type)}
+                        </div>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Informasi Rekening */}
             <Card>
               <CardHeader>
-                <CardTitle>Transfer Bank</CardTitle>
+                <CardTitle>
+                  {selectedMethod
+                    ? `${selectedMethod.bank_name}`
+                    : "Transfer Bank"}
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {paymentData?.bank_accounts?.map((account, index) => (
-                  <div
-                    key={index}
-                    className="p-4 border rounded-lg bg-gray-50 space-y-2"
-                  >
+                {selectedMethod ? (
+                  <div className="p-4 border rounded-lg bg-gray-50 space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="font-bold text-lg">
-                        {account.bank_name}
+                        {selectedMethod.bank_name}
                       </span>
                       <span className="text-sm text-muted-foreground">
-                        a.n {account.account_holder}
+                        a.n {selectedMethod.account_holder}
                       </span>
                     </div>
                     <div className="flex items-center justify-between bg-white p-3 rounded border">
                       <span className="font-mono text-lg font-bold">
-                        {account.account_number}
+                        {selectedMethod.account_number}
                       </span>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => copyToClipboard(account.account_number)}
+                        onClick={() =>
+                          copyToClipboard(selectedMethod.account_number)
+                        }
                       >
                         <Copy className="w-4 h-4 mr-2" />
                         Salin
                       </Button>
                     </div>
                   </div>
-                )) || (
+                ) : (
                   <div className="p-4 border rounded-lg bg-gray-50 space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="font-bold text-lg">Bank BCA</span>
@@ -399,7 +493,14 @@ export default function Pembayaran() {
                     (Rp{" "}
                     {paymentData?.amount?.toLocaleString("id-ID") || "300.000"})
                   </li>
-                  <li>Transfer ke salah satu rekening yang tersedia di atas</li>
+                  <li>
+                    Transfer ke rekening yang dipilih:
+                    <strong>
+                      {" "}
+                      {selectedMethod?.bank_name || "Bank BCA"} (a.n{" "}
+                      {selectedMethod?.account_holder || "Universitas Global"})
+                    </strong>
+                  </li>
                   <li>Simpan bukti transfer Anda</li>
                   <li>
                     Upload bukti transfer melalui tombol "Konfirmasi Pembayaran"
@@ -533,13 +634,11 @@ export default function Pembayaran() {
                 </Button>
               </Link>
 
-              {paymentStatus === "verified" && (
-                <Link href="/pendaftaran/status" className="block">
-                  <Button variant="green" className="w-full">
-                    Lihat Status Pendaftaran
-                  </Button>
-                </Link>
-              )}
+              <Link href="/pendaftaran/status" className="block">
+                <Button variant="green" className="w-full">
+                  Lihat Status Pendaftaran
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
