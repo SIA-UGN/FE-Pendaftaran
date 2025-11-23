@@ -81,7 +81,9 @@ export default function Login() {
         <div className="w-full flex items-center justify-end bg-white  rounded-[5vw]">
           <div className="py-6 w-full md:w-5/8 h-full flex flex-col justify-center gap-4 md:px-12">
             <CardHeader className={"text-center"}>
-              <CardTitle className={"font-bold text-3xl md:text-4xl text-[var(--green)]"}>
+              <CardTitle
+                className={"font-bold text-3xl md:text-4xl text-[var(--green)]"}
+              >
                 LOGIN
               </CardTitle>
             </CardHeader>
@@ -138,8 +140,11 @@ export default function Login() {
               </form>
               <CardFooter className="flex justify-center md:hidden gap-1 p-0 mt-3">
                 <div className="text-sm md:text-md flex flex-col items-center gap-2">
-                  <span>Don`t have an account?</span>
-                  <a href={"/register"} className="font-bold text-[var(--green)] hover:text-var[(--green)]]/80">
+                  <div>Don`t have an account?</div>
+                  <a
+                    href={"/register"}
+                    className="font-bold text-[var(--green)] hover:text-var[(--green)]]/80"
+                  >
                     Register
                   </a>
                 </div>

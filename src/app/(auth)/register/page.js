@@ -153,8 +153,8 @@ export default function RegisterPage() {
                 </Button>
               </form>
               <CardFooter className="flex justify-center md:hidden gap-1 p-0 mt-3">
-                <div className="text-sm md:text-md flex-col items-center gap-2">
-                  <span>Already have an account?</span>
+                <div className="text-sm flex md:text-md flex-col items-center gap-2">
+                  <div>Already have an account?</div>
                   <a
                     href={"/login"}
                     className="font-bold text-[var(--green)]  hover:text-var[(--green)]]/80"
