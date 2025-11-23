@@ -13,9 +13,16 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  SidebarClose,
 } from "@/components/ui/sidebar";
 
-import { LayoutDashboard, Users, BarChart3, Wallet, Megaphone } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  BarChart3,
+  Wallet,
+  Megaphone,
+} from "lucide-react";
 
 const data = {
   user: {
@@ -53,6 +60,7 @@ export function ManagerSidebar({ ...props }) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
+        <SidebarClose />
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <DropdownMenuSeparator />

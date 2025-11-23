@@ -38,11 +38,7 @@ export default function Navbar() {
   const [mobileProfilOpen, setMobileProfilOpen] = useState(false);
   const [hasNotification, setHasNotification] = useState(true);
 
-  const {
-    data: unreadNotificationsData,
-    isError,
-    error,
-  } = useUnreadCount();
+  const { data: unreadNotificationsData, isError, error } = useUnreadCount();
 
   useEffect(() => {
     const updateUserData = () => {
@@ -121,7 +117,18 @@ export default function Navbar() {
         </Link>
       </div>
 
-      <div className="flex md:hidden items-center">
+      {/* Mobile Right Section */}
+      <div className="flex md:hidden items-center gap-3">
+        {isLoggedIn && (
+          <Link href="/notifikasi" className="relative">
+            <Bell className="w-6 h-6 cursor-pointer hover:text-white/90 text-white" />
+            {unreadNotifications > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                {unreadNotifications}
+              </span>
+            )}
+          </Link>
+        )}
         <button
           onClick={toggleMobileMenu}
           className="text-white cursor-pointer"
@@ -283,6 +290,31 @@ export default function Navbar() {
                   {item.label}
                 </Link>
               ))}
+
+              {/* Notifikasi & Profil di Mobile Menu */}
+              {isLoggedIn && (
+                <>
+                  <Link
+                    href="/notifikasi"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-6 py-4 text-lg font-medium tracking-wide hover:bg-[var(--yellow)] hover:text-[var(--green)] transition-colors duration-200 flex items-center justify-between"
+                  >
+                    <span>Notifikasi</span>
+                    {unreadNotifications > 0 && (
+                      <span className="bg-red-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                        {unreadNotifications}
+                      </span>
+                    )}
+                  </Link>
+                  <Link
+                    href="/profil"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-6 py-4 text-lg font-medium tracking-wide hover:bg-[var(--yellow)] hover:text-[var(--green)] transition-colors duration-200"
+                  >
+                    Profil
+                  </Link>
+                </>
+              )}
 
               <div className="p-4 flex flex-col gap-3 bg-[var(--green)]/90">
                 {isLoggedIn ? (
