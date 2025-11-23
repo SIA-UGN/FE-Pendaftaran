@@ -46,9 +46,7 @@ export default function ApplicantList({ data, type }) {
 
   return (
     <div className="w-full px-4 sm:px-0">
-      {/* Bagian Pencarian & Filter */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 my-4 sm:my-6 w-full">
-        {/* Input Pencarian */}
         <div className="flex-1 min-w-0 border-1 border-[var(--green)] rounded-lg">
           <InputGroup className="w-full">
             <InputGroupInput
@@ -63,7 +61,6 @@ export default function ApplicantList({ data, type }) {
           </InputGroup>
         </div>
 
-        {/* Dropdown Filter Status */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -97,7 +94,6 @@ export default function ApplicantList({ data, type }) {
         </DropdownMenu>
       </div>
 
-      {/* Tabel Pendaftar */}
       <div className="w-full overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
         <ApplicantTable data={filteredApplicants} type={type} />
       </div>

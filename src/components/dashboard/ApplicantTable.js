@@ -84,6 +84,11 @@ export function ApplicantTable({ data, type }) {
       header: "Status",
       cell: ({ row }) => {
         const status = row.getValue("status");
+        const statusLabels = {
+          approved: "Approved",
+          rejected: "Rejected",
+          under_review: "Under Review",
+        };
         return (
           <div className="text-center">
             <span
@@ -95,7 +100,7 @@ export function ApplicantTable({ data, type }) {
                     : "bg-yellow-100 text-yellow-700"
               }`}
             >
-              {status}
+              {statusLabels[status] || status}
             </span>
           </div>
         );
@@ -127,15 +132,7 @@ export function ApplicantTable({ data, type }) {
                 size="sm"
                 className="text-sm font-medium text-[var(--green)] hover:bg-[var(--green)] hover:text-white transition-all rounded-md"
               >
-                {type === "manager" ? (
-                  <>
-                    Verifikasi
-                  </>
-                ) : (
-                  <>
-                    Lihat
-                  </>
-                )}
+                {type === "manager" ? <>Verifikasi</> : <>Lihat</>}
               </Button>
             </Link>
           </div>

@@ -4,6 +4,7 @@ import { MajorTable } from "@/components/MajorTable";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/Heading";
 import { useAdminDashboard, useApplicantStatistics } from "@/hooks/useAdmin";
+import { StatCard } from "@/components/StatCard";
 
 export default function Page() {
   const { data, isLoading, isError, error } = useAdminDashboard();
@@ -38,45 +39,19 @@ export default function Page() {
   return (
     <div className="w-full min-h-screen">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 max-w-7xl">
-        {/* Section: Pendaftar & Manajer */}
         <Heading title={"Pendaftar & Manajer"} variant="first" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-10 lg:mb-12">
-          <Card className="flex items-center justify-center p-4 sm:p-6 lg:p-8 flex-col stroke-black gap-2 min-h-[140px] sm:min-h-[160px] border border-black shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <span className="font-bold text-3xl sm:text-4xl lg:text-4xl">
-              {totalApplicants}
-            </span>
-            <span className="text-sm sm:text-base lg:text-lg text-gray-500">
-              Pendaftar
-            </span>
-          </Card>
-          <Card className="flex items-center justify-center p-4 sm:p-6 lg:p-8 flex-col stroke-black gap-2 min-h-[140px] sm:min-h-[160px] border border-black shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <span className="font-bold text-3xl sm:text-4xl lg:text-4xl">
-              {totalManagers}
-            </span>
-            <span className="text-sm sm:text-base lg:text-lg text-gray-500">
-              Manager
-            </span>
-          </Card>
+          <StatCard value={totalApplicants} label={"Pendaftar"} />
+          <StatCard value={totalManagers} label={"Manager"} />
         </div>
 
         <Heading title={"Quick Status"} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-10 lg:mb-12">
-          <Card className="flex items-center justify-center p-4 sm:p-6 lg:p-8 flex-col stroke-black gap-3 sm:gap-5 min-h-[140px] sm:min-h-[160px] border border-black shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <span className="font-bold text-2xl sm:text-3xl lg:text-4xl text-center break-all">
-              Rp {Number(revenue).toLocaleString("id-ID")}
-            </span>
-            <span className="text-sm sm:text-base lg:text-lg text-gray-500 text-center">
-              Total Pendapatan
-            </span>
-          </Card>
-          <Card className="flex items-center justify-center p-4 sm:p-6 lg:p-8 flex-col stroke-black gap-3 sm:gap-5 min-h-[140px] sm:min-h-[160px] border border-black shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <span className="font-bold text-3xl sm:text-4xl lg:text-4xl">
-              {growthPercentage}%
-            </span>
-            <span className="text-sm sm:text-base lg:text-lg text-gray-500">
-              Kenaikan
-            </span>
-          </Card>
+          <StatCard
+            value={`Rp ${Number(revenue).toLocaleString("id-ID")}`}
+            label={"Total Pendapatan"}
+          />
+          <StatCard value={`${growthPercentage}%`} label={"Kenaikan"} />
         </div>
 
         <Heading title={"Prodi Pendaftar"} />

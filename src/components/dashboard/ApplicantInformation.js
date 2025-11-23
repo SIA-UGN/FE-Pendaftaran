@@ -25,12 +25,10 @@ export default function ApplicantInformation({
 
   return (
     <div className="w-full">
-      {/* Bagian Verifikasi Dokumen */}
       <section className="w-full">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-7xl">
           <Heading title={"Data Verifikasi Dokumen Pendaftar"} variant="first"/>
 
-          {/* Grid Statistik 3 Kolom */}
           <div
             className="
               grid w-full gap-4 sm:gap-6 lg:gap-8 xl:gap-12
@@ -43,7 +41,6 @@ export default function ApplicantInformation({
             <StatCard value={Pending} label={"Pending"} />
           </div>
 
-          {/* Daftar Pendaftar */}
           <div className="w-full">
             {VerificationTable.data.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 sm:py-16 px-4">
@@ -77,15 +74,12 @@ export default function ApplicantInformation({
         </div>
       </section>
 
-      {/* Divider */}
       <div className="w-full border-t border-gray-200"></div>
 
-      {/* Bagian Kelulusan */}
       <section className="w-full">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 max-w-7xl">
           <Heading title="Data Kelulusan Pendaftar" variant={"first"} />
 
-          {/* Grid Statistik 2 Kolom */}
           <div
             className="
               grid w-full max-w-4xl mx-auto
@@ -98,7 +92,6 @@ export default function ApplicantInformation({
             <StatCard value={TidakLulus} label={"Tidak Lulus"} />
           </div>
 
-          {/* Daftar Kelulusan */}
           <div className="w-full">
             {GraduationTable.data.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 sm:py-16 px-4">

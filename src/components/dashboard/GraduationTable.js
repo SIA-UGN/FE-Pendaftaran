@@ -86,18 +86,22 @@ export function GraduationTable({ data, type }) {
       header: "Status",
       cell: ({ row }) => {
         const status = row.getValue("graduation_status");
+        const statusLabels = {
+          graduated: "Graduated",
+          not_graduated: "Not Graduated",
+        };
         return (
           <div className="text-center">
             <span
               className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
                 status === "graduated"
                   ? "bg-green-100 text-green-700"
-                  : status === "rejected"
+                  : status === "not_graduated"
                     ? "bg-red-100 text-red-700"
                     : "bg-yellow-100 text-yellow-700"
               }`}
             >
-              {status}
+              {statusLabels[status] || status}
             </span>
           </div>
         );
@@ -163,7 +167,7 @@ export function GraduationTable({ data, type }) {
   return (
     <div className="w-full space-y-4">
       {/* Filters */}
-     
+
       {/* Desktop Table */}
       <div className="hidden md:block overflow-hidden rounded-md border">
         <Table>
@@ -256,12 +260,16 @@ export function GraduationTable({ data, type }) {
                       className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
                         applicant.graduation_status === "graduated"
                           ? "bg-green-100 text-green-700"
-                          : applicant.graduation_status === "rejected"
+                          : applicant.graduation_status === "not_graduated"
                             ? "bg-red-100 text-red-700"
                             : "bg-yellow-100 text-yellow-700"
                       }`}
                     >
-                      {applicant.graduation_status}
+                      {applicant.graduation_status === "graduated"
+                        ? "Graduated"
+                        : applicant.graduation_status === "not_graduated"
+                          ? "Not Graduated"
+                          : applicant.graduation_status}
                     </span>
                   </div>
 

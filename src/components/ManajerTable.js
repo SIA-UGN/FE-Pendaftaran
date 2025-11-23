@@ -182,7 +182,6 @@ export function ManajerTable({ data }) {
 
   return (
     <div className="w-full space-y-4">
-
       {/* Desktop Table */}
       <div className="hidden md:block overflow-hidden rounded-md border">
         <Table>
@@ -229,14 +228,6 @@ export function ManajerTable({ data }) {
               </TableRow>
             )}
           </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TableCell colSpan={3}>Total Manajer</TableCell>
-              <TableCell className="text-center font-semibold" colSpan={2}>
-                {table.getFilteredRowModel().rows.length}
-              </TableCell>
-            </TableRow>
-          </TableFooter>
         </Table>
       </div>
 
