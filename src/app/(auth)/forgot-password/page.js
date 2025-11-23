@@ -27,7 +27,6 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [showDialog, setShowDialog] = useState(false);
   
-  // State untuk form reset password
   const [token, setToken] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
@@ -78,7 +77,6 @@ export default function ForgotPassword() {
         onSuccess: () => {
           toast.success("Password reset successful");
           setShowDialog(false);
-          // Reset form
           setEmail("");
           setToken("");
           setPassword("");
