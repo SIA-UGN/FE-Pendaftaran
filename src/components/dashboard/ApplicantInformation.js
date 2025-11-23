@@ -15,6 +15,10 @@ export default function ApplicantInformation({
   GraduationTable,
   type,
 }) {
+  console.log(Approved);
+  console.log(Rejected);
+  console.log(Pending);
+
   console.log(VerificationTable.data);
   console.log(GraduationTable.data);
   console.log(`type : ${type}`);

@@ -25,10 +25,12 @@ export default function Pendaftar() {
   const Lulus = data.data.data.graduation_summary.lulus;
   const TidakLulus = data.data.data.graduation_summary.tidak_lulus;
 
-  // console.log(data.data.data);
-
+  
   const VerificationTable = data.data.data.verification_table;
   const GraduationTable = data.data.data.graduation_table;
+  console.log(data.data.data.verification_summary);
+  console.log(data.data.data.verification_table);
+
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-6xl mx-auto">
       <ApplicantInformation

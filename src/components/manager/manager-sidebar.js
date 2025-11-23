@@ -15,7 +15,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-import { LayoutDashboard, Users, BarChart3, Wallet } from "lucide-react";
+import { LayoutDashboard, Users, BarChart3, Wallet, Megaphone } from "lucide-react";
 
 const data = {
   user: {
@@ -44,7 +44,7 @@ const data = {
     {
       title: "Broadcast",
       url: "/manager/broadcast",
-      icon: Users,
+      icon: Megaphone,
     },
   ],
 };

@@ -118,7 +118,7 @@ export function ApplicantTable({ data, type }) {
             <Link
               href={
                 type === "manager"
-                  ? `/manager/verification?id=${applicant.user_id}`
+                  ? `/manager/verification?id=${applicant.id}`
                   : `/dashboard/profile?id=${applicant.user_id}`
               }
             >

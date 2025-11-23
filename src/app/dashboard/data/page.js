@@ -11,13 +11,12 @@ import Link from "next/link";
 import { useApplicantStatistics } from "@/hooks/useAdmin";
 
 export default function Page() {
-
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState("pendaftar");
 
-  const { data, isLoading, isError, error } = useApplicantStatistics({ per_page: 100 });
+  const { data, isLoading, isError, error } = useApplicantStatistics({per_page: 100});
 
-  console.log(data)
+  console.log(data);
 
   if (isLoading) {
     return (
@@ -56,7 +55,6 @@ export default function Page() {
 
   const VerificationTable = data.data.data.verification_table;
   const GraduationTable = data.data.data.graduation_table;
-
 
   return (
     <div className="w-full min-h-screen">

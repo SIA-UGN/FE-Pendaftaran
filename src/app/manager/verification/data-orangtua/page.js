@@ -1,4 +1,4 @@
-"use client"; // <-- Diperlukan untuk form interaktif
+"use client";
 
 import { useSearchParams } from "next/navigation";
 
@@ -29,6 +29,7 @@ import { useState } from "react";
 import RegistrationProgress from "@/components/registrations/RegistrationProgress";
 
 import { Card } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import {
   AlertDialog,
@@ -81,12 +82,11 @@ const FormSchema = z.object({
 
 export default function DataOrangtua() {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [activeForm, setActiveForm] = useState("orangTua");
 
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const user_id = searchParams.get("user_id");
-
-  const [activeForm, setActiveForm] = useState("orangTua");
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
@@ -116,7 +116,6 @@ export default function DataOrangtua() {
     return <div>Error loading applicant: {applicantError.message}</div>;
 
   const applicant = applicantData?.data?.data;
-
   const father = applicant.steps.father;
   const mother = applicant.steps.mother;
 
@@ -136,20 +135,55 @@ export default function DataOrangtua() {
           <Button variant={"yellow"}>{applicant.user.status}</Button>
         </Card>
 
-        <div className="flex justify-between">
-          <div className="flex items-center gap-2 pb-0">
+        <div className="flex flex-col justify-between items-start gap-4">
+          <div className="flex gap-2 pb-0 items-start justify-start">
             <CheckCircle className="text-green-500" />
             <h2 className="text-xl font-semibold">Data Orang Tua</h2>
           </div>
-          <Button
-            type="button"
-            variant="yellow"
-            onClick={() =>
-              setActiveForm(activeForm === "orangTua" ? "wali" : "orangTua")
-            }
-          >
-            {activeForm === "orangTua" ? "Data Wali" : "Data Orang Tua"}
-          </Button>
+
+          {/* Tabs Navigation */}
+          <div className="w-full sm:w-auto max-w-lg mx-auto">
+            <Tabs
+              value={activeForm}
+              onValueChange={setActiveForm}
+              className="w-full"
+            >
+              <TabsList
+                className="grid w-full grid-cols-2 bg-gray-200 p-1 rounded-full 
+                h-10 sm:h-12 
+                text-xs sm:text-sm
+                shadow-md hover:shadow-lg transition-shadow duration-300"
+              >
+                <TabsTrigger
+                  value="orangTua"
+                  className="rounded-full 
+                  data-[state=active]:bg-green-800 
+                  data-[state=active]:text-[var(--yellow)] 
+                  data-[state=inactive]:text-gray-600
+                  data-[state=inactive]:hover:text-gray-900
+                  transition-all duration-200 cursor-pointer 
+                  py-2 sm:py-2.5
+                  font-medium"
+                >
+                  Orang Tua
+                </TabsTrigger>
+
+                <TabsTrigger
+                  value="wali"
+                  className="rounded-full 
+                  data-[state=active]:bg-green-800 
+                  data-[state=active]:text-[var(--yellow)] 
+                  data-[state=inactive]:text-gray-600
+                  data-[state=inactive]:hover:text-gray-900
+                  transition-all duration-200 cursor-pointer 
+                  py-2 sm:py-2.5
+                  font-medium"
+                >
+                  Wali
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
         </div>
       </div>
 
@@ -157,8 +191,8 @@ export default function DataOrangtua() {
         <form className="space-y-8">
           <div className="flex flex-col gap-5 p-12 border rounded-xl m-12 bg-[var(--light-cream)]">
             {activeForm === "orangTua" && (
-              <>
-                <div className=" p-4 rounded-md space-y-4">
+              <div className="animate-in fade-in duration-300">
+                <div className="p-4 rounded-md space-y-4">
                   <h3 className="font-semibold text-lg">Data Identitas Ayah</h3>
                   <FormField
                     control={form.control}
@@ -263,7 +297,7 @@ export default function DataOrangtua() {
                   </div>
                 </div>
 
-                <div className=" p-4 rounded-md space-y-4">
+                <div className="p-4 rounded-md space-y-4 mt-6">
                   <h3 className="font-semibold text-lg">Data Identitas Ibu</h3>
                   <FormField
                     control={form.control}
@@ -371,10 +405,11 @@ export default function DataOrangtua() {
                     />
                   </div>
                 </div>
-              </>
+              </div>
             )}
+
             {activeForm === "wali" && (
-              <div className=" p-4 rounded-md space-y-4">
+              <div className="p-4 rounded-md space-y-4 animate-in fade-in duration-300">
                 <h3 className="font-semibold text-lg">
                   Data Identitas Wali (Opsional)
                 </h3>
@@ -470,7 +505,9 @@ export default function DataOrangtua() {
             )}
           </div>
           <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
-            <Button variant={"green"}>Kembali</Button>
+            <Link href={`/manager/verification/data-alamat?id=${id}`}>
+              <Button variant={"green"}>Kembali</Button>
+            </Link>
             <Link href={`/manager/verification/data-akademik?id=${id}`}>
               <Button variant="matcha">Lanjut</Button>
             </Link>
