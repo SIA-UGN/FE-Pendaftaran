@@ -90,7 +90,7 @@ export default function Login() {
             <CardContent>
               <form
                 onSubmit={handleSubmit}
-                className="grid gap-4 overflow-auto"
+                className="flex flex-col gap-4 overflow-auto"
               >
                 <div className="flex flex-col gap-6 flex-1">
                   <div className="grid gap-2">
@@ -125,7 +125,7 @@ export default function Login() {
                     <ReCAPTCHA
                       sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
                       onChange={setCaptcha}
-                      className="w-1/2 px-6"
+                      className="w-full px-6"
                     />
                   </div>
                 </div>
