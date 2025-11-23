@@ -143,7 +143,7 @@ export default function DataAkademik() {
 
   return (
     <>
-      <div className="mx-12 mt-6 grid grid-cols-1 gap-12">
+      <div className="mx-3 md:mx-12 mt-6 grid grid-cols-1 gap-12">
         <Card className="w-full flex flex-col md:flex-row gap-6 p-8 rounded-2xl shadow-md bg-[var(--light-cream)] justify-between">
           <div className="flex flex-col p-2 w-full sm:w-2/3 space-y-1 items-start">
             <h2 className="font-bold text-xl">{applicant.user.name}</h2>
@@ -162,7 +162,7 @@ export default function DataAkademik() {
       </div>
       <Form {...form}>
         <form className="space-y-6">
-          <div className="flex flex-col gap-5 p-12 border rounded-xl m-12 bg-[var(--light-cream)]">
+          <div className="flex flex-col gap-5 p-12 border rounded-xl m-0 md:m-12 bg-[var(--light-cream)]">
             <FormField
               control={form.control}
               name="sekolahAsal"
@@ -191,7 +191,13 @@ export default function DataAkademik() {
                       <FormLabel>Status Kelulusan</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder={data.graduation_status}
+                          placeholder={
+                            data.graduation_status === "graduated"
+                              ? "Lulus"
+                              : data.graduation_status === "not_graduated"
+                                ? "Tidak Lulus"
+                                : data.graduation_status
+                          }
                           {...field}
                           readOnly
                         />
@@ -210,7 +216,11 @@ export default function DataAkademik() {
                       <FormLabel>Ijazah Terakhir</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder={data.last_certificate}
+                          placeholder={
+                            data.last_certificate
+                              ? data.last_certificate.toUpperCase()
+                              : ""
+                          }
                           {...field}
                           readOnly
                         />

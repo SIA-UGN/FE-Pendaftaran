@@ -80,6 +80,24 @@ const FormSchema = z.object({
   penghasilanWali: z.string().optional(),
 });
 
+const formatEducation = (value) => {
+  if (!value) return "-";
+  return value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+};
+
+const formatIncome = (value) => {
+  switch (value) {
+    case "below_5m":
+      return "Di bawah 5 juta";
+    case "5m_to_10m":
+      return "5 juta – 10 juta";
+    case "above_10m":
+      return "Di atas 10 juta";
+    default:
+      return value || "-";
+  }
+};
+
 export default function DataOrangtua() {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [activeForm, setActiveForm] = useState("orangTua");
@@ -123,7 +141,7 @@ export default function DataOrangtua() {
 
   return (
     <>
-      <div className="mx-12 mt-6 grid grid-cols-1 gap-12">
+      <div className="mx-3 md:mx-12 mt-6 grid grid-cols-1 gap-12">
         <Card className="w-full flex flex-col md:flex-row gap-6 p-8 rounded-2xl shadow-md bg-[var(--light-cream)] justify-between">
           <div className="flex flex-col p-2 w-full sm:w-2/3 space-y-1 items-start">
             <h2 className="font-bold text-xl">{applicant.user.name}</h2>
@@ -189,7 +207,7 @@ export default function DataOrangtua() {
 
       <Form {...form}>
         <form className="space-y-8">
-          <div className="flex flex-col gap-5 p-12 border rounded-xl m-12 bg-[var(--light-cream)]">
+          <div className="flex flex-col gap-5 p-12 border rounded-xl m-0 md:m-12 bg-[var(--light-cream)]">
             {activeForm === "orangTua" && (
               <div className="animate-in fade-in duration-300">
                 <div className="p-4 rounded-md space-y-4">
@@ -271,7 +289,10 @@ export default function DataOrangtua() {
                         <FormItem>
                           <FormLabel>Pendidikan Terakhir Ayah</FormLabel>
                           <FormControl>
-                            <Input placeholder={father.education} readOnly />
+                            <Input
+                              placeholder={formatEducation(father.education)}
+                              readOnly
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -285,7 +306,7 @@ export default function DataOrangtua() {
                           <FormLabel>Penghasilan Ayah</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder={father.income}
+                              placeholder={formatIncome(father.income)}
                               {...field}
                               readOnly
                             />
@@ -377,7 +398,7 @@ export default function DataOrangtua() {
                           <FormLabel>Pendidikan Terakhir Ibu</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder={mother.education}
+                              placeholder={formatEducation(mother.education)}
                               {...field}
                               readOnly
                             />
@@ -394,7 +415,7 @@ export default function DataOrangtua() {
                           <FormLabel>Penghasilan Ibu</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder={mother.income}
+                              placeholder={formatIncome(mother.income)}
                               {...field}
                               readOnly
                             />

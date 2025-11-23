@@ -44,7 +44,7 @@ export function TeamSwitcher({ teams }) {
                 />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight text-wrap">
-                <span className="truncate font-semibold text-[var(--yellow)] text-wrap text-md">
+                <span className="truncate font-semibold text-[var(--yellow)] text-wrap text-md w-3/4 md:w-full">
                   Universitas Global Nusantara
                 </span>
               </div>

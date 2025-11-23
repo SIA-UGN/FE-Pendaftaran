@@ -1,7 +1,16 @@
 "use client";
 
 import { TrendingUp } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, LabelList, XAxis, Cell, YAxis, ResponsiveContainer } from "recharts";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  LabelList,
+  XAxis,
+  Cell,
+  YAxis,
+  ResponsiveContainer,
+} from "recharts";
 
 import {
   Card,
@@ -17,19 +26,11 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useYearlyRevenue } from "@/hooks/useAdmin";
 
 const colors = ["var(--green)", "var(--yellow)"];
 
 export const description = "A bar chart with a label";
-
-const chartData = [
-  { year: "2020", desktop: 186 },
-  { year: "2021", desktop: 305 },
-  { year: "2022", desktop: 237 },
-  { year: "2023", desktop: 73 },
-  { year: "2024", desktop: 209 },
-  { year: "2025", desktop: 214 },
-];
 
 const chartConfig = {
   desktop: {
@@ -39,6 +40,20 @@ const chartConfig = {
 };
 
 export function ChartBarLabel() {
+  const {
+    data: yearlyRevenueData,
+    isLoading,
+    isError,
+    error,
+  } = useYearlyRevenue(5);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error: {error?.message}</div>;
+
+  const data = yearlyRevenueData?.data?.data;
+  console.log(data);
+  const yearly_revenue = data?.yearly_revenue;
+
   return (
     <Card className="w-full">
       <CardHeader className="px-4 sm:px-6 pt-4 sm:pt-6">
@@ -46,15 +61,18 @@ export function ChartBarLabel() {
           Bar Chart - Label
         </CardTitle>
         <CardDescription className="text-xs sm:text-sm">
-          2020 - 2024
+          {data.range.start} - {data.range.end}
         </CardDescription>
       </CardHeader>
       <CardContent className="px-2 sm:px-4 lg:px-6 pb-4 sm:pb-6">
-        <ChartContainer config={chartConfig} className="h-[250px] sm:h-[300px] lg:h-[350px] w-full">
+        <ChartContainer
+          config={chartConfig}
+          className="h-[250px] sm:h-[300px] lg:h-[350px] w-full"
+        >
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               accessibilityLayer
-              data={chartData}
+              data={yearly_revenue}
               margin={{
                 top: 20,
                 right: 10,
@@ -95,7 +113,7 @@ export function ChartBarLabel() {
                 content={<ChartTooltipContent hideLabel />}
               />
               <Bar dataKey="desktop" radius={8} maxBarSize={60}>
-                {chartData.map((entry, index) => (
+                {yearly_revenue.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={colors[index % colors.length]}

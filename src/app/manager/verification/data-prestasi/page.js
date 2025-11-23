@@ -89,7 +89,7 @@ export default function DataPrestasi() {
 
   return (
     <>
-      <div className="mx-12 mt-6 grid grid-cols-1 gap-12">
+      <div className="mx-3 md:mx-12 mt-6 grid grid-cols-1 gap-12">
         <Card className="w-full flex flex-col md:flex-row gap-6 p-8 rounded-2xl shadow-md bg-[var(--light-cream)] justify-between">
           <div className="flex flex-col p-2 w-full sm:w-2/3 space-y-1 items-start">
             <h2 className="font-bold text-xl">{applicant.user.name}</h2>
@@ -111,7 +111,7 @@ export default function DataPrestasi() {
 
       <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
         <Button variant={"green"}>Kembali</Button>
-        <Link href={`/manager/verification/pembayaran?id=${id}`}>
+        <Link href={`/manager/verification/pembayaran?payment_id=${applicant.payment_info.id}&id=${id}`}>
           <Button variant="matcha">Lanjut</Button>
         </Link>
       </div>

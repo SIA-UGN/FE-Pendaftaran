@@ -29,6 +29,33 @@ import {
 
 import { useApplicantDetail } from "@/hooks/useManager";
 
+const formatValue = (value) => {
+  if (!value) return "";
+
+  const lower = value.toString().toLowerCase();
+
+  const genderMap = {
+    male: "Laki-laki",
+    female: "Perempuan",
+  };
+  if (genderMap[lower]) return genderMap[lower];
+
+  const countryMap = {
+    wni: "WNI",
+    wna: "WNA",
+  };
+  if (countryMap[lower]) return countryMap[lower];
+
+  if (value.includes("_")) {
+    return value
+      .split("_")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+  }
+
+  return value.charAt(0).toUpperCase() + value.slice(1);
+};
+
 export default function DataDiri() {
   const router = useRouter();
   const [showCancelDialog, setShowCancelDialog] = useState(false);
@@ -78,7 +105,7 @@ export default function DataDiri() {
 
   return (
     <ProtectedRoute>
-      <div className="mx-12 mt-6 grid grid-cols-1 gap-12">
+      <div className="mx-3 md:mx-12 mt-6 grid grid-cols-1 gap-12">
         <Card className="w-full flex flex-col md:flex-row gap-6 p-8 rounded-2xl shadow-md bg-[var(--light-cream)] justify-between">
           <div className="flex flex-col p-2 w-full sm:w-2/3 space-y-1 items-start">
             <h2 className="font-bold text-xl">{applicant.user.name}</h2>
@@ -98,7 +125,8 @@ export default function DataDiri() {
 
       <Form {...form}>
         <form className="space-y-6">
-          <div className="flex flex-col gap-5 p-12 border rounded-xl m-12 bg-[var(--light-cream)]">
+          <div className="flex flex-col gap-5 p-12 border rounded-xl md:m-12 bg-[var(--light-cream)]">
+
             <FormField
               control={form.control}
               name="namaLengkap"
@@ -133,6 +161,7 @@ export default function DataDiri() {
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
               <FormField
                 control={form.control}
                 name="jenisKelamin"
@@ -140,7 +169,11 @@ export default function DataDiri() {
                   <FormItem>
                     <FormLabel>Jenis Kelamin</FormLabel>
                     <FormControl>
-                      <Input placeholder={data.gender} {...field} readOnly />
+                      <Input
+                        placeholder={formatValue(data.gender)}
+                        {...field}
+                        readOnly
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -231,7 +264,6 @@ export default function DataDiri() {
               />
             </div>
 
-            {/* KTP Dialog */}
             <FormField
               control={form.control}
               name="ktp"
@@ -286,7 +318,6 @@ export default function DataDiri() {
               )}
             />
 
-            {/* Akta Dialog */}
             <FormField
               control={form.control}
               name="akta"
@@ -341,7 +372,6 @@ export default function DataDiri() {
               )}
             />
 
-            {/* KK Dialog */}
             <FormField
               control={form.control}
               name="kk"
@@ -385,7 +415,11 @@ export default function DataDiri() {
                 <FormItem>
                   <FormLabel>Kewarganegaraan</FormLabel>
                   <FormControl>
-                    <Input placeholder={data.citizenship} {...field} readOnly />
+                    <Input
+                      placeholder={formatValue(data.citizenship)}
+                      {...field}
+                      readOnly
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -432,6 +466,7 @@ export default function DataDiri() {
               />
             </div>
           </div>
+
           <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
             <Link href="/manager/verification">
               <Button variant={"green"}>Kembali</Button>

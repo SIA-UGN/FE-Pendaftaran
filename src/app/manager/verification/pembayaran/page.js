@@ -98,7 +98,7 @@ export default function Pembayaran() {
     useVerifyApplicant();
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
-  const user_id = searchParams.get("user_id");
+  const payment_id = searchParams.get("payment_id");
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
@@ -114,7 +114,7 @@ export default function Pembayaran() {
   const [openProof, setOpenProof] = useState(false);
 
   console.log(id);
-  const { data, isLoading, isError, error } = usePaymentVerification(id);
+  const { data, isLoading, isError, error } = usePaymentVerification(payment_id);
 
   if (isLoading) return <div>Loading payment...</div>;
   if (isError) return <div>Error loading payment: {error.message}</div>;
@@ -141,7 +141,7 @@ export default function Pembayaran() {
 
   const handlePayment = async (statusType, note = "") => {
     const payload = {
-      id: Number(id),
+      id: Number(payment_id),
       data: {
         status: statusType,
         ...(note && { verification_notes: note }),
@@ -154,10 +154,10 @@ export default function Pembayaran() {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto">
+    <div className="w-full w-max-6xl px-6 md:px-12">
       <Heading title="Pembayaran" />
       <Heading title={"Rincian Pembayaran"} />
-      <Card className={"mx-12 p-6 gap-0"}>
+      <Card className={"mx-0 md:mx-12 p-6 gap-0"}>
         <h1 className="font-bold text-lg text-[var(--green)] mb-4">
           Ringkasan Pembayaran
         </h1>
@@ -170,7 +170,7 @@ export default function Pembayaran() {
       </Card>
 
       <Heading title="Bukti Pembayaran" />
-      <div className="mx-12 items-center flex justify-center">
+      <div className="mx-0 md:mx-12 items-center flex justify-center">
         <Dialog open={openProof} onOpenChange={setOpenProof}>
           <DialogTrigger asChild>
             <Button variant={"green"} className={"w-full"} type="button">
@@ -199,7 +199,7 @@ export default function Pembayaran() {
       <Heading title="Validation Notes" />
       <Form {...form}>
         <div className="space-y-6">
-          <div className="flex flex-col gap-5 p-12 border rounded-xl mx-12 bg-[var(--light-cream)]">
+          <div className="flex flex-col gap-5 p-12 border rounded-xl mx-0 md:mx-12 bg-[var(--light-cream)]">
             {paymentData.validation_notes}
           </div>
           <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
@@ -395,18 +395,43 @@ export default function Pembayaran() {
                 <div className="w-full mt-4">
                   <Accordion type="multiple" className="w-full">
                     {[
-                      { key: "identity", label: "Catatan Identitas Pendaftar" },
-                      { key: "address", label: "Catatan Alamat Pendaftar" },
-                      { key: "parents", label: "Catatan Data Orang Tua" },
-                      { key: "academic", label: "Catatan Data Akademik" },
-                      { key: "achievement", label: "Catatan Prestasi" },
-                      { key: "payment", label: "Catatan Pembayaran" },
+                      { 
+                        key: "identity", 
+                        label: "Catatan Identitas Pendaftar",
+                        heading: "Data Diri"
+                      },
+                      { 
+                        key: "address", 
+                        label: "Catatan Alamat Pendaftar",
+                        heading: "Alamat"
+                      },
+                      { 
+                        key: "parents", 
+                        label: "Catatan Data Orang Tua",
+                        heading: "Data Orang Tua"
+                      },
+                      { 
+                        key: "academic", 
+                        label: "Catatan Data Akademik",
+                        heading: "Data Akademik"
+                      },
+                      { 
+                        key: "achievement", 
+                        label: "Catatan Prestasi",
+                        heading: "Prestasi"
+                      },
+                      { 
+                        key: "payment", 
+                        label: "Catatan Pembayaran",
+                        heading: "Pembayaran"
+                      },
                     ].map((item) => (
                       <AccordionItem key={item.key} value={item.key}>
                         <AccordionTrigger>{item.label}</AccordionTrigger>
                         <AccordionContent>
                           <TextareaAutosize
                             id={`notes-${item.key}`}
+                            data-heading={item.heading}
                             className="w-full min-h-24 mt-2 p-3 border rounded-md resize-none"
                             placeholder={`Tulis ${item.label.toLowerCase()}...`}
                           />
@@ -426,27 +451,34 @@ export default function Pembayaran() {
                     disabled={isRegistrationLoading}
                     onClick={async () => {
                       const sections = [
-                        "identity",
-                        "address",
-                        "parents",
-                        "academic",
-                        "achievement",
-                        "payment",
+                        { key: "identity", heading: "Data Diri" },
+                        { key: "address", heading: "Alamat" },
+                        { key: "parents", heading: "Data Orang Tua" },
+                        { key: "academic", heading: "Data Akademik" },
+                        { key: "achievement", heading: "Prestasi" },
+                        { key: "payment", heading: "Pembayaran" },
                       ];
 
                       const notes = sections
-                        .map((key) => {
-                          const value = document.querySelector(
-                            `#notes-${key}`
-                          )?.value;
-                          return value ? `• ${value}` : null;
+                        .map((section) => {
+                          const textarea = document.querySelector(
+                            `#notes-${section.key}`
+                          );
+                          const value = textarea?.value?.trim();
+                          
+                          if (value) {
+                            return `**${section.heading}**: ${value}`;
+                          }
+                          return null;
                         })
                         .filter(Boolean)
-                        .join("\n");
+                        .join("\n\n");
 
                       console.log("Notes collected:", notes);
 
-                      await handleRegistration("revision_needed", notes);
+                      if (notes) {
+                        await handleRegistration("revision_needed", notes);
+                      }
 
                       setShowRevisionDialog(false);
                       router.push(`/manager/verification?id=${id}`);

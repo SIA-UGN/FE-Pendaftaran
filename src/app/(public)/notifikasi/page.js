@@ -13,6 +13,82 @@ import {
 import { CheckCheck, Trash2, Mail } from "lucide-react";
 import toast from "react-hot-toast";
 
+// Helper function untuk format message
+const formatMessage = (message) => {
+  if (!message) return "";
+
+  // Check if message contains markdown-style bold (**text**)
+  const hasMarkdownBold = /\*\*([^*]+)\*\*/.test(message);
+  
+  if (hasMarkdownBold) {
+    // Format lama: **Heading**: content
+    const parts = message.split(/\*\*([^*]+)\*\*:\s*/);
+    const formatted = [];
+    
+    for (let i = 1; i < parts.length; i += 2) {
+      const heading = parts[i];
+      const content = parts[i + 1]?.trim();
+      
+      if (heading && content) {
+        formatted.push(
+          <div key={i} className="mb-4 last:mb-0">
+            <p className="font-bold text-[var(--green)] text-base mb-1.5">
+              {heading}
+            </p>
+            <p className="text-sm text-gray-700 leading-relaxed pl-3 whitespace-pre-line">
+              {content}
+            </p>
+          </div>
+        );
+      }
+    }
+    
+    return formatted.length > 0 ? formatted : <p className="text-sm text-gray-700 whitespace-pre-line">{message}</p>;
+  }
+  
+  // Format baru: UPPERCASE heading dengan separator ---
+  const sections = message.split(/---/);
+
+  return sections.map((section, idx) => {
+    const trimmedSection = section.trim();
+    if (!trimmedSection) return null;
+
+    const lines = trimmedSection.split("\n");
+    const firstLine = lines[0].trim();
+
+    // Check if first line is a heading (all uppercase)
+    const isHeading =
+      firstLine === firstLine.toUpperCase() &&
+      firstLine.length > 0 &&
+      /^[A-Z\s]+$/.test(firstLine);
+
+    if (isHeading && lines.length > 1) {
+      // Format as heading + content
+      const content = lines.slice(1).join("\n").trim();
+      return (
+        <div key={idx} className="mb-4 last:mb-0">
+          <p className="font-bold text-[var(--green)] text-base mb-1.5">
+            {firstLine}
+          </p>
+          <p className="text-sm text-gray-700 leading-relaxed pl-3 whitespace-pre-line">
+            {content}
+          </p>
+        </div>
+      );
+    } else {
+      // Regular text
+      return (
+        <p
+          key={idx}
+          className="text-sm text-gray-700 leading-relaxed mb-2 last:mb-0 whitespace-pre-line"
+        >
+          {trimmedSection}
+        </p>
+      );
+    }
+  }).filter(Boolean);
+};
+
 export default function Notification() {
   const {
     data: notificationData,
@@ -143,7 +219,7 @@ export default function Notification() {
           data.map((notification, index) => (
             <Card
               key={`notifikasi-${index}`}
-              className={`relative p-4 md:p-5 lg:p-6 flex flex-col gap-2 md:gap-3 shadow-sm hover:shadow-md transition-shadow 
+              className={`relative p-4 md:p-5 lg:p-6 flex flex-col gap-3 md:gap-4 shadow-sm hover:shadow-md transition-shadow 
                 ${notification.read_at ? "opacity-70 bg-gray-50" : "opacity-100"}`}
             >
               {/* Status Indicator */}
@@ -179,9 +255,10 @@ export default function Notification() {
                 </h1>
               </div>
 
-              <p className="text-sm sm:text-base text-gray-600 leading-relaxed break-words pr-4">
-                {notification.message}
-              </p>
+              {/* Formatted Message */}
+              <div className="pr-4 bg-white rounded-lg p-3 border border-gray-100">
+                {formatMessage(notification.message)}
+              </div>
 
               {/* Timestamp */}
               {notification.created_at && (
