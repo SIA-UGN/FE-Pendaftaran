@@ -209,8 +209,8 @@ export default function Navbar() {
                 <DropdownMenuTrigger>
                   <Avatar>
                     <AvatarImage
-                      src="https://github.com/shadcn.png"
-                      alt="avatar"
+                      src={user?.avatar_url || "/default-avatar-male.webp"}
+                      alt={user?.name || "User avatar"}
                     />
                     <AvatarFallback>
                       {user?.name?.charAt(0)?.toUpperCase() || "U"}
