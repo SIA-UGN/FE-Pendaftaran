@@ -611,11 +611,15 @@ export default function Pembayaran() {
                             <p className="text-sm text-gray-700 mb-2">
                               Pembayaran berhasil dikonfirmasi!
                             </p>
-                            <Link href="/pendaftaran/status">
-                              <Button variant="green" className="mt-2">
-                                Lanjutkan
-                              </Button>
-                            </Link>
+                            {(() => {
+                              setTimeout(() => {
+                                router.push("/pendaftaran/status");
+                              }, 1500);
+                              return null;
+                            })()}
+                            <p className="text-sm text-gray-600 mt-2">
+                              Anda akan dialihkan ke halaman status...
+                            </p>
                           </div>
                         )}
                       </AlertDialogContent>
