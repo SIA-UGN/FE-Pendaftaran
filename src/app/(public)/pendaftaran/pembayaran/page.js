@@ -224,6 +224,28 @@ export default function Pembayaran() {
     );
   };
 
+  const parseInstructions = (instructions) => {
+    if (!instructions) return [];
+
+    let parts = [];
+
+    if (/\d+\.\s/.test(instructions)) {
+      parts = instructions
+        .split(/\d+\.\s*/)
+        .filter((part) => part.trim() !== "");
+    } else if (instructions.includes("\n")) {
+      parts = instructions.split("\n");
+    } else if (instructions.includes(";")) {
+      parts = instructions.split(";");
+    } else if (instructions.includes(",")) {
+      parts = instructions.split(",");
+    } else {
+      parts = [instructions];
+    }
+
+    return parts.map((part) => part.trim()).filter((part) => part !== "");
+  };
+
   if (isLoading) {
     return (
       <ProtectedRoute>
@@ -485,30 +507,44 @@ export default function Pembayaran() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ol className="list-decimal list-inside space-y-2 text-sm">
-                  <li>
-                    Transfer sesuai <strong>nominal EXACT</strong> yang tertera
-                    (Rp{" "}
-                    {paymentData?.amount?.toLocaleString("id-ID") || "300.000"})
-                  </li>
-                  <li>
-                    Transfer ke rekening yang dipilih:
-                    <strong>
-                      {" "}
-                      {selectedMethod?.bank_name || "Bank BCA"} (a.n{" "}
-                      {selectedMethod?.account_holder || "Universitas Global"})
-                    </strong>
-                  </li>
-                  <li>Simpan bukti transfer Anda</li>
-                  <li>
-                    Upload bukti transfer melalui tombol "Konfirmasi Pembayaran"
-                  </li>
-                  <li>Tunggu verifikasi dari admin (maksimal 1 x 24 jam)</li>
-                  <li>
-                    Setelah terverifikasi, Anda dapat melanjutkan proses
-                    pendaftaran
-                  </li>
-                </ol>
+                {selectedMethod && selectedMethod.payment_instructions ? (
+                  <ol className="list-decimal list-inside space-y-2 text-sm">
+                    {parseInstructions(selectedMethod.payment_instructions).map(
+                      (instruction, index) => (
+                        <li key={index}>{instruction}</li>
+                      )
+                    )}
+                  </ol>
+                ) : (
+                  <ol className="list-decimal list-inside space-y-2 text-sm">
+                    <li>
+                      Transfer sesuai <strong>nominal EXACT</strong> yang
+                      tertera (Rp{" "}
+                      {paymentData?.amount?.toLocaleString("id-ID") ||
+                        "300.000"}
+                      )
+                    </li>
+                    <li>
+                      Transfer ke rekening yang dipilih:
+                      <strong>
+                        {" "}
+                        {selectedMethod?.bank_name || "Bank BCA"} (a.n{" "}
+                        {selectedMethod?.account_holder || "Universitas Global"}
+                        )
+                      </strong>
+                    </li>
+                    <li>Simpan bukti transfer Anda</li>
+                    <li>
+                      Upload bukti transfer melalui tombol "Konfirmasi
+                      Pembayaran"
+                    </li>
+                    <li>Tunggu verifikasi dari admin (maksimal 1 x 24 jam)</li>
+                    <li>
+                      Setelah terverifikasi, Anda dapat melanjutkan proses
+                      pendaftaran
+                    </li>
+                  </ol>
+                )}
               </CardContent>
             </Card>
           </div>
