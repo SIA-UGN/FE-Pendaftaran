@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   useReactTable,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 
 import {
   Table,
@@ -14,14 +14,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
 export function DataTable({ columns, data }) {
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-  })
+  });
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white/70 shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-md dark:bg-gray-900/60 dark:border-gray-800">
@@ -37,7 +37,10 @@ export function DataTable({ columns, data }) {
                   >
                     {header.isPlaceholder
                       ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -61,7 +64,10 @@ export function DataTable({ columns, data }) {
                       key={cell.id}
                       className="px-4 py-3 border-b border-gray-100 dark:border-gray-800"
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -80,5 +86,5 @@ export function DataTable({ columns, data }) {
         </Table>
       </div>
     </div>
-  )
+  );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import PenambahanManajer from "@/components/PenambahanManajer";
+import PenambahanManajer from "@/components/admin/PenambahanManajer";
 import {
   Form,
   FormControl,
@@ -11,96 +11,86 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Heading } from "@/components/Heading";
 
-import Link from "next/link"
+import { useCreateManager } from "@/hooks/useAdmin";
 
-// 🧩 Schema Validasi
-const FormSchema = z.object({
-  namaLengkap: z.string().min(3, "Nama lengkap minimal 3 karakter"),
-  username: z.string().min(3, "Username minimal 3 karakter"),
-  email: z.string().email("Format email tidak valid"),
-  noHandphone: z
-    .string()
-    .min(10, "Nomor handphone minimal 10 digit")
-    .regex(/^0\d+$/, "Nomor harus diawali dengan 0 dan hanya angka"),
-  hakAkses: z.array(z.string()).min(1, "Pilih minimal satu hak akses"),
-});
+import { useRouter } from "next/navigation";
+
+const FormSchema = z
+  .object({
+    name: z.string().min(3, "Nama lengkap minimal 3 karakter"),
+    email: z.string().email("Format email tidak valid"),
+    password: z.string().min(8, "Password minimal 8 karakter"),
+    passwordConfirmation: z.string().min(8, "Password minimal 8 karakter"),
+  })
+  .refine((data) => data.password === data.passwordConfirmation, {
+    message: "Password tidak cocok",
+    path: ["passwordConfirmation"],
+  });
 
 export default function TambahManajer() {
+  const router = useRouter();
+
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      namaLengkap: "",
-      username: "",
+      name: "",
       email: "",
-      noHandphone: "",
-      hakAkses: [],
+      password: "",
+      passwordConfirmation: "",
     },
   });
 
-  const onSubmit = async (data) => {
-    console.log("Data dikirim:", data);
+  const { mutate: createManager, isLoading } = useCreateManager();
 
-    try {
-      const res = await fetch("/api/manajer", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+  const onSubmit = (data) => {
+    // Map form fields to backend
+    const payload = {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      password_confirmation: data.passwordConfirmation,
+    };
 
-      if (!res.ok) throw new Error("Gagal menambahkan manajer");
-
-      const result = await res.json();
-      alert("Manajer berhasil ditambahkan ✅");
-      console.log("Response:", result);
-    } catch (err) {
-      console.error(err);
-      alert("Terjadi kesalahan saat menambahkan manajer ❌");
-    }
+    createManager(payload, {
+      onSuccess: () => {
+        router.push("/dashboard");
+      },
+    });
   };
 
   return (
     <div className="flex flex-col items-center justify-center">
       <PenambahanManajer />
 
-      <div className="flex flex-col items-center px-4 sm:px-8 max-w-11/12 my-12 w-full">
+      <div className="flex flex-col items-center px-4 sm:px-6 lg:px-8 max-w-6xl my-6 sm:my-8 lg:my-12 w-full">
+        <Heading title="Data Manajer Baru" />
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full">
-            
-            {/* === BAGIAN 1: DATA MANAJER === */}
-            <h2 className="text-3xl sm:text-2xl font-semibold mb-6 mt-12 w-full border-b-2 border-black pb-2 text-[var(--green)]">
-              Data Manajer Baru
-            </h2>
-
-            <div className="flex flex-col gap-5 p-12 border rounded-xl bg-[var(--light-cream)]">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 sm:space-y-6 w-full"
+          >
+            <div className="flex flex-col gap-4 sm:gap-5 p-4 sm:p-8 lg:p-12 border rounded-lg sm:rounded-xl bg-[var(--yellow)]">
               <FormField
                 control={form.control}
-                name="namaLengkap"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nama Lengkap</FormLabel>
+                    <FormLabel className="text-sm sm:text-base">
+                      Nama Lengkap
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="Nama Lengkap" {...field} />
+                      <Input
+                        placeholder="Nama Lengkap"
+                        className="text-sm sm:text-base"
+                        {...field}
+                      />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Username" {...field} />
-                    </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-xs sm:text-sm" />
                   </FormItem>
                 )}
               />
@@ -110,38 +100,81 @@ export default function TambahManajer() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel className="text-sm sm:text-base">
+                      Email
+                    </FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="email@example.com" {...field} />
+                      <Input
+                        type="email"
+                        placeholder="email@example.com"
+                        className="text-sm sm:text-base"
+                        {...field}
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-xs sm:text-sm" />
                   </FormItem>
                 )}
               />
 
               <FormField
                 control={form.control}
-                name="noHandphone"
+                name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nomor Handphone</FormLabel>
+                    <FormLabel className="text-sm sm:text-base">
+                      Password
+                    </FormLabel>
                     <FormControl>
-                      <Input type="tel" placeholder="08xxxxxxxx" {...field} />
+                      <Input
+                        type="password"
+                        placeholder="Minimal 8 karakter"
+                        className="text-sm sm:text-base"
+                        {...field}
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-xs sm:text-sm" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="passwordConfirmation"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm sm:text-base">
+                      Konfirmasi Password
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Ulangi password"
+                        className="text-sm sm:text-base"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs sm:text-sm" />
                   </FormItem>
                 )}
               />
             </div>
 
-            <div className="w-full flex items-center justify-end gap-2">
-              <Link href="/dashboard/manajer/tambah/validasi">
-              <Button type="submit" variant={"matcha"} className={"w-48 rounded-md"}>
+            <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3">
+              <Button
+                type="button"
+                variant="yellow"
+                onClick={() => router.back()}
+                className="w-full sm:w-40 lg:w-48 rounded-xl sm:rounded-2xl text-sm sm:text-base py-2 sm:py-3"
+              >
                 Kembali
               </Button>
-              </Link>
-              <Button type="submit" variant={"matcha"} className={"w-48 rounded-md"}>
-                Lanjut
+              <Button
+                type="submit"
+                variant="green"
+                className="w-full sm:w-40 lg:w-48 rounded-xl sm:rounded-2xl text-sm sm:text-base py-2 sm:py-3"
+                disabled={isLoading}
+              >
+                {isLoading ? "Menyimpan..." : "Tambah Manajer"}
               </Button>
             </div>
           </form>

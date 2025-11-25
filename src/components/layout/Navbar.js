@@ -27,14 +27,18 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useLogout } from "@/hooks/useAuth";
+import { useUnreadCount } from "@/hooks/useNotification";
 
 export default function Navbar() {
   const router = useRouter();
   const logoutMutation = useLogout();
-
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [user, setUser] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mobileProfilOpen, setMobileProfilOpen] = useState(false);
+  const [hasNotification, setHasNotification] = useState(true);
+
+  const { data: unreadNotificationsData, isError, error } = useUnreadCount();
 
   useEffect(() => {
     const updateUserData = () => {
@@ -65,9 +69,7 @@ export default function Navbar() {
           setUser(event.detail);
           setIsLoggedIn(true);
           localStorage.setItem("user", JSON.stringify(event.detail));
-        } catch (error) {
-          // Silent fail - localStorage error won't affect UI
-        }
+        } catch (error) {}
       } else {
         updateUserData();
       }
@@ -81,6 +83,12 @@ export default function Navbar() {
       window.removeEventListener("storage", updateUserData);
     };
   }, []);
+
+  if (isError) return <div>Error: {error.message}</div>;
+
+  const unreadNotifications = unreadNotificationsData?.data?.data?.unread_count;
+
+  console.log("Unread notifications", unreadNotifications);
 
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -109,53 +117,18 @@ export default function Navbar() {
         </Link>
       </div>
 
-      <div className="hidden md:flex">
-        <NavigationMenu>
-          <NavigationMenuList className="w-fit">
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                asChild
-                className={navigationMenuTriggerStyle()}
-              >
-                <Link href="/">Home</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>Profil</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid w-[200px] gap-4 text-center">
-                  <li>
-                    <NavigationMenuLink asChild>
-                      <Link href="/sejarah">Sejarah</Link>
-                    </NavigationMenuLink>
-                    <NavigationMenuLink asChild>
-                      <Link href="/visi-misi">Visi-Misi</Link>
-                    </NavigationMenuLink>
-                    <NavigationMenuLink asChild>
-                      <Link href="/pimpinan-universitas">
-                        Pimpinan Universitas
-                      </Link>
-                    </NavigationMenuLink>
-                    <NavigationMenuLink asChild>
-                      <Link href="/fakultas">Fakultas</Link>
-                    </NavigationMenuLink>
-                  </li>
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                asChild
-                className={navigationMenuTriggerStyle()}
-              >
-                <Link href="/pendaftaran">Pendaftaran</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
-      </div>
-
-      <div className="flex md:hidden items-center">
+      {/* Mobile Right Section */}
+      <div className="flex md:hidden items-center gap-3">
+        {isLoggedIn && (
+          <Link href="/notifikasi" className="relative">
+            <Bell className="w-6 h-6 cursor-pointer hover:text-white/90 text-white" />
+            {unreadNotifications > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                {unreadNotifications}
+              </span>
+            )}
+          </Link>
+        )}
         <button
           onClick={toggleMobileMenu}
           className="text-white cursor-pointer"
@@ -164,49 +137,124 @@ export default function Navbar() {
         </button>
       </div>
 
-      <div className="hidden md:flex items-center gap-4">
-        {isLoggedIn ? (
-          <>
-            <Bell className="w-6 h-6 cursor-pointer hover:text-white/90 text-white" />
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Avatar>
-                  <AvatarImage
-                    src={user?.avatar_url || "/default-avatar-male.webp"}
-                    alt={user?.name || "User avatar"}
-                  />
-                  <AvatarFallback>
-                    {user?.name?.charAt(0)?.toUpperCase() || "U"}
-                  </AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="start"
-                alignOffset={14}
-                className="z-[2000]"
-              >
-                <DropdownMenuLabel>{user?.name || "User"}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/profil">Profil</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
+      <div className="hidden md:flex gap-6">
+        <div className="hidden md:flex">
+          <NavigationMenu>
+            <NavigationMenuList className="w-fit">
+              <NavigationMenuItem>
+                <NavigationMenuLink
+                  asChild
+                  className={navigationMenuTriggerStyle()}
+                >
+                  <Link href="/">Home</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Profil</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-[200px] gap-4 text-center">
+                    <li>
+                      <NavigationMenuLink asChild>
+                        <Link href="/sejarah">Sejarah</Link>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <Link href="/visi-misi">Visi-Misi</Link>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <Link href="/pimpinan-universitas">
+                          Pimpinan Universitas
+                        </Link>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <Link href="/fakultas">Fakultas</Link>
+                      </NavigationMenuLink>
+                    </li>
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink
+                  asChild
+                  className={navigationMenuTriggerStyle()}
+                >
                   <Link href="/pendaftaran">Pendaftaran</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleLogout}>
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-        ) : (
-          <Link
-            href="/login"
-            className="text-[var(--cream)] font-bold text-md hover:underline"
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+        </div>
+
+        <div className="hidden md:flex items-center gap-4">
+          {isLoggedIn ? (
+            <>
+              <Link href="/notifikasi" className="relative">
+                <Bell className="w-6 h-6 cursor-pointer hover:text-white/90 text-white" />
+
+                {unreadNotifications > 0 && (
+                  <span
+                    className="
+      absolute -top-1 -right-1 
+      bg-red-600 text-white 
+      text-xs font-bold 
+      rounded-full 
+      w-4 h-4 
+      flex items-center justify-center
+    "
+                  >
+                    {unreadNotifications}
+                  </span>
+                )}
+              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Avatar>
+                    <AvatarImage
+                      src="https://github.com/shadcn.png"
+                      alt="avatar"
+                    />
+                    <AvatarFallback>
+                      {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  alignOffset={14}
+                  className="z-[2000]"
+                >
+                  <DropdownMenuLabel>{user?.name}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/profil">Profil</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/pendaftaran">Pendaftaran</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className="text-[var(--cream)] font-bold text-md hover:bg-[var(--yellow)] px-4 py-2 bg-white rounded-lg hover:text-white"
+            >
+              Login
+            </Link>
+          )}
+          <button
+            onClick={toggleMobileMenu}
+            className="md:hidden text-white cursor-pointer p-1"
           >
-            Login
-          </Link>
-        )}
+            {isMobileMenuOpen ? (
+              <X size={24} className="sm:w-7 sm:h-7" />
+            ) : (
+              <Menu size={24} className="sm:w-7 sm:h-7" />
+            )}
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -215,99 +263,83 @@ export default function Navbar() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
-            className="absolute top-[calc(100%+2px)] left-0 w-full bg-[var(--green)] text-white flex flex-col lg:hidden z-[999] border-t border-[var(--yellow)]/20 shadow-lg max-h-[calc(100vh-80px)] overflow-y-auto"
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="absolute top-[calc(100%+2px)] left-0 w-full bg-[var(--green)]/95 backdrop-blur-md text-white flex flex-col lg:hidden z-[999] border-t border-[var(--yellow)]/30 shadow-2xl rounded-b-2xl overflow-hidden max-h-[calc(100vh-80px)] overflow-y-auto"
           >
-            <Link
-              href="/"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="px-6 py-3 hover:bg-white/10 transition-colors"
-            >
-              Home
-            </Link>
-            <Link
-              href="/#sejarah"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="px-6 py-3 hover:bg-white/10 transition-colors"
-            >
-              Sejarah
-            </Link>
-            <Link
-              href="/#visi-misi"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="px-6 py-3 hover:bg-white/10 transition-colors"
-            >
-              Visi-Misi
-            </Link>
-            <Link
-              href="#"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="px-6 py-3 hover:bg-white/10 transition-colors"
-            >
-              Pimpinan Universitas
-            </Link>
-            <Link
-              href="/pendaftaran"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="px-6 py-3 hover:bg-white/10 transition-colors"
-            >
-              Pendaftaran
-            </Link>
+            <nav className="flex flex-col divide-y divide-[var(--yellow)]/10">
+              {[
+                { href: "/", label: "Home" },
+                { href: "/sejarah", label: "Sejarah" },
+                { href: "/visi-misi", label: "Visi-Misi" },
+                {
+                  href: "/pimpinan-universitas",
+                  label: "Pimpinan Universitas",
+                },
+                {
+                  href: "/fakultas",
+                  label: "Fakultas",
+                },
+                { href: "/pendaftaran", label: "Pendaftaran" },
+              ].map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="px-6 py-4 text-lg font-medium tracking-wide hover:bg-[var(--yellow)] hover:text-[var(--green)] transition-colors duration-200"
+                >
+                  {item.label}
+                </Link>
+              ))}
 
-            {isLoggedIn ? (
-              <>
-                <div className="px-6 py-3 border-t border-white/20">
-                  <div className="flex items-center gap-3 mb-2">
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage
-                        src={user?.avatar_url || "/default-avatar-male.webp"}
-                        alt={user?.name || "User avatar"}
-                      />
-                      <AvatarFallback>
-                        {user?.name?.charAt(0)?.toUpperCase() || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="font-medium">{user?.name || "User"}</span>
-                  </div>
-                </div>
-                <Link
-                  href="/profil"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="px-6 py-3 hover:bg-white/10 transition-colors"
-                >
-                  Profil
-                </Link>
-                <Link
-                  href="/pendaftaran"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="px-6 py-3 hover:bg-white/10 transition-colors"
-                >
-                  Pendaftaran
-                </Link>
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="px-6 py-3 hover:bg-white/10 transition-colors text-left"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <div className="px-6 py-3">
-                <Button
-                  onClick={() => {
-                    router.push("/login");
-                    setIsMobileMenuOpen(false);
-                  }}
-                  variant="secondary"
-                  className="w-full"
-                >
-                  Login
-                </Button>
+              {/* Notifikasi & Profil di Mobile Menu */}
+              {isLoggedIn && (
+                <>
+                  <Link
+                    href="/notifikasi"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-6 py-4 text-lg font-medium tracking-wide hover:bg-[var(--yellow)] hover:text-[var(--green)] transition-colors duration-200 flex items-center justify-between"
+                  >
+                    <span>Notifikasi</span>
+                    {unreadNotifications > 0 && (
+                      <span className="bg-red-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                        {unreadNotifications}
+                      </span>
+                    )}
+                  </Link>
+                  <Link
+                    href="/profil"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-6 py-4 text-lg font-medium tracking-wide hover:bg-[var(--yellow)] hover:text-[var(--green)] transition-colors duration-200"
+                  >
+                    Profil
+                  </Link>
+                </>
+              )}
+
+              <div className="p-4 flex flex-col gap-3 bg-[var(--green)]/90">
+                {isLoggedIn ? (
+                  <>
+                    <span className="text-sm text-[var(--yellow)] italic">
+                      Welcome,{" "}
+                      <span className="font-semibold">{user?.name}</span>
+                    </span>
+                    <button
+                      onClick={handleLogout}
+                      className="px-4 py-2 rounded-xl bg-[var(--yellow)] text-[var(--green)] font-semibold hover:bg-white transition-all duration-200 shadow-md"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <Button
+                    onClick={() => router.push("/login")}
+                    className="w-full bg-[var(--yellow)] text-[var(--green)] hover:bg-white transition-all duration-200 font-semibold rounded-xl shadow-md"
+                  >
+                    Login
+                  </Button>
+                )}
               </div>
-            )}
+            </nav>
           </motion.div>
         )}
       </AnimatePresence>

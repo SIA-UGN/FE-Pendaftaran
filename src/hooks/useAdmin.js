@@ -91,3 +91,11 @@ export const usePaymentVerification = (id) => {
     enabled: !!id,
   });
 };
+
+export const useYearlyRevenue = (years = 10) => {
+  return useQuery({
+    queryKey: ["admin", "statistics", "revenue", "yearly", years],
+    queryFn: () => adminService.getYearlyRevenue(years),
+    staleTime: 10 * 60 * 1000,
+  });
+};

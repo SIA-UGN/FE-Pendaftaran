@@ -14,10 +14,12 @@ html {
 :root {
   /* custom color */
   --yellow: #DABC50;
+  --green-background: rgba(230,238,233);
   --green: #015023;
   --dark-green: oklch(0.467 0.083 182.489);
   --cream: #CBA400;
-  --light-cream: #F5EFD3;
+  --light-cream: #FBF8ED;
+  --light-cream-card: rgba(251 248 237);
   --light-green: rgba(230, 238, 233, 1);
 
   --font-poppins: 'Poppins', sans-serif;

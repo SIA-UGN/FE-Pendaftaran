@@ -1,18 +1,7 @@
 "use client";
 
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from "lucide-react";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { LogOut } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,37 +21,31 @@ import {
 import { useRouter } from "next/navigation";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useLogout, useAuth } from "@/hooks/useAuth";
 
-export function NavUser({ user }) {
+export function NavUser() {
+  const logoutMutation = useLogout();
   const { isMobile } = useSidebar();
-  const router = useRouter();
+  const { data: user, isLoading, isError, error } = useAuth(); // ambil data user
   const [loading, setLoading] = useState(false);
 
-  async function handleLogout() {
-    try {
-      setLoading(true);
-      const token = getCookie("access_token");
+  const handleLogout = () => {
+    setLoading(true);
+    logoutMutation.mutate({
+      onSuccess: () => {
+        setLoading(false);
+      },
+      onError: () => {
+        setLoading(false);
+      },
+    });
+  };
 
-      await fetch("http://localhost:8000/api/auth/logout", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Accept": "application/json",
-        },
-      });
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error: {error?.message}</div>;
 
-      // hapus cookie di frontend
-      deleteCookie("access_token");
-      deleteCookie("role");
-
-      // redirect ke halaman login
-      router.push("/");
-    } catch (error) {
-      console.error("Logout gagal:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
+  console.log(user)
 
   return (
     <SidebarMenu>
@@ -71,52 +54,42 @@ export function NavUser({ user }) {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-[var(--yellow)] data-[state=open]:text-white rounded-lg">
+              className="hover:bg-green-800 data-[state=open]:bg-green-800 data-[state=open]:text-white rounded-lg text-white"
+              group
+            >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">
-                  {user.name?.charAt(0).toUpperCase() || "U"}
-                </AvatarFallback>
+                {user?.avatar ? (
+                  <AvatarImage src={user.avatar} alt={user.name} />
+                ) : (
+                  <AvatarFallback className="rounded-lg text-black">
+                    {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                  </AvatarFallback>
+                )}
               </Avatar>
+
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">Manager</span>
-                <span className="truncate text-xs">manager@sia.com</span>
+                <span className="truncate font-medium text-white">
+                  {user?.name || "User"}
+                </span>
+                <span className="truncate text-xs text-gray-300">
+                  {user?.email || "user@example.com"}
+                </span>
               </div>
-              <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
-
-          <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg bg-[var(--yellow)] text-white"
-            side={isMobile ? "bottom" : "right"}
-            align="end"
-            sideOffset={4}>
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">
-                    {user.name?.charAt(0).toUpperCase() || "U"}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Manager</span>
-                  <span className="truncate text-xs">manager@sia.com</span>
-                </div>
-              </div>
-            </DropdownMenuLabel>
-
-            <DropdownMenuSeparator />
-
-            <DropdownMenuItem
-              onClick={handleLogout}
-              disabled={loading}
-              className="bg-red-800 fw-bold cursor-pointer hover:bg-red-500 text-white">
-              <LogOut className="text-white"/>
-              {loading ? "Logging out..." : "Log out"}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
         </DropdownMenu>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem className="mt-3">
+        <Button
+          onClick={handleLogout}
+          disabled={loading}
+          variant="destructive"
+          className="w-full flex items-center justify-center gap-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
+          {loading ? "Logging out..." : "Logout"}
+        </Button>
       </SidebarMenuItem>
     </SidebarMenu>
   );

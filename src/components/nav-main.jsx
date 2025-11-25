@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { ChevronRight } from "lucide-react"
-import Link from "next/link"
+import { Triangle } from "lucide-react";
+import Link from "next/link";
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+} from "@/components/ui/collapsible";
 import {
   SidebarGroup,
   SidebarMenu,
@@ -16,9 +16,13 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
-export function NavMain({ items }) {
+import { UserRound } from "lucide-react";
+import { GraduationCap } from "lucide-react";
+import { Banknote } from "lucide-react";
+
+export function NavMain({ items, type }) {
   return (
     <SidebarGroup>
       <SidebarMenu>
@@ -34,11 +38,26 @@ export function NavMain({ items }) {
               {item.title === "Statistik" ? (
                 <>
                   <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip={item.title}>
+                    <SidebarMenuButton
+                      tooltip={item.title}
+                      className="group/button"
+                    >
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
-                      <ChevronRight
-                        className="cursor-pointer ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 text-white"
+
+                      <Triangle
+                        fill="currentColor"
+                        stroke="none"
+                        className="
+                          cursor-pointer ml-auto
+                          transition-transform duration-200
+                          rotate-90
+                          group-data-[state=open]/collapsible:rotate-180
+                          fill-[var(--yellow)]
+                          group-hover/button:fill-[var(--green)]
+                          group-focus/button:fill-[var(--green)]
+                          
+                        "
                       />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
@@ -46,13 +65,35 @@ export function NavMain({ items }) {
                   <CollapsibleContent>
                     <SidebarMenuSub>
                       {[
-                        { title: "Pendaftar", url: "/manager/statistik/pendaftar" },
-                        { title: "Program Studi", url: "/manager/statistik/program-studi" },
-                        { title: "Keuangan", url: "/manager/statistik/keuangan" },
+                        {
+                          title: "Statistika Pendaftar",
+                          url:
+                            type === "manager"
+                              ? "/manager/statistik/pendaftar"
+                              : "/dashboard/statistik/pendaftar",
+                          icon: UserRound,
+                        },
+                        {
+                          title: "Statistika Prodi",
+                          url:
+                            type === "manager"
+                              ? "/manager/statistik/program-studi"
+                              : "/dashboard/statistik/program-studi",
+                          icon: GraduationCap,
+                        },
+                        {
+                          title: "Statistika Keuangan",
+                          url:
+                            type === "manager"
+                              ? "/manager/statistik/keuangan"
+                              : "/dashboard/statistik/keuangan",
+                          icon: Banknote,
+                        },
                       ].map((sub) => (
                         <SidebarMenuSubItem key={sub.title}>
                           <SidebarMenuSubButton asChild>
-                            <Link href={sub.url}>
+                            <Link href={sub.url} className="text-white">
+                              <sub.icon className="stroke-white !text-white" />
                               <span>{sub.title}</span>
                             </Link>
                           </SidebarMenuSubButton>
@@ -75,5 +116,5 @@ export function NavMain({ items }) {
         ))}
       </SidebarMenu>
     </SidebarGroup>
-  )
+  );
 }

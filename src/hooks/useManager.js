@@ -12,7 +12,7 @@ export const useManagerDashboard = () => {
 
 export const useManagerApplicants = (params) => {
   return useQuery({
-    queryKey: ["manager", "applicant", params],
+    queryKey: ["manager", "applicants", params],
     queryFn: () => managerService.getApplicants(params),
     keepPreviousData: true,
   });
@@ -32,17 +32,19 @@ export const useVerifyApplicant = () => {
   return useMutation({
     mutationFn: ({ id, data }) => managerService.verifyApplicant(id, data),
     onSuccess: (data, { id }) => {
+      console.log("RESPONSE FROM BACKEND:", data);
+
       queryClient.invalidateQueries({ queryKey: ["manager", "applicants"] });
       queryClient.invalidateQueries({ queryKey: ["manager", "applicant", id] });
       queryClient.invalidateQueries({ queryKey: ["manager", "dashboard"] });
 
-      const status = data.data.registration.status;
+      const status = data?.data?.data?.registration?.status;
       const message =
         status === "approved"
           ? "Pendaftaran berhasil disetujui"
           : status === "rejected"
-          ? "Pendaftaran berhasil ditolak"
-          : "Status pendaftaran berhasil diperbarui";
+            ? "Pendaftaran berhasil ditolak"
+            : "Status pendaftaran berhasil diperbarui";
       toast.success(message);
     },
     onError: (error) => {
@@ -60,11 +62,13 @@ export const useSetGraduationStatus = () => {
   return useMutation({
     mutationFn: ({ id, data }) => managerService.setGraduationStatus(id, data),
     onSuccess: (data, { id }) => {
+      console.log("RESPONSE FROM BACKEND:", data);
+
       queryClient.invalidateQueries({ queryKey: ["manager", "applicants"] });
       queryClient.invalidateQueries({ queryKey: ["manager", "applicant", id] });
       queryClient.invalidateQueries({ queryKey: ["manager", "dashboard"] });
 
-      const status = data.data.registration.graduation_status;
+      const status = data.data.data.registration.graduation_status;
       const message =
         status === "graduated"
           ? "Pendaftar berhasil ditandai sebagai lulusan"
@@ -72,9 +76,11 @@ export const useSetGraduationStatus = () => {
       toast.success(message);
     },
     onError: (error) => {
-      const message =
-        error?.response?.data?.message || "Gagal memperbarui status kelulusan";
-      toast.error(message);
+      console.log("ERROR OBJECT:", error);
+      console.log("RESPONSE:", error.response);
+      console.log("REQUEST:", error.request);
+
+      toast.error("Gagal memperbarui status kelulusan");
     },
   });
 };
@@ -93,6 +99,8 @@ export const useVerifyPayment = () => {
   return useMutation({
     mutationFn: ({ id, data }) => managerService.verifyPayment(id, data),
     onSuccess: (data, { id }) => {
+      console.log("RESPONSE FROM BACKEND:", data);
+
       queryClient.invalidateQueries({
         queryKey: ["manager", "payment", "verification", id],
       });
@@ -100,7 +108,7 @@ export const useVerifyPayment = () => {
       queryClient.invalidateQueries({ queryKey: ["manager", "dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["payments"] });
 
-      const status = data.data.payment.status;
+      const status = data?.data?.data?.payment?.status;
       const message =
         status === "verified"
           ? "Pembayaran berhasil diverifikasi"
@@ -129,17 +137,18 @@ export const useCreateBroadcastNotification = () => {
   return useMutation({
     mutationFn: managerService.createBroadcastNotification,
     onSuccess: (data) => {
+      console.log("RESPONSE FROM BACKEND:", data);
+
       queryClient.invalidateQueries({ queryKey: ["manager", "notifications"] });
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
 
       toast.success(
-        `Broadcast berhasil dikirim ke ${data.data.recipient_count} penerima`
+        `Broadcast berhasil dikirim ke ${data.data.data.target_count} penerima`
       );
     },
     onError: (error) => {
       const message =
-        error?.response?.data?.message ||
-        "Gagal mengirim notifikasi broadcast";
+        error?.response?.data?.message || "Gagal mengirim notifikasi broadcast";
       toast.error(message);
     },
   });

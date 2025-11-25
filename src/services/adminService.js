@@ -12,4 +12,8 @@ export const adminService = {
   getUserProfile: (id) => apiClient.get(`/admin/users/${id}`),
   getPaymentVerification: (id) =>
     apiClient.get(`/admin/payments/${id}/verification`),
+  getYearlyRevenue: (years) =>
+  apiClient.get(`/admin/statistics/yearly-revenue`, {
+    params: { years },
+  }),
 };

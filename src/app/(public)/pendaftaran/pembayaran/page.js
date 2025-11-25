@@ -31,7 +31,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import RegistrationProgress from "@/components/RegistrationProgress";
+import RegistrationProgress from "@/components/registrations/RegistrationProgress";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { usePayment } from "@/hooks/usePayment";
 import { useMyRegistration } from "@/hooks/useRegistration";
