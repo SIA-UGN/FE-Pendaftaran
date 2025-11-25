@@ -189,11 +189,15 @@ export default function RegistrationProgress() {
     ? (() => {
         let completedCount = progressData.data.completed_steps.length;
 
-        if (paymentData?.data?.data?.payment?.status === "verified") {
+        if (
+          paymentData?.data?.data?.payment?.status === "verified" ||
+          paymentData?.data?.data?.payment?.status === "waiting_verification"
+        ) {
           completedCount += 1;
         }
 
-        return Math.min((completedCount / steps.length) * 100, 100);
+        const totalSteps = 7;
+        return Math.min((completedCount / totalSteps) * 100, 100);
       })()
     : 0;
 
