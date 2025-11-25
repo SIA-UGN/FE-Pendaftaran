@@ -672,8 +672,21 @@ export default function Pembayaran() {
                 </Button>
               </Link>
 
-              <Link href="/pendaftaran/status" className="block">
-                <Button variant="green" className="w-full">
+              <Link
+                href={paymentStatus !== "pending" ? "/pendaftaran/status" : "#"}
+                className="block"
+                onClick={(e) => {
+                  if (paymentStatus === "pending") {
+                    e.preventDefault();
+                    toast.error("Silakan upload bukti pembayaran terlebih dahulu sebelum melihat status pendaftaran.");
+                  }
+                }}
+              >
+                <Button
+                  variant="green"
+                  className="w-full"
+                  disabled={paymentStatus === "pending" && !uploadSuccess}
+                >
                   Lihat Status Pendaftaran
                 </Button>
               </Link>

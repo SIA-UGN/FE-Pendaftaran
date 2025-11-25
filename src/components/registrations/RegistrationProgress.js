@@ -69,17 +69,22 @@ export default function RegistrationProgress() {
     if (stepNumber === 6) {
       if (paymentLoading) return "locked";
 
-      if (paymentData?.data?.data?.payment?.status === "verified")
+      if (
+        paymentData?.data?.data?.payment?.status === "verified" ||
+        paymentData?.data?.data?.payment?.status === "waiting_verification"
+      ) {
         return "completed";
+      }
 
       if (
-        ["pending", "waiting_verification"].includes(
-          paymentData?.data?.data?.payment?.status
-        )
-      )
+        paymentData?.data?.data?.payment?.status === "pending" &&
+        completed_steps.length === 5
+      ) {
         return "accessible";
+      }
 
-      if (completed_steps.length === 5) return "accessible";
+      if (completed_steps.length === 5 && !paymentData?.data?.data?.payment)
+        return "accessible";
 
       return "locked";
     }
