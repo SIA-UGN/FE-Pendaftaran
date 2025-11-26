@@ -13,6 +13,7 @@ const buttonVariants = cva(
         green: "bg-[var(--green)] text-white hover:bg-[var(--green)]/90 focus-visible:ring-[var(--green-foreground)] rounded-full text-[var(--yellow)]",
         yellow: "bg-[var(--yellow)] text-white hover:bg-[var(--yellow)]/90 focus-visible:ring-[var(--yellow-foreground)] rounded-full text-[var(--green)]",
         white: "bg-white text-black hover:bg-white/90 focus-visible:ring-white/90",
+        succed: "bg-green-600 text-white rounded-full",
         destructive:
           "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
@@ -20,7 +21,7 @@ const buttonVariants = cva(
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost:
-          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+          "",
         link: "text-primary underline-offset-4 hover:underline",
         matcha:
           "bg-[#B0C9BB] hover:bg-[#B0C9BB]/80 hover:text-accent-foreground dark:hover:[#B0C9BB]/50 rounded-full",

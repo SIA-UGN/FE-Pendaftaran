@@ -103,7 +103,6 @@ export default function History() {
 
           <Heading title={"Peran dan Perkembangan"} />
 
-          {/* Bullet Points Section */}
           <div className="flex flex-col gap-3 sm:gap-4 text-gray-800 leading-relaxed">
             {[
               "Pesantren Maslakul Huda berkembang menjadi salah satu pesantren terbesar dan tertua di Kajen, serta berperan penting dalam perjuangan kemerdekaan Indonesia dan pendidikan masyarakat.",

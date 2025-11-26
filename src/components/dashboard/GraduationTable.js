@@ -9,7 +9,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, Eye, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -44,11 +43,9 @@ export function GraduationTable({ data, type }) {
         return (
           <Button
             variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="w-full"
           >
             ID
-            <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
       },
@@ -62,10 +59,8 @@ export function GraduationTable({ data, type }) {
         return (
           <Button
             variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Nomor Peserta
-            <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
       },
@@ -299,8 +294,7 @@ export function GraduationTable({ data, type }) {
         )}
       </div>
 
-      {/* Pagination */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4">
         <div className="text-sm text-gray-500">
           Menampilkan{" "}
           {table.getState().pagination.pageIndex *
@@ -315,7 +309,7 @@ export function GraduationTable({ data, type }) {
           dari {table.getFilteredRowModel().rows.length} data
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 px-6 py-4">
           <Button
             variant="outline"
             size="sm"
