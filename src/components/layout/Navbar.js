@@ -112,7 +112,9 @@ export default function Navbar() {
             className="w-[45px] h-[56px] sm:w-[50px] sm:h-[62px] md:w-[60px] md:h-[75px]"
           />
           <p className="text-[var(--cream)] font-medium text-sm sm:text-base md:text-lg leading-tight hidden sm:block max-w-[150px] md:max-w-[200px]">
-            Universitas Global Nusantara
+            Universitas
+            <br />
+            Global Nusantara
           </p>
         </Link>
       </div>

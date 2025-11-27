@@ -31,13 +31,8 @@ export function AnnouncementTable({ data }) {
       accessorKey: "no",
       header: ({ column }) => {
         return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-full"
-          >
+          <Button variant="ghost" className="w-full">
             No
-            <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
       },
@@ -82,15 +77,7 @@ export function AnnouncementTable({ data }) {
     {
       accessorKey: "status",
       header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Status
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
+        return <Button variant="ghost">Status</Button>;
       },
       cell: ({ row }) => {
         const status = row.original.status || "Lulus";

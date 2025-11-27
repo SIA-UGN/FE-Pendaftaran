@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import ApplicantInformation from "@/components/dashboard/ApplicantInformation";
 import { useManagerApplicants } from "@/hooks/useManager";
@@ -15,8 +15,8 @@ export default function Pendaftar() {
         {error.response?.data?.message || error.message}
       </div>
     );
-  
-  console.log(data)
+
+  console.log(data);
 
   const Approved = data.data.data.verification_summary.approved;
   const Pending = data.data.data.verification_summary.pending;
@@ -25,7 +25,6 @@ export default function Pendaftar() {
   const Lulus = data.data.data.graduation_summary.lulus;
   const TidakLulus = data.data.data.graduation_summary.tidak_lulus;
 
-  
   const VerificationTable = data.data.data.verification_table;
   const GraduationTable = data.data.data.graduation_table;
   console.log(data.data.data.verification_summary);
