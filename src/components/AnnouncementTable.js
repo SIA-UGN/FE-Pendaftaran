@@ -59,7 +59,7 @@ export function AnnouncementTable({ data }) {
       ),
     },
     {
-      accessorKey: "profile.full_name",
+      accessorKey: "name",
       header: ({ column }) => {
         return (
           <Button
@@ -69,7 +69,7 @@ export function AnnouncementTable({ data }) {
           </Button>
         );
       },
-      cell: ({ row }) => <div>{row.original.profile?.full_name || "-"}</div>,
+      cell: ({ row }) => <div>{row.original.name || "-"}</div>,
     },
     {
       accessorKey: "status",
@@ -142,7 +142,7 @@ export function AnnouncementTable({ data }) {
   });
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-2">
       {/* Desktop Table */}
       <div className="hidden md:block overflow-hidden rounded-md border">
         <Table>
@@ -233,7 +233,7 @@ export function AnnouncementTable({ data }) {
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Nama</p>
                     <p className="text-sm text-gray-700">
-                      {announcement.profile?.full_name || "-"}
+                      {announcement.name || "-"}
                     </p>
                   </div>
 
@@ -259,8 +259,8 @@ export function AnnouncementTable({ data }) {
       </div>
 
       {/* Pagination */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="text-sm text-gray-500 px-6 py-4">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-1 pb-2">
+        <div className="text-sm text-gray-500">
           Menampilkan{" "}
           {table.getState().pagination.pageIndex *
             table.getState().pagination.pageSize +

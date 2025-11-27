@@ -112,7 +112,9 @@ export default function Navbar() {
             className="w-[45px] h-[56px] sm:w-[50px] sm:h-[62px] md:w-[60px] md:h-[75px]"
           />
           <p className="text-[var(--cream)] font-medium text-sm sm:text-base md:text-lg leading-tight hidden sm:block max-w-[150px] md:max-w-[200px]">
-            Universitas Global Nusantara
+            Universitas
+            <br />
+            Global Nusantara
           </p>
         </Link>
       </div>
@@ -209,8 +211,8 @@ export default function Navbar() {
                 <DropdownMenuTrigger>
                   <Avatar>
                     <AvatarImage
-                      src="https://github.com/shadcn.png"
-                      alt="avatar"
+                      src={user?.avatar_url || "/default-avatar-male.webp"}
+                      alt={user?.name || "User avatar"}
                     />
                     <AvatarFallback>
                       {user?.name?.charAt(0)?.toUpperCase() || "U"}

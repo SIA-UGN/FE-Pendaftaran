@@ -17,7 +17,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import Prestasi from "@/components/prestasi/Prestasi";
-import RegistrationProgress from "@/components/RegistrationProgress";
+import RegistrationProgress from "@/components/registrations/RegistrationProgress";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import toast from "react-hot-toast";
 import { useRegistrationProgress } from "@/hooks/useRegistration";

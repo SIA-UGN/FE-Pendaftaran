@@ -65,7 +65,7 @@ export default function Footer() {
           </li>
         </ul>
 
-        <div className="flex flex-col gap-3 text-[var(--light-cream)] text-sm sm:text-base items-center max-w-lg leading-relaxed">
+        <div className="flex flex-col gap-3 text-[var(--light-cream)] text-sm sm:text-base items-center max-w-xl leading-relaxed">
           <div className="text-center">
             Jl. Cendekia Utama No. 123, Surakarta, Jawa Tengah, Indonesia 57126
           </div>
@@ -76,7 +76,8 @@ export default function Footer() {
         </div>
 
         <div className="text-xs sm:text-sm mt-4 opacity-70">
-          © {new Date().getFullYear()} Universitas Global Nusantara. All rights reserved.
+          © {new Date().getFullYear()} Universitas Global Nusantara. All rights
+          reserved.
         </div>
       </div>
     </footer>

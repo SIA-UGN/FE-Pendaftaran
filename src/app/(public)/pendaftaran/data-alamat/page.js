@@ -19,7 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import toast from "react-hot-toast";
-import RegistrationProgress from "@/components/RegistrationProgress";
+import RegistrationProgress from "@/components/registrations/RegistrationProgress";
 import {
   useRegistrationProgress,
   useMyRegistration,

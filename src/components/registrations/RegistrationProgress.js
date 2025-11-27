@@ -1,158 +1,271 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { z } from "zod";
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
-import { CheckCircle } from "lucide-react";
-
-const FormSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-});
+import { CheckCircle, Lock } from "lucide-react";
+import { useRegistrationProgress } from "@/hooks/useRegistration";
+import { useMyPayment } from "@/hooks/usePayment";
 
 export default function RegistrationProgress() {
-  const form = useForm({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      username: "",
-    },
-  });
-
   const pathname = usePathname();
+  const router = useRouter();
   const [activeStep, setActiveStep] = useState("");
 
-  // Ambil bagian terakhir path, misalnya /pendaftaran/data-alamat => "data-alamat"
+  const { data: progressData, isLoading, isError } = useRegistrationProgress();
+  const { data: paymentData, isLoading: paymentLoading } = useMyPayment();
+
   useEffect(() => {
     const path = pathname.split("/").pop() || "";
     setActiveStep(path);
   }, [pathname]);
 
-  // Daftar langkah pendaftaran + nilai progress custom
   const steps = [
     {
       href: "/pendaftaran/data-diri",
       label: "Data Diri",
       key: "data-diri",
-      progress: 0,
+      step_number: 1,
     },
     {
       href: "/pendaftaran/data-alamat",
       label: "Data Alamat",
       key: "data-alamat",
-      progress: 18,
+      step_number: 2,
     },
     {
       href: "/pendaftaran/data-orangtua",
       label: "Data Orang Tua",
       key: "data-orangtua",
-      progress: 34,
+      step_number: 3,
     },
     {
       href: "/pendaftaran/data-akademik",
       label: "Data Akademik",
       key: "data-akademik",
-      progress: 52,
+      step_number: 4,
     },
     {
       href: "/pendaftaran/data-prestasi",
       label: "Data Prestasi",
       key: "data-prestasi",
-      progress: 68,
+      step_number: 5,
     },
     {
       href: "/pendaftaran/pembayaran",
-      label: "Data Pembayaran",
+      label: "Pembayaran",
       key: "pembayaran",
-      progress: 86,
+      step_number: 6,
     },
   ];
 
   const activeIndex = steps.findIndex((s) => s.key === activeStep);
 
-  // Dapatkan persentase progress bar (custom jika diset di steps)
-  const progressPercent =
-    activeIndex >= 0
-      ? (steps[activeIndex]?.progress ??
-        (activeIndex / (steps.length - 1)) * 100)
-      : 0;
+  const getStepStatus = (stepNumber) => {
+    if (!progressData?.data) return "locked";
 
-  // fungsi menentukan warna lingkaran dan kotak
-  const getColor = (index) => {
-    if (index < activeIndex) return "green"; // sudah dilewati
-    if (index === activeIndex) return "yellow"; // sedang aktif
-    return "red"; // belum dilewati
+    const { completed_steps = [], accessible_steps = [] } = progressData.data;
+
+    if (stepNumber === 6) {
+      if (paymentLoading) return "locked";
+
+      if (
+        paymentData?.data?.data?.payment?.status === "verified" ||
+        paymentData?.data?.data?.payment?.status === "waiting_verification"
+      ) {
+        return "completed";
+      }
+
+      if (
+        paymentData?.data?.data?.payment?.status === "pending" &&
+        completed_steps.length === 5
+      ) {
+        return "accessible";
+      }
+
+      if (completed_steps.length === 5 && !paymentData?.data?.data?.payment)
+        return "accessible";
+
+      return "locked";
+    }
+
+    const numberOfCompletedSteps = completed_steps.length;
+
+    if (numberOfCompletedSteps === 5 && stepNumber < 6) {
+      if (completed_steps.includes(stepNumber)) {
+        let allExpectedStepsCompleted = true;
+        for (let i = 1; i <= stepNumber; i++) {
+          if (!completed_steps.includes(i)) {
+            allExpectedStepsCompleted = false;
+            break;
+          }
+        }
+
+        if (allExpectedStepsCompleted) {
+          return "completed";
+        } else {
+          return "locked";
+        }
+      }
+    }
+
+    const isStepCompleted = completed_steps.includes(stepNumber);
+
+    if (isStepCompleted) {
+      let allPriorStepsCompleted = true;
+      for (let i = 1; i < stepNumber; i++) {
+        if (!completed_steps.includes(i)) {
+          allPriorStepsCompleted = false;
+          break;
+        }
+      }
+
+      if (allPriorStepsCompleted) {
+        return "completed";
+      } else {
+        return "locked";
+      }
+    }
+
+    if (stepNumber === 1) {
+      return accessible_steps.includes(1) ? "accessible" : "locked";
+    } else {
+      const previousStep = stepNumber - 1;
+
+      if (
+        completed_steps.includes(previousStep) &&
+        accessible_steps.includes(stepNumber)
+      ) {
+        return "accessible";
+      }
+      return "locked";
+    }
   };
 
-  function onSubmit(data) {
-    toast("You submitted the following values", {
-      description: (
-        <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+  const getStepStyles = (stepNumber) => {
+    const status = getStepStatus(stepNumber);
+
+    switch (status) {
+      case "completed":
+        return {
+          border: "border-green-500 bg-green-50",
+          text: "text-green-500",
+          icon: <CheckCircle className="text-green-500 bg-white" />,
+          clickable: true,
+        };
+      case "accessible":
+        return {
+          border: "border-red-500 bg-red-50",
+          text: "text-red-500",
+          icon: <CheckCircle className="text-red-500 bg-white" />,
+          clickable: true,
+        };
+      case "locked":
+        return {
+          border: "border-yellow-500 bg-yellow-50",
+          text: "text-yellow-500",
+          icon: <Lock className="text-yellow-500 bg-white" />,
+          clickable: false,
+        };
+      default:
+        return {
+          border: "border-gray-300 bg-gray-50",
+          text: "text-gray-500",
+          icon: <CheckCircle className="text-gray-500 bg-white" />,
+          clickable: false,
+        };
+    }
+  };
+
+  const handleStepClick = (e, step) => {
+    const styles = getStepStyles(step.step_number);
+    if (!styles.clickable) {
+      e.preventDefault();
+      return;
+    }
+  };
+
+  const progressPercent = progressData?.data?.completed_steps
+    ? (() => {
+        let completedCount = progressData.data.completed_steps.length;
+
+        if (
+          paymentData?.data?.data?.payment?.status === "verified" ||
+          paymentData?.data?.data?.payment?.status === "waiting_verification"
+        ) {
+          completedCount += 1;
+        }
+
+        const totalSteps = 7;
+        return Math.min((completedCount / totalSteps) * 100, 100);
+      })()
+    : 0;
+
+  if (isLoading || paymentLoading) {
+    return (
+      <div className="sm:w-full w-0 h-0 sm:h-full max-w-11/12 p-0 sm:p-4 flex flex-col items-center gap-12 m-0 sm:mx-auto sm:my-12 sm:mb-6">
+        <div className="flex items-center justify-center">
+          <span className="text-gray-500">Memuat progress...</span>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="sm:w-full w-0  h-0 sm:h-full max-w-11/12 p-0 sm:p-4 flex flex-col items-center gap-12 m-0 sm:mx-auto sm:my-12 sm:mb-6">
+    <div className="sm:w-full w-0 h-0 sm:h-full max-w-11/12 p-0 sm:p-4 flex flex-col items-center gap-12 m-0 sm:mx-auto sm:my-12 sm:mb-6">
       <div className="flex flex-col gap-5 w-full items-center justify-center">
         <div className="flex gap-5 w-full flex-col-reverse">
-          {/* === Progress bar === */}
           <div className="w-full relative hidden sm:grid grid-cols-6 gap-12 rounded-full">
-            {/* garis abu-abu (dasar) */}
             <div className="absolute top-1/2 left-[7%] right-[7%] transform -translate-y-1/2 h-[4px] bg-gray-200 rounded-full z-0"></div>
 
-            {/* garis hijau progress dinamis */}
             <div
               className="absolute top-1/2 left-[7%] transform -translate-y-1/2 h-[4px] bg-green-500 rounded-full z-0 transition-all duration-500"
               style={{ width: `${progressPercent}%` }}
             ></div>
 
-            {/* ikon step */}
-            {steps.map((step, index) => {
-              const color = getColor(index);
-              const colorClass =
-                color === "green"
-                  ? "text-green-500"
-                  : color === "yellow"
-                    ? "text-yellow-500"
-                    : "text-red-500";
+            {steps.map((step) => {
+              const styles = getStepStyles(step.step_number);
               return (
                 <div
                   key={step.key}
                   className="h-8 flex justify-center items-center w-full z-10"
                 >
-                  <CheckCircle className={`${colorClass} bg-white`} />
+                  {styles.icon}
                 </div>
               );
             })}
           </div>
 
-          {/* === Step boxes === */}
           <div className="w-full none hidden md:grid grid-cols-6 gap-6 items-center">
-            {steps.map((step, index) => {
-              const color = getColor(index);
-              const borderClass =
-                color === "green"
-                  ? "border-green-500 bg-green-50"
-                  : color === "yellow"
-                    ? "border-yellow-500 bg-yellow-50"
-                    : "border-red-500 bg-red-50";
+            {steps.map((step) => {
+              const styles = getStepStyles(step.step_number);
 
-              return (
-                <Link key={step.key} href={step.href}>
-                  <div
-                    className={`h-12 min-h-fit border rounded-lg p-4 flex items-center justify-center transition-all duration-300 ${borderClass}`}
-                  >
-                    <span>{step.label}</span>
-                  </div>
+              const content = (
+                <div
+                  className={`h-12 min-h-fit border rounded-lg p-4 flex items-center justify-center transition-all duration-300 ${
+                    styles.border
+                  } ${
+                    !styles.clickable
+                      ? "cursor-not-allowed opacity-60"
+                      : "cursor-pointer hover:shadow-md"
+                  }`}
+                >
+                  <span className={styles.text}>{step.label}</span>
+                </div>
+              );
+
+              return styles.clickable ? (
+                <Link
+                  key={step.key}
+                  href={step.href}
+                  onClick={(e) => handleStepClick(e, step)}
+                >
+                  {content}
                 </Link>
+              ) : (
+                <div key={step.key} onClick={(e) => handleStepClick(e, step)}>
+                  {content}
+                </div>
               );
             })}
           </div>

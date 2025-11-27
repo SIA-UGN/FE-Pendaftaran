@@ -10,11 +10,13 @@ import Ketentuan from "@/components/registrations/Ketentuan";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useRegistrationProgress } from "@/hooks/useRegistration";
+import { useMyPayment } from "@/hooks/usePayment";
 import toast from "react-hot-toast";
 
 export default function PendaftaranPage() {
   const router = useRouter();
   const { data: progressData, isLoading, isError } = useRegistrationProgress();
+  const { data: paymentData, isLoading: paymentLoading } = useMyPayment();
 
   const stepRoutes = {
     1: "/pendaftaran/data-diri",
@@ -30,6 +32,18 @@ export default function PendaftaranPage() {
     }
 
     const { completed_steps = [], accessible_steps = [] } = progressData.data;
+
+    if (paymentData?.data?.data?.payment) {
+      const paymentStatus = paymentData.data.data.payment.status;
+
+      if (paymentStatus !== "pending") {
+        return "/pendaftaran/status";
+      }
+
+      if (completed_steps.length === 5) {
+        return "/pendaftaran/pembayaran";
+      }
+    }
 
     for (let step = 1; step <= 5; step++) {
       if (!completed_steps.includes(step) && accessible_steps.includes(step)) {
