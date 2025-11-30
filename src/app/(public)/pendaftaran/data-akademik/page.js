@@ -42,6 +42,9 @@ const FormSchema = z.object({
   ijazahTerakhir: z.string({
     required_error: "Ijazah terakhir harus dipilih.",
   }),
+  programStudi: z.string({
+    required_error: "Program studi harus dipilih.",
+  }),
   fileSertifikat: z.string().optional(),
   fileSuratKelulusan: z.string().optional(),
   fileTranskrip: z.string().optional(),
@@ -69,6 +72,7 @@ export default function DataAkademik() {
       sekolahAsal: "",
       statusKelulusan: "",
       ijazahTerakhir: "",
+      programStudi: "",
       fileSertifikat: "",
       fileSuratKelulusan: "",
       fileTranskrip: "",
@@ -95,6 +99,7 @@ export default function DataAkademik() {
         sekolahAsal: academic.school_origin || "",
         statusKelulusan: academic.graduation_status || "",
         ijazahTerakhir: academic.last_certificate || "",
+        programStudi: academic.study_program || "",
         fileSertifikat: academic.certification_file || "",
         fileSuratKelulusan: academic.graduation_letter_file || "",
         fileTranskrip: academic.transcript_file || "",
@@ -158,6 +163,7 @@ export default function DataAkademik() {
         school_origin: data.sekolahAsal,
         graduation_status: data.statusKelulusan,
         last_certificate: data.ijazahTerakhir,
+        study_program: data.programStudi,
         certification_file: data.fileSertifikat || null,
         graduation_letter_file: data.fileSuratKelulusan || null,
         transcript_file: data.fileTranskrip || null,
@@ -266,6 +272,37 @@ export default function DataAkademik() {
                     )}
                   />
                 </div>
+              </div>
+
+              <div className="w-full">
+                <FormField
+                  control={form.control}
+                  name="programStudi"
+                  render={({ field }) => (
+                    <FormItem className={"w-full"}>
+                      <FormLabel>Program Studi</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih program studi" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="teknik-informatika">Teknik Informatika</SelectItem>
+                          <SelectItem value="sistem-informasi">Sistem Informasi</SelectItem>
+                          <SelectItem value="manajemen">Manajemen</SelectItem>
+                          <SelectItem value="akuntansi">Akuntansi</SelectItem>
+                          <SelectItem value="psikologi">Psikologi</SelectItem>
+                          <SelectItem value="desain-grafis">Desain Grafis</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
               <div className="space-y-4 mt-6">
