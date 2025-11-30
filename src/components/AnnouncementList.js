@@ -8,12 +8,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { SearchIcon } from "lucide-react";
 import { AnnouncementTable } from "@/components/AnnouncementTable";
-import { useState } from "react";
 
-export default function AnnouncementList({ data }) {
-  const [search, setSearch] = useState("");
-
+export default function AnnouncementList({ data, onSearchChange, searchValue }) {
   console.log(data);
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    if (onSearchChange) {
+      onSearchChange(value);
+    }
+  };
 
   return (
     <div className="w-full px-0">
@@ -22,10 +26,10 @@ export default function AnnouncementList({ data }) {
         <div className="flex-1 min-w-0 border-1 border-black rounded-lg">
           <InputGroup className="w-full">
             <InputGroupInput
-              placeholder="Cari berdasarkan nama atau email..."
+              placeholder="Cari berdasarkan nama atau nomor registrasi..."
               className="text-sm sm:text-base"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={searchValue}
+              onChange={handleSearchChange}
             />
             <InputGroupAddon>
               <SearchIcon className="text-gray-500 w-5 h-5" />
@@ -36,7 +40,7 @@ export default function AnnouncementList({ data }) {
 
       {/* Table */}
       <div className="w-full overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-          <AnnouncementTable data={data} />
+          <AnnouncementTable data={data} searchValue={searchValue} />
       </div>
     </div>
   );

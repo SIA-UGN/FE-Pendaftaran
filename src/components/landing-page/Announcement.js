@@ -2,22 +2,31 @@
 
 import { Button } from "@/components/ui/button";
 
-import { useState } from "react";
-import { useAnnouncements } from "@/hooks/useAnnouncement";
+import { useState, useCallback } from "react";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useAnnouncementsWithSearch } from "@/hooks/useAnnouncementsWithSearch";
 import { Heading } from "@/components/Heading";
 import AnnouncementList from "@/components/AnnouncementList";
 
 export default function Announcement() {
+  const [search, setSearch] = useState("");
   const [isOn, setIsOn] = useState(false);
+
+  // Debounce the search input to avoid too many API calls
+  const debouncedSearch = useDebounce(search, 500);
 
   const {
     data: announcementsData,
     isLoading,
     isError,
     error,
-  } = useAnnouncements({});
+  } = useAnnouncementsWithSearch(debouncedSearch);
 
-  if (isLoading) {
+  const handleSearchChange = useCallback((newSearch) => {
+    setSearch(newSearch);
+  }, []);
+
+  if (isLoading && !announcementsData) {
     return (
       <div className="flex items-center justify-center min-h-[200px] w-full">
         <div className="text-center">
@@ -74,29 +83,14 @@ export default function Announcement() {
     );
   }
 
-  const data = announcementsData?.data?.data?.data;
+  const data = announcementsData?.data?.data?.data || [];
 
   return (
     <div className="flex flex-col items-center pt-4 sm:pt-6 lg:pt-8 pb-12 sm:pb-14 lg:pb-16 px-4 sm:px-6 md:px-8 lg:px-12 max-w-7xl mx-auto w-full">
       <Heading title={"Pengumuman"} />
-      {data.length !== 0 ? (
-        <div className="w-full overflow-x-auto">
-          <AnnouncementList data={data} />
-        </div>
-      ) : (
-        <div className="w-full p-6 sm:p-8 lg:p-10 flex flex-col items-center justify-center gap-4 sm:gap-6">
-          <p className="text-center text-gray-500 text-sm sm:text-base lg:text-lg max-w-2xl leading-relaxed">
-            Dokumen masih berada dalam proses verifikasi. Silakan cek kembali
-            nanti.
-          </p>
-          <Button
-            variant="yellow"
-            className="rounded-lg px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base"
-          >
-            17 November 2025
-          </Button>
-        </div>
-      )}
+      <div className="w-full overflow-x-auto">
+        <AnnouncementList data={data} onSearchChange={handleSearchChange} searchValue={search} />
+      </div>
     </div>
   );
 }
