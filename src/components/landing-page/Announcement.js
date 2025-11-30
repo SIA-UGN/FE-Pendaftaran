@@ -13,7 +13,7 @@ export default function Announcement() {
   const [isOn, setIsOn] = useState(false);
 
   // Debounce the search input to avoid too many API calls
-  const debouncedSearch = useDebounce(search, 500);
+  const debouncedSearch = useDebounce(search, 1000);
 
   const {
     data: announcementsData,
@@ -89,7 +89,11 @@ export default function Announcement() {
     <div className="flex flex-col items-center pt-4 sm:pt-6 lg:pt-8 pb-12 sm:pb-14 lg:pb-16 px-4 sm:px-6 md:px-8 lg:px-12 max-w-7xl mx-auto w-full">
       <Heading title={"Pengumuman"} />
       <div className="w-full overflow-x-auto">
-        <AnnouncementList data={data} onSearchChange={handleSearchChange} searchValue={search} />
+        <AnnouncementList
+          data={data}
+          onSearchChange={handleSearchChange}
+          searchValue={search}
+        />
       </div>
     </div>
   );
