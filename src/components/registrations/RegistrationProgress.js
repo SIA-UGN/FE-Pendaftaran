@@ -197,7 +197,7 @@ export default function RegistrationProgress() {
         }
 
         const totalSteps = 7;
-        return Math.min((completedCount / totalSteps) * 120, 100);
+        return Math.min((completedCount / totalSteps) * 120, 87);
       })()
     : 0;
 

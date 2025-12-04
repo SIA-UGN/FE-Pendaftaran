@@ -236,11 +236,11 @@ export default function DataAlamat() {
               />
             </div>
             <div className="w-full flex items-center justify-end my-6 sm:my-8 md:my-10 lg:my-12 px-4 sm:px-6 md:px-8 lg:px-12 gap-6">
-              <Link href="/pendaftaran">
+              <Link href="/pendaftaran" className="w-1/2 sm:w-48">
                 <Button
                   type="button"
                   variant={"yellow"}
-                  className={"w-full sm:w-48"}
+                  className={"w-full"}
                 >
                   Kembali
                 </Button>
@@ -248,7 +248,7 @@ export default function DataAlamat() {
               <Button
                 type="submit"
                 variant={"matcha"}
-                className={"w-full sm:w-48"}
+                className={"w-1/2 sm:w-48"}
                 disabled={storeMutation.isPending}
               >
                 {storeMutation.isPending ? "Menyimpan..." : "Lanjut"}
