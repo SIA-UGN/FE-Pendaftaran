@@ -46,14 +46,14 @@ const FormSchema = z.object({
   tempatLahir: z.string().min(1, { message: "Tempat Lahir wajib diisi." }),
   tanggalLahir: z.string().min(1, { message: "Tanggal Lahir wajib diisi." }),
   nik: z.string().length(16, { message: "NIK harus 16 digit." }),
-  ktp: z.any().optional(),
-  ktpFile: z.string().optional(),
-  noAkta: z.string().min(1, { message: "Nomor Akta wajib diisi." }),
+  ktp: z.any(),
+  ktpFile: z.string().min(1, { message: "File KTP/KITAS wajib diupload." }),
+  noAkta: z.string().optional(),
   akta: z.any().optional(),
   aktaFile: z.string().optional(),
   noKK: z.string().length(16, { message: "Nomor KK harus 16 digit." }),
-  kk: z.any().optional(),
-  kkFile: z.string().optional(),
+  kk: z.any(),
+  kkFile: z.string().min(1, { message: "File Kartu Keluarga wajib diupload." }),
   kewarganegaraan: z
     .string()
     .min(1, { message: "Kewarganegaraan wajib diisi." }),
@@ -198,7 +198,7 @@ export default function DataDiri() {
                 name="namaLengkap"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nama Lengkap</FormLabel>
+                    <FormLabel>Nama Lengkap <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <Input placeholder="Nama Lengkap" {...field} />
                     </FormControl>
@@ -212,7 +212,7 @@ export default function DataDiri() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Email <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <Input type="email" placeholder="Email" {...field} />
                     </FormControl>
@@ -227,12 +227,13 @@ export default function DataDiri() {
                   name="jenisKelamin"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Jenis Kelamin</FormLabel>
+                      <FormLabel>Jenis Kelamin <span className="text-red-500">*</span></FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
+                        
                       >
-                        <FormControl>
+                        <FormControl className={"w-full"}>
                           <SelectTrigger>
                             <SelectValue placeholder="Pilih Jenis Kelamin" />
                           </SelectTrigger>
@@ -252,12 +253,12 @@ export default function DataDiri() {
                   name="agama"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Agama</FormLabel>
+                      <FormLabel>Agama <span className="text-red-500">*</span></FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
                       >
-                        <FormControl>
+                        <FormControl className={"w-full"}>
                           <SelectTrigger>
                             <SelectValue placeholder="Pilih Agama" />
                           </SelectTrigger>
@@ -281,7 +282,7 @@ export default function DataDiri() {
                   name="noPonsel"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nomer Ponsel</FormLabel>
+                      <FormLabel>Nomer Ponsel <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input placeholder="08xxxxxxxx" {...field} />
                       </FormControl>
@@ -295,7 +296,7 @@ export default function DataDiri() {
                   name="tempatLahir"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tempat Lahir</FormLabel>
+                      <FormLabel>Tempat Lahir <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input placeholder="Tempat Lahir" {...field} />
                       </FormControl>
@@ -309,7 +310,7 @@ export default function DataDiri() {
                   name="tanggalLahir"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tanggal Lahir</FormLabel>
+                      <FormLabel>Tanggal Lahir <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input type="date" {...field} />
                       </FormControl>
@@ -323,7 +324,7 @@ export default function DataDiri() {
                   name="nik"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>NIK</FormLabel>
+                      <FormLabel>NIK <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input placeholder="NIK" {...field} />
                       </FormControl>
@@ -338,7 +339,7 @@ export default function DataDiri() {
                 name="ktp"
                 render={({ field: { onChange, value, ...field } }) => (
                   <FormItem>
-                    <FormLabel>KTP / KITAS</FormLabel>
+                    <FormLabel>KTP / KITAS <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <Input
                         type="file"
@@ -408,7 +409,7 @@ export default function DataDiri() {
                 name="noKK"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nomor Kartu Keluarga</FormLabel>
+                    <FormLabel>Nomor Kartu Keluarga <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <Input placeholder="Nomor KK" {...field} />
                     </FormControl>
@@ -422,7 +423,7 @@ export default function DataDiri() {
                 name="kk"
                 render={({ field: { onChange, value, ...field } }) => (
                   <FormItem>
-                    <FormLabel>Kartu Keluarga</FormLabel>
+                    <FormLabel>Kartu Keluarga<span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <Input
                         type="file"
@@ -450,9 +451,9 @@ export default function DataDiri() {
                 name="kewarganegaraan"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Kewarganegaraan</FormLabel>
+                    <FormLabel>Kewarganegaraan <span className="text-red-500">*</span></FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
+                      <FormControl className={"w-full"}>
                         <SelectTrigger>
                           <SelectValue placeholder="Pilih Kewarganegaraan" />
                         </SelectTrigger>
@@ -473,7 +474,7 @@ export default function DataDiri() {
                   name="anakKe"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Anak ke Berapa</FormLabel>
+                      <FormLabel>Anak ke Berapa <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input type="number" placeholder="1" {...field} />
                       </FormControl>
@@ -487,7 +488,7 @@ export default function DataDiri() {
                   name="jumlahSaudara"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Jumlah Saudara Kandung</FormLabel>
+                      <FormLabel>Jumlah Saudara Kandung <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input type="number" placeholder="0" {...field} />
                       </FormControl>
