@@ -22,6 +22,7 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${poppins.variable} font-sans bg-white text-gray-900 antialiased`}
+        suppressHydrationWarning
       >
         <Providers>
           <main className="min-h-screen">{children}</main>

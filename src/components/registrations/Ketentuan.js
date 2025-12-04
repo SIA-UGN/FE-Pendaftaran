@@ -1,12 +1,11 @@
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
+import { Heading } from "@/components/Heading";
 
 export default function Ketentuan() {
   return (
-    <div className="flex flex-col items-center pt-4 pb-16 max-w-11/12 w-full">
-      <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
-        Ketentuan
-      </h2>
+    <div className="flex flex-col items-center pt-4 pb-6 max-w-11/12 w-full">
+      <Heading title="Ketentuan" />
       <div className="flex gap-5 w-full">
         <Card className="p-5">
           <ul className="list-disc list-inside space-y-4 text-gray-700 leading-relaxed">

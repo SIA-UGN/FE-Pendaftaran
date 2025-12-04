@@ -2,7 +2,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const apiClient = axios.create({
-  baseURL: process.env.APP_URL || "http://sia-global.test/api",
+  baseURL: process.env.APP_URL || "http://sia-globall.test/api",
   headers: {
     "Content-Type": "application/json",
   },
