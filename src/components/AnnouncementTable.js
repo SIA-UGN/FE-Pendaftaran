@@ -9,7 +9,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +21,6 @@ import {
 } from "@/components/ui/table";
 
 export function AnnouncementTable({ data }) {
-  const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
 
@@ -31,7 +29,10 @@ export function AnnouncementTable({ data }) {
       accessorKey: "no",
       header: ({ column }) => {
         return (
-          <Button variant="ghost" className="w-full">
+          <Button
+            variant="ghost"
+            className="w-full"
+          >
             No
           </Button>
         );
@@ -46,10 +47,8 @@ export function AnnouncementTable({ data }) {
         return (
           <Button
             variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Nomor Registrasi
-            <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
       },
@@ -65,10 +64,8 @@ export function AnnouncementTable({ data }) {
         return (
           <Button
             variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Nama
-            <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
       },
@@ -77,7 +74,13 @@ export function AnnouncementTable({ data }) {
     {
       accessorKey: "status",
       header: ({ column }) => {
-        return <Button variant="ghost">Status</Button>;
+        return (
+          <Button
+            variant="ghost"
+          >
+            Status
+          </Button>
+        );
       },
       cell: ({ row }) => {
         const status = row.original.status || "Lulus";
@@ -121,7 +124,6 @@ export function AnnouncementTable({ data }) {
   const table = useReactTable({
     data,
     columns,
-    onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -129,7 +131,6 @@ export function AnnouncementTable({ data }) {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     state: {
-      sorting,
       columnFilters,
       columnVisibility,
     },
@@ -273,7 +274,7 @@ export function AnnouncementTable({ data }) {
           dari {table.getFilteredRowModel().rows.length} data
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 px-6 py-4">
           <Button
             variant="outline"
             size="sm"

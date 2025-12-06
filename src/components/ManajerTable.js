@@ -9,7 +9,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, Eye, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -56,11 +55,9 @@ export function ManajerTable({ data }) {
         return (
           <Button
             variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="w-full"
           >
             No
-            <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
       },
@@ -74,10 +71,8 @@ export function ManajerTable({ data }) {
         return (
           <Button
             variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Nama
-            <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
       },
@@ -182,7 +177,6 @@ export function ManajerTable({ data }) {
 
   return (
     <div className="w-full space-y-4">
-      {/* Desktop Table */}
       <div className="hidden md:block overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
@@ -231,7 +225,6 @@ export function ManajerTable({ data }) {
         </Table>
       </div>
 
-      {/* Mobile Cards */}
       <div className="md:hidden space-y-4">
         {table.getRowModel().rows?.length ? (
           table.getRowModel().rows.map((row, index) => {
@@ -294,8 +287,7 @@ export function ManajerTable({ data }) {
         )}
       </div>
 
-      {/* Pagination */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4">
         <div className="text-sm text-gray-500">
           Menampilkan{" "}
           {table.getState().pagination.pageIndex *
@@ -310,7 +302,7 @@ export function ManajerTable({ data }) {
           dari {table.getFilteredRowModel().rows.length} data
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 px-6 py-4">
           <Button
             variant="outline"
             size="sm"
@@ -334,7 +326,6 @@ export function ManajerTable({ data }) {
         </div>
       </div>
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

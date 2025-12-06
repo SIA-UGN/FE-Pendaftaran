@@ -25,9 +25,10 @@ import toast from "react-hot-toast";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
+  const [step, setStep] = useState(1); // 1: email, 2: verify code, 3: reset password
   const [showDialog, setShowDialog] = useState(false);
-  
-  const [token, setToken] = useState("");
+
+  const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
 
@@ -52,10 +53,25 @@ export default function ForgotPassword() {
       {
         onSuccess: () => {
           setShowDialog(true);
-          toast.success("Token has been sent to your email");
+          setStep(2);
+          toast.success("Verification code has been sent to your email");
         },
       }
     );
+  }
+
+  async function handleVerifyCode(e) {
+    e.preventDefault();
+
+    if (code.length !== 6) {
+      toast.error("Please enter a 6-digit code");
+      return;
+    }
+
+    // Validasi kode di sini jika ada endpoint khusus
+    // Untuk sementara langsung ke step 3
+    setStep(3);
+    toast.success("Code verified! Please enter your new password");
   }
 
   async function handleResetPassword(e) {
@@ -69,7 +85,7 @@ export default function ForgotPassword() {
     resetPasswordMutation.mutate(
       {
         email,
-        token,
+        code, // kirim code bukan token
         password,
         password_confirmation: passwordConfirmation,
       },
@@ -78,12 +94,26 @@ export default function ForgotPassword() {
           toast.success("Password reset successful");
           setShowDialog(false);
           setEmail("");
-          setToken("");
+          setCode("");
           setPassword("");
           setPasswordConfirmation("");
+          setStep(1);
+        },
+        onError: (error) => {
+          toast.error(
+            error.response?.data?.message || "Failed to reset password"
+          );
         },
       }
     );
+  }
+
+  function handleCloseDialog() {
+    setShowDialog(false);
+    setStep(1);
+    setCode("");
+    setPassword("");
+    setPasswordConfirmation("");
   }
 
   return (
@@ -159,7 +189,7 @@ export default function ForgotPassword() {
                   variant={"green"}
                   disabled={isForgotLoading}
                 >
-                  {isForgotLoading ? "Sending..." : "Send Token"}
+                  {isForgotLoading ? "Sending..." : "Send Verification Code"}
                 </Button>
               </form>
             </CardContent>
@@ -167,82 +197,118 @@ export default function ForgotPassword() {
         </div>
       </Card>
 
-      {/* Reset Password Alert Dialog */}
-      <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
+      <AlertDialog open={showDialog} onOpenChange={handleCloseDialog}>
         <AlertDialogContent className="sm:max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl font-bold text-[var(--green)]">
-              Reset Password
+              {step === 2 ? "Verify Code" : "Reset Password"}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Enter the token from your email and your new password.
+              {step === 2
+                ? "Enter the 6-digit verification code sent to your email."
+                : "Enter your new password to complete the reset."}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <form onSubmit={handleResetPassword} className="grid gap-4 mt-4">
-            <div className="grid gap-2">
-              <Label htmlFor="dialog-email">Email</Label>
-              <Input
-                id="dialog-email"
-                type="email"
-                value={email}
-                disabled
-                className="bg-gray-100"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="token">Token</Label>
-              <Input
-                id="token"
-                type="text"
-                value={token}
-                onChange={(e) => setToken(e.target.value)}
-                placeholder="Enter token from email"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="new-password">New Password</Label>
-              <Input
-                id="new-password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter new password"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="confirm-password">Confirm Password</Label>
-              <Input
-                id="confirm-password"
-                type="password"
-                value={passwordConfirmation}
-                onChange={(e) => setPasswordConfirmation(e.target.value)}
-                placeholder="Confirm new password"
-                required
-              />
-            </div>
-            <div className="flex gap-2 mt-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowDialog(false)}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                variant="green"
-                className="flex-1 text-white"
-                disabled={resetPasswordMutation.isPending}
-              >
-                {resetPasswordMutation.isPending
-                  ? "Resetting..."
-                  : "Reset Password"}
-              </Button>
-            </div>
-          </form>
+
+          {step === 2 && (
+            <form onSubmit={handleVerifyCode} className="grid gap-4 mt-4">
+              <div className="grid gap-2">
+                <Label htmlFor="dialog-email">Email</Label>
+                <Input
+                  id="dialog-email"
+                  type="email"
+                  value={email}
+                  disabled
+                  className="bg-gray-100"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="code">Verification Code</Label>
+                <Input
+                  id="code"
+                  type="text"
+                  value={code}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "").slice(0, 6);
+                    setCode(value);
+                  }}
+                  placeholder="Enter 6-digit code"
+                  maxLength={6}
+                  className="text-center text-2xl tracking-widest"
+                  required
+                />
+                <p className="text-xs text-gray-500 text-center">
+                  Please check your email for the verification code
+                </p>
+              </div>
+              <div className="flex gap-2 mt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCloseDialog}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="green"
+                  className="flex-1 text-white"
+                  disabled={code.length !== 6}
+                >
+                  Verify Code
+                </Button>
+              </div>
+            </form>
+          )}
+
+          {/* Step 3: Reset Password */}
+          {step === 3 && (
+            <form onSubmit={handleResetPassword} className="grid gap-4 mt-4">
+              <div className="grid gap-2">
+                <Label htmlFor="new-password">New Password</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter new password"
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="confirm-password">Confirm Password</Label>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  value={passwordConfirmation}
+                  onChange={(e) => setPasswordConfirmation(e.target.value)}
+                  placeholder="Confirm new password"
+                  required
+                />
+              </div>
+              <div className="flex gap-2 mt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCloseDialog}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="green"
+                  className="flex-1 text-white"
+                  disabled={resetPasswordMutation.isPending}
+                >
+                  {resetPasswordMutation.isPending
+                    ? "Resetting..."
+                    : "Reset Password"}
+                </Button>
+              </div>
+            </form>
+          )}
         </AlertDialogContent>
       </AlertDialog>
     </div>

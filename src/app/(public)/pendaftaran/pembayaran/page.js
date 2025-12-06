@@ -50,6 +50,7 @@ export default function Pembayaran() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
 
+  // Set default payment method
   useEffect(() => {
     if (paymentData?.payment_method_id) {
       setSelectedPaymentMethod(paymentData.payment_method_id);
@@ -59,7 +60,7 @@ export default function Pembayaran() {
     ) {
       setSelectedPaymentMethod(paymentData.available_payment_methods[0].id);
     }
-  }, [paymentData, selectedPaymentMethod]);
+  }, [paymentData]);
 
   // Countdown timer
   useEffect(() => {
@@ -182,48 +183,6 @@ export default function Pembayaran() {
     }
   };
 
-  const StatusBadge = ({ status }) => {
-    const statusConfig = {
-      pending: {
-        icon: Clock,
-        text: "Menunggu Pembayaran",
-        color: "text-yellow-600 bg-yellow-50 border-yellow-200",
-      },
-      waiting_verification: {
-        icon: Upload,
-        text: "Menunggu Verifikasi",
-        color: "text-blue-600 bg-blue-50 border-blue-200",
-      },
-      verified: {
-        icon: CheckCheck,
-        text: "Pembayaran Terverifikasi",
-        color: "text-green-600 bg-green-50 border-green-200",
-      },
-      rejected: {
-        icon: XCircle,
-        text: "Bukti Pembayaran Ditolak",
-        color: "text-red-600 bg-red-50 border-red-200",
-      },
-      expired: {
-        icon: AlertCircle,
-        text: "Pembayaran Expired",
-        color: "text-gray-600 bg-gray-50 border-gray-200",
-      },
-    };
-
-    const config = statusConfig[status] || statusConfig.pending;
-    const Icon = config.icon;
-
-    return (
-      <div
-        className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${config.color}`}
-      >
-        <Icon className="w-5 h-5" />
-        <span className="font-medium">{config.text}</span>
-      </div>
-    );
-  };
-
   const parseInstructions = (instructions) => {
     if (!instructions) return [];
 
@@ -280,11 +239,6 @@ export default function Pembayaran() {
           <CheckCircle className="text-green-500 w-6 h-6" />
           <h2 className="text-2xl font-semibold">Pembayaran Pendaftaran</h2>
         </div>
-
-        {/* Status Payment */}
-        {/* <div className="mb-6">
-          <StatusBadge status={paymentStatus} />
-        </div> */}
 
         {/* Alert Deadline */}
         {!isExpired && paymentStatus === "pending" && (
@@ -384,11 +338,11 @@ export default function Pembayaran() {
             )}
 
             {/* Pemilihan Metode Pembayaran */}
-            {paymentData?.available_payment_methods?.length > 1 && (
+            {paymentData?.available_payment_methods?.length > 0 && (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    {getPaymentIcon("payment")}
+                    <CreditCard className="w-5 h-5" />
                     <span>Pilih Metode Pembayaran</span>
                   </CardTitle>
                 </CardHeader>
@@ -401,35 +355,37 @@ export default function Pembayaran() {
                     className="grid grid-cols-1 gap-3"
                   >
                     {paymentData?.available_payment_methods?.map((method) => (
-                      <div
+                      <Label
                         key={method.id}
-                        className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-colors ${
+                        htmlFor={`method-${method.id}`}
+                        className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-all ${
                           selectedPaymentMethod === method.id
-                            ? "border-green-500 bg-green-50"
-                            : "border-gray-200 hover:bg-gray-50"
+                            ? "border-green-500 bg-green-50 shadow-md"
+                            : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                         }`}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-1">
                           <RadioGroupItem
                             value={method.id.toString()}
                             id={`method-${method.id}`}
+                            className="shrink-0"
                           />
-                          <div className="flex flex-col">
-                            <span className="font-medium">
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-semibold text-base">
                               {method.bank_name}
                             </span>
                             <span className="text-sm text-muted-foreground">
                               a.n {method.account_holder}
                             </span>
-                            <span className="text-sm font-mono">
+                            <span className="text-sm font-mono text-gray-700">
                               {method.account_number}
                             </span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 ml-3">
                           {getPaymentIcon(method.method_type)}
                         </div>
-                      </div>
+                      </Label>
                     ))}
                   </RadioGroup>
                 </CardContent>
@@ -441,7 +397,7 @@ export default function Pembayaran() {
               <CardHeader>
                 <CardTitle>
                   {selectedMethod
-                    ? `${selectedMethod.bank_name}`
+                    ? `Transfer ke ${selectedMethod.bank_name}`
                     : "Transfer Bank"}
                 </CardTitle>
               </CardHeader>
@@ -473,26 +429,8 @@ export default function Pembayaran() {
                     </div>
                   </div>
                 ) : (
-                  <div className="p-4 border rounded-lg bg-gray-50 space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="font-bold text-lg">Bank BCA</span>
-                      <span className="text-sm text-muted-foreground">
-                        a.n Universitas Global
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between bg-white p-3 rounded border">
-                      <span className="font-mono text-lg font-bold">
-                        1234567890
-                      </span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard("1234567890")}
-                      >
-                        <Copy className="w-4 h-4 mr-2" />
-                        Salin
-                      </Button>
-                    </div>
+                  <div className="p-4 border rounded-lg bg-gray-50 text-center text-muted-foreground">
+                    Silakan pilih metode pembayaran terlebih dahulu
                   </div>
                 )}
               </CardContent>
@@ -525,13 +463,13 @@ export default function Pembayaran() {
                       )
                     </li>
                     <li>
-                      Transfer ke rekening yang dipilih:
-                      <strong>
-                        {" "}
-                        {selectedMethod?.bank_name || "Bank BCA"} (a.n{" "}
-                        {selectedMethod?.account_holder || "Universitas Global"}
-                        )
-                      </strong>
+                      Transfer ke rekening yang dipilih
+                      {selectedMethod && (
+                        <>
+                          : <strong>{selectedMethod.bank_name}</strong> (a.n{" "}
+                          {selectedMethod.account_holder})
+                        </>
+                      )}
                     </li>
                     <li>Simpan bukti transfer Anda</li>
                     <li>

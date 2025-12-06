@@ -137,7 +137,7 @@ export default function DataAlamat() {
                   name="provinsi"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Provinsi</FormLabel>
+                      <FormLabel>Provinsi <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input placeholder="Provinsi" {...field} />
                       </FormControl>
@@ -151,7 +151,7 @@ export default function DataAlamat() {
                   name="kota"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Kota / Kabupaten</FormLabel>
+                      <FormLabel>Kota / Kabupaten <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input placeholder="Kota / Kabupaten" {...field} />
                       </FormControl>
@@ -165,7 +165,7 @@ export default function DataAlamat() {
                   name="kecamatan"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Kecamatan</FormLabel>
+                      <FormLabel>Kecamatan <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input placeholder="Kecamatan" {...field} />
                       </FormControl>
@@ -179,7 +179,7 @@ export default function DataAlamat() {
                   name="kelurahan"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Kelurahan</FormLabel>
+                      <FormLabel>Kelurahan <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input placeholder="Kelurahan" {...field} />
                       </FormControl>
@@ -193,7 +193,7 @@ export default function DataAlamat() {
                   name="kodePos"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Kode Pos</FormLabel>
+                      <FormLabel>Kode Pos <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -211,7 +211,7 @@ export default function DataAlamat() {
                   name="namaDusun"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nama Dusun</FormLabel>
+                      <FormLabel>Nama Dusun <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input placeholder="Nama Dusun" {...field} />
                       </FormControl>
@@ -226,7 +226,7 @@ export default function DataAlamat() {
                 name="alamatLengkap"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Alamat Lengkap</FormLabel>
+                    <FormLabel>Alamat Lengkap <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <Input placeholder="Jl. Nama Jalan No. XX" {...field} />
                     </FormControl>
@@ -235,12 +235,12 @@ export default function DataAlamat() {
                 )}
               />
             </div>
-            <div className="w-full flex items-center justify-end my-6 sm:my-8 md:my-10 lg:my-12 px-4 sm:px-6 md:px-8 lg:px-12">
-              <Link href="/pendaftaran">
+            <div className="w-full flex items-center justify-end my-6 sm:my-8 md:my-10 lg:my-12 px-4 sm:px-6 md:px-8 lg:px-12 gap-6">
+              <Link href="/pendaftaran" className="w-1/2 sm:w-48">
                 <Button
                   type="button"
                   variant={"yellow"}
-                  className={"w-full sm:w-48"}
+                  className={"w-full"}
                 >
                   Kembali
                 </Button>
@@ -248,7 +248,7 @@ export default function DataAlamat() {
               <Button
                 type="submit"
                 variant={"matcha"}
-                className={"w-full sm:w-48"}
+                className={"w-1/2 sm:w-48"}
                 disabled={storeMutation.isPending}
               >
                 {storeMutation.isPending ? "Menyimpan..." : "Lanjut"}

@@ -9,8 +9,13 @@ import { Button } from "@/components/ui/button";
 import { SearchIcon } from "lucide-react";
 import { AnnouncementTable } from "@/components/AnnouncementTable";
 
-export default function AnnouncementList({ data, onSearchChange, searchValue }) {
+export default function AnnouncementList({
+  data,
+  onSearchChange,
+  searchValue,
+}) {
   console.log(data);
+  console.log("Filtered:", filteredData);
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -21,7 +26,6 @@ export default function AnnouncementList({ data, onSearchChange, searchValue }) 
 
   return (
     <div className="w-full px-0">
-      {/* Search Only (dropdown removed) */}
       <div className="flex items-center justify-between gap-4 my-6 w-full">
         <div className="flex-1 min-w-0 border-1 border-black rounded-lg">
           <InputGroup className="w-full">
@@ -38,10 +42,15 @@ export default function AnnouncementList({ data, onSearchChange, searchValue }) 
         </div>
       </div>
 
-      {/* Table */}
       <div className="w-full overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-          <AnnouncementTable data={data} searchValue={searchValue} />
+        <AnnouncementTable data={data} searchValue={searchValue} />
       </div>
+
+      {filteredData.length === 0 && search && (
+        <div className="text-center py-8 text-gray-500">
+          Tidak ada hasil untuk `{search}`
+        </div>
+      )}
     </div>
   );
 }

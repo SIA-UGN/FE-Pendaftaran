@@ -84,44 +84,31 @@ export default function Fakultas() {
             variant="first"
           />
 
-          {/* Fakultas Sections */}
           <div className="flex flex-col gap-8 sm:gap-10 lg:gap-12 w-full">
             {data.map((fakultas, index) => (
               <div key={index} className="w-full">
-                {/* Fakultas Title */}
-                <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold w-full border-b-2 border-gray-300 pb-3 text-[var(--green)] mt-6 sm:mt-8 mb-4 sm:mb-5">
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold w-full border-b-2 border-gray-300 pb-3 text-[var(--green)] mt-2 sm:mt-2 mb-4 sm:mb-5">
                   {fakultas.fakultas}
                 </h2>
 
-                {/* Fakultas Description */}
                 <p className="w-full mb-6 sm:mb-8 text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
                   {fakultas.deskripsi}
                 </p>
 
-                {/* Program Studi Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
                   {fakultas.prodi.map((prodi, prodiIndex) => (
                     <Card
                       key={prodiIndex}
                       className="flex flex-col p-4 sm:p-5 lg:p-6 gap-3 sm:gap-4 hover:shadow-lg transition-shadow"
                     >
-                      {/* Prodi Title */}
-                      <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold border-b-2 border-gray-200 pb-2 text-[var(--green)]">
+                      <h3 className="text-md sm:text-lg lg:text-xl font-semibold border-b-2 border-gray-200 pb-2 text-[var(--green)]">
                         {prodi.nama}
                       </h3>
 
-                      {/* Prodi Description */}
-                      <p className="text-xs sm:text-sm lg:text-base text-gray-500 leading-relaxed flex-grow">
+                      <p className="text-xs lg:text-base text-gray-500 leading-relaxed flex-grow">
                         {prodi.deskripsi}
                       </p>
 
-                      {/* Button */}
-                      {/* <Button
-                        variant="green"
-                        className="w-full sm:w-auto text-sm sm:text-base"
-                      >
-                        Selengkapnya
-                      </Button> */}
                     </Card>
                   ))}
                 </div>

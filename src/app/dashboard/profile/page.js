@@ -25,7 +25,6 @@ export default function Profile() {
 
   return (
     <div className="flex flex-col items-center px-4 sm:px-6 lg:px-8 max-w-6xl my-6 sm:my-8 lg:my-12 w-full gap-3 mx-auto">
-      {/* Akun Pendaftar */}
       <Heading title={"Akun Pendaftar"} variant="first" />
 
       <Card className="w-full flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl shadow-md bg-white">
@@ -43,34 +42,31 @@ export default function Profile() {
         </div>
       </Card>
 
-      {/* Status Verifikasi Pendaftar */}
       <Heading title={"Status Verifikasi Pendaftar"} />
       <div className="w-full">
         <Button
-          variant={data.applicant.verification_status === "Approved" ? `green` : `destructive`}
+          variant={data.applicant.verification_status === "Approved" ? `succed` : `destructive`}
           className="w-full rounded-lg text-sm sm:text-base py-2 sm:py-3"
         >
           {data.applicant.verification_status}
         </Button>
       </div>
 
-      {/* Status Kelulusan Pendaftar */}
       <Heading title={"Status Kelulusan Pendaftar"} />
       <div className="w-full">
         <Button
-          variant={data.applicant.graduation_status === "Lulus" ? `green` : `destructive`}
+          variant={data.applicant.graduation_status === "Lulus" ? `succed` : `destructive`}
           className="w-full rounded-lg text-sm sm:text-base py-2 sm:py-3"
         >
           {data.applicant.graduation_status}
         </Button>
       </div>
 
-      {/* Nominal Masuk */}
       <Heading title={"Nominal Masuk"} />
       <div className="w-full">
         <Button
           variant={
-            data.applicant.payment.nominal === "Rp500.000,-" ? `green` : `destructive`
+            data.applicant.payment.nominal === "Rp500.000,-" ? `succed` : `destructive`
           }
           className="w-full rounded-lg text-sm sm:text-base py-2 sm:py-3"
         >
@@ -78,7 +74,6 @@ export default function Profile() {
         </Button>
       </div>
 
-      {/* Status Verifikasi Keuangan */}
       <Heading title={"Status Verifikasi Keuangan"} />
       <div className="w-full sm:w-3/4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-6 justify-center">
         <Button variant="yellow" className="rounded-lg text-sm sm:text-base py-2 sm:py-3">

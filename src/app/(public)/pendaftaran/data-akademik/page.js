@@ -204,7 +204,7 @@ export default function DataAkademik() {
                 name="sekolahAsal"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Sekolah Asal</FormLabel>
+                    <FormLabel>Sekolah Asal <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <Input placeholder="Nama sekolah asal" {...field} />
                     </FormControl>
@@ -220,12 +220,12 @@ export default function DataAkademik() {
                     name="statusKelulusan"
                     render={({ field }) => (
                       <FormItem className={"w-full"}>
-                        <FormLabel>Status Kelulusan</FormLabel>
+                        <FormLabel>Status Kelulusan <span className="text-red-500">*</span></FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
-                          <FormControl>
+                          <FormControl className="w-full">
                             <SelectTrigger>
                               <SelectValue placeholder="Pilih status kelulusan" />
                             </SelectTrigger>
@@ -250,12 +250,12 @@ export default function DataAkademik() {
                     name="ijazahTerakhir"
                     render={({ field }) => (
                       <FormItem className={"w-full"}>
-                        <FormLabel>Ijazah Terakhir</FormLabel>
+                        <FormLabel>Ijazah Terakhir <span className="text-red-500">*</span></FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
-                          <FormControl>
+                          <FormControl className="w-full">
                             <SelectTrigger>
                               <SelectValue placeholder="Pilih ijazah terakhir" />
                             </SelectTrigger>
@@ -316,7 +316,7 @@ export default function DataAkademik() {
                   name="fileSertifikat"
                   render={({ field: { onChange, value, ...field } }) => (
                     <FormItem>
-                      <FormLabel>File Ijazah / Sertifikat</FormLabel>
+                      <FormLabel>File Ijazah / Sertifikat <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input
                           type="file"
@@ -344,7 +344,7 @@ export default function DataAkademik() {
                   name="fileSuratKelulusan"
                   render={({ field: { onChange, value, ...field } }) => (
                     <FormItem>
-                      <FormLabel>File Surat Keterangan Lulus (SKL)</FormLabel>
+                      <FormLabel>File Surat Keterangan Lulus (SKL) <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input
                           type="file"
@@ -372,7 +372,7 @@ export default function DataAkademik() {
                   name="fileTranskrip"
                   render={({ field: { onChange, value, ...field } }) => (
                     <FormItem>
-                      <FormLabel>File Transkrip Nilai / Rapor</FormLabel>
+                      <FormLabel>File Transkrip Nilai / Rapor <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input
                           type="file"
@@ -400,7 +400,7 @@ export default function DataAkademik() {
                   name="fileUjianNasional"
                   render={({ field: { onChange, value, ...field } }) => (
                     <FormItem>
-                      <FormLabel>File Nilai Ujian Nasional</FormLabel>
+                      <FormLabel>File Nilai Ujian Nasional <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input
                           type="file"
@@ -427,8 +427,8 @@ export default function DataAkademik() {
                   control={form.control}
                   name="fileTesSeleksi"
                   render={({ field: { onChange, value, ...field } }) => (
-                    <FormItem>
-                      <FormLabel>File Hasil Tes Seleksi</FormLabel>
+                    <FormItem> 
+                      <FormLabel>File Hasil Tes Seleksi <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input
                           type="file"
@@ -452,12 +452,12 @@ export default function DataAkademik() {
                 />
               </div>
             </div>
-            <div className="w-full flex items-center justify-end my-6 sm:my-8 md:my-10 lg:my-12 px-4 sm:px-6 md:px-8 lg:px-12">
-              <Link href="/pendaftaran">
+            <div className="w-full flex items-center justify-end my-6 sm:my-8 md:my-10 lg:my-12 px-4 sm:px-6 md:px-8 lg:px-12 gap-6">
+              <Link href="/pendaftaran" className="w-1/2 sm:w-48">
                 <Button
                   type="button"
                   variant={"yellow"}
-                  className={"w-full sm:w-48"}
+                  className={"w-full"}
                 >
                   Kembali
                 </Button>
@@ -465,7 +465,7 @@ export default function DataAkademik() {
               <Button
                 type="submit"
                 variant={"matcha"}
-                className={"w-full sm:w-48"}
+                className={"w-1/2 sm:w-48"}
                 disabled={storeMutation.isPending || isUploading}
               >
                 {isUploading

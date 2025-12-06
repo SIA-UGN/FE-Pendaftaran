@@ -32,6 +32,7 @@ import {
   useMyRegistration,
   useStoreFamilyData,
 } from "@/hooks/useRegistration";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const FormSchema = z.object({
   namaAyah: z.string().min(2, { message: "Nama Ayah harus diisi." }),
@@ -187,26 +188,58 @@ export default function DataOrangtua() {
     <ProtectedRoute>
       <div className="max-w-7xl mx-auto">
         <RegistrationProgress />
-        <div className="flex items-center gap-2 m-12 mt-6 justify-between">
-          <div className="flex gap-5 items-center">
+        <div className="flex flex-col items-center gap-6 m-12 my-6 justify-between">
+          <div className="flex gap-5 w-full">
             <CheckCircle className="text-green-500" />
-            <h2 className="text-xl font-semibold">Data Orang Tua/ Wali</h2>
+            <h2 className="text-xl font-semibold">Data Orang Tua/ Wali </h2>
           </div>
-          <div className="flex gap-2 mb-6">
-            <Button
-              type="button"
-              variant="yellow"
-              onClick={() =>
-                setActiveForm(activeForm === "orangTua" ? "wali" : "orangTua")
-              }
+
+          <div className="w-full max-w-full sm:max-w-md mx-auto my-6">
+            <Tabs
+              value={activeForm}
+              onValueChange={setActiveForm}
+              className="w-full"
             >
-              {activeForm === "orangTua" ? "Data Wali" : "Data Orang Tua"}
-            </Button>
+              <TabsList
+                className="grid w-full grid-cols-2 bg-gray-200 p-1 rounded-full 
+      h-10 sm:h-12 lg:h-14 
+      text-xs sm:text-sm lg:text-base
+      shadow-md hover:shadow-lg transition-shadow duration-300"
+              >
+                <TabsTrigger
+                  value="orangTua"
+                  className="rounded-full 
+        data-[state=active]:bg-green-800 
+        data-[state=active]:text-[var(--yellow)] 
+        data-[state=inactive]:text-gray-600
+        data-[state=inactive]:hover:text-gray-900
+        transition-all duration-200 cursor-pointer 
+        py-2 sm:py-2.5 lg:py-3
+        font-medium"
+                >
+                  Data Orang Tua
+                </TabsTrigger>
+
+                <TabsTrigger
+                  value="wali"
+                  className="rounded-full 
+        data-[state=active]:bg-green-800 
+        data-[state=active]:text-[var(--yellow)] 
+        data-[state=inactive]:text-gray-600
+        data-[state=inactive]:hover:text-gray-900
+        transition-all duration-200 cursor-pointer 
+        py-2 sm:py-2.5 lg:py-3
+        font-medium"
+                >
+                  Data Wali
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="flex flex-col gap-5 p-12 border rounded-xl m-12 bg-[var(--light-cream)]">
+            <div className="flex flex-col gap-5 sm:p-12 border rounded-xl m-4 sm:m-12 bg-[var(--light-cream)]">
               {activeForm === "orangTua" && (
                 <>
                   <div className=" p-4 rounded-md space-y-4">
@@ -218,7 +251,10 @@ export default function DataOrangtua() {
                       name="namaAyah"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Nama Ayah Kandung</FormLabel>
+                          <FormLabel>
+                            Nama Ayah Kandung{" "}
+                            <span className="text-red-500">*</span>
+                          </FormLabel>
                           <FormControl>
                             <Input placeholder="Nama lengkap Ayah" {...field} />
                           </FormControl>
@@ -231,7 +267,10 @@ export default function DataOrangtua() {
                       name="alamatAyah"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Alamat Ayah Kandung</FormLabel>
+                          <FormLabel>
+                            Alamat Ayah Kandung{" "}
+                            <span className="text-red-500">*</span>
+                          </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="Alamat lengkap Ayah"
@@ -248,7 +287,10 @@ export default function DataOrangtua() {
                         name="telpAyah"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>No. HP Ayah Kandung</FormLabel>
+                            <FormLabel>
+                              No. HP Ayah Kandung{" "}
+                              <span className="text-red-500">*</span>
+                            </FormLabel>
                             <FormControl>
                               <Input
                                 type="tel"
@@ -265,7 +307,10 @@ export default function DataOrangtua() {
                         name="pekerjaanAyah"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Pekerjaan Ayah</FormLabel>
+                            <FormLabel>
+                              Pekerjaan Ayah{" "}
+                              <span className="text-red-500">*</span>
+                            </FormLabel>
                             <FormControl>
                               <Input placeholder="Pekerjaan" {...field} />
                             </FormControl>
@@ -278,12 +323,15 @@ export default function DataOrangtua() {
                         name="pendidikanAyah"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Pendidikan Terakhir Ayah</FormLabel>
+                            <FormLabel>
+                              Pendidikan Terakhir Ayah{" "}
+                              <span className="text-red-500">*</span>
+                            </FormLabel>
                             <Select
                               onValueChange={field.onChange}
                               defaultValue={field.value}
                             >
-                              <FormControl>
+                              <FormControl className="w-full">
                                 <SelectTrigger>
                                   <SelectValue placeholder="Pilih pendidikan" />
                                 </SelectTrigger>
@@ -312,12 +360,15 @@ export default function DataOrangtua() {
                         name="penghasilanAyah"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Penghasilan Ayah</FormLabel>
+                            <FormLabel>
+                              Penghasilan Ayah{" "}
+                              <span className="text-red-500">*</span>
+                            </FormLabel>
                             <Select
                               onValueChange={field.onChange}
                               defaultValue={field.value}
                             >
-                              <FormControl>
+                              <FormControl className="w-full">
                                 <SelectTrigger>
                                   <SelectValue placeholder="Pilih penghasilan" />
                                 </SelectTrigger>
@@ -350,7 +401,10 @@ export default function DataOrangtua() {
                       name="namaIbu"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Nama Ibu Kandung</FormLabel>
+                          <FormLabel>
+                            Nama Ibu Kandung{" "}
+                            <span className="text-red-500">*</span>
+                          </FormLabel>
                           <FormControl>
                             <Input placeholder="Nama lengkap Ibu" {...field} />
                           </FormControl>
@@ -363,7 +417,10 @@ export default function DataOrangtua() {
                       name="alamatIbu"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Alamat Ibu Kandung</FormLabel>
+                          <FormLabel>
+                            Alamat Ibu Kandung{" "}
+                            <span className="text-red-500">*</span>
+                          </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="Alamat lengkap Ibu"
@@ -380,7 +437,10 @@ export default function DataOrangtua() {
                         name="telpIbu"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>No. HP Ibu Kandung</FormLabel>
+                            <FormLabel>
+                              No. HP Ibu Kandung{" "}
+                              <span className="text-red-500">*</span>
+                            </FormLabel>
                             <FormControl>
                               <Input
                                 type="tel"
@@ -397,7 +457,10 @@ export default function DataOrangtua() {
                         name="pekerjaanIbu"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Pekerjaan Ibu</FormLabel>
+                            <FormLabel>
+                              Pekerjaan Ibu{" "}
+                              <span className="text-red-500">*</span>
+                            </FormLabel>
                             <FormControl>
                               <Input placeholder="Pekerjaan" {...field} />
                             </FormControl>
@@ -410,12 +473,15 @@ export default function DataOrangtua() {
                         name="pendidikanIbu"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Pendidikan Terakhir Ibu</FormLabel>
+                            <FormLabel>
+                              Pendidikan Terakhir Ibu{" "}
+                              <span className="text-red-500">*</span>
+                            </FormLabel>
                             <Select
                               onValueChange={field.onChange}
                               defaultValue={field.value}
                             >
-                              <FormControl>
+                              <FormControl className="w-full">
                                 <SelectTrigger>
                                   <SelectValue placeholder="Pilih pendidikan" />
                                 </SelectTrigger>
@@ -444,12 +510,15 @@ export default function DataOrangtua() {
                         name="penghasilanIbu"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Penghasilan Ibu</FormLabel>
+                            <FormLabel>
+                              Penghasilan Ibu{" "}
+                              <span className="text-red-500">*</span>
+                            </FormLabel>
                             <Select
                               onValueChange={field.onChange}
                               defaultValue={field.value}
                             >
-                              <FormControl>
+                              <FormControl className="w-full">
                                 <SelectTrigger>
                                   <SelectValue placeholder="Pilih penghasilan" />
                                 </SelectTrigger>
@@ -484,7 +553,9 @@ export default function DataOrangtua() {
                     name="namaWali"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nama Wali</FormLabel>
+                        <FormLabel>
+                          Nama Wali <span className="text-red-500">*</span>
+                        </FormLabel>
                         <FormControl>
                           <Input placeholder="Nama lengkap Wali" {...field} />
                         </FormControl>
@@ -496,7 +567,9 @@ export default function DataOrangtua() {
                     name="alamatWali"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Alamat Wali</FormLabel>
+                        <FormLabel>
+                          Alamat Wali <span className="text-red-500">*</span>
+                        </FormLabel>
                         <FormControl>
                           <Input placeholder="Alamat lengkap Wali" {...field} />
                         </FormControl>
@@ -509,7 +582,9 @@ export default function DataOrangtua() {
                       name="telpWali"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>No. HP Wali</FormLabel>
+                          <FormLabel>
+                            No. HP Wali <span className="text-red-500">*</span>
+                          </FormLabel>
                           <FormControl>
                             <Input type="tel" placeholder="08..." {...field} />
                           </FormControl>
@@ -521,7 +596,10 @@ export default function DataOrangtua() {
                       name="pekerjaanWali"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Pekerjaan Wali</FormLabel>
+                          <FormLabel>
+                            Pekerjaan Wali{" "}
+                            <span className="text-red-500">*</span>
+                          </FormLabel>
                           <FormControl>
                             <Input placeholder="Pekerjaan" {...field} />
                           </FormControl>
@@ -533,12 +611,15 @@ export default function DataOrangtua() {
                       name="pendidikanWali"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Pendidikan Terakhir Wali</FormLabel>
+                          <FormLabel>
+                            Pendidikan Terakhir Wali{" "}
+                            <span className="text-red-500">*</span>
+                          </FormLabel>
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
-                            <FormControl>
+                            <FormControl className="w-full">
                               <SelectTrigger>
                                 <SelectValue placeholder="Pilih pendidikan" />
                               </SelectTrigger>
@@ -564,12 +645,15 @@ export default function DataOrangtua() {
                       name="penghasilanWali"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Penghasilan Wali</FormLabel>
+                          <FormLabel>
+                            Penghasilan Wali{" "}
+                            <span className="text-red-500">*</span>
+                          </FormLabel>
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
-                            <FormControl>
+                            <FormControl className="w-full">
                               <SelectTrigger>
                                 <SelectValue placeholder="Pilih penghasilan" />
                               </SelectTrigger>
@@ -593,12 +677,12 @@ export default function DataOrangtua() {
                 </div>
               )}
             </div>
-            <div className="w-full flex items-center justify-end my-12 px-12">
-              <Link href="/pendaftaran">
+            <div className="md:w-full flex items-center justify-end my-12 px-12 gap-6">
+              <Link href="/pendaftaran" className="w-1/2 sm:w-48">
                 <Button
                   type="button"
                   variant={"yellow"}
-                  className={"w-full sm:w-48"}
+                  className={"w-full"}
                 >
                   Kembali
                 </Button>
@@ -606,7 +690,7 @@ export default function DataOrangtua() {
               <Button
                 type="submit"
                 variant={"matcha"}
-                className={"w-full sm:w-48"}
+                className={"w-1/2 sm:w-48"}
                 disabled={storeMutation.isPending}
               >
                 {storeMutation.isPending ? "Menyimpan..." : "Lanjut"}

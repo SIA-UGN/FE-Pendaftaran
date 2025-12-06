@@ -70,7 +70,7 @@ export default function PendaftaranPage() {
         <RegistrationProgress />
         <UrutanTahapan />
         <Ketentuan />
-        <div className="w-10/12">
+        <div className="ms-auto me-6 w-1/2 md:w-2/12">
           <Button
             type="button"
             variant="green"
