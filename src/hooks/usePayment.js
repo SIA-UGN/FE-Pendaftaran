@@ -19,18 +19,6 @@ export const useMyPayment = () => {
   });
 };
 
-export const useCreatePayment = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: paymentService.createPayment,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["payment", "my"]);
-      toast.success("Pembayaran berhasil dibuat, silakan lanjutkan pembayaran");
-    },
-  });
-};
-
 export const useUploadPaymentProof = () => {
   const queryClient = useQueryClient();
 
@@ -49,12 +37,48 @@ export const useUploadPaymentProof = () => {
   });
 };
 
-// admin
+export const useReUploadPaymentProof = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ paymentId, formData }) =>
+      paymentService.reUploadProof(paymentId, formData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["payment", "my"] });
+      toast.success(
+        "Bukti pembayaran berhasil diupload ulang. Menunggu verifikasi"
+      );
+    },
+    onError: (error) => {
+      const message =
+        error?.response?.data?.message ||
+        "Gagal mengupload ulang bukti pembayaran";
+      toast.error(message);
+    },
+  });
+};
+
+// Admin/Manager hooks
 export const usePayments = (params) => {
   return useQuery({
     queryKey: ["payments", "all", params],
     queryFn: () => paymentService.getAllPayments(params),
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData,
+  });
+};
+
+export const usePaymentDetail = (id) => {
+  return useQuery({
+    queryKey: ["payments", id],
+    queryFn: () => paymentService.getPayment(id),
+    enabled: !!id,
+  });
+};
+
+export const usePaymentStatistics = () => {
+  return useQuery({
+    queryKey: ["payments", "statistics"],
+    queryFn: paymentService.getStatistics,
   });
 };
 

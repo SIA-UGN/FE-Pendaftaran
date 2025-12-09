@@ -1,12 +1,20 @@
 import apiClient from "@/lib/api";
 
 export const authService = {
-  register: (data) => apiClient.post("/auth/register", data),
-  login: (data) => apiClient.post("/auth/login", data),
-  logout: () => apiClient.post("/auth/logout"),
-  getUser: () => apiClient.get("/auth/user"),
+  // Authentication
+  register: (data) => apiClient.post("/register", data),
+  login: (data) => apiClient.post("/login", data),
+  logout: () => apiClient.post("/logout"),
+  getUser: () => apiClient.get("/user"),
+
+  // Password Management
+  changePassword: (data) => apiClient.post("/change-password", data),
+  forgotPassword: (data) => apiClient.post("/forgot-password", data),
+  resetPassword: (data) => apiClient.post("/reset-password", data),
+
+  // Email Management
+  changeEmail: (data) => apiClient.post("/change-email", data),
+
+  // Token Management
   refreshToken: () => apiClient.post("/auth/refresh-token"),
-  forgotPassword: (data) => apiClient.post("/auth/forgot-password", data),
-  resetPassword: (data) => apiClient.post("/auth/reset-password", data),
-  changePassword: (data) => apiClient.post("/auth/change-password", data),
 };

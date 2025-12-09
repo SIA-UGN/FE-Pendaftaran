@@ -220,3 +220,22 @@ export const useChangePassword = () => {
     },
   });
 };
+
+export const useChangeEmail = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: authService.changeEmail,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Email berhasil diubah!");
+    },
+    onError: (error) => {
+      if (!error.response || error.response?.status >= 500) return;
+
+      const message = error?.response?.data?.message || "Gagal mengubah email.";
+      toast.error(message);
+    },
+  });
+};

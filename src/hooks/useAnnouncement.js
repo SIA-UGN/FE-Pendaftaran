@@ -4,9 +4,9 @@ import toast from "react-hot-toast";
 
 export const useAnnouncements = (params) => {
   return useQuery({
-    queryKey: ["announcements", "all", params],
+    queryKey: ["announcements", params],
     queryFn: () => announcementService.getAll(params),
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData,
   });
 };
 

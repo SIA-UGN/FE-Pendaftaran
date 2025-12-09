@@ -5,6 +5,6 @@ export const useAnnouncementsWithSearch = (search) => {
   return useQuery({
     queryKey: ["announcements", "all", { search }],
     queryFn: () => announcementService.getAll({ search }),
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData,
   });
 };

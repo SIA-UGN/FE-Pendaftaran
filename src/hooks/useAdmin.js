@@ -14,7 +14,7 @@ export const useApplicantStatistics = (params) => {
   return useQuery({
     queryKey: ["admin", "statistics", "applicants", params],
     queryFn: () => adminService.getApplicantStatistics(params),
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData,
   });
 };
 
@@ -38,7 +38,7 @@ export const useManagers = (params) => {
   return useQuery({
     queryKey: ["admin", "managers", params],
     queryFn: () => adminService.getManagers(params),
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData,
   });
 };
 

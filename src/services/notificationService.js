@@ -1,11 +1,19 @@
 import apiClient from "@/lib/api";
 
 export const notificationService = {
-  getAll: (params) => apiClient.get("/notifications", params),
+  // Get all notifications with pagination
+  getAll: (params) => apiClient.get("/notifications", { params }),
+
+  // Get unread count
   getUnreadCount: () => apiClient.get("/notifications/unread-count"),
-  getRecent: () => apiClient.get("/notifications/recent"),
-  markAsRead: (id) => apiClient.patch(`/notifications/${id}/read`),
+
+  // Mark as read
+  markAsRead: (id) => apiClient.post(`/notifications/${id}/read`),
   markAllAsRead: () => apiClient.post("/notifications/mark-all-read"),
+
+  // Delete notifications
   delete: (id) => apiClient.delete(`/notifications/${id}`),
-  clearRead: () => apiClient.delete("/notifications/read-clear"),
+
+  // Send notification (Admin/Manager only)
+  sendNotification: (data) => apiClient.post("/notifications/send", data),
 };

@@ -172,12 +172,12 @@ export const useSubmitRegistration = () => {
   });
 };
 
-// admin
+// Admin hooks
 export const useRegistrations = (params) => {
   return useQuery({
     queryKey: ["registrations", "all", params],
     queryFn: () => registrationService.getAllRegistrations(params),
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData,
   });
 };
 

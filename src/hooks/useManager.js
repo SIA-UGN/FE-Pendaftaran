@@ -14,7 +14,7 @@ export const useManagerApplicants = (params) => {
   return useQuery({
     queryKey: ["manager", "applicants", params],
     queryFn: () => managerService.getApplicants(params),
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData,
   });
 };
 
@@ -43,8 +43,8 @@ export const useVerifyApplicant = () => {
         status === "approved"
           ? "Pendaftaran berhasil disetujui"
           : status === "rejected"
-            ? "Pendaftaran berhasil ditolak"
-            : "Status pendaftaran berhasil diperbarui";
+          ? "Pendaftaran berhasil ditolak"
+          : "Status pendaftaran berhasil diperbarui";
       toast.success(message);
     },
     onError: (error) => {
@@ -127,7 +127,7 @@ export const useManagerNotifications = (params) => {
   return useQuery({
     queryKey: ["manager", "notifications", params],
     queryFn: () => managerService.getNotifications(params),
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData,
   });
 };
 

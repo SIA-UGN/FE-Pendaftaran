@@ -4,9 +4,9 @@ import toast from "react-hot-toast";
 
 export const useNotification = (params) => {
   return useQuery({
-    queryKey: ["notifications", "all", params],
+    queryKey: ["notifications", params],
     queryFn: () => notificationService.getAll(params),
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData,
   });
 };
 
