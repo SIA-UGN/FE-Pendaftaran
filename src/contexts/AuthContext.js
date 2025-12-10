@@ -52,7 +52,8 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!token,
     isAdmin: user?.role === "admin",
     isManager: user?.role === "manager",
-    isStudent: user?.role === "student",
+    isPendaftar: user?.role === "pendaftar",
+    isMahasiswa: user?.role === "mahasiswa",
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
