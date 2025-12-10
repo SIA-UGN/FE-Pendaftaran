@@ -1,88 +1,70 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
 import { paymentMethodService } from "@/services/paymentMethodService";
+import toast from "react-hot-toast";
 
-/* ---------------------------
-   GET ALL PAYMENT METHODS
----------------------------- */
 export const usePaymentMethods = (params = {}) => {
   return useQuery({
     queryKey: ["paymentMethods", params],
     queryFn: () => paymentMethodService.getAll(params),
-    staleTime: 1000 * 60 * 5,
-    placeholderData: (prev) => prev, // sama seperti keepPreviousData
-    onError: () => toast.error("Error fetching payment methods"),
+    placeholderData: (previousData) => previousData,
   });
 };
 
-/* ---------------------------
-   GET SINGLE PAYMENT METHOD
----------------------------- */
 export const usePaymentMethod = (id) => {
   return useQuery({
     queryKey: ["paymentMethod", id],
     queryFn: () => paymentMethodService.getOne(id),
-    enabled: !!id, // biar gak nge-fetch kalau id kosong
-    onError: () => toast.error("Error fetching payment method"),
+    enabled: !!id,
   });
 };
 
-/* ---------------------------
-   CREATE PAYMENT METHOD
----------------------------- */
 export const useCreatePaymentMethod = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: paymentMethodService.create,
     onSuccess: () => {
+      toast.success("Metode pembayaran berhasil ditambahkan");
       queryClient.invalidateQueries({ queryKey: ["paymentMethods"] });
-      toast.success("Payment method created successfully");
     },
     onError: (error) => {
       toast.error(
-        error?.response?.data?.message || "Failed to create payment method"
+        error.response?.data?.message || "Gagal menambahkan metode pembayaran"
       );
     },
   });
 };
 
-/* ---------------------------
-   UPDATE PAYMENT METHOD
----------------------------- */
 export const useUpdatePaymentMethod = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, data }) => paymentMethodService.update(id, data),
-    onSuccess: (_data, variables) => {
+    onSuccess: () => {
+      toast.success("Metode pembayaran berhasil diperbarui");
       queryClient.invalidateQueries({ queryKey: ["paymentMethods"] });
-      queryClient.invalidateQueries({ queryKey: ["paymentMethod", variables.id] });
-      toast.success("Payment method updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["paymentMethod"] });
     },
     onError: (error) => {
       toast.error(
-        error?.response?.data?.message || "Failed to update payment method"
+        error.response?.data?.message || "Gagal memperbarui metode pembayaran"
       );
     },
   });
 };
 
-/* ---------------------------
-   DELETE PAYMENT METHOD
----------------------------- */
 export const useDeletePaymentMethod = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id) => paymentMethodService.delete(id),
+    mutationFn: paymentMethodService.delete,
     onSuccess: () => {
+      toast.success("Metode pembayaran berhasil dihapus");
       queryClient.invalidateQueries({ queryKey: ["paymentMethods"] });
-      toast.success("Payment method deleted successfully");
     },
     onError: (error) => {
       toast.error(
-        error?.response?.data?.message || "Failed to delete payment method"
+        error.response?.data?.message || "Gagal menghapus metode pembayaran"
       );
     },
   });

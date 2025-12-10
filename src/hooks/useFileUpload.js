@@ -1,77 +1,88 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { uploadFile } from "@/services/uploadService";
 
-export const useFileUpload = (options = {}) => {
-  const {
-    maxSize = 5 * 1024 * 1024,
-    allowedTypes = ["application/pdf", "image/jpeg", "image/jpg", "image/png"],
-    onSuccess,
-    onError,
-  } = options;
-
+/**
+ * Hook untuk handle file upload dengan validasi
+ * @param {Object} options - Configuration options
+ * @param {number} options.maxSize - Maximum file size in bytes (default: 2MB)
+ * @param {string[]} options.allowedTypes - Allowed MIME types
+ * @param {Function} options.onUpload - Upload handler function
+ * @returns {Object} Upload utilities
+ */
+export const useFileUpload = ({
+  maxSize = 2 * 1024 * 1024, // 2MB default
+  allowedTypes = ["image/jpeg", "image/png", "image/jpg", "application/pdf"],
+  onUpload,
+} = {}) => {
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [progress, setProgress] = useState(0);
 
-  const handleUpload = async (file, type = "document") => {
-    if (!file) return null;
+  const validateFile = (file) => {
+    if (!file) {
+      toast.error("Tidak ada file yang dipilih");
+      return false;
+    }
 
     if (file.size > maxSize) {
-      const sizeMB = (maxSize / (1024 * 1024)).toFixed(0);
-      toast.error(`Ukuran file maksimal ${sizeMB}MB`);
-      onError?.({ message: "File size exceeds limit", file });
-      return null;
+      toast.error(`Ukuran file maksimal ${maxSize / (1024 * 1024)}MB`);
+      return false;
     }
 
     if (!allowedTypes.includes(file.type)) {
-      toast.error("Format file harus PDF, JPG, atau PNG");
-      onError?.({ message: "Invalid file type", file });
+      toast.error("Tipe file tidak diizinkan");
+      return false;
+    }
+
+    return true;
+  };
+
+  const uploadFile = async (file, additionalData = {}) => {
+    if (!validateFile(file)) {
       return null;
     }
 
     setIsUploading(true);
-    setUploadProgress(0);
+    setProgress(0);
 
     try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // Append additional data
+      Object.keys(additionalData).forEach((key) => {
+        formData.append(key, additionalData[key]);
+      });
+
+      // Simulate progress
       const progressInterval = setInterval(() => {
-        setUploadProgress((prev) => {
+        setProgress((prev) => {
           if (prev >= 90) {
             clearInterval(progressInterval);
-            return prev;
+            return 90;
           }
           return prev + 10;
         });
       }, 100);
 
-      const response = await uploadFile(file, type);
+      const result = await onUpload(formData);
 
       clearInterval(progressInterval);
-      setUploadProgress(100);
+      setProgress(100);
 
-      if (response.success) {
-        toast.success(`File ${file.name} berhasil diupload`);
-        onSuccess?.({ url: response.url, file });
-        return response.url;
-      } else {
-        toast.error("Gagal upload file");
-        onError?.({ message: "Upload failed", file });
-        return null;
-      }
+      return result;
     } catch (error) {
-      toast.error(
-        `Gagal upload file: ${error.response?.data?.message || error.message}`
-      );
-      onError?.({ error, file });
+      toast.error(error.response?.data?.message || "Gagal upload file");
       return null;
     } finally {
       setIsUploading(false);
-      setUploadProgress(0);
+      setTimeout(() => setProgress(0), 1000);
     }
   };
 
   return {
-    handleUpload,
     isUploading,
-    uploadProgress,
+    progress,
+    uploadFile,
+    validateFile,
   };
 };

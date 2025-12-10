@@ -1,38 +1,94 @@
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useRegistrationProgress } from "./useRegistration";
-import toast from "react-hot-toast";
+import { useState } from "react";
 
-export const useStepValidation = (currentStep) => {
-  const router = useRouter();
-  const { data: progressData, isPending } = useRegistrationProgress();
+/**
+ * Hook untuk validasi multi-step form
+ * @param {number} totalSteps - Total jumlah steps
+ * @returns {Object} Validation utilities
+ */
+export const useStepValidation = (totalSteps = 1) => {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [completedSteps, setCompletedSteps] = useState([]);
+  const [errors, setErrors] = useState({});
 
-  useEffect(() => {
-    if (!isPending && progressData) {
-      const { completed_steps = [], accessible_steps = [] } =
-        progressData.data || {};
-
-      if (!accessible_steps.includes(currentStep)) {
-        const nextAccessibleStep = Math.max(...completed_steps, 0) + 1;
-        toast.error(
-          `Silakan selesaikan Step ${nextAccessibleStep} terlebih dahulu`
-        );
-
-        const stepRoutes = {
-          1: "/pendaftaran/data-diri",
-          2: "/pendaftaran/data-alamat",
-          3: "/pendaftaran/data-akademik",
-          4: "/pendaftaran/data-orangtua",
-          5: "/pendaftaran/data-prestasi",
-        };
-
-        router.push(stepRoutes[nextAccessibleStep] || "/pendaftaran/data-diri");
-      }
+  const nextStep = () => {
+    if (currentStep < totalSteps) {
+      setCurrentStep((prev) => prev + 1);
     }
-  }, [progressData, isPending, currentStep, router]);
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep((prev) => prev - 1);
+    }
+  };
+
+  const goToStep = (step) => {
+    if (step >= 1 && step <= totalSteps) {
+      setCurrentStep(step);
+    }
+  };
+
+  const markStepAsCompleted = (step) => {
+    if (!completedSteps.includes(step)) {
+      setCompletedSteps((prev) => [...prev, step]);
+    }
+  };
+
+  const markStepAsIncomplete = (step) => {
+    setCompletedSteps((prev) => prev.filter((s) => s !== step));
+  };
+
+  const isStepCompleted = (step) => {
+    return completedSteps.includes(step);
+  };
+
+  const setStepErrors = (step, stepErrors) => {
+    setErrors((prev) => ({
+      ...prev,
+      [step]: stepErrors,
+    }));
+  };
+
+  const clearStepErrors = (step) => {
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[step];
+      return newErrors;
+    });
+  };
+
+  const getStepErrors = (step) => {
+    return errors[step] || {};
+  };
+
+  const hasStepErrors = (step) => {
+    const stepErrors = errors[step];
+    return stepErrors && Object.keys(stepErrors).length > 0;
+  };
+
+  const reset = () => {
+    setCurrentStep(1);
+    setCompletedSteps([]);
+    setErrors({});
+  };
 
   return {
-    isValidating: isPending,
-    progressData: progressData?.data,
+    currentStep,
+    completedSteps,
+    errors,
+    nextStep,
+    prevStep,
+    goToStep,
+    markStepAsCompleted,
+    markStepAsIncomplete,
+    isStepCompleted,
+    setStepErrors,
+    clearStepErrors,
+    getStepErrors,
+    hasStepErrors,
+    reset,
+    isFirstStep: currentStep === 1,
+    isLastStep: currentStep === totalSteps,
+    progress: (completedSteps.length / totalSteps) * 100,
   };
 };

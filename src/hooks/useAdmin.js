@@ -2,43 +2,50 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { adminService } from "@/services/adminService";
 import toast from "react-hot-toast";
 
+// Dashboard
 export const useAdminDashboard = () => {
   return useQuery({
-    queryKey: ["admin", "dashboard"],
+    queryKey: ["adminDashboard"],
     queryFn: adminService.getDashboard,
-    staleTime: 5 * 60 * 1000,
   });
 };
 
-export const useApplicantStatistics = (params) => {
+// Statistics
+export const useApplicantStatistics = (params = {}) => {
   return useQuery({
-    queryKey: ["admin", "statistics", "applicants", params],
+    queryKey: ["applicantStatistics", params],
     queryFn: () => adminService.getApplicantStatistics(params),
-    keepPreviousData: true,
   });
 };
 
 export const useProgramStatistics = () => {
   return useQuery({
-    queryKey: ["admin", "statistics", "programs"],
+    queryKey: ["programStatistics"],
     queryFn: adminService.getProgramStatistics,
-    staleTime: 10 * 60 * 1000,
   });
 };
 
 export const useFinancialStatistics = () => {
   return useQuery({
-    queryKey: ["admin", "statistics", "financial"],
+    queryKey: ["financialStatistics"],
     queryFn: adminService.getFinancialStatistics,
-    staleTime: 10 * 60 * 1000,
   });
 };
 
-export const useManagers = (params) => {
+export const useYearlyRevenue = (years) => {
   return useQuery({
-    queryKey: ["admin", "managers", params],
+    queryKey: ["yearlyRevenue", years],
+    queryFn: () => adminService.getYearlyRevenue(years),
+    enabled: !!years,
+  });
+};
+
+// Managers
+export const useManagers = (params = {}) => {
+  return useQuery({
+    queryKey: ["managers", params],
     queryFn: () => adminService.getManagers(params),
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData,
   });
 };
 
@@ -48,13 +55,11 @@ export const useCreateManager = () => {
   return useMutation({
     mutationFn: adminService.createManager,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin", "managers"] });
-      toast.success("Manager created successfully!");
+      toast.success("Manajer berhasil ditambahkan");
+      queryClient.invalidateQueries({ queryKey: ["managers"] });
     },
     onError: (error) => {
-      const message =
-        error.response?.data?.message || "Failed to create manager.";
-      toast.error(message);
+      toast.error(error.response?.data?.message || "Gagal menambahkan manajer");
     },
   });
 };
@@ -65,37 +70,88 @@ export const useDeleteManager = () => {
   return useMutation({
     mutationFn: adminService.deleteManager,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin", "managers"] });
-      toast.success("Manager deleted successfully!");
+      toast.success("Manajer berhasil dihapus");
+      queryClient.invalidateQueries({ queryKey: ["managers"] });
     },
     onError: (error) => {
-      const message =
-        error.response?.data?.message || "Failed to delete manager.";
-      toast.error(message);
+      toast.error(error.response?.data?.message || "Gagal menghapus manajer");
     },
   });
 };
 
-export const useUserProfile = (id) => {
+// Applicants
+export const useApplicants = (params = {}) => {
   return useQuery({
-    queryKey: ["admin", "users", id],
-    queryFn: () => adminService.getUserProfile(id),
+    queryKey: ["applicants", params],
+    queryFn: () => adminService.getApplicants(params),
+    placeholderData: (previousData) => previousData,
+  });
+};
+
+export const useApplicantDetail = (id) => {
+  return useQuery({
+    queryKey: ["applicant", id],
+    queryFn: () => adminService.getApplicantDetail(id),
     enabled: !!id,
   });
 };
 
-export const usePaymentVerification = (id) => {
+export const useUpdateApplicantStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }) => adminService.updateApplicantStatus(id, data),
+    onSuccess: () => {
+      toast.success("Status pendaftar berhasil diperbarui");
+      queryClient.invalidateQueries({ queryKey: ["applicants"] });
+      queryClient.invalidateQueries({ queryKey: ["applicant"] });
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Gagal memperbarui status");
+    },
+  });
+};
+
+export const useSetGraduationStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }) => adminService.setGraduationStatus(id, data),
+    onSuccess: () => {
+      toast.success("Status kelulusan berhasil diperbarui");
+      queryClient.invalidateQueries({ queryKey: ["applicants"] });
+      queryClient.invalidateQueries({ queryKey: ["applicant"] });
+    },
+    onError: (error) => {
+      toast.error(
+        error.response?.data?.message || "Gagal memperbarui status kelulusan"
+      );
+    },
+  });
+};
+
+// Documents
+export const useApplicantDocuments = (id) => {
   return useQuery({
-    queryKey: ["admin", "payments", id, "verification"],
-    queryFn: () => adminService.getPaymentVerification(id),
+    queryKey: ["applicantDocuments", id],
+    queryFn: () => adminService.getApplicantDocuments(id),
     enabled: !!id,
   });
 };
 
-export const useYearlyRevenue = (years = 10) => {
-  return useQuery({
-    queryKey: ["admin", "statistics", "revenue", "yearly", years],
-    queryFn: () => adminService.getYearlyRevenue(years),
-    staleTime: 10 * 60 * 1000,
+export const useUpdateDocumentStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }) => adminService.updateDocumentStatus(id, data),
+    onSuccess: () => {
+      toast.success("Status dokumen berhasil diperbarui");
+      queryClient.invalidateQueries({ queryKey: ["applicantDocuments"] });
+    },
+    onError: (error) => {
+      toast.error(
+        error.response?.data?.message || "Gagal memperbarui status dokumen"
+      );
+    },
   });
 };

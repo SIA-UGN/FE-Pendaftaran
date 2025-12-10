@@ -1,61 +1,67 @@
-import { createContext, useContext, useEffect, useState } from "react";
+"use client";
 
-const AuthContext = createContext({});
+import { createContext, useContext, useState, useEffect } from "react";
+import { authService } from "@/services/authService";
+
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Load auth data from localStorage on mount
+    const storedToken = localStorage.getItem("access_token");
     const storedUser = localStorage.getItem("user");
-    if (storedUser && storedUser !== "undefined" && storedUser !== "null") {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error("Failed to parse user from localStorage:", error);
-        localStorage.removeItem("user");
-      }
+
+    if (storedToken && storedUser) {
+      setToken(storedToken);
+      setUser(JSON.parse(storedUser));
     }
+
     setLoading(false);
   }, []);
 
+  const login = (userData, accessToken) => {
+    setUser(userData);
+    setToken(accessToken);
+    localStorage.setItem("access_token", accessToken);
+    localStorage.setItem("user", JSON.stringify(userData));
+  };
+
+  const logout = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user");
+  };
+
   const updateUser = (userData) => {
     setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
   };
 
-  const clearUser = () => {
-    setUser(null);
+  const value = {
+    user,
+    token,
+    loading,
+    login,
+    logout,
+    updateUser,
+    isAuthenticated: !!token,
+    isAdmin: user?.role === "admin",
+    isManager: user?.role === "manager",
+    isStudent: user?.role === "student",
   };
 
-  const hasRole = (role) => {
-    return user?.roles?.includes(role) || false;
-  };
-
-  const hasPermission = (permission) => {
-    return user?.permissions?.includes(permission) || false;
-  };
-
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        updateUser,
-        clearUser,
-        hasRole,
-        hasPermission,
-        isAuthenticated: !!user,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuthContext = () => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuthContext must be used within an AuthProvider");
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

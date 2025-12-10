@@ -2,25 +2,26 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { managerService } from "@/services/managerService";
 import toast from "react-hot-toast";
 
+// Dashboard
 export const useManagerDashboard = () => {
   return useQuery({
-    queryKey: ["manager", "dashboard"],
+    queryKey: ["managerDashboard"],
     queryFn: managerService.getDashboard,
-    staleTime: 5 * 60 * 1000,
   });
 };
 
-export const useManagerApplicants = (params) => {
+// Applicants
+export const useManagerApplicants = (params = {}) => {
   return useQuery({
-    queryKey: ["manager", "applicants", params],
+    queryKey: ["managerApplicants", params],
     queryFn: () => managerService.getApplicants(params),
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData,
   });
 };
 
-export const useApplicantDetail = (id) => {
+export const useManagerApplicantDetail = (id) => {
   return useQuery({
-    queryKey: ["manager", "applicant", id],
+    queryKey: ["managerApplicant", id],
     queryFn: () => managerService.getApplicantDetail(id),
     enabled: !!id,
   });
@@ -31,103 +32,99 @@ export const useVerifyApplicant = () => {
 
   return useMutation({
     mutationFn: ({ id, data }) => managerService.verifyApplicant(id, data),
-    onSuccess: (data, { id }) => {
-      console.log("RESPONSE FROM BACKEND:", data);
-
-      queryClient.invalidateQueries({ queryKey: ["manager", "applicants"] });
-      queryClient.invalidateQueries({ queryKey: ["manager", "applicant", id] });
-      queryClient.invalidateQueries({ queryKey: ["manager", "dashboard"] });
-
-      const status = data?.data?.data?.registration?.status;
-      const message =
-        status === "approved"
-          ? "Pendaftaran berhasil disetujui"
-          : status === "rejected"
-            ? "Pendaftaran berhasil ditolak"
-            : "Status pendaftaran berhasil diperbarui";
-      toast.success(message);
+    onSuccess: () => {
+      toast.success("Status pendaftar berhasil diverifikasi");
+      queryClient.invalidateQueries({ queryKey: ["managerApplicants"] });
+      queryClient.invalidateQueries({ queryKey: ["managerApplicant"] });
     },
     onError: (error) => {
-      const message =
-        error?.response?.data?.message ||
-        "Gagal memperbarui status pendaftaran";
-      toast.error(message);
+      toast.error(
+        error.response?.data?.message || "Gagal verifikasi pendaftar"
+      );
     },
   });
 };
 
-export const useSetGraduationStatus = () => {
+export const useManagerSetGraduationStatus = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, data }) => managerService.setGraduationStatus(id, data),
-    onSuccess: (data, { id }) => {
-      console.log("RESPONSE FROM BACKEND:", data);
-
-      queryClient.invalidateQueries({ queryKey: ["manager", "applicants"] });
-      queryClient.invalidateQueries({ queryKey: ["manager", "applicant", id] });
-      queryClient.invalidateQueries({ queryKey: ["manager", "dashboard"] });
-
-      const status = data.data.data.registration.graduation_status;
-      const message =
-        status === "graduated"
-          ? "Pendaftar berhasil ditandai sebagai lulusan"
-          : "Status kelulusan pendaftar berhasil diperbarui";
-      toast.success(message);
+    onSuccess: () => {
+      toast.success("Status kelulusan berhasil diperbarui");
+      queryClient.invalidateQueries({ queryKey: ["managerApplicants"] });
+      queryClient.invalidateQueries({ queryKey: ["managerApplicant"] });
     },
     onError: (error) => {
-      console.log("ERROR OBJECT:", error);
-      console.log("RESPONSE:", error.response);
-      console.log("REQUEST:", error.request);
-
-      toast.error("Gagal memperbarui status kelulusan");
+      toast.error(
+        error.response?.data?.message || "Gagal memperbarui status kelulusan"
+      );
     },
   });
 };
 
-export const usePaymentVerification = (id) => {
+// Documents
+export const useManagerApplicantDocuments = (id) => {
   return useQuery({
-    queryKey: ["manager", "payment", "verification", id],
+    queryKey: ["managerApplicantDocuments", id],
+    queryFn: () => managerService.getApplicantDocuments(id),
+    enabled: !!id,
+  });
+};
+
+export const useManagerUpdateDocumentStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }) => managerService.updateDocumentStatus(id, data),
+    onSuccess: () => {
+      toast.success("Status dokumen berhasil diperbarui");
+      queryClient.invalidateQueries({
+        queryKey: ["managerApplicantDocuments"],
+      });
+    },
+    onError: (error) => {
+      toast.error(
+        error.response?.data?.message || "Gagal memperbarui status dokumen"
+      );
+    },
+  });
+};
+
+// Payment Verification
+export const useManagerPaymentVerification = (id) => {
+  return useQuery({
+    queryKey: ["managerPaymentVerification", id],
     queryFn: () => managerService.getPaymentVerification(id),
     enabled: !!id,
   });
 };
 
-export const useVerifyPayment = () => {
+export const useManagerVerifyPayment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, data }) => managerService.verifyPayment(id, data),
-    onSuccess: (data, { id }) => {
-      console.log("RESPONSE FROM BACKEND:", data);
-
+    onSuccess: () => {
+      toast.success("Pembayaran berhasil diverifikasi");
       queryClient.invalidateQueries({
-        queryKey: ["manager", "payment", "verification", id],
+        queryKey: ["managerPaymentVerification"],
       });
-      queryClient.invalidateQueries({ queryKey: ["manager", "applicants"] });
-      queryClient.invalidateQueries({ queryKey: ["manager", "dashboard"] });
-      queryClient.invalidateQueries({ queryKey: ["payments"] });
-
-      const status = data?.data?.data?.payment?.status;
-      const message =
-        status === "verified"
-          ? "Pembayaran berhasil diverifikasi"
-          : "Pembayaran ditolak";
-      toast.success(message);
     },
     onError: (error) => {
-      const message =
-        error?.response?.data?.message || "Gagal memverifikasi pembayaran";
-      toast.error(message);
+      toast.error(
+        error.response?.data?.message || "Gagal verifikasi pembayaran"
+      );
     },
   });
 };
 
-export const useManagerNotifications = (params) => {
+// Notifications
+export const useManagerNotifications = (params = {}) => {
   return useQuery({
-    queryKey: ["manager", "notifications", params],
+    queryKey: ["managerNotifications", params],
     queryFn: () => managerService.getNotifications(params),
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData,
   });
 };
 
@@ -136,20 +133,12 @@ export const useCreateBroadcastNotification = () => {
 
   return useMutation({
     mutationFn: managerService.createBroadcastNotification,
-    onSuccess: (data) => {
-      console.log("RESPONSE FROM BACKEND:", data);
-
-      queryClient.invalidateQueries({ queryKey: ["manager", "notifications"] });
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-
-      toast.success(
-        `Broadcast berhasil dikirim ke ${data.data.data.target_count} penerima`
-      );
+    onSuccess: () => {
+      toast.success("Notifikasi broadcast berhasil dikirim");
+      queryClient.invalidateQueries({ queryKey: ["managerNotifications"] });
     },
     onError: (error) => {
-      const message =
-        error?.response?.data?.message || "Gagal mengirim notifikasi broadcast";
-      toast.error(message);
+      toast.error(error.response?.data?.message || "Gagal mengirim notifikasi");
     },
   });
 };

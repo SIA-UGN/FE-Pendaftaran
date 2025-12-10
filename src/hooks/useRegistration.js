@@ -1,200 +1,171 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { registrationService } from "@/services/registrationService";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
 
+// Progress & Status
 export const useRegistrationProgress = () => {
   return useQuery({
-    queryKey: ["registration", "progress"],
-    queryFn: async () => {
-      try {
-        const response = await registrationService.getProgress();
-        return response.data;
-      } catch (error) {
-        if (error?.response?.status === 404) {
-          return {
-            completed_steps: [],
-            accessible_steps: [1],
-            current_step: 1,
-            can_submit: false,
-          };
-        }
-        throw error;
-      }
-    },
-    staleTime: 30 * 1000,
-    retry: false,
+    queryKey: ["registrationProgress"],
+    queryFn: registrationService.getProgress,
+  });
+};
+
+export const useRegistrationStatus = () => {
+  return useQuery({
+    queryKey: ["registrationStatus"],
+    queryFn: registrationService.getStatus,
   });
 };
 
 export const useMyRegistration = () => {
   return useQuery({
-    queryKey: ["registration", "my"],
-    queryFn: async () => {
-      const response = await registrationService.getMyRegistration();
-      return response.data;
-    },
-    staleTime: 30 * 1000,
-    retry: false,
+    queryKey: ["myRegistration"],
+    queryFn: registrationService.getMyRegistration,
   });
 };
 
-export const useStorePersonalIdentity = () => {
-  const router = useRouter();
+// Profile
+export const useRegistrationProfile = () => {
+  return useQuery({
+    queryKey: ["registrationProfile"],
+    queryFn: registrationService.getProfile,
+  });
+};
+
+export const useStoreProfile = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: registrationService.storePersonalIdentity,
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["registration"] });
-      toast.success("Data diri berhasil disimpan!");
-
-      const canAccessNext = response?.data?.data?.can_access_next_step;
-      if (canAccessNext) {
-        router.push("/pendaftaran/data-alamat");
-      }
+    mutationFn: registrationService.storeProfile,
+    onSuccess: () => {
+      toast.success("Data profil berhasil disimpan");
+      queryClient.invalidateQueries({ queryKey: ["registrationProgress"] });
+      queryClient.invalidateQueries({ queryKey: ["registrationProfile"] });
     },
     onError: (error) => {
-      const message =
-        error?.response?.data?.message || "Gagal menyimpan data diri";
-      toast.error(message);
+      toast.error(
+        error.response?.data?.message || "Gagal menyimpan data profil"
+      );
     },
   });
 };
 
-export const useStoreAddressInformation = () => {
-  const router = useRouter();
+// Documents
+export const useDocuments = () => {
+  return useQuery({
+    queryKey: ["documents"],
+    queryFn: registrationService.getDocuments,
+  });
+};
+
+export const useDocumentTypes = () => {
+  return useQuery({
+    queryKey: ["documentTypes"],
+    queryFn: registrationService.getDocumentTypes,
+  });
+};
+
+export const useUploadDocument = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: registrationService.storeAddressInformation,
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["registration"] });
-      toast.success("Data alamat berhasil disimpan!");
-
-      const canAccessNext = response?.data?.data?.can_access_next_step;
-      if (canAccessNext) {
-        router.push("/pendaftaran/data-orangtua");
-      }
+    mutationFn: registrationService.uploadDocument,
+    onSuccess: () => {
+      toast.success("Dokumen berhasil diupload");
+      queryClient.invalidateQueries({ queryKey: ["documents"] });
     },
     onError: (error) => {
-      const message =
-        error?.response?.data?.message || "Gagal menyimpan data alamat";
-      toast.error(message);
+      toast.error(error.response?.data?.message || "Gagal upload dokumen");
     },
   });
 };
-export const useStoreFamilyData = () => {
-  const router = useRouter();
+
+export const useDeleteDocument = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: registrationService.storeFamilyData,
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["registration"] });
-      toast.success("Data orang tua berhasil disimpan!");
-
-      const canAccessNext = response?.data?.data?.can_access_next_step;
-      if (canAccessNext) {
-        router.push("/pendaftaran/data-akademik");
-      }
+    mutationFn: registrationService.deleteDocument,
+    onSuccess: () => {
+      toast.success("Dokumen berhasil dihapus");
+      queryClient.invalidateQueries({ queryKey: ["documents"] });
     },
     onError: (error) => {
-      const message =
-        error?.response?.data?.message || "Gagal menyimpan data orang tua";
-      toast.error(message);
+      toast.error(error.response?.data?.message || "Gagal menghapus dokumen");
     },
   });
 };
 
-export const useStoreAcademicBackground = () => {
-  const router = useRouter();
+// Guardians
+export const useGuardians = () => {
+  return useQuery({
+    queryKey: ["guardians"],
+    queryFn: registrationService.getGuardians,
+  });
+};
+
+export const useAddGuardian = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: registrationService.storeAcademicBackground,
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["registration"] });
-      toast.success("Data akademik berhasil disimpan!");
-
-      const canAccessNext = response?.data?.data?.can_access_next_step;
-      if (canAccessNext) {
-        router.push("/pendaftaran/data-prestasi");
-      }
+    mutationFn: registrationService.addGuardian,
+    onSuccess: () => {
+      toast.success("Data wali berhasil ditambahkan");
+      queryClient.invalidateQueries({ queryKey: ["guardians"] });
+      queryClient.invalidateQueries({ queryKey: ["registrationProgress"] });
     },
     onError: (error) => {
-      const message =
-        error?.response?.data?.message || "Gagal menyimpan data akademik";
-      toast.error(message);
+      toast.error(
+        error.response?.data?.message || "Gagal menambahkan data wali"
+      );
     },
   });
 };
 
-export const useStoreAchievements = () => {
-  const router = useRouter();
+export const useUpdateGuardian = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: registrationService.storeAchievements,
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["registration"] });
-      toast.success("Data prestasi berhasil disimpan!");
-
-      const canSubmit = response?.data?.data?.can_submit;
-      if (canSubmit) {
-        router.push("/pendaftaran/pembayaran");
-      }
+    mutationFn: ({ id, data }) => registrationService.updateGuardian(id, data),
+    onSuccess: () => {
+      toast.success("Data wali berhasil diperbarui");
+      queryClient.invalidateQueries({ queryKey: ["guardians"] });
     },
     onError: (error) => {
-      const message =
-        error?.response?.data?.message || "Gagal menyimpan data prestasi";
-      toast.error(message);
+      toast.error(
+        error.response?.data?.message || "Gagal memperbarui data wali"
+      );
     },
   });
 };
 
+export const useDeleteGuardian = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: registrationService.deleteGuardian,
+    onSuccess: () => {
+      toast.success("Data wali berhasil dihapus");
+      queryClient.invalidateQueries({ queryKey: ["guardians"] });
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Gagal menghapus data wali");
+    },
+  });
+};
+
+// Submit
 export const useSubmitRegistration = () => {
-  const router = useRouter();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: registrationService.submitRegistration,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["registration"] });
-      toast.success("Pendaftaran berhasil diajukan");
-      router.push("/payment");
+      toast.success("Pendaftaran berhasil disubmit!");
+      queryClient.invalidateQueries({ queryKey: ["registrationProgress"] });
+      queryClient.invalidateQueries({ queryKey: ["registrationStatus"] });
     },
     onError: (error) => {
-      const message =
-        error?.response?.data?.message || "Gagal mengajukan pendaftaran";
-      toast.error(message);
-    },
-  });
-};
-
-// admin
-export const useRegistrations = (params) => {
-  return useQuery({
-    queryKey: ["registrations", "all", params],
-    queryFn: () => registrationService.getAllRegistrations(params),
-    keepPreviousData: true,
-  });
-};
-
-export const useUpdateRegistrationStatus = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, data }) => registrationService.updateStatus(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["registrations"] });
-      toast.success("Status pendaftaran berhasil diperbarui");
-    },
-    onError: (error) => {
-      const message =
-        error?.response?.data?.message ||
-        "Gagal memperbarui status pendaftaran";
-      toast.error(message);
+      toast.error(error.response?.data?.message || "Gagal submit pendaftaran");
     },
   });
 };
