@@ -3,10 +3,16 @@ import { registrationService } from "@/services/registrationService";
 import toast from "react-hot-toast";
 
 // Progress & Status
-export const useRegistrationProgress = () => {
+export const useRegistrationProgress = (enabled = true) => {
   return useQuery({
     queryKey: ["registrationProgress"],
     queryFn: registrationService.getProgress,
+    enabled:
+      enabled &&
+      typeof window !== "undefined" &&
+      !!localStorage.getItem("access_token"),
+    retry: 2,
+    retryDelay: 1000,
   });
 };
 

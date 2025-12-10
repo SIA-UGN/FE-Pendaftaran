@@ -41,8 +41,8 @@ export const useAnnouncementsWithSearch = () => {
   };
 
   return {
-    announcements: data?.data || [],
-    pagination: data?.meta || {},
+    announcements: data?.data?.data?.data || [],
+    pagination: data?.data?.data?.meta || {},
     isLoading,
     error,
     search,

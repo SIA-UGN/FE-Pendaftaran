@@ -1,32 +1,24 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-
-import { useState, useCallback } from "react";
-import { useDebounce } from "@/hooks/useDebounce";
+import { useCallback } from "react";
 import { useAnnouncementsWithSearch } from "@/hooks/useAnnouncementsWithSearch";
 import { Heading } from "@/components/Heading";
 import AnnouncementList from "@/components/AnnouncementList";
 
 export default function Announcement() {
-  const [search, setSearch] = useState("");
-  const [isOn, setIsOn] = useState(false);
+  const { announcements, isLoading, error, search, handleSearch } =
+    useAnnouncementsWithSearch();
 
-  // Debounce the search input to avoid too many API calls
-  const debouncedSearch = useDebounce(search, 1000);
+  const isError = !!error;
 
-  const {
-    data: announcementsData,
-    isLoading,
-    isError,
-    error,
-  } = useAnnouncementsWithSearch(debouncedSearch);
+  const handleSearchChange = useCallback(
+    (newSearch) => {
+      handleSearch(newSearch);
+    },
+    [handleSearch]
+  );
 
-  const handleSearchChange = useCallback((newSearch) => {
-    setSearch(newSearch);
-  }, []);
-
-  if (isLoading && !announcementsData) {
+  if (isLoading && !announcements.length) {
     return (
       <div className="flex items-center justify-center min-h-[200px] w-full">
         <div className="text-center">
@@ -83,14 +75,12 @@ export default function Announcement() {
     );
   }
 
-  const data = announcementsData?.data?.data?.data || [];
-
   return (
     <div className="flex flex-col items-center pt-4 sm:pt-6 lg:pt-8 pb-12 sm:pb-14 lg:pb-16 px-4 sm:px-6 md:px-8 lg:px-12 max-w-7xl mx-auto w-full">
       <Heading title={"Pengumuman"} />
       <div className="w-full overflow-x-auto">
         <AnnouncementList
-          data={data}
+          data={announcements}
           onSearchChange={handleSearchChange}
           searchValue={search}
         />

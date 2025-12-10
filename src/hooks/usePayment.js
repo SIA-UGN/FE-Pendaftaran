@@ -4,10 +4,16 @@ import toast from "react-hot-toast";
 import { useState } from "react";
 
 // Student hooks
-export const useMyPayment = () => {
+export const useMyPayment = (enabled = true) => {
   return useQuery({
     queryKey: ["myPayment"],
     queryFn: paymentService.getMyPayment,
+    enabled:
+      enabled &&
+      typeof window !== "undefined" &&
+      !!localStorage.getItem("access_token"),
+    retry: 2,
+    retryDelay: 1000,
   });
 };
 

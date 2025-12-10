@@ -32,29 +32,21 @@ export default function ForgotPassword() {
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
 
-  const {
-    mutate: forgotPasswordMutation,
-    isLoading: isForgotLoading,
-    isError,
-    error,
-  } = useForgotPassword();
+  const forgotPasswordMutation = useForgotPassword();
 
   const resetPasswordMutation = useResetPassword();
-
-  if (isError) return <div>Error: {error.message}</div>;
 
   async function handleSubmit(e) {
     e.preventDefault();
 
     if (!email) return;
 
-    forgotPasswordMutation(
+    forgotPasswordMutation.mutate(
       { email },
       {
         onSuccess: () => {
           setShowDialog(true);
           setStep(2);
-          toast.success("Verification code has been sent to your email");
         },
       }
     );
@@ -85,24 +77,18 @@ export default function ForgotPassword() {
     resetPasswordMutation.mutate(
       {
         email,
-        code, // kirim code bukan token
+        code, // backend expects 'code' field
         password,
         password_confirmation: passwordConfirmation,
       },
       {
         onSuccess: () => {
-          toast.success("Password reset successful");
           setShowDialog(false);
           setEmail("");
           setCode("");
           setPassword("");
           setPasswordConfirmation("");
           setStep(1);
-        },
-        onError: (error) => {
-          toast.error(
-            error.response?.data?.message || "Failed to reset password"
-          );
         },
       }
     );
@@ -186,10 +172,12 @@ export default function ForgotPassword() {
                 <Button
                   type="submit"
                   className="w-full rounded-full text-white hover:text-white"
-                  variant={"green"}
-                  disabled={isForgotLoading}
+                  variant="green"
+                  disabled={forgotPasswordMutation.isPending}
                 >
-                  {isForgotLoading ? "Sending..." : "Send Verification Code"}
+                  {forgotPasswordMutation.isPending
+                    ? "Sending..."
+                    : "Send Verification Code"}
                 </Button>
               </form>
             </CardContent>

@@ -27,40 +27,6 @@ export async function middleware(request) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (isAuthRoute && token) {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/check`,
-        {
-          method: "GET",
-          headers: {
-            Cookie: request.headers.get("cookie") || "",
-            Authorization: token ? `Bearer ${token}` : "",
-            Accept: "application/json",
-          },
-        }
-      );
-
-      if (response.ok) {
-        const userData = await response.json();
-        const userRoles = userData.data?.user?.roles || [];
-
-        if (userRoles.includes("admin")) {
-          return NextResponse.redirect(new URL("/dashboard", request.url));
-        } else if (userRoles.includes("manager")) {
-          return NextResponse.redirect(new URL("/manager", request.url));
-        } else if (
-          userRoles.includes("applicant") ||
-          userRoles.includes("student")
-        ) {
-          return NextResponse.redirect(new URL("/pendaftaran", request.url));
-        }
-      }
-    } catch (error) {
-      console.log("Token validation error:", error);
-    }
-  }
-
   return NextResponse.next();
 }
 

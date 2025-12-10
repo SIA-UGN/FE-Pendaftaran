@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,6 +21,7 @@ export default function Login() {
   const [captcha, setCaptcha] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const recaptchaRef = useRef(null);
 
   const loginMutation = useLogin();
 
@@ -28,14 +29,25 @@ export default function Login() {
     e.preventDefault();
 
     if (!captcha) {
-      toast.error("Silakan selesaikan reCAPTCHA terlebih dahulu");
+      toast.error("Captcha harus diisi terlebih dahulu!");
       return;
     }
 
-    loginMutation.mutate({
-      email,
-      password,
-    });
+    loginMutation.mutate(
+      {
+        email,
+        password,
+        "g-recaptcha-response": captcha,
+      },
+      {
+        onError: () => {
+          if (recaptchaRef.current) {
+            recaptchaRef.current.reset();
+          }
+          setCaptcha(null);
+        },
+      }
+    );
   }
 
   return (
@@ -123,6 +135,7 @@ export default function Login() {
                     }}
                   >
                     <ReCAPTCHA
+                      ref={recaptchaRef}
                       sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
                       onChange={setCaptcha}
                       className="w-full px-6"

@@ -14,9 +14,6 @@ export default function AnnouncementList({
   onSearchChange,
   searchValue,
 }) {
-  console.log(data);
-  console.log("Filtered:", filteredData);
-
   const handleSearchChange = (e) => {
     const value = e.target.value;
     if (onSearchChange) {
@@ -46,9 +43,9 @@ export default function AnnouncementList({
         <AnnouncementTable data={data} searchValue={searchValue} />
       </div>
 
-      {filteredData.length === 0 && search && (
+      {data.length === 0 && searchValue && (
         <div className="text-center py-8 text-gray-500">
-          Tidak ada hasil untuk `{search}`
+          Tidak ada hasil untuk "{searchValue}"
         </div>
       )}
     </div>

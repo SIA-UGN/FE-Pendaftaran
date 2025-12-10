@@ -40,8 +40,14 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mobileProfilOpen, setMobileProfilOpen] = useState(false);
   const [hasNotification, setHasNotification] = useState(true);
+  const [canFetchNotifications, setCanFetchNotifications] = useState(false);
 
-  const { data: unreadNotificationsData, isError, error } = useUnreadCount();
+  const shouldFetchNotifications = false;
+  const {
+    data: unreadNotificationsData,
+    isError,
+    error,
+  } = useUnreadCount(shouldFetchNotifications);
 
   // Helper function untuk check apakah path aktif
   const isActivePath = (path) => {
@@ -52,8 +58,13 @@ export default function Navbar() {
   };
 
   const isProfilMenuActive = () => {
-    const profilPaths = ["/sejarah", "/visi-misi", "/pimpinan-universitas", "/fakultas"];
-    return profilPaths.some(path => pathname.startsWith(path));
+    const profilPaths = [
+      "/sejarah",
+      "/visi-misi",
+      "/pimpinan-universitas",
+      "/fakultas",
+    ];
+    return profilPaths.some((path) => pathname.startsWith(path));
   };
 
   useEffect(() => {
@@ -66,14 +77,22 @@ export default function Navbar() {
           const userData = JSON.parse(userStr);
           setUser(userData);
           setIsLoggedIn(true);
+
+          // Wait 500ms after user is set before enabling notifications fetch
+          // This ensures token is ready in localStorage
+          setTimeout(() => {
+            setCanFetchNotifications(true);
+          }, 500);
         } catch (error) {
           localStorage.removeItem("user");
           setIsLoggedIn(false);
           setUser(null);
+          setCanFetchNotifications(false);
         }
       } else {
         setIsLoggedIn(false);
         setUser(null);
+        setCanFetchNotifications(false);
       }
     };
 
@@ -136,10 +155,12 @@ export default function Navbar() {
       <div className="flex md:hidden items-center gap-3">
         {isLoggedIn && (
           <Link href="/notifikasi" className="relative">
-            <Bell className={cn(
-              "w-6 h-6 cursor-pointer hover:text-white/90 text-white",
-              isActivePath("/notifikasi") && "text-[var(--yellow)]"
-            )} />
+            <Bell
+              className={cn(
+                "w-6 h-6 cursor-pointer hover:text-white/90 text-white",
+                isActivePath("/notifikasi") && "text-[var(--yellow)]"
+              )}
+            />
             {unreadNotifications > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
                 {unreadNotifications}
@@ -164,16 +185,20 @@ export default function Navbar() {
                   asChild
                   className={cn(
                     navigationMenuTriggerStyle(),
-                    isActivePath("/") && !isProfilMenuActive() && !isActivePath("/pendaftaran") && "bg-[var(--yellow)] text-[var(--green)]"
+                    isActivePath("/") &&
+                      !isProfilMenuActive() &&
+                      !isActivePath("/pendaftaran") &&
+                      "bg-[var(--yellow)] text-[var(--green)]"
                   )}
                 >
                   <Link href="/">Home</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuTrigger 
+                <NavigationMenuTrigger
                   className={cn(
-                    isProfilMenuActive() && "bg-[var(--yellow)] text-[var(--green)]"
+                    isProfilMenuActive() &&
+                      "bg-[var(--yellow)] text-[var(--green)]"
                   )}
                 >
                   Profil
@@ -182,44 +207,48 @@ export default function Navbar() {
                   <ul className="grid w-[200px] gap-4 text-center">
                     <li>
                       <NavigationMenuLink asChild>
-                        <Link 
+                        <Link
                           href="/sejarah"
                           className={cn(
                             "block py-2 hover:bg-[var(--yellow)]/10 rounded transition-colors",
-                            isActivePath("/sejarah") && "bg-[var(--yellow)]/20 font-semibold"
+                            isActivePath("/sejarah") &&
+                              "bg-[var(--yellow)]/20 font-semibold"
                           )}
                         >
                           Sejarah
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link 
+                        <Link
                           href="/visi-misi"
                           className={cn(
                             "block py-2 hover:bg-[var(--yellow)]/10 rounded transition-colors",
-                            isActivePath("/visi-misi") && "bg-[var(--yellow)]/20 font-semibold"
+                            isActivePath("/visi-misi") &&
+                              "bg-[var(--yellow)]/20 font-semibold"
                           )}
                         >
                           Visi-Misi
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link 
+                        <Link
                           href="/pimpinan-universitas"
                           className={cn(
                             "block py-2 hover:bg-[var(--yellow)]/10 rounded transition-colors",
-                            isActivePath("/pimpinan-universitas") && "bg-[var(--yellow)]/20 font-semibold"
+                            isActivePath("/pimpinan-universitas") &&
+                              "bg-[var(--yellow)]/20 font-semibold"
                           )}
                         >
                           Pimpinan Universitas
                         </Link>
                       </NavigationMenuLink>
                       <NavigationMenuLink asChild>
-                        <Link 
+                        <Link
                           href="/fakultas"
                           className={cn(
                             "block py-2 hover:bg-[var(--yellow)]/10 rounded transition-colors",
-                            isActivePath("/fakultas") && "bg-[var(--yellow)]/20 font-semibold"
+                            isActivePath("/fakultas") &&
+                              "bg-[var(--yellow)]/20 font-semibold"
                           )}
                         >
                           Fakultas
@@ -234,7 +263,8 @@ export default function Navbar() {
                   asChild
                   className={cn(
                     navigationMenuTriggerStyle(),
-                    isActivePath("/pendaftaran") && "bg-[var(--yellow)] text-[var(--green)]"
+                    isActivePath("/pendaftaran") &&
+                      "bg-[var(--yellow)] text-[var(--green)]"
                   )}
                 >
                   <Link href="/pendaftaran">Pendaftaran</Link>
@@ -248,10 +278,12 @@ export default function Navbar() {
           {isLoggedIn ? (
             <>
               <Link href="/notifikasi" className="relative">
-                <Bell className={cn(
-                  "w-6 h-6 cursor-pointer hover:text-white/90 text-white",
-                  isActivePath("/notifikasi") && "text-[var(--yellow)]"
-                )} />
+                <Bell
+                  className={cn(
+                    "w-6 h-6 cursor-pointer hover:text-white/90 text-white",
+                    isActivePath("/notifikasi") && "text-[var(--yellow)]"
+                  )}
+                />
 
                 {unreadNotifications > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
@@ -261,10 +293,12 @@ export default function Navbar() {
               </Link>
               <DropdownMenu>
                 <DropdownMenuTrigger>
-                  <Avatar className={cn(
-                    "ring-2 ring-transparent transition-all",
-                    isActivePath("/profil") && "ring-[var(--yellow)]"
-                  )}>
+                  <Avatar
+                    className={cn(
+                      "ring-2 ring-transparent transition-all",
+                      isActivePath("/profil") && "ring-[var(--yellow)]"
+                    )}
+                  >
                     <AvatarImage
                       src={user?.avatar_url || "/default-avatar-male.webp"}
                       alt={user?.name || "User avatar"}
@@ -282,20 +316,22 @@ export default function Navbar() {
                   <DropdownMenuLabel>{user?.name}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link 
+                    <Link
                       href="/profil"
                       className={cn(
-                        isActivePath("/profil") && "bg-[var(--yellow)]/10 font-semibold"
+                        isActivePath("/profil") &&
+                          "bg-[var(--yellow)]/10 font-semibold"
                       )}
                     >
                       Profil
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link 
+                    <Link
                       href="/pendaftaran"
                       className={cn(
-                        isActivePath("/pendaftaran") && "bg-[var(--yellow)]/10 font-semibold"
+                        isActivePath("/pendaftaran") &&
+                          "bg-[var(--yellow)]/10 font-semibold"
                       )}
                     >
                       Pendaftaran
@@ -358,7 +394,8 @@ export default function Navbar() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
                     "px-6 py-4 text-lg font-medium tracking-wide hover:bg-[var(--yellow)] hover:text-[var(--green)] transition-colors duration-200",
-                    isActivePath(item.href) && "bg-[var(--yellow)] text-[var(--green)] font-bold"
+                    isActivePath(item.href) &&
+                      "bg-[var(--yellow)] text-[var(--green)] font-bold"
                   )}
                 >
                   {item.label}
@@ -373,7 +410,8 @@ export default function Navbar() {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={cn(
                       "px-6 py-4 text-lg font-medium tracking-wide hover:bg-[var(--yellow)] hover:text-[var(--green)] transition-colors duration-200 flex items-center justify-between",
-                      isActivePath("/notifikasi") && "bg-[var(--yellow)] text-[var(--green)] font-bold"
+                      isActivePath("/notifikasi") &&
+                        "bg-[var(--yellow)] text-[var(--green)] font-bold"
                     )}
                   >
                     <span>Notifikasi</span>
@@ -388,7 +426,8 @@ export default function Navbar() {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={cn(
                       "px-6 py-4 text-lg font-medium tracking-wide hover:bg-[var(--yellow)] hover:text-[var(--green)] transition-colors duration-200",
-                      isActivePath("/profil") && "bg-[var(--yellow)] text-[var(--green)] font-bold"
+                      isActivePath("/profil") &&
+                        "bg-[var(--yellow)] text-[var(--green)] font-bold"
                     )}
                   >
                     Profil

@@ -2,7 +2,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const apiClient = axios.create({
-  baseURL: process.env.APP_URL || "http://sia-globall.test/api",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -20,16 +20,31 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("user");
+    const status = error.response?.status;
+    const url = error.config?.url || "";
 
-      if (
-        typeof window !== "undefined" &&
-        window.location.pathname !== "/login"
-      ) {
-        window.location.href = "/login";
+    if (status === 401) {
+      if (!url.includes("/login")) {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("user");
+
+        if (
+          typeof window !== "undefined" &&
+          window.location.pathname !== "/login"
+        ) {
+          toast.error("Sesi Anda telah berakhir. Silakan login kembali.");
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 3000);
+        }
       }
+    }
+
+    if (status === 403) {
+      const message =
+        error.response?.data?.message ||
+        "Anda tidak memiliki izin untuk mengakses resource ini.";
+      toast.error(message);
     }
 
     if (error.response?.status === 500) {

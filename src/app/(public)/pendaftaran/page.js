@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import InformasiPendaftaran from "@/components/registrations/InformasiPendaftaran";
 import InformasiProfil from "@/components/InformasiProfil";
@@ -15,8 +16,21 @@ import toast from "react-hot-toast";
 
 export default function PendaftaranPage() {
   const router = useRouter();
-  const { data: progressData, isLoading, isError } = useRegistrationProgress();
-  const { data: paymentData, isLoading: paymentLoading } = useMyPayment();
+  const [isReady, setIsReady] = React.useState(false);
+
+  // Wait for auth to be ready before fetching
+  React.useEffect(() => {
+    const timer = setTimeout(() => setIsReady(true), 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const {
+    data: progressData,
+    isLoading,
+    isError,
+  } = useRegistrationProgress(isReady);
+  const { data: paymentData, isLoading: paymentLoading } =
+    useMyPayment(isReady);
 
   const stepRoutes = {
     1: "/pendaftaran/data-diri",

@@ -10,11 +10,15 @@ export const useNotifications = (params = {}) => {
   });
 };
 
-export const useUnreadCount = () => {
+export const useUnreadCount = (enabled = true) => {
   return useQuery({
     queryKey: ["unreadCount"],
     queryFn: notificationService.getUnreadCount,
-    refetchInterval: 30000, // Auto refetch every 30 seconds
+    refetchInterval: 30000,
+    enabled: enabled,
+    retry: 2,
+    retryDelay: 1000,
+    staleTime: 25000,
   });
 };
 
