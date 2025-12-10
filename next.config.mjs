@@ -6,12 +6,15 @@ const nextConfig = {
         protocol: "http",
         hostname: "localhost",
         port: "8000",
+        pathname: "/**",
       },
       {
         protocol: "http",
         hostname: "sia-globall.test",
+        pathname: "/**",
       },
     ],
+    domains: ["localhost"],
   },
   async headers() {
     return [

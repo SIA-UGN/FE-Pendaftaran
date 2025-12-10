@@ -302,6 +302,7 @@ export default function Navbar() {
                     <AvatarImage
                       src={user?.avatar_url || "/default-avatar-male.webp"}
                       alt={user?.name || "User avatar"}
+                      key={user?.avatar_url || "default"}
                     />
                     <AvatarFallback>
                       {user?.name?.charAt(0)?.toUpperCase() || "U"}

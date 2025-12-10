@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { authService } from "@/services/authService";
+import { profileService } from "@/services/profileService";
 import { useAuth as useAuthContext } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -10,7 +11,6 @@ export const useLogin = () => {
   const router = useRouter();
   const timeoutRef = useRef(null);
 
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
@@ -21,15 +21,35 @@ export const useLogin = () => {
 
   return useMutation({
     mutationFn: authService.login,
-    onSuccess: (response) => {
-      const { user, access_token } = response.data.data;
+    onSuccess: async (response) => {
+      const user = response.data.data.user;
+      const token = response.data.data.token;
 
       if (!user.is_active) {
         toast.error("Akun Anda belum diaktifkan. Silakan hubungi admin.");
         return;
       }
 
-      setAuth(user, access_token);
+      localStorage.setItem("access_token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      setAuth(user, token);
+
+      // Fetch fresh profile data to get avatar_url
+      try {
+        const profileResponse = await profileService.getProfile();
+        const freshUser = profileResponse.data.data.user;
+
+        // Update localStorage with fresh user data including avatar_url
+        localStorage.setItem("user", JSON.stringify(freshUser));
+
+        // Dispatch event to update Navbar
+        window.dispatchEvent(
+          new CustomEvent("userUpdated", { detail: freshUser })
+        );
+      } catch (error) {
+        console.error("Failed to fetch profile after login:", error);
+      }
+
       toast.success("Login berhasil!");
 
       timeoutRef.current = setTimeout(() => {
@@ -57,9 +77,9 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: authService.register,
     onSuccess: (response) => {
-      const { user, access_token } = response.data.data;
+      const { user, token } = response.data.data;
 
-      setAuth(user, access_token);
+      setAuth(user, token);
       toast.success("Registrasi berhasil! Selamat datang.");
 
       router.push("/pendaftaran");

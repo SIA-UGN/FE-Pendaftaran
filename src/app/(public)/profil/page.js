@@ -54,15 +54,21 @@ export default function Profil() {
 
     if (file.size > 2 * 1024 * 1024) {
       toast.error("Ukuran file maksimal 2MB!");
+      e.target.value = "";
       return;
     }
 
     if (!file.type.startsWith("image/")) {
       toast.error("File harus berupa gambar!");
+      e.target.value = "";
       return;
     }
 
-    uploadAvatarMutation.mutate(file);
+    uploadAvatarMutation.mutate(file, {
+      onSuccess: () => {
+        e.target.value = "";
+      },
+    });
   };
 
   const handleSave = () => {
@@ -136,6 +142,7 @@ export default function Profil() {
               fill
               alt="profile-image"
               className="object-cover rounded-2xl transition duration-300 group-hover:opacity-70"
+              key={user?.avatar_url || "default"}
             />
             <label
               htmlFor="picture"

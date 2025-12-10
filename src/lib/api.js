@@ -11,6 +11,7 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("access_token");
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -18,13 +19,15 @@ apiClient.interceptors.request.use((config) => {
 });
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    return response;
+  },
   (error) => {
     const status = error.response?.status;
     const url = error.config?.url || "";
 
     if (status === 401) {
-      if (!url.includes("/login")) {
+      if (!url.includes("/login") && !url.includes("/register")) {
         localStorage.removeItem("access_token");
         localStorage.removeItem("user");
 

@@ -24,10 +24,22 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (userData, accessToken) => {
+    console.log("🔐 [AuthContext.login] Called with:", {
+      userData,
+      tokenLength: accessToken?.length,
+      tokenPreview: accessToken?.substring(0, 30) + "...",
+    });
+
     setUser(userData);
     setToken(accessToken);
     localStorage.setItem("access_token", accessToken);
     localStorage.setItem("user", JSON.stringify(userData));
+
+    console.log("✅ [AuthContext.login] Saved to localStorage");
+    console.log(
+      "✅ [AuthContext.login] Verify token:",
+      localStorage.getItem("access_token")?.substring(0, 30) + "..."
+    );
   };
 
   const logout = () => {

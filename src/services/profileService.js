@@ -5,7 +5,10 @@ export const profileService = {
    * Get current user profile
    * GET /api/profile
    */
-  getProfile: () => apiClient.get("/profile"),
+  getProfile: () => {
+    const token = localStorage.getItem("access_token");
+    return apiClient.get("/profile");
+  },
 
   /**
    * Update profile

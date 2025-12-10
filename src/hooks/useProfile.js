@@ -7,7 +7,16 @@ export const useProfile = () => {
   return useQuery({
     queryKey: ["profile"],
     queryFn: profileService.getProfile,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
+    enabled:
+      typeof window !== "undefined" && !!localStorage.getItem("access_token"),
+    retry: (failureCount, error) => {
+      if (error.response?.status === 401) {
+        return false;
+      }
+      return failureCount < 2;
+    },
+    retryDelay: 1000,
   });
 };
 
@@ -16,9 +25,16 @@ export const useUpdateProfile = () => {
 
   return useMutation({
     mutationFn: profileService.updateProfile,
-    onSuccess: () => {
-      toast.success("Profil berhasil diperbarui");
+    onSuccess: (response) => {
+      const updatedUser = response.data.data?.user;
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
       queryClient.invalidateQueries({ queryKey: ["profile"] });
+      window.dispatchEvent(
+        new CustomEvent("userUpdated", { detail: updatedUser })
+      );
+
+      toast.success("Profil berhasil diperbarui");
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "Gagal memperbarui profil");
@@ -38,10 +54,22 @@ export const useUploadAvatar = () => {
     onMutate: () => {
       setUploadProgress(0);
     },
-    onSuccess: () => {
-      toast.success("Avatar berhasil diupload");
-      setUploadProgress(100);
+    onSuccess: (response) => {
+      const avatarUrl =
+        response.data.avatar_url || response.data.data?.avatar_url;
+
+      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+      storedUser.avatar_url = avatarUrl;
+      localStorage.setItem("user", JSON.stringify(storedUser));
+
       queryClient.invalidateQueries({ queryKey: ["profile"] });
+      window.dispatchEvent(
+        new CustomEvent("userUpdated", { detail: storedUser })
+      );
+
+      setUploadProgress(100);
+      toast.success("Avatar berhasil diupload");
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "Gagal upload avatar");
@@ -59,8 +87,16 @@ export const useDeleteAvatar = () => {
   return useMutation({
     mutationFn: profileService.deleteAvatar,
     onSuccess: () => {
-      toast.success("Avatar berhasil dihapus");
+      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+      storedUser.avatar_url = null;
+      localStorage.setItem("user", JSON.stringify(storedUser));
+
       queryClient.invalidateQueries({ queryKey: ["profile"] });
+      window.dispatchEvent(
+        new CustomEvent("userUpdated", { detail: storedUser })
+      );
+
+      toast.success("Avatar berhasil dihapus");
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "Gagal menghapus avatar");

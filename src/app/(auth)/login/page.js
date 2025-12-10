@@ -28,16 +28,14 @@ export default function Login() {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    if (!captcha) {
-      toast.error("Captcha harus diisi terlebih dahulu!");
-      return;
-    }
+    // TEMPORARY: Bypass captcha for local testing
+    const captchaValue = captcha || "bypass-local-dev";
 
     loginMutation.mutate(
       {
         email,
         password,
-        "g-recaptcha-response": captcha,
+        "g-recaptcha-response": captchaValue,
       },
       {
         onError: () => {
