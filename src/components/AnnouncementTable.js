@@ -29,10 +29,7 @@ export function AnnouncementTable({ data }) {
       accessorKey: "no",
       header: ({ column }) => {
         return (
-          <Button
-            variant="ghost"
-            className="w-full"
-          >
+          <Button variant="ghost" className="w-full">
             No
           </Button>
         );
@@ -44,13 +41,7 @@ export function AnnouncementTable({ data }) {
     {
       accessorKey: "registration_number",
       header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-          >
-            Nomor Registrasi
-          </Button>
-        );
+        return <Button variant="ghost">Nomor Registrasi</Button>;
       },
       cell: ({ row }) => (
         <div className="font-medium">
@@ -61,26 +52,37 @@ export function AnnouncementTable({ data }) {
     {
       accessorKey: "name",
       header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-          >
-            Nama
-          </Button>
-        );
+        return <Button variant="ghost">Nama</Button>;
       },
       cell: ({ row }) => <div>{row.original.name || "-"}</div>,
     },
     {
+      accessorKey: "program",
+      header: ({ column }) => {
+        return <Button variant="ghost">Program Studi</Button>;
+      },
+      cell: ({ row }) => {
+        const program = row.original.program;
+        return (
+          <div className="text-sm">
+            {program?.name ? (
+              <div>
+                <div className="font-medium">{program.name}</div>
+                {program.code && (
+                  <div className="text-gray-500 text-xs">{program.code}</div>
+                )}
+              </div>
+            ) : (
+              "-"
+            )}
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: "status",
       header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-          >
-            Status
-          </Button>
-        );
+        return <Button variant="ghost">Status</Button>;
       },
       cell: ({ row }) => {
         const status = row.original.status || "Lulus";
