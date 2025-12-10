@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Load auth data from localStorage on mount
-    const storedToken = localStorage.getItem("token");
+    const storedToken = localStorage.getItem("access_token");
     const storedUser = localStorage.getItem("user");
 
     if (storedToken && storedUser) {
@@ -44,14 +44,14 @@ export const AuthProvider = ({ children }) => {
   const login = (userData, accessToken) => {
     setUser(userData);
     setToken(accessToken);
-    localStorage.setItem("token", accessToken);
+    localStorage.setItem("access_token", accessToken);
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
   const logout = () => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem("token");
+    localStorage.removeItem("access_token");
     localStorage.removeItem("user");
   };
 
