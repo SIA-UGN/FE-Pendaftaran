@@ -12,8 +12,9 @@ export const useMyPayment = (enabled = true) => {
       enabled &&
       typeof window !== "undefined" &&
       !!localStorage.getItem("access_token"),
-    retry: 2,
-    retryDelay: 1000,
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 };
 

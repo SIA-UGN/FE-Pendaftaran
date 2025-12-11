@@ -41,7 +41,7 @@ export default function RegistrationProgress() {
     },
     {
       href: "/pendaftaran/data-akademik",
-      label: "Data Akademik",
+      label: "Dokumen",
       key: "data-akademik",
       step_number: 4,
     },

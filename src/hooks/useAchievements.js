@@ -1,15 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { registrationService } from "@/services/registrationService";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export const useAchievements = () => {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   // Get achievements
   const {
     data: achievements,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["achievements"],
     queryFn: registrationService.getAchievements,
@@ -42,11 +45,30 @@ export const useAchievements = () => {
     },
   });
 
+  // Helper: Check if has achievements
+  const achievementsList = achievements?.data?.data || [];
+  const hasAchievements = achievementsList.length > 0;
+
+  // Helper: Skip achievements and go to payment
+  const skipAchievements = () => {
+    router.push("/pendaftaran/pembayaran");
+  };
+
+  // Helper: Submit achievements (just navigate, no API call needed)
+  const submitAchievements = () => {
+    router.push("/pendaftaran/pembayaran");
+  };
+
   return {
     achievements,
+    hasAchievements,
     isLoading,
+    isSubmitting: false,
     error,
-    addAchievement,
-    deleteAchievement,
+    refetch,
+    addAchievement: addAchievement.mutateAsync,
+    deleteAchievement: deleteAchievement.mutateAsync,
+    skipAchievements,
+    submitAchievements,
   };
 };

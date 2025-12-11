@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ExternalLink, FileCheck, Download, Eye } from "lucide-react";
+import { ExternalLink, FileCheck, Download, Eye, FileText } from "lucide-react";
 
 const typeLabels = {
   academic: "Akademik",
@@ -94,12 +94,8 @@ export const columns = [
         return <span className="text-gray-400 text-sm">-</span>;
       }
 
-      const API_URL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const fullUrl = certificateFile.startsWith("http")
-        ? certificateFile
-        : `${API_URL}${certificateFile}`;
-
+      // certificateFile is already a full URL from backend (certificate_url)
+      const fullUrl = certificateFile;
       const isPdf = fullUrl.toLowerCase().endsWith(".pdf");
 
       return (
@@ -123,19 +119,43 @@ export const columns = [
             </DialogHeader>
             <div className="mt-4 space-y-4">
               {/* Preview Area */}
-              <div className="w-full h-[60vh] border rounded-lg overflow-hidden bg-gray-50">
+              <div className="w-full h-[60vh] border rounded-lg overflow-hidden bg-gray-50 relative">
                 {isPdf ? (
-                  <iframe
-                    src={fullUrl}
-                    className="w-full h-full"
-                    title="PDF Preview"
-                  />
+                  <>
+                    <iframe
+                      src={`${fullUrl}#toolbar=0`}
+                      className="w-full h-full"
+                      title="PDF Preview"
+                    />
+                    {/* Fallback message overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100 pointer-events-none">
+                      <div className="text-center p-6">
+                        <FileText className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                        <p className="text-gray-600 mb-2">
+                          Preview tidak tersedia
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Silakan gunakan tombol "Buka di Tab Baru" atau
+                          "Download" di bawah
+                        </p>
+                      </div>
+                    </div>
+                  </>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center p-4">
                     <img
                       src={fullUrl}
                       alt="Certificate"
                       className="max-w-full max-h-full object-contain"
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                        e.target.parentElement.innerHTML = `
+                          <div class="text-center">
+                            <p class="text-gray-600 mb-2">Gagal memuat gambar</p>
+                            <p class="text-sm text-gray-500">Silakan gunakan tombol Download</p>
+                          </div>
+                        `;
+                      }}
                     />
                   </div>
                 )}

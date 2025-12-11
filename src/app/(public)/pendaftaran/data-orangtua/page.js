@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +30,8 @@ import RegistrationProgress from "@/components/registrations/RegistrationProgres
 import {
   useRegistrationProgress,
   useMyRegistration,
-  useStoreFamilyData,
+  useAddGuardian,
+  useGuardians,
 } from "@/hooks/useRegistration";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -71,9 +72,14 @@ export default function DataOrangtua() {
   const { data: progressData, isLoading: progressLoading } =
     useRegistrationProgress();
   const { data: registrationData, refetch } = useMyRegistration();
-  const storeMutation = useStoreFamilyData();
+  const { data: guardiansData } = useGuardians();
+  const addGuardianMutation = useAddGuardian();
 
   const progress = progressData?.data;
+  const existingGuardians = useMemo(
+    () => guardiansData?.data?.data || [],
+    [guardiansData]
+  );
 
   useEffect(() => {
     refetch();
@@ -115,63 +121,95 @@ export default function DataOrangtua() {
   }, [progress, progressLoading, router]);
 
   useEffect(() => {
-    if (registrationData?.data?.registration?.family) {
-      const family = registrationData.data.registration.family;
+    if (existingGuardians.length > 0) {
+      const father = existingGuardians.find(
+        (g) => g.relationship_type === "Father"
+      );
+      const mother = existingGuardians.find(
+        (g) => g.relationship_type === "Mother"
+      );
+      const guardian = existingGuardians.find(
+        (g) => g.relationship_type === "Guardian"
+      );
+
       form.reset({
-        namaAyah: family.father_name || "",
-        alamatAyah: family.father_address || "",
-        telpAyah: family.father_phone || "",
-        pekerjaanAyah: family.father_occupation || "",
-        pendidikanAyah: family.father_education || "",
-        penghasilanAyah: family.father_income || "",
-        namaIbu: family.mother_name || "",
-        alamatIbu: family.mother_address || "",
-        telpIbu: family.mother_phone || "",
-        pekerjaanIbu: family.mother_occupation || "",
-        pendidikanIbu: family.mother_education || "",
-        penghasilanIbu: family.mother_income || "",
-        namaWali: family.guardian_name || "",
-        alamatWali: family.guardian_address || "",
-        telpWali: family.guardian_phone || "",
-        pekerjaanWali: family.guardian_occupation || "",
-        pendidikanWali: family.guardian_education || "",
-        penghasilanWali: family.guardian_income || "",
+        namaAyah: father?.full_name || "",
+        alamatAyah: father?.address || "",
+        telpAyah: father?.phone_number || "",
+        pekerjaanAyah: father?.occupation || "",
+        pendidikanAyah: father?.last_education || "",
+        penghasilanAyah: father?.income_range || "",
+        namaIbu: mother?.full_name || "",
+        alamatIbu: mother?.address || "",
+        telpIbu: mother?.phone_number || "",
+        pekerjaanIbu: mother?.occupation || "",
+        pendidikanIbu: mother?.last_education || "",
+        penghasilanIbu: mother?.income_range || "",
+        namaWali: guardian?.full_name || "",
+        alamatWali: guardian?.address || "",
+        telpWali: guardian?.phone_number || "",
+        pekerjaanWali: guardian?.occupation || "",
+        pendidikanWali: guardian?.last_education || "",
+        penghasilanWali: guardian?.income_range || "",
       });
     }
-  }, [registrationData, form]);
+  }, [existingGuardians, form]);
 
   async function onSubmit(data) {
-    const payload = {
-      father: {
-        name: data.namaAyah,
-        address: data.alamatAyah,
-        phone: data.telpAyah,
-        occupation: data.pekerjaanAyah,
-        education: data.pendidikanAyah,
-        income: data.penghasilanAyah,
-      },
-      mother: {
-        name: data.namaIbu,
-        address: data.alamatIbu,
-        phone: data.telpIbu,
-        occupation: data.pekerjaanIbu,
-        education: data.pendidikanIbu,
-        income: data.penghasilanIbu,
-      },
-    };
+    // Build array of guardians to submit
+    const guardians = [];
 
+    // Add Father
+    guardians.push({
+      relationship_type: "Father",
+      full_name: data.namaAyah,
+      address: data.alamatAyah,
+      phone_number: data.telpAyah,
+      occupation: data.pekerjaanAyah,
+      last_education: data.pendidikanAyah,
+      income_range: data.penghasilanAyah,
+    });
+
+    // Add Mother
+    guardians.push({
+      relationship_type: "Mother",
+      full_name: data.namaIbu,
+      address: data.alamatIbu,
+      phone_number: data.telpIbu,
+      occupation: data.pekerjaanIbu,
+      last_education: data.pendidikanIbu,
+      income_range: data.penghasilanIbu,
+    });
+
+    // Add Guardian (optional)
     if (data.namaWali) {
-      payload.guardian = {
-        name: data.namaWali,
-        address: data.alamatWali || null,
-        phone: data.telpWali || null,
-        occupation: data.pekerjaanWali || null,
-        education: data.pendidikanWali || null,
-        income: data.penghasilanWali || null,
-      };
+      guardians.push({
+        relationship_type: "Guardian",
+        full_name: data.namaWali,
+        address: data.alamatWali,
+        phone_number: data.telpWali,
+        occupation: data.pekerjaanWali,
+        last_education: data.pendidikanWali,
+        income_range: data.penghasilanWali,
+      });
     }
 
-    storeMutation.mutate(payload);
+    // Submit each guardian sequentially
+    try {
+      for (const guardian of guardians) {
+        await addGuardianMutation.mutateAsync(guardian);
+      }
+
+      // Show success toast once after all guardians saved
+      toast.success("Data orang tua/wali berhasil disimpan!");
+
+      // Wait for query invalidation then redirect
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      router.push("/pendaftaran/data-akademik");
+    } catch (error) {
+      // Error already handled by mutation
+      console.error("Failed to save guardians:", error);
+    }
   }
 
   if (progressLoading) {
@@ -375,13 +413,13 @@ export default function DataOrangtua() {
                               </FormControl>
                               <SelectContent>
                                 <SelectItem value="below_5m">
-                                  &lt; 5.000.000
+                                  &lt; Rp 5.000.000
                                 </SelectItem>
                                 <SelectItem value="5m_to_10m">
-                                  5.000.000 – 9.999.999
+                                  Rp 5.000.000 - Rp 10.000.000
                                 </SelectItem>
                                 <SelectItem value="above_10m">
-                                  &gt; 10.000.000
+                                  &gt; Rp 10.000.000
                                 </SelectItem>
                               </SelectContent>
                             </Select>
@@ -525,13 +563,13 @@ export default function DataOrangtua() {
                               </FormControl>
                               <SelectContent>
                                 <SelectItem value="below_5m">
-                                  &lt; 5.000.000
+                                  &lt; Rp 5.000.000
                                 </SelectItem>
                                 <SelectItem value="5m_to_10m">
-                                  5.000.000 – 9.999.999
+                                  Rp 5.000.000 - Rp 10.000.000
                                 </SelectItem>
                                 <SelectItem value="above_10m">
-                                  &gt; 10.000.000
+                                  &gt; Rp 10.000.000
                                 </SelectItem>
                               </SelectContent>
                             </Select>
@@ -660,13 +698,13 @@ export default function DataOrangtua() {
                             </FormControl>
                             <SelectContent>
                               <SelectItem value="below_5m">
-                                &lt; 5.000.000
+                                &lt; Rp 5.000.000
                               </SelectItem>
                               <SelectItem value="5m_to_10m">
-                                5.000.000 – 9.999.999
+                                Rp 5.000.000 - Rp 10.000.000
                               </SelectItem>
                               <SelectItem value="above_10m">
-                                &gt; 10.000.000
+                                &gt; Rp 10.000.000
                               </SelectItem>
                             </SelectContent>
                           </Select>
@@ -679,11 +717,7 @@ export default function DataOrangtua() {
             </div>
             <div className="md:w-full flex items-center justify-end my-12 px-12 gap-6">
               <Link href="/pendaftaran" className="w-1/2 sm:w-48">
-                <Button
-                  type="button"
-                  variant={"yellow"}
-                  className={"w-full"}
-                >
+                <Button type="button" variant={"yellow"} className={"w-full"}>
                   Kembali
                 </Button>
               </Link>
@@ -691,9 +725,9 @@ export default function DataOrangtua() {
                 type="submit"
                 variant={"matcha"}
                 className={"w-1/2 sm:w-48"}
-                disabled={storeMutation.isPending}
+                disabled={addGuardianMutation.isPending}
               >
-                {storeMutation.isPending ? "Menyimpan..." : "Lanjut"}
+                {addGuardianMutation.isPending ? "Menyimpan..." : "Lanjut"}
               </Button>
             </div>
           </form>

@@ -29,9 +29,12 @@ export default function PendaftaranPage() {
     isLoading,
     isError,
   } = useRegistrationProgress(isReady);
-  const { data: paymentData, isLoading: paymentLoading } =
-    useMyPayment(isReady);
 
+  const {
+    data: paymentData,
+    isLoading: paymentLoading,
+    isError: paymentError,
+  } = useMyPayment(isReady);
   const stepRoutes = {
     1: "/pendaftaran/data-diri",
     2: "/pendaftaran/data-alamat",
@@ -41,6 +44,7 @@ export default function PendaftaranPage() {
   };
 
   const getNextIncompleteStep = () => {
+    // If error or no data (e.g., first-time user with no profile), start from beginning
     if (isError || !progressData?.data) {
       return "/pendaftaran/data-diri";
     }
@@ -84,11 +88,11 @@ export default function PendaftaranPage() {
         <RegistrationProgress />
         <UrutanTahapan />
         <Ketentuan />
-        <div className="ms-auto me-6 w-1/2 md:w-2/12">
+        <div className="w-full max-w-4xl px-6">
           <Button
             type="button"
             variant="green"
-            className={"w-full"}
+            className="w-full"
             onClick={handleContinue}
           >
             Lanjut

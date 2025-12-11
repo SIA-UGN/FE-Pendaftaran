@@ -22,21 +22,18 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
     if (allowedRoles.length > 0 && userStr) {
       try {
         const user = JSON.parse(userStr);
-        const userRoles = user.roles || [];
+        const userRole = user.role;
 
-        const hasAccess = allowedRoles.some((role) => userRoles.includes(role));
+        const hasAccess = allowedRoles.includes(userRole);
 
         if (!hasAccess) {
           toast.error("Anda tidak memiliki izin untuk mengakses halaman ini");
 
-          if (userRoles.includes("admin")) {
+          if (userRole === "admin") {
             router.push("/dashboard");
-          } else if (userRoles.includes("manager")) {
+          } else if (userRole === "manager") {
             router.push("/manager");
-          } else if (
-            userRoles.includes("applicant") ||
-            userRoles.includes("student")
-          ) {
+          } else if (userRole === "pendaftar" || userRole === "mahasiswa") {
             router.push("/pendaftaran");
           } else {
             router.push("/");

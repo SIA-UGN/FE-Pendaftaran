@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
@@ -15,6 +15,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -25,6 +32,8 @@ import {
   useMyRegistration,
   useStoreAddressInformation,
 } from "@/hooks/useRegistration";
+import { useProvinces, useCitiesByProvince } from "@/hooks/useMasterData";
+import { useAuth } from "@/contexts/AuthContext";
 
 const FormSchema = z.object({
   provinsi: z.string().min(1, { message: "Provinsi wajib diisi." }),
@@ -43,12 +52,24 @@ const FormSchema = z.object({
 
 export default function DataAlamat() {
   const router = useRouter();
+  const { user } = useAuth(); // Get authenticated user
   const { data: progressData, isLoading: progressLoading } =
     useRegistrationProgress();
   const { data: registrationData, refetch } = useMyRegistration();
   const storeMutation = useStoreAddressInformation();
 
+  // Region data hooks
+  const { data: provincesData, isLoading: provincesLoading } = useProvinces();
+  const [selectedProvinceId, setSelectedProvinceId] = useState("");
+  const { data: citiesData, isLoading: citiesLoading } =
+    useCitiesByProvince(selectedProvinceId);
+
   const progress = progressData?.data;
+  const provinces = useMemo(
+    () => provincesData?.data?.data || [],
+    [provincesData]
+  );
+  const cities = useMemo(() => citiesData?.data?.data || [], [citiesData]);
 
   useEffect(() => {
     refetch();
@@ -79,34 +100,74 @@ export default function DataAlamat() {
   }, [progress, progressLoading, router]);
 
   useEffect(() => {
-    if (registrationData?.data?.registration?.address) {
-      const address = registrationData.data.registration.address;
+    if (registrationData?.data?.data?.profile && provinces.length > 0) {
+      const profile = registrationData.data.data.profile;
+
+      // Find matching province to set selectedProvinceId
+      if (profile.province) {
+        const matchingProvince = provinces.find(
+          (prov) => prov.name === profile.province
+        );
+        if (matchingProvince) {
+          setSelectedProvinceId(matchingProvince.id_province.toString());
+        }
+      }
+
       form.reset({
-        provinsi: address.province || "",
-        kota: address.city_regency || "",
-        kecamatan: address.district || "",
-        kelurahan: address.village || "",
-        kodePos: address.postal_code || "",
-        namaDusun: address.hamlet || "",
-        alamatLengkap: address.full_address || "",
+        provinsi: profile.province || "",
+        kota: profile.city_regency || "",
+        kecamatan: profile.kecamatan || "",
+        kelurahan: profile.kelurahan || "",
+        kodePos: profile.postal_code || "",
+        namaDusun: profile.dusun || "",
+        alamatLengkap: profile.full_address || "",
       });
     }
-  }, [registrationData, form]);
+  }, [registrationData, form, provinces]);
 
   async function onSubmit(data) {
-    const payload = {
-      address: {
-        province: data.provinsi,
-        city_regency: data.kota,
-        district: data.kecamatan,
-        village: data.kelurahan,
-        postal_code: data.kodePos,
-        hamlet: data.namaDusun,
-        full_address: data.alamatLengkap,
-      },
+    // Merge existing profile data with new address data
+    // Correct path: registrationData.data.data.profile
+    const existingProfile = registrationData?.data?.data?.profile || {};
+
+    // Helper function to format birth_date to YYYY-MM-DD
+    const formatBirthDate = (dateString) => {
+      if (!dateString) return null;
+      // Extract YYYY-MM-DD from "2025-12-10T00:00:00.000000Z" format
+      return dateString.split("T")[0];
     };
 
-    storeMutation.mutate(payload);
+    const payload = {
+      // Keep existing profile data (data diri from step 1)
+      id_program: existingProfile.id_program,
+      full_name: existingProfile.full_name,
+      email: existingProfile.email || user?.email, // Fallback to auth user email
+      birth_place: existingProfile.birth_place,
+      birth_date: formatBirthDate(existingProfile.birth_date), // Format to YYYY-MM-DD
+      nik: existingProfile.nik,
+      phone_number: existingProfile.phone_number,
+      gender: existingProfile.gender,
+      birth_order: existingProfile.birth_order,
+      number_of_siblings: existingProfile.number_of_siblings,
+      no_kk: existingProfile.no_kk,
+
+      // Add new address data (step 2)
+      province: data.provinsi,
+      city_regency: data.kota,
+      kecamatan: data.kecamatan,
+      kelurahan: data.kelurahan,
+      postal_code: data.kodePos,
+      dusun: data.namaDusun,
+      full_address: data.alamatLengkap,
+    };
+
+    storeMutation.mutate(payload, {
+      onSuccess: async () => {
+        // Wait for query invalidation to complete before redirect
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        router.push("/pendaftaran/data-orangtua");
+      },
+    });
   }
   if (progressLoading) {
     return (
@@ -137,10 +198,51 @@ export default function DataAlamat() {
                   name="provinsi"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Provinsi <span className="text-red-500">*</span></FormLabel>
-                      <FormControl>
-                        <Input placeholder="Provinsi" {...field} />
-                      </FormControl>
+                      <FormLabel>
+                        Provinsi <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          // Reset city when province changes
+                          const province = provinces.find(
+                            (p) => p.name === value
+                          );
+                          if (province) {
+                            setSelectedProvinceId(
+                              province.id_province.toString()
+                            );
+                            form.setValue("kota", "");
+                          }
+                        }}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih Provinsi" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {provincesLoading ? (
+                            <SelectItem value="loading" disabled>
+                              Memuat...
+                            </SelectItem>
+                          ) : provinces.length === 0 ? (
+                            <SelectItem value="empty" disabled>
+                              Tidak ada data
+                            </SelectItem>
+                          ) : (
+                            provinces.map((province) => (
+                              <SelectItem
+                                key={province.id_province}
+                                value={province.name}
+                              >
+                                {province.name}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -151,10 +253,43 @@ export default function DataAlamat() {
                   name="kota"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Kota / Kabupaten <span className="text-red-500">*</span></FormLabel>
-                      <FormControl>
-                        <Input placeholder="Kota / Kabupaten" {...field} />
-                      </FormControl>
+                      <FormLabel>
+                        Kota / Kabupaten <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        disabled={!selectedProvinceId}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue
+                              placeholder={
+                                !selectedProvinceId
+                                  ? "Pilih provinsi terlebih dahulu"
+                                  : "Pilih Kota/Kabupaten"
+                              }
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {citiesLoading ? (
+                            <SelectItem value="loading" disabled>
+                              Memuat...
+                            </SelectItem>
+                          ) : cities.length === 0 ? (
+                            <SelectItem value="empty" disabled>
+                              Tidak ada data
+                            </SelectItem>
+                          ) : (
+                            cities.map((city) => (
+                              <SelectItem key={city.id_city} value={city.name}>
+                                {city.name}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -165,7 +300,9 @@ export default function DataAlamat() {
                   name="kecamatan"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Kecamatan <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>
+                        Kecamatan <span className="text-red-500">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder="Kecamatan" {...field} />
                       </FormControl>
@@ -179,7 +316,9 @@ export default function DataAlamat() {
                   name="kelurahan"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Kelurahan <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>
+                        Kelurahan <span className="text-red-500">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder="Kelurahan" {...field} />
                       </FormControl>
@@ -193,7 +332,9 @@ export default function DataAlamat() {
                   name="kodePos"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Kode Pos <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>
+                        Kode Pos <span className="text-red-500">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -211,7 +352,9 @@ export default function DataAlamat() {
                   name="namaDusun"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nama Dusun <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>
+                        Nama Dusun <span className="text-red-500">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder="Nama Dusun" {...field} />
                       </FormControl>
@@ -226,7 +369,9 @@ export default function DataAlamat() {
                 name="alamatLengkap"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Alamat Lengkap <span className="text-red-500">*</span></FormLabel>
+                    <FormLabel>
+                      Alamat Lengkap <span className="text-red-500">*</span>
+                    </FormLabel>
                     <FormControl>
                       <Input placeholder="Jl. Nama Jalan No. XX" {...field} />
                     </FormControl>
@@ -237,11 +382,7 @@ export default function DataAlamat() {
             </div>
             <div className="w-full flex items-center justify-end my-6 sm:my-8 md:my-10 lg:my-12 px-4 sm:px-6 md:px-8 lg:px-12 gap-6">
               <Link href="/pendaftaran" className="w-1/2 sm:w-48">
-                <Button
-                  type="button"
-                  variant={"yellow"}
-                  className={"w-full"}
-                >
+                <Button type="button" variant={"yellow"} className={"w-full"}>
                   Kembali
                 </Button>
               </Link>

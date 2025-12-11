@@ -6,19 +6,13 @@ export const registrationService = {
   // ==========================================
 
   /**
-   * Get registration progress
-   * GET /api/registration/progress
+   * Get registration status and progress
+   * GET /api/registration/status
    */
-  getProgress: () => apiClient.get("/registration/progress"),
+  getProgress: () => apiClient.get("/registration/status"),
 
   /**
-   * Get my registration data
-   * GET /api/registration/my
-   */
-  getMyRegistration: () => apiClient.get("/registration/my"),
-
-  /**
-   * Get registration status
+   * Get registration status (alias for getProgress)
    * GET /api/registration/status
    */
   getStatus: () => apiClient.get("/registration/status"),

@@ -85,7 +85,7 @@ export default function DataPrestasi() {
           </Link>
         </div>
 
-        <Prestasi />
+        <Prestasi Data={achievements?.data?.data} />
 
         <div className="flex flex-col mx-4 sm:mx-6 md:mx-8 lg:mx-12 my-6 gap-5 items-center">
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-5 items-center justify-end ms-auto">

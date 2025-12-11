@@ -1,6 +1,20 @@
 import apiClient from "@/lib/api";
 
 export const paymentMethodService = {
+  // ==========================================
+  // PUBLIC/APPLICANT ENDPOINTS
+  // ==========================================
+
+  /**
+   * Get available payment methods (Public - for applicants)
+   * GET /api/payment-methods
+   */
+  getAvailable: () => apiClient.get("/payment-methods"),
+
+  // ==========================================
+  // ADMIN ENDPOINTS
+  // ==========================================
+
   /**
    * Get all payment methods (Admin only)
    * GET /api/admin/payment-methods

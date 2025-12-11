@@ -33,14 +33,49 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import RegistrationProgress from "@/components/registrations/RegistrationProgress";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { usePayment } from "@/hooks/usePayment";
-import { useMyRegistration } from "@/hooks/useRegistration";
+import {
+  useMyPayment,
+  useUploadPaymentProof,
+  useReUploadPaymentProof,
+} from "@/hooks/usePayment";
+import {
+  useMyRegistration,
+  useSubmitRegistration,
+} from "@/hooks/useRegistration";
 
 export default function Pembayaran() {
   const router = useRouter();
-  const { paymentData, paymentStatus, uploadProof, isLoading, isUploading } =
-    usePayment();
+  const {
+    data: paymentResponse,
+    isLoading,
+    isError,
+    refetch: refetchPayment,
+  } = useMyPayment();
   const { data: registrationData } = useMyRegistration();
+  const uploadProofMutation = useUploadPaymentProof();
+  const reUploadProofMutation = useReUploadPaymentProof();
+  const submitRegistrationMutation = useSubmitRegistration();
+
+  // API URL untuk construct full URL
+  const API_URL =
+    process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") ||
+    "http://localhost:8000";
+
+  // Extract payment data from response
+  const paymentData = paymentResponse?.data?.data?.payment;
+  const availablePaymentMethods =
+    paymentResponse?.data?.data?.available_payment_methods || [];
+  const paymentStatus = paymentData?.status;
+  const paymentMessage = paymentResponse?.data?.message;
+
+  // Debug: Log data structure
+  console.log("=== PAYMENT DEBUG ===");
+  console.log("Full Payment Response:", paymentResponse);
+  console.log("Payment Data:", paymentData);
+  console.log("Available Payment Methods:", availablePaymentMethods);
+  console.log("Registration Data:", registrationData);
+  console.log("Payment Status:", paymentStatus);
+  console.log("====================");
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [countdown, setCountdown] = useState("");
@@ -49,18 +84,46 @@ export default function Pembayaran() {
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+  const [hasTriedSubmit, setHasTriedSubmit] = useState(false);
+
+  // Auto-submit registration if not submitted yet
+  useEffect(() => {
+    const autoSubmitRegistration = async () => {
+      // Jika payment response mengatakan "Selesaikan pendaftaran terlebih dahulu"
+      // dan belum pernah coba submit, maka submit registration
+      if (
+        !isLoading &&
+        !paymentData &&
+        paymentMessage === "Selesaikan pendaftaran terlebih dahulu" &&
+        !hasTriedSubmit
+      ) {
+        try {
+          setHasTriedSubmit(true);
+          console.log("Auto-submitting registration...");
+          await submitRegistrationMutation.mutateAsync();
+          // Setelah berhasil submit, refetch payment
+          await refetchPayment();
+          toast.success("Pendaftaran berhasil disubmit");
+        } catch (error) {
+          console.error("Failed to submit registration:", error);
+          // Jika gagal submit, mungkin sudah submitted atau ada error lain
+          // Tetap coba refetch payment
+          await refetchPayment();
+        }
+      }
+    };
+
+    autoSubmitRegistration();
+  }, [isLoading, paymentData, paymentMessage, hasTriedSubmit]);
 
   // Set default payment method
   useEffect(() => {
     if (paymentData?.payment_method_id) {
       setSelectedPaymentMethod(paymentData.payment_method_id);
-    } else if (
-      !selectedPaymentMethod &&
-      paymentData?.available_payment_methods?.length > 0
-    ) {
-      setSelectedPaymentMethod(paymentData.available_payment_methods[0].id);
+    } else if (!selectedPaymentMethod && availablePaymentMethods?.length > 0) {
+      setSelectedPaymentMethod(availablePaymentMethods[0].id);
     }
-  }, [paymentData]);
+  }, [paymentData, availablePaymentMethods]);
 
   // Countdown timer
   useEffect(() => {
@@ -97,12 +160,9 @@ export default function Pembayaran() {
     return () => clearInterval(interval);
   }, [paymentData?.deadline]);
 
+  // Redirect hanya untuk status verified (final)
   useEffect(() => {
-    if (
-      !isLoading &&
-      paymentStatus !== "pending" &&
-      paymentStatus !== "rejected"
-    ) {
+    if (!isLoading && paymentStatus === "verified") {
       router.push("/pendaftaran/status");
     }
   }, [isLoading, paymentStatus, router]);
@@ -136,17 +196,47 @@ export default function Pembayaran() {
       return;
     }
 
-    const actualPaymentId = paymentData?.data?.payment?.id;
-
-    if (!actualPaymentId) {
+    if (!paymentData?.id) {
       toast.error("ID pembayaran tidak ditemukan.");
       return;
     }
 
+    const formData = new FormData();
+    formData.append("payment_proof", selectedFile);
+    formData.append("sender_bank", "Bank Transfer");
+    formData.append("sender_account_number", "1234567890");
+    formData.append(
+      "sender_account_holder",
+      registrationData?.data?.registration?.profile?.full_name || "User"
+    );
+    formData.append("paid_amount", paymentData?.amount || 0);
+    formData.append(
+      "payment_notes",
+      `Payment method: ${selectedPaymentMethod}`
+    );
+
     try {
       setUploading(true);
-      await uploadProof(selectedFile, actualPaymentId);
+
+      // Check if this is re-upload (rejected status) or first upload
+      if (paymentStatus === "rejected") {
+        await reUploadProofMutation.mutateAsync({
+          paymentId: paymentData.id,
+          formData,
+        });
+      } else {
+        await uploadProofMutation.mutateAsync({
+          paymentId: paymentData.id,
+          formData,
+        });
+      }
+
       setUploadSuccess(true);
+      // Redirect setelah 2 detik
+      setTimeout(() => {
+        setIsDialogOpen(false);
+        router.push("/pendaftaran/status");
+      }, 2000);
     } catch (error) {
       console.error("Upload error:", error);
       toast.error(
@@ -160,10 +250,13 @@ export default function Pembayaran() {
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setUploadSuccess(false);
-    setIsUploading(false);
+    setUploading(false);
   };
 
-  const selectedMethod = paymentData?.available_payment_methods?.find(
+  const isUploading =
+    uploadProofMutation.isPending || reUploadProofMutation.isPending;
+
+  const selectedMethod = availablePaymentMethods?.find(
     (method) => method.id === selectedPaymentMethod
   );
 
@@ -240,6 +333,17 @@ export default function Pembayaran() {
           <h2 className="text-2xl font-semibold">Pembayaran Pendaftaran</h2>
         </div>
 
+        {/* Alert if payment data not available */}
+        {!paymentData && paymentMessage && hasTriedSubmit && (
+          <Alert className="mb-6 border-yellow-500 bg-yellow-50">
+            <AlertCircle className="h-4 w-4 text-yellow-600" />
+            <AlertTitle className="text-yellow-800">Informasi</AlertTitle>
+            <AlertDescription className="text-yellow-700">
+              {paymentMessage}
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Alert Deadline */}
         {!isExpired && paymentStatus === "pending" && (
           <Alert className="mb-6 border-yellow-500 bg-yellow-50">
@@ -279,358 +383,590 @@ export default function Pembayaran() {
           </Alert>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Payment Info */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Ringkasan Pembayaran */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-green-600">
-                  Ringkasan Pembayaran
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Nama</span>
-                  <span className="font-medium">
-                    {registrationData?.data?.registration?.profile?.full_name ||
-                      paymentData?.student_name ||
-                      "-"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    Nomor Registrasi
-                  </span>
-                  <span className="font-medium">
-                    {registrationData?.data?.registration
-                      ?.registration_number ||
-                      paymentData?.registration_number ||
-                      "-"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    Biaya Pendaftaran
-                  </span>
-                  <span className="font-bold text-lg text-green-600">
-                    Rp{" "}
-                    {paymentData?.amount?.toLocaleString("id-ID") || "300.000"}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+        {/* Main Content - Only show if paymentData exists */}
+        {paymentData && (
+          <>
+            {/* MODE 1: Form Upload (pending atau rejected) */}
+            {(paymentStatus === "pending" || paymentStatus === "rejected") && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Column - Payment Info */}
+                <div className="lg:col-span-2 space-y-6">
+                  {/* Ringkasan Pembayaran */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-green-600">
+                        Ringkasan Pembayaran
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Nama</span>
+                        <span className="font-medium">
+                          {paymentData?.applicant_name || "-"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">
+                          Nomor Registrasi
+                        </span>
+                        <span className="font-medium">
+                          {paymentData?.registration_number || "-"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">
+                          Biaya Pendaftaran
+                        </span>
+                        <span className="font-bold text-lg text-green-600">
+                          Rp{" "}
+                          {paymentData?.amount?.toLocaleString("id-ID") ||
+                            "300.000"}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-            {/* Countdown Timer */}
-            {!isExpired && paymentStatus === "pending" && (
-              <Card>
-                <CardContent className="py-8">
-                  <div className="text-center">
-                    <p className="text-muted-foreground mb-2">
-                      Batas Waktu Pembayaran
-                    </p>
-                    <div className="text-4xl font-bold text-red-600 font-mono">
-                      {countdown || "00:00:00"}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                  {/* Countdown Timer */}
+                  {!isExpired && paymentStatus === "pending" && (
+                    <Card>
+                      <CardContent className="py-8">
+                        <div className="text-center">
+                          <p className="text-muted-foreground mb-2">
+                            Batas Waktu Pembayaran
+                          </p>
+                          <div className="text-4xl font-bold text-red-600 font-mono">
+                            {countdown || "00:00:00"}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
 
-            {/* Pemilihan Metode Pembayaran */}
-            {paymentData?.available_payment_methods?.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <CreditCard className="w-5 h-5" />
-                    <span>Pilih Metode Pembayaran</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <RadioGroup
-                    value={selectedPaymentMethod?.toString()}
-                    onValueChange={(value) =>
-                      setSelectedPaymentMethod(Number(value))
-                    }
-                    className="grid grid-cols-1 gap-3"
-                  >
-                    {paymentData?.available_payment_methods?.map((method) => (
-                      <Label
-                        key={method.id}
-                        htmlFor={`method-${method.id}`}
-                        className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                          selectedPaymentMethod === method.id
-                            ? "border-green-500 bg-green-50 shadow-md"
-                            : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3 flex-1">
-                          <RadioGroupItem
-                            value={method.id.toString()}
-                            id={`method-${method.id}`}
-                            className="shrink-0"
-                          />
-                          <div className="flex flex-col gap-0.5">
-                            <span className="font-semibold text-base">
-                              {method.bank_name}
+                  {/* Pemilihan Metode Pembayaran */}
+                  {availablePaymentMethods?.length > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <CreditCard className="w-5 h-5" />
+                          <span>Pilih Metode Pembayaran</span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <RadioGroup
+                          value={selectedPaymentMethod?.toString()}
+                          onValueChange={(value) =>
+                            setSelectedPaymentMethod(Number(value))
+                          }
+                          className="grid grid-cols-1 gap-3"
+                        >
+                          {availablePaymentMethods?.map((method) => (
+                            <Label
+                              key={method.id}
+                              htmlFor={`method-${method.id}`}
+                              className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                                selectedPaymentMethod === method.id
+                                  ? "border-green-500 bg-green-50 shadow-md"
+                                  : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                              }`}
+                            >
+                              <div className="flex items-center gap-3 flex-1">
+                                <RadioGroupItem
+                                  value={method.id.toString()}
+                                  id={`method-${method.id}`}
+                                  className="shrink-0"
+                                />
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="font-semibold text-base">
+                                    {method.bank_name}
+                                  </span>
+                                  <span className="text-sm text-muted-foreground">
+                                    a.n {method.account_holder}
+                                  </span>
+                                  <span className="text-sm font-mono text-gray-700">
+                                    {method.account_number}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2 ml-3">
+                                {getPaymentIcon(method.method_type)}
+                              </div>
+                            </Label>
+                          ))}
+                        </RadioGroup>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Informasi Rekening */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>
+                        {selectedMethod
+                          ? `Transfer ke ${selectedMethod.bank_name}`
+                          : "Transfer Bank"}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {selectedMethod ? (
+                        <div className="p-4 border rounded-lg bg-gray-50 space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="font-bold text-lg">
+                              {selectedMethod.bank_name}
                             </span>
                             <span className="text-sm text-muted-foreground">
-                              a.n {method.account_holder}
-                            </span>
-                            <span className="text-sm font-mono text-gray-700">
-                              {method.account_number}
+                              a.n {selectedMethod.account_holder}
                             </span>
                           </div>
+                          <div className="flex items-center justify-between bg-white p-3 rounded border">
+                            <span className="font-mono text-lg font-bold">
+                              {selectedMethod.account_number}
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                copyToClipboard(selectedMethod.account_number)
+                              }
+                            >
+                              <Copy className="w-4 h-4 mr-2" />
+                              Salin
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 ml-3">
-                          {getPaymentIcon(method.method_type)}
+                      ) : (
+                        <div className="p-4 border rounded-lg bg-gray-50 text-center text-muted-foreground">
+                          Silakan pilih metode pembayaran terlebih dahulu
                         </div>
-                      </Label>
-                    ))}
-                  </RadioGroup>
-                </CardContent>
-              </Card>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Instruksi Pembayaran */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Info className="w-5 h-5 text-blue-500" />
+                        Petunjuk Pembayaran
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {selectedMethod && selectedMethod.payment_instructions ? (
+                        <ol className="list-decimal list-inside space-y-2 text-sm">
+                          {parseInstructions(
+                            selectedMethod.payment_instructions
+                          ).map((instruction, index) => (
+                            <li key={index}>{instruction}</li>
+                          ))}
+                        </ol>
+                      ) : (
+                        <ol className="list-decimal list-inside space-y-2 text-sm">
+                          <li>
+                            Transfer sesuai <strong>nominal EXACT</strong> yang
+                            tertera (Rp{" "}
+                            {paymentData?.amount?.toLocaleString("id-ID") ||
+                              "300.000"}
+                            )
+                          </li>
+                          <li>
+                            Transfer ke rekening yang dipilih
+                            {selectedMethod && (
+                              <>
+                                : <strong>{selectedMethod.bank_name}</strong>{" "}
+                                (a.n {selectedMethod.account_holder})
+                              </>
+                            )}
+                          </li>
+                          <li>Simpan bukti transfer Anda</li>
+                          <li>
+                            Upload bukti transfer melalui tombol "Konfirmasi
+                            Pembayaran"
+                          </li>
+                          <li>
+                            Tunggu verifikasi dari admin (maksimal 1 x 24 jam)
+                          </li>
+                          <li>
+                            Setelah terverifikasi, Anda dapat melanjutkan proses
+                            pendaftaran
+                          </li>
+                        </ol>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Right Column - Upload & Actions */}
+                <div className="space-y-6">
+                  {/* Upload Bukti Pembayaran */}
+                  {(paymentStatus === "pending" ||
+                    paymentStatus === "rejected") &&
+                    !isExpired && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Upload Bukti Pembayaran</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div>
+                            <input
+                              type="file"
+                              accept=".pdf,.jpg,.jpeg,.png"
+                              onChange={handleFileSelect}
+                              className="hidden"
+                              id="payment-proof"
+                              disabled={isUploading}
+                            />
+                            <label
+                              htmlFor="payment-proof"
+                              className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${
+                                isUploading
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : ""
+                              }`}
+                            >
+                              <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                              <span className="text-sm text-gray-600">
+                                {selectedFile
+                                  ? selectedFile.name
+                                  : "Klik untuk pilih file"}
+                              </span>
+                              <span className="text-xs text-muted-foreground mt-1">
+                                PDF, JPG, PNG (Max 5MB)
+                              </span>
+                            </label>
+                          </div>
+
+                          <AlertDialog
+                            open={isDialogOpen}
+                            onOpenChange={setIsDialogOpen}
+                          >
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                className="w-full"
+                                variant="green"
+                                disabled={!selectedFile || isUploading}
+                              >
+                                {isUploading
+                                  ? "Mengupload..."
+                                  : "Konfirmasi Pembayaran"}
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              {!uploading && !uploadSuccess && (
+                                <>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      Konfirmasi Upload
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Pastikan bukti pembayaran yang Anda upload
+                                      sudah benar. Setelah di-upload, admin akan
+                                      memverifikasi dalam 1 x 24 jam.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <div className="flex gap-3 justify-end">
+                                    <Button
+                                      variant="outline"
+                                      onClick={handleCloseDialog}
+                                    >
+                                      Batal
+                                    </Button>
+                                    <Button
+                                      variant="green"
+                                      onClick={handleConfirmPayment}
+                                      disabled={isUploading}
+                                    >
+                                      Ya, Upload
+                                    </Button>
+                                  </div>
+                                </>
+                              )}
+
+                              {uploading && !uploadSuccess && (
+                                <div className="flex flex-col items-center justify-center py-6">
+                                  <Loader2 className="w-8 h-8 text-green-500 animate-spin mb-3" />
+                                  <p className="text-sm text-gray-600">
+                                    Mengunggah bukti pembayaran...
+                                  </p>
+                                </div>
+                              )}
+
+                              {uploadSuccess && (
+                                <div className="flex flex-col items-center justify-center py-6">
+                                  <CheckCircle className="w-10 h-10 text-green-500 mb-3" />
+                                  <p className="text-sm text-gray-700 mb-2">
+                                    Pembayaran berhasil dikonfirmasi!
+                                  </p>
+                                  <p className="text-sm text-gray-600 mt-2">
+                                    Anda akan dialihkan ke halaman status...
+                                  </p>
+                                </div>
+                              )}
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                  {/* Action Buttons */}
+                  <div className="space-y-3">
+                    <Link href="/pendaftaran/data-prestasi" className="block">
+                      <Button variant="yellow" className="w-full">
+                        Kembali
+                      </Button>
+                    </Link>
+
+                    <Link
+                      href={
+                        paymentStatus !== "pending"
+                          ? "/pendaftaran/status"
+                          : "#"
+                      }
+                      className="block"
+                      onClick={(e) => {
+                        if (paymentStatus === "pending") {
+                          e.preventDefault();
+                          toast.error(
+                            "Silakan upload bukti pembayaran terlebih dahulu sebelum melihat status pendaftaran."
+                          );
+                        }
+                      }}
+                    >
+                      <Button
+                        variant="green"
+                        className="w-full"
+                        disabled={paymentStatus === "pending" && !uploadSuccess}
+                      >
+                        Lihat Status Pendaftaran
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
             )}
 
-            {/* Informasi Rekening */}
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  {selectedMethod
-                    ? `Transfer ke ${selectedMethod.bank_name}`
-                    : "Transfer Bank"}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {selectedMethod ? (
-                  <div className="p-4 border rounded-lg bg-gray-50 space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="font-bold text-lg">
-                        {selectedMethod.bank_name}
-                      </span>
-                      <span className="text-sm text-muted-foreground">
-                        a.n {selectedMethod.account_holder}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between bg-white p-3 rounded border">
-                      <span className="font-mono text-lg font-bold">
-                        {selectedMethod.account_number}
-                      </span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() =>
-                          copyToClipboard(selectedMethod.account_number)
-                        }
-                      >
-                        <Copy className="w-4 h-4 mr-2" />
-                        Salin
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="p-4 border rounded-lg bg-gray-50 text-center text-muted-foreground">
-                    Silakan pilih metode pembayaran terlebih dahulu
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Instruksi Pembayaran */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Info className="w-5 h-5 text-blue-500" />
-                  Petunjuk Pembayaran
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {selectedMethod && selectedMethod.payment_instructions ? (
-                  <ol className="list-decimal list-inside space-y-2 text-sm">
-                    {parseInstructions(selectedMethod.payment_instructions).map(
-                      (instruction, index) => (
-                        <li key={index}>{instruction}</li>
-                      )
-                    )}
-                  </ol>
-                ) : (
-                  <ol className="list-decimal list-inside space-y-2 text-sm">
-                    <li>
-                      Transfer sesuai <strong>nominal EXACT</strong> yang
-                      tertera (Rp{" "}
-                      {paymentData?.amount?.toLocaleString("id-ID") ||
-                        "300.000"}
-                      )
-                    </li>
-                    <li>
-                      Transfer ke rekening yang dipilih
-                      {selectedMethod && (
-                        <>
-                          : <strong>{selectedMethod.bank_name}</strong> (a.n{" "}
-                          {selectedMethod.account_holder})
-                        </>
-                      )}
-                    </li>
-                    <li>Simpan bukti transfer Anda</li>
-                    <li>
-                      Upload bukti transfer melalui tombol "Konfirmasi
-                      Pembayaran"
-                    </li>
-                    <li>Tunggu verifikasi dari admin (maksimal 1 x 24 jam)</li>
-                    <li>
-                      Setelah terverifikasi, Anda dapat melanjutkan proses
-                      pendaftaran
-                    </li>
-                  </ol>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Right Column - Upload & Actions */}
-          <div className="space-y-6">
-            {/* Upload Bukti Pembayaran */}
-            {(paymentStatus === "pending" || paymentStatus === "rejected") &&
-              !isExpired && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Upload Bukti Pembayaran</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <input
-                        type="file"
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        onChange={handleFileSelect}
-                        className="hidden"
-                        id="payment-proof"
-                        disabled={isUploading}
-                      />
-                      <label
-                        htmlFor="payment-proof"
-                        className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${
-                          isUploading ? "opacity-50 cursor-not-allowed" : ""
-                        }`}
-                      >
-                        <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                        <span className="text-sm text-gray-600">
-                          {selectedFile
-                            ? selectedFile.name
-                            : "Klik untuk pilih file"}
+            {/* MODE 2: Detail View (waiting_verification atau verified) */}
+            {(paymentStatus === "waiting_verification" ||
+              paymentStatus === "verified") && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Column - Payment Details */}
+                <div className="lg:col-span-2 space-y-6">
+                  {/* Ringkasan Pembayaran */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-green-600">
+                        Detail Pembayaran
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Nama</span>
+                        <span className="font-medium">
+                          {paymentData?.applicant_name || "-"}
                         </span>
-                        <span className="text-xs text-muted-foreground mt-1">
-                          PDF, JPG, PNG (Max 5MB)
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">
+                          Nomor Registrasi
                         </span>
-                      </label>
-                    </div>
-
-                    <AlertDialog
-                      open={isDialogOpen}
-                      onOpenChange={setIsDialogOpen}
-                    >
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          className="w-full"
-                          variant="green"
-                          disabled={!selectedFile || isUploading}
+                        <span className="font-medium">
+                          {paymentData?.registration_number || "-"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">
+                          Biaya Pendaftaran
+                        </span>
+                        <span className="font-bold text-lg text-green-600">
+                          Rp{" "}
+                          {paymentData?.amount?.toLocaleString("id-ID") ||
+                            "300.000"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Status</span>
+                        <span
+                          className={`font-semibold ${
+                            paymentStatus === "verified"
+                              ? "text-green-600"
+                              : "text-yellow-600"
+                          }`}
                         >
-                          {isUploading
-                            ? "Mengupload..."
-                            : "Konfirmasi Pembayaran"}
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        {!uploading && !uploadSuccess && (
-                          <>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>
-                                Konfirmasi Upload
-                              </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Pastikan bukti pembayaran yang Anda upload sudah
-                                benar. Setelah di-upload, admin akan
-                                memverifikasi dalam 1 x 24 jam.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <div className="flex gap-3 justify-end">
-                              <Button
-                                variant="outline"
-                                onClick={handleCloseDialog}
-                              >
-                                Batal
-                              </Button>
-                              <Button
-                                variant="green"
-                                onClick={handleConfirmPayment}
-                                disabled={isUploading}
-                              >
-                                Ya, Upload
-                              </Button>
+                          {paymentStatus === "verified"
+                            ? "✓ Terverifikasi"
+                            : "⏳ Menunggu Verifikasi"}
+                        </span>
+                      </div>
+                      {paymentData?.paid_at && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">
+                            Tanggal Upload
+                          </span>
+                          <span className="font-medium">
+                            {new Date(paymentData.paid_at).toLocaleDateString(
+                              "id-ID",
+                              {
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }
+                            )}
+                          </span>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Info Metode Pembayaran yang Digunakan */}
+                  {paymentData?.payment_method && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Metode Pembayaran</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        <div className="p-4 border rounded-lg bg-gray-50">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-bold text-lg">
+                              {paymentData.payment_method.bank_name}
+                            </span>
+                            <span className="text-sm text-muted-foreground">
+                              a.n {paymentData.payment_method.account_holder}
+                            </span>
+                          </div>
+                          <div className="bg-white p-3 rounded border">
+                            <span className="font-mono text-lg font-bold">
+                              {paymentData.payment_method.account_number}
+                            </span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Bukti Pembayaran */}
+                  {paymentData?.payment_proof_url &&
+                    (() => {
+                      // Construct full URL for payment proof
+                      const proofUrl = paymentData.payment_proof_url.startsWith(
+                        "http"
+                      )
+                        ? paymentData.payment_proof_url
+                        : `${API_URL}${paymentData.payment_proof_url}`;
+
+                      return (
+                        <Card>
+                          <CardHeader>
+                            <CardTitle>Bukti Pembayaran</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-3">
+                              <div className="border rounded-lg p-4 bg-gray-50">
+                                <p className="text-sm text-muted-foreground mb-3">
+                                  File bukti pembayaran yang telah diupload:
+                                </p>
+                                <Button
+                                  variant="outline"
+                                  className="w-full"
+                                  onClick={() =>
+                                    window.open(proofUrl, "_blank")
+                                  }
+                                >
+                                  <Upload className="w-4 h-4 mr-2" />
+                                  Lihat Bukti
+                                </Button>
+                              </div>
                             </div>
-                          </>
+                          </CardContent>
+                        </Card>
+                      );
+                    })()}
+
+                  {/* Info Status */}
+                  <Alert
+                    className={`${
+                      paymentStatus === "verified"
+                        ? "border-green-500 bg-green-50"
+                        : "border-yellow-500 bg-yellow-50"
+                    }`}
+                  >
+                    <Info
+                      className={`h-4 w-4 ${
+                        paymentStatus === "verified"
+                          ? "text-green-600"
+                          : "text-yellow-600"
+                      }`}
+                    />
+                    <AlertTitle
+                      className={
+                        paymentStatus === "verified"
+                          ? "text-green-800"
+                          : "text-yellow-800"
+                      }
+                    >
+                      {paymentStatus === "verified"
+                        ? "Pembayaran Terverifikasi"
+                        : "Menunggu Verifikasi"}
+                    </AlertTitle>
+                    <AlertDescription
+                      className={
+                        paymentStatus === "verified"
+                          ? "text-green-700"
+                          : "text-yellow-700"
+                      }
+                    >
+                      {paymentStatus === "verified"
+                        ? "Pembayaran Anda telah diverifikasi oleh admin. Anda dapat melanjutkan proses pendaftaran."
+                        : "Bukti pembayaran Anda sedang diverifikasi oleh admin. Proses verifikasi memakan waktu maksimal 1 x 24 jam."}
+                    </AlertDescription>
+                  </Alert>
+                </div>
+
+                {/* Right Column - Actions */}
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm">
+                        Status Pembayaran
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-center py-4">
+                        {paymentStatus === "verified" ? (
+                          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-3" />
+                        ) : (
+                          <Clock className="w-16 h-16 text-yellow-500 mx-auto mb-3" />
                         )}
+                        <p className="font-semibold mb-1">
+                          {paymentStatus === "verified"
+                            ? "Terverifikasi"
+                            : "Menunggu Verifikasi"}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {paymentStatus === "verified"
+                            ? "Pembayaran sudah dikonfirmasi"
+                            : "Harap menunggu konfirmasi admin"}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-                        {uploading && !uploadSuccess && (
-                          <div className="flex flex-col items-center justify-center py-6">
-                            <Loader2 className="w-8 h-8 text-green-500 animate-spin mb-3" />
-                            <p className="text-sm text-gray-600">
-                              Mengunggah bukti pembayaran...
-                            </p>
-                          </div>
-                        )}
-
-                        {uploadSuccess && (
-                          <div className="flex flex-col items-center justify-center py-6">
-                            <CheckCircle className="w-10 h-10 text-green-500 mb-3" />
-                            <p className="text-sm text-gray-700 mb-2">
-                              Pembayaran berhasil dikonfirmasi!
-                            </p>
-                            {(() => {
-                              setTimeout(() => {
-                                router.push("/pendaftaran/status");
-                              }, 1500);
-                              return null;
-                            })()}
-                            <p className="text-sm text-gray-600 mt-2">
-                              Anda akan dialihkan ke halaman status...
-                            </p>
-                          </div>
-                        )}
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </CardContent>
-                </Card>
-              )}
-
-            {/* Action Buttons */}
-            <div className="space-y-3">
-              <Link href="/pendaftaran/data-prestasi" className="block">
-                <Button variant="yellow" className="w-full">
-                  Kembali
-                </Button>
-              </Link>
-
-              <Link
-                href={paymentStatus !== "pending" ? "/pendaftaran/status" : "#"}
-                className="block"
-                onClick={(e) => {
-                  if (paymentStatus === "pending") {
-                    e.preventDefault();
-                    toast.error("Silakan upload bukti pembayaran terlebih dahulu sebelum melihat status pendaftaran.");
-                  }
-                }}
-              >
-                <Button
-                  variant="green"
-                  className="w-full"
-                  disabled={paymentStatus === "pending" && !uploadSuccess}
-                >
-                  Lihat Status Pendaftaran
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
+                  <div className="space-y-3">
+                    <Link href="/pendaftaran/data-prestasi" className="block">
+                      <Button variant="yellow" className="w-full">
+                        Kembali
+                      </Button>
+                    </Link>
+                    <Link href="/pendaftaran/status" className="block">
+                      <Button variant="green" className="w-full">
+                        Lihat Status Pendaftaran
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </ProtectedRoute>
   );

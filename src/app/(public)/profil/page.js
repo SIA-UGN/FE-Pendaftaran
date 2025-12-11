@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { SquarePen, Upload } from "lucide-react";
 import { useProfile, useUploadAvatar } from "@/hooks/useProfile";
-import { useChangePassword } from "@/hooks/useAuth";
+import { useChangePassword, useChangeEmail } from "@/hooks/useAuth";
 import toast from "react-hot-toast";
 
 export default function Profil() {
@@ -26,6 +26,7 @@ export default function Profil() {
 
   const uploadAvatarMutation = useUploadAvatar();
   const changePasswordMutation = useChangePassword();
+  const changeEmailMutation = useChangeEmail();
 
   const [open, setOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
@@ -108,8 +109,15 @@ export default function Profil() {
         toast.error("Email tidak valid!");
         return;
       }
-      toast.info("Fitur ubah email akan segera tersedia");
-      setOpen(false);
+      changeEmailMutation.mutate(
+        { email: inputValue },
+        {
+          onSuccess: () => {
+            setOpen(false);
+            setInputValue("");
+          },
+        }
+      );
     }
   };
 

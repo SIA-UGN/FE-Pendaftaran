@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Upload, X, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -25,13 +25,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useFileUpload } from "@/hooks/useFileUpload";
+import toast from "react-hot-toast";
 import { useAchievements } from "@/hooks/useAchievements";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 const FormSchema = z.object({
   uploadSertifikat: z.any().optional(),
-  sertifikatFile: z.string().optional(),
+  sertifikatFile: z.any().optional(), // Changed from z.string() to z.any() to accept File object
   namaPrestasi: z
     .string()
     .min(3, { message: "Nama prestasi minimal 3 karakter" }),
@@ -55,11 +55,7 @@ export default function InputData() {
   const router = useRouter();
 
   const { addAchievement, isSubmitting } = useAchievements();
-
-  const { handleUpload, isUploading } = useFileUpload({
-    maxSize: 5 * 1024 * 1024,
-    allowedTypes: ["application/pdf", "image/jpeg", "image/jpg", "image/png"],
-  });
+  const [isUploading, setIsUploading] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
@@ -75,39 +71,48 @@ export default function InputData() {
   });
 
   async function onSubmit(data) {
-    const typeMap = {
-      akademik: "academic",
-      musik: "music",
-      seni: "art",
-      agama: "religion",
-      olahraga: "sport",
-      lainnya: "other",
-    };
+    // Backend tidak pakai mapping English, langsung kirim value form
+    // achievement_type: string max 50, bebas
+    // achievement_level: enum ['Sekolah', 'Kecamatan', 'Kabupaten/Kota', 'Provinsi', 'Nasional', 'Internasional']
 
     const levelMap = {
-      sekolah: "school",
-      kecamatan: "regency",
-      kabupaten: "regency",
-      provinsi: "provincial",
-      nasional: "national",
-      internasional: "international",
+      sekolah: "Sekolah",
+      kecamatan: "Kecamatan",
+      kabupaten: "Kabupaten/Kota",
+      provinsi: "Provinsi",
+      nasional: "Nasional",
+      internasional: "Internasional",
     };
 
-    const newAchievement = {
-      achievement_name: data.namaPrestasi,
-      year: data.tahun,
-      type: typeMap[data.jenisPrestasi] || data.jenisPrestasi,
-      level: levelMap[data.tingkatPrestasi] || data.tingkatPrestasi,
-      organizer: data.penyelenggara,
-      rank: data.peringkat,
-      certificate_file: data.sertifikatFile || null,
-    };
+    setIsUploading(true);
 
     try {
-      await addAchievement(newAchievement);
+      const formData = new FormData();
+      formData.append("achievement_name", data.namaPrestasi);
+      formData.append("year", data.tahun);
+      // achievement_type: bebas string, kirim capitalize pertama huruf
+      formData.append(
+        "achievement_type",
+        data.jenisPrestasi.charAt(0).toUpperCase() + data.jenisPrestasi.slice(1)
+      );
+      formData.append(
+        "achievement_level",
+        levelMap[data.tingkatPrestasi] || data.tingkatPrestasi
+      );
+      formData.append("organizer", data.penyelenggara);
+      formData.append("ranking", data.peringkat);
+
+      // Add file if exists
+      if (data.sertifikatFile && data.sertifikatFile instanceof File) {
+        formData.append("certificate_path", data.sertifikatFile);
+      }
+
+      await addAchievement(formData);
       router.push("/pendaftaran/data-prestasi");
     } catch (error) {
       console.error("Failed to add achievement:", error);
+    } finally {
+      setIsUploading(false);
     }
   }
 
@@ -130,26 +135,61 @@ export default function InputData() {
                       <FormLabel>
                         Upload Sertifikat Prestasi (Opsional)
                       </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="file"
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={async (e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              const url = await handleUpload(
-                                file,
-                                "certificate"
-                              );
-                              if (url) {
-                                form.setValue("sertifikatFile", url);
+                      <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                        {!form.watch("sertifikatFile") ? (
+                          <div>
+                            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                            <div className="mt-4">
+                              <label
+                                htmlFor="uploadSertifikat"
+                                className="cursor-pointer text-blue-600 hover:text-blue-500"
+                              >
+                                <span>
+                                  {isUploading ? "Mengupload..." : "Pilih file"}
+                                </span>
+                                <input
+                                  id="uploadSertifikat"
+                                  type="file"
+                                  className="sr-only"
+                                  accept=".pdf,.jpg,.jpeg,.png"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      // Validate file
+                                      if (file.size > 5 * 1024 * 1024) {
+                                        toast.error("Ukuran file maksimal 5MB");
+                                        return;
+                                      }
+                                      // Store file object directly
+                                      form.setValue("sertifikatFile", file);
+                                    }
+                                  }}
+                                  disabled={isUploading}
+                                />
+                              </label>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2">
+                              JPG, PNG, atau PDF, maksimal 2MB
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between bg-white p-3 rounded">
+                            <div className="flex items-center gap-2">
+                              <FileText className="h-5 w-5 text-blue-600" />
+                              <span className="text-sm">File terupload</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                form.setValue("sertifikatFile", "")
                               }
-                            }
-                          }}
-                          disabled={isUploading}
-                          {...field}
-                        />
-                      </FormControl>
+                              className="text-red-600 hover:text-red-500"
+                            >
+                              <X className="h-5 w-5" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -172,100 +212,98 @@ export default function InputData() {
                   )}
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="tahun"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Tahun</FormLabel>
+                <FormField
+                  control={form.control}
+                  name="tahun"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tahun</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="2024" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="jenisPrestasi"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Jenis Prestasi</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
-                          <Input type="number" placeholder="2024" {...field} />
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih jenis prestasi" />
+                          </SelectTrigger>
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                        <SelectContent>
+                          <SelectItem value="akademik">Akademik</SelectItem>
+                          <SelectItem value="musik">Musik</SelectItem>
+                          <SelectItem value="seni">Seni</SelectItem>
+                          <SelectItem value="agama">Agama</SelectItem>
+                          <SelectItem value="olahraga">Olahraga</SelectItem>
+                          <SelectItem value="lainnya">Lainnya</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                  <FormField
-                    control={form.control}
-                    name="jenisPrestasi"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Jenis Prestasi</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih jenis prestasi" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="akademik">Akademik</SelectItem>
-                            <SelectItem value="musik">Musik</SelectItem>
-                            <SelectItem value="seni">Seni</SelectItem>
-                            <SelectItem value="agama">Agama</SelectItem>
-                            <SelectItem value="olahraga">Olahraga</SelectItem>
-                            <SelectItem value="lainnya">Lainnya</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="tingkatPrestasi"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Tingkat Prestasi</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih tingkat prestasi" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="sekolah">Sekolah</SelectItem>
-                            <SelectItem value="kecamatan">Kecamatan</SelectItem>
-                            <SelectItem value="kabupaten">
-                              Kabupaten/Kota
-                            </SelectItem>
-                            <SelectItem value="provinsi">Provinsi</SelectItem>
-                            <SelectItem value="nasional">Nasional</SelectItem>
-                            <SelectItem value="internasional">
-                              Internasional
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="peringkat"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Peringkat</FormLabel>
+                <FormField
+                  control={form.control}
+                  name="tingkatPrestasi"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tingkat Prestasi</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
-                          <Input
-                            placeholder="Contoh: Juara 1, Harapan 2"
-                            {...field}
-                          />
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih tingkat prestasi" />
+                          </SelectTrigger>
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                        <SelectContent>
+                          <SelectItem value="sekolah">Sekolah</SelectItem>
+                          <SelectItem value="kecamatan">Kecamatan</SelectItem>
+                          <SelectItem value="kabupaten">
+                            Kabupaten/Kota
+                          </SelectItem>
+                          <SelectItem value="provinsi">Provinsi</SelectItem>
+                          <SelectItem value="nasional">Nasional</SelectItem>
+                          <SelectItem value="internasional">
+                            Internasional
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="peringkat"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Peringkat</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Contoh: Juara 1, Harapan 2"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}

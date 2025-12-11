@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Clock } from "lucide-react";
 import { useMyRegistration } from "@/hooks/useRegistration";
+import { useMyPayment } from "@/hooks/usePayment";
 
 import ApplicantAnnouncement from "@/components/ApplicantAnnouncement";
 import EmailPicker from "@/components/registrations/EmailPicker";
@@ -13,87 +14,83 @@ import Link from "next/link";
 
 export default function Status() {
   const [status, setStatus] = useState("Pending");
-  const [dataStatus, setDataStatus] = useState([
-    { title: "Data Diri", status: "Pending" },
-    { title: "Data Akademik", status: "Pending" },
-    { title: "Data Prestasi", status: "Pending" },
-    { title: "Data Orang Tua", status: "Pending" },
-    { title: "Pembayaran", status: "Pending" },
-  ]);
+  const [registrationStatus, setRegistrationStatus] = useState("Pending");
+  const [paymentStatus, setPaymentStatus] = useState("Pending");
 
-  const { data: registrationData, isLoading, isError } = useMyRegistration();
+  const {
+    data: registrationData,
+    isLoading: isLoadingReg,
+    isError: isErrorReg,
+  } = useMyRegistration();
+  const {
+    data: paymentData,
+    isLoading: isLoadingPayment,
+    isError: isErrorPayment,
+  } = useMyPayment();
 
   useEffect(() => {
-    if (registrationData) {
-      const reg = registrationData.registration;
-      const payment = registrationData.payment;
+    if (registrationData?.data?.data?.profile) {
+      const regStatus = registrationData.data.data.profile.registration_status;
 
-      if (!reg) {
-        setStatus("Pending");
-        return;
+      if (regStatus === "approved") {
+        setRegistrationStatus("Verified");
+      } else if (regStatus === "rejected") {
+        setRegistrationStatus("Rejected");
+      } else if (regStatus === "submitted" || regStatus === "reviewed") {
+        setRegistrationStatus("Waiting");
+      } else if (regStatus === "draft") {
+        setRegistrationStatus("Pending");
+      } else {
+        setRegistrationStatus("Pending");
       }
-
-      let globalStatus = "Pending";
-
-      if (payment && payment.status === "verified") {
-        globalStatus = "Accepted";
-      } else if (
-        (payment && payment.status === "rejected") ||
-        reg.status === "rejected"
-      ) {
-        globalStatus = "Rejected";
-      } else if (reg.status === "waiting_payment_verification") {
-        globalStatus = "Pending";
-      } else if (payment && payment.status === "pending") {
-        globalStatus = "Pending";
-      } else if (payment && payment.status === "waiting_verification") {
-        globalStatus = "Pending";
-      }
-
-      setStatus(globalStatus);
-
-      setDataStatus([
-        {
-          title: "Data Diri",
-          status: reg.profile ? "Accepted" : "Pending",
-        },
-        {
-          title: "Data Akademik",
-          status: reg.academicRecord ? "Accepted" : "Pending",
-        },
-        {
-          title: "Data Prestasi",
-          status:
-            reg.achievements?.length > 0
-              ? "Accepted"
-              : reg.achievements_skipped
-              ? "Accepted"
-              : "Pending",
-        },
-        {
-          title: "Data Orang Tua",
-          status: reg.father && reg.mother ? "Accepted" : "Pending",
-        },
-        {
-          title: "Pembayaran",
-          status: payment
-            ? payment.status === "verified"
-              ? "Accepted"
-              : payment.status === "rejected"
-              ? "Rejected"
-              : "Pending"
-            : "Pending",
-        },
-      ]);
     }
-  }, [registrationData]);
+
+    if (paymentData?.data?.data?.payment) {
+      const pymtStatus = paymentData.data.data.payment.status;
+
+      if (pymtStatus === "verified") {
+        setPaymentStatus("Verified");
+      } else if (pymtStatus === "rejected") {
+        setPaymentStatus("Rejected");
+      } else if (pymtStatus === "waiting_verification") {
+        setPaymentStatus("Waiting");
+      } else if (pymtStatus === "pending" || pymtStatus === "expired") {
+        setPaymentStatus("Pending");
+      } else {
+        setPaymentStatus("Pending");
+      }
+    }
+
+    // Determine global status
+    let globalStatus = "Pending";
+
+    const regStat = registrationData?.data?.data?.profile?.registration_status;
+    const pymtStat = paymentData?.data?.data?.payment?.status;
+
+    // Accepted: Keduanya approved dan verified
+    if (regStat === "approved" && pymtStat === "verified") {
+      globalStatus = "Accepted";
+    }
+    // Rejected: Salah satu rejected
+    else if (regStat === "rejected" || pymtStat === "rejected") {
+      globalStatus = "Rejected";
+    }
+    // Pending: Lainnya
+    else {
+      globalStatus = "Pending";
+    }
+
+    setStatus(globalStatus);
+  }, [registrationData, paymentData]);
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "Accepted":
+      case "Verified":
         return "text-green-600";
-      case "Pending":
+      case "Waiting":
         return "text-yellow-600";
+      case "Pending":
+        return "text-gray-600";
       case "Rejected":
         return "text-red-600";
       default:
@@ -103,18 +100,35 @@ export default function Status() {
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case "Accepted":
-        return <CheckCircle className="text-green-800 w-5 h-5" />;
+      case "Verified":
+        return <CheckCircle className="text-green-600 w-8 h-8" />;
+      case "Waiting":
+        return <Clock className="text-yellow-600 w-8 h-8" />;
       case "Pending":
-        return <Clock className="text-yellow-600 w-5 h-5" />;
+        return <Clock className="text-gray-600 w-8 h-8" />;
       case "Rejected":
-        return <XCircle className="text-red-600 w-5 h-5" />;
+        return <XCircle className="text-red-600 w-8 h-8" />;
       default:
         return null;
     }
   };
 
-  if (isLoading) {
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case "Verified":
+        return "Terverifikasi";
+      case "Waiting":
+        return "Menunggu Verifikasi";
+      case "Pending":
+        return "Belum Selesai";
+      case "Rejected":
+        return "Ditolak";
+      default:
+        return "Pending";
+    }
+  };
+
+  if (isLoadingReg || isLoadingPayment) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p>Loading...</p>
@@ -122,7 +136,7 @@ export default function Status() {
     );
   }
 
-  if (isError) {
+  if (isErrorReg || isErrorPayment) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p>Error loading data</p>
@@ -164,27 +178,103 @@ export default function Status() {
           <>
             <RegistrationProgress />
             <h2 className="text-xl font-semibold mt-10 mb-4">
-              Status Verifikasi Setiap Tahap
+              Status Verifikasi Pendaftaran
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {dataStatus.map((item, index) => (
-                <Card
-                  key={index}
-                  className="flex flex-col items-center justify-center gap-3 p-6 font-semibold shadow-md"
-                >
-                  {getStatusIcon(item.status)}
-                  <h1 className="text-lg">{item.title}</h1>
-                  <p className={`text-base ${getStatusColor(item.status)}`}>
-                    {item.status}
-                  </p>
-                </Card>
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Card Status Pendaftaran */}
+              <Card className="p-6 shadow-lg">
+                <div className="flex flex-col items-center gap-4">
+                  {getStatusIcon(registrationStatus)}
+                  <div className="text-center">
+                    <h3 className="text-xl font-bold mb-2">Pendaftaran</h3>
+                    <p
+                      className={`text-lg font-semibold ${getStatusColor(
+                        registrationStatus
+                      )}`}
+                    >
+                      {getStatusLabel(registrationStatus)}
+                    </p>
+                  </div>
+                  {registrationStatus === "Waiting" && (
+                    <p className="text-sm text-gray-600 text-center mt-2">
+                      Data pendaftaran Anda sedang diverifikasi oleh admin
+                    </p>
+                  )}
+                  {registrationStatus === "Pending" && (
+                    <p className="text-sm text-gray-600 text-center mt-2">
+                      Silakan lengkapi semua tahap pendaftaran
+                    </p>
+                  )}
+                  {registrationStatus === "Rejected" &&
+                    registrationData?.data?.data?.profile?.rejection_reason && (
+                      <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <p className="text-sm text-red-700">
+                          <span className="font-semibold">Alasan: </span>
+                          {registrationData.data.data.profile.rejection_reason}
+                        </p>
+                      </div>
+                    )}
+                </div>
+              </Card>
+
+              {/* Card Status Pembayaran */}
+              <Card className="p-6 shadow-lg">
+                <div className="flex flex-col items-center gap-4">
+                  {getStatusIcon(paymentStatus)}
+                  <div className="text-center">
+                    <h3 className="text-xl font-bold mb-2">Pembayaran</h3>
+                    <p
+                      className={`text-lg font-semibold ${getStatusColor(
+                        paymentStatus
+                      )}`}
+                    >
+                      {getStatusLabel(paymentStatus)}
+                    </p>
+                  </div>
+                  {paymentStatus === "Waiting" && (
+                    <p className="text-sm text-gray-600 text-center mt-2">
+                      Bukti pembayaran Anda sedang diverifikasi oleh admin
+                    </p>
+                  )}
+                  {paymentStatus === "Pending" && (
+                    <p className="text-sm text-gray-600 text-center mt-2">
+                      Silakan upload bukti pembayaran
+                    </p>
+                  )}
+                  {paymentStatus === "Rejected" &&
+                    paymentData?.data?.data?.payment?.rejection_reason && (
+                      <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <p className="text-sm text-red-700">
+                          <span className="font-semibold">Alasan: </span>
+                          {paymentData.data.data.payment.rejection_reason}
+                        </p>
+                      </div>
+                    )}
+                  {paymentData?.data?.data?.payment && (
+                    <div className="mt-2 text-center">
+                      <p className="text-sm text-gray-600">
+                        Jumlah:{" "}
+                        <span className="font-semibold">
+                          Rp{" "}
+                          {Number(
+                            paymentData.data.data.payment.amount
+                          ).toLocaleString("id-ID")}
+                        </span>
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </Card>
             </div>
-            <div className="mt-8 flex justify-end">
+
+            <div className="mt-8 flex justify-between">
               <Button variant="yellow" onClick={() => window.history.back()}>
                 Kembali
               </Button>
+              <Link href="/pendaftaran/pembayaran">
+                <Button variant="green">Lihat Detail Pembayaran</Button>
+              </Link>
             </div>
           </>
         )}

@@ -26,25 +26,25 @@ export default function Prestasi({ Data }) {
 
   if (!Data || Data.length === 0) {
     finalData = achievements.map((item) => ({
-      id: item.id?.toString() || "",
+      id: item.id_achievement?.toString() || "",
       achievement_name: item.achievement_name,
       year: item.year,
-      type: item.type,
-      level: item.level,
+      type: item.achievement_type,
+      level: item.achievement_level,
       organizer: item.organizer,
-      rank: item.rank,
-      certificate_file: item.certificate_file,
+      rank: item.ranking,
+      certificate_file: item.certificate_url || item.certificate_path,
     }));
   } else {
     finalData = Data.map((item) => ({
-      id: item.id?.toString() || "",
+      id: item.id_achievement?.toString() || "",
       achievement_name: item.achievement_name,
       year: item.year,
-      type: item.type,
-      level: item.level,
+      type: item.achievement_type,
+      level: item.achievement_level,
       organizer: item.organizer,
-      rank: item.rank,
-      certificate_file: item.certificate_file,
+      rank: item.ranking,
+      certificate_file: item.certificate_url || item.certificate_path,
     }));
   }
 

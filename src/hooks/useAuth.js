@@ -37,6 +37,7 @@ export const useLogin = () => {
       // Fetch fresh profile data to get avatar_url
       try {
         const profileResponse = await profileService.getProfile();
+
         const freshUser = profileResponse.data.data.user;
 
         // Update localStorage with fresh user data including avatar_url
