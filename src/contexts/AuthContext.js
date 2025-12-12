@@ -11,7 +11,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load auth data from localStorage on mount
     const storedToken = localStorage.getItem("access_token");
     const storedUser = localStorage.getItem("user");
 

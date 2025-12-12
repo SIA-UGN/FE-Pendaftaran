@@ -1,11 +1,5 @@
 import { useState, useEffect } from "react";
 
-/**
- * Hook untuk debounce value
- * @param {any} value - Value yang akan di-debounce
- * @param {number} delay - Delay dalam milliseconds (default: 500ms)
- * @returns {any} Debounced value
- */
 export const useDebounce = (value, delay = 500) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
 

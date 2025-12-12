@@ -28,7 +28,6 @@ export default function Login() {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    // TEMPORARY: Bypass captcha for local testing
     const captchaValue = captcha || "bypass-local-dev";
 
     loginMutation.mutate(

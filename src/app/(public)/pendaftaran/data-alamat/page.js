@@ -52,13 +52,12 @@ const FormSchema = z.object({
 
 export default function DataAlamat() {
   const router = useRouter();
-  const { user } = useAuth(); // Get authenticated user
+  const { user } = useAuth();
   const { data: progressData, isLoading: progressLoading } =
     useRegistrationProgress();
   const { data: registrationData, refetch } = useMyRegistration();
   const storeMutation = useStoreAddressInformation();
 
-  // Region data hooks
   const { data: provincesData, isLoading: provincesLoading } = useProvinces();
   const [selectedProvinceId, setSelectedProvinceId] = useState("");
   const { data: citiesData, isLoading: citiesLoading } =
@@ -103,7 +102,6 @@ export default function DataAlamat() {
     if (registrationData?.data?.data?.profile && provinces.length > 0) {
       const profile = registrationData.data.data.profile;
 
-      // Find matching province to set selectedProvinceId
       if (profile.province) {
         const matchingProvince = provinces.find(
           (prov) => prov.name === profile.province
@@ -126,24 +124,19 @@ export default function DataAlamat() {
   }, [registrationData, form, provinces]);
 
   async function onSubmit(data) {
-    // Merge existing profile data with new address data
-    // Correct path: registrationData.data.data.profile
     const existingProfile = registrationData?.data?.data?.profile || {};
 
-    // Helper function to format birth_date to YYYY-MM-DD
     const formatBirthDate = (dateString) => {
       if (!dateString) return null;
-      // Extract YYYY-MM-DD from "2025-12-10T00:00:00.000000Z" format
       return dateString.split("T")[0];
     };
 
     const payload = {
-      // Keep existing profile data (data diri from step 1)
       id_program: existingProfile.id_program,
       full_name: existingProfile.full_name,
-      email: existingProfile.email || user?.email, // Fallback to auth user email
+      email: existingProfile.email || user?.email,
       birth_place: existingProfile.birth_place,
-      birth_date: formatBirthDate(existingProfile.birth_date), // Format to YYYY-MM-DD
+      birth_date: formatBirthDate(existingProfile.birth_date),
       nik: existingProfile.nik,
       phone_number: existingProfile.phone_number,
       gender: existingProfile.gender,
@@ -151,7 +144,6 @@ export default function DataAlamat() {
       number_of_siblings: existingProfile.number_of_siblings,
       no_kk: existingProfile.no_kk,
 
-      // Add new address data (step 2)
       province: data.provinsi,
       city_regency: data.kota,
       kecamatan: data.kecamatan,
@@ -163,7 +155,6 @@ export default function DataAlamat() {
 
     storeMutation.mutate(payload, {
       onSuccess: async () => {
-        // Wait for query invalidation to complete before redirect
         await new Promise((resolve) => setTimeout(resolve, 1000));
         router.push("/pendaftaran/data-orangtua");
       },
@@ -204,7 +195,6 @@ export default function DataAlamat() {
                       <Select
                         onValueChange={(value) => {
                           field.onChange(value);
-                          // Reset city when province changes
                           const province = provinces.find(
                             (p) => p.name === value
                           );

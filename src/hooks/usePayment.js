@@ -3,7 +3,7 @@ import { paymentService } from "@/services/paymentService";
 import toast from "react-hot-toast";
 import { useState } from "react";
 
-// Student hooks
+// Applicant
 export const useMyPayment = (enabled = true) => {
   return useQuery({
     queryKey: ["myPayment"],
@@ -72,7 +72,7 @@ export const useReUploadPaymentProof = () => {
   });
 };
 
-// Admin/Manager hooks
+// Admin/Manager
 export const usePayments = (params = {}) => {
   return useQuery({
     queryKey: ["payments", params],

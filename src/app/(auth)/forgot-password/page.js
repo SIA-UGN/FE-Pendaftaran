@@ -60,8 +60,6 @@ export default function ForgotPassword() {
       return;
     }
 
-    // Validasi kode di sini jika ada endpoint khusus
-    // Untuk sementara langsung ke step 3
     setStep(3);
     toast.success("Code verified! Please enter your new password");
   }
@@ -77,7 +75,7 @@ export default function ForgotPassword() {
     resetPasswordMutation.mutate(
       {
         email,
-        code, // backend expects 'code' field
+        code,
         password,
         password_confirmation: passwordConfirmation,
       },
@@ -250,7 +248,6 @@ export default function ForgotPassword() {
             </form>
           )}
 
-          {/* Step 3: Reset Password */}
           {step === 3 && (
             <form onSubmit={handleResetPassword} className="grid gap-4 mt-4">
               <div className="grid gap-2">

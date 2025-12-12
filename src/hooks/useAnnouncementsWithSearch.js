@@ -2,10 +2,6 @@ import { useState, useEffect } from "react";
 import { useAnnouncements } from "./useAnnouncement";
 import { useDebounce } from "./useDebounce";
 
-/**
- * Hook untuk announcements dengan search functionality
- * @returns {Object} Announcements with search utilities
- */
 export const useAnnouncementsWithSearch = () => {
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState({});

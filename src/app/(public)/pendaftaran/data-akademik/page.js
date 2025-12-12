@@ -26,7 +26,6 @@ export default function UploadDokumen() {
   const progress = progressData?.data;
   const existingDocuments = documentsData?.data?.data || [];
 
-  // Create mapping of document names to IDs
   const documentTypeMap = {};
   const documentTypes =
     documentTypesData?.data?.data || documentTypesData?.data || [];
@@ -69,13 +68,11 @@ export default function UploadDokumen() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type (PDF only)
     if (file.type !== "application/pdf") {
       toast.error("Hanya file PDF yang diperbolehkan");
       return;
     }
 
-    // Validate file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
       toast.error("Ukuran file maksimal 2MB");
       return;
@@ -93,7 +90,6 @@ export default function UploadDokumen() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if at least ijazah is uploaded (required)
     if (!files.ijazah) {
       toast.error("Ijazah wajib diupload");
       return;
@@ -102,7 +98,6 @@ export default function UploadDokumen() {
     setIsUploading(true);
 
     try {
-      // Upload each file separately
       const uploads = [];
 
       if (files.ijazah) {
@@ -144,17 +139,13 @@ export default function UploadDokumen() {
         uploads.push(uploadMutation.mutateAsync(formData));
       }
 
-      // Wait for all uploads to complete
       await Promise.all(uploads);
 
-      // Show single success toast after all uploads complete
       toast.success("Semua dokumen berhasil diupload!");
 
-      // Wait for query invalidation then redirect
       await new Promise((resolve) => setTimeout(resolve, 1000));
       router.push("/pendaftaran/prestasi");
     } catch (error) {
-      // Error already handled by mutation
       console.error("Failed to upload documents:", error);
     } finally {
       setIsUploading(false);

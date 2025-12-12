@@ -1,11 +1,8 @@
-// Debug tool to monitor localStorage changes
 if (typeof window !== "undefined") {
-  // Store original methods
   const originalSetItem = localStorage.setItem.bind(localStorage);
   const originalRemoveItem = localStorage.removeItem.bind(localStorage);
   const originalClear = localStorage.clear.bind(localStorage);
 
-  // Override setItem
   localStorage.setItem = function (key, value) {
     console.log(`📦 localStorage.setItem called:`, {
       key,
@@ -16,7 +13,6 @@ if (typeof window !== "undefined") {
     originalSetItem(key, value);
   };
 
-  // Override removeItem
   localStorage.removeItem = function (key) {
     console.log(`🗑️ localStorage.removeItem called:`, {
       key,
@@ -26,7 +22,6 @@ if (typeof window !== "undefined") {
     originalRemoveItem(key);
   };
 
-  // Override clear
   localStorage.clear = function () {
     console.log(`🧹 localStorage.clear called:`, {
       timestamp: new Date().toISOString(),

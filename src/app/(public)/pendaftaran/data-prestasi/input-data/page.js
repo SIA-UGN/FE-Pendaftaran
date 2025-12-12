@@ -31,7 +31,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 
 const FormSchema = z.object({
   uploadSertifikat: z.any().optional(),
-  sertifikatFile: z.any().optional(), // Changed from z.string() to z.any() to accept File object
+  sertifikatFile: z.any().optional(),
   namaPrestasi: z
     .string()
     .min(3, { message: "Nama prestasi minimal 3 karakter" }),
@@ -71,10 +71,6 @@ export default function InputData() {
   });
 
   async function onSubmit(data) {
-    // Backend tidak pakai mapping English, langsung kirim value form
-    // achievement_type: string max 50, bebas
-    // achievement_level: enum ['Sekolah', 'Kecamatan', 'Kabupaten/Kota', 'Provinsi', 'Nasional', 'Internasional']
-
     const levelMap = {
       sekolah: "Sekolah",
       kecamatan: "Kecamatan",
@@ -90,7 +86,6 @@ export default function InputData() {
       const formData = new FormData();
       formData.append("achievement_name", data.namaPrestasi);
       formData.append("year", data.tahun);
-      // achievement_type: bebas string, kirim capitalize pertama huruf
       formData.append(
         "achievement_type",
         data.jenisPrestasi.charAt(0).toUpperCase() + data.jenisPrestasi.slice(1)
@@ -102,7 +97,6 @@ export default function InputData() {
       formData.append("organizer", data.penyelenggara);
       formData.append("ranking", data.peringkat);
 
-      // Add file if exists
       if (data.sertifikatFile && data.sertifikatFile instanceof File) {
         formData.append("certificate_path", data.sertifikatFile);
       }

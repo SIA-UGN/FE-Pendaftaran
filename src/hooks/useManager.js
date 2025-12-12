@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { managerService } from "@/services/managerService";
 import toast from "react-hot-toast";
 
-// Dashboard
 export const useManagerDashboard = () => {
   return useQuery({
     queryKey: ["managerDashboard"],
@@ -91,7 +90,6 @@ export const useManagerUpdateDocumentStatus = () => {
   });
 };
 
-// Payment Verification
 export const useManagerPaymentVerification = (id) => {
   return useQuery({
     queryKey: ["managerPaymentVerification", id],
@@ -119,7 +117,6 @@ export const useManagerVerifyPayment = () => {
   });
 };
 
-// Notifications
 export const useManagerNotifications = (params = {}) => {
   return useQuery({
     queryKey: ["managerNotifications", params],

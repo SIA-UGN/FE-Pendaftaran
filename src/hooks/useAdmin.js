@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { adminService } from "@/services/adminService";
 import toast from "react-hot-toast";
 
-// Dashboard
 export const useAdminDashboard = () => {
   return useQuery({
     queryKey: ["adminDashboard"],
@@ -10,7 +9,6 @@ export const useAdminDashboard = () => {
   });
 };
 
-// Statistics
 export const useApplicantStatistics = (params = {}) => {
   return useQuery({
     queryKey: ["applicantStatistics", params],

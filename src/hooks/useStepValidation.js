@@ -1,10 +1,5 @@
 import { useState } from "react";
 
-/**
- * Hook untuk validasi multi-step form
- * @param {number} totalSteps - Total jumlah steps
- * @returns {Object} Validation utilities
- */
 export const useStepValidation = (totalSteps = 1) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState([]);

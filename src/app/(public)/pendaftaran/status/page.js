@@ -61,22 +61,16 @@ export default function Status() {
       }
     }
 
-    // Determine global status
     let globalStatus = "Pending";
 
     const regStat = registrationData?.data?.data?.profile?.registration_status;
     const pymtStat = paymentData?.data?.data?.payment?.status;
 
-    // Accepted: Keduanya approved dan verified
     if (regStat === "approved" && pymtStat === "verified") {
       globalStatus = "Accepted";
-    }
-    // Rejected: Salah satu rejected
-    else if (regStat === "rejected" || pymtStat === "rejected") {
+    } else if (regStat === "rejected" || pymtStat === "rejected") {
       globalStatus = "Rejected";
-    }
-    // Pending: Lainnya
-    else {
+    } else {
       globalStatus = "Pending";
     }
 

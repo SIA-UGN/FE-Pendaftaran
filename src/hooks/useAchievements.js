@@ -7,7 +7,6 @@ export const useAchievements = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  // Get achievements
   const {
     data: achievements,
     isLoading,
@@ -18,7 +17,6 @@ export const useAchievements = () => {
     queryFn: registrationService.getAchievements,
   });
 
-  // Add achievement
   const addAchievement = useMutation({
     mutationFn: registrationService.addAchievement,
     onSuccess: () => {
@@ -33,7 +31,6 @@ export const useAchievements = () => {
     },
   });
 
-  // Delete achievement
   const deleteAchievement = useMutation({
     mutationFn: registrationService.deleteAchievement,
     onSuccess: () => {
@@ -45,16 +42,13 @@ export const useAchievements = () => {
     },
   });
 
-  // Helper: Check if has achievements
   const achievementsList = achievements?.data?.data || [];
   const hasAchievements = achievementsList.length > 0;
 
-  // Helper: Skip achievements and go to payment
   const skipAchievements = () => {
     router.push("/pendaftaran/pembayaran");
   };
 
-  // Helper: Submit achievements (just navigate, no API call needed)
   const submitAchievements = () => {
     router.push("/pendaftaran/pembayaran");
   };

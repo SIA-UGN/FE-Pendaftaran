@@ -56,26 +56,15 @@ export default function Pembayaran() {
   const reUploadProofMutation = useReUploadPaymentProof();
   const submitRegistrationMutation = useSubmitRegistration();
 
-  // API URL untuk construct full URL
   const API_URL =
     process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") ||
     "http://localhost:8000";
 
-  // Extract payment data from response
   const paymentData = paymentResponse?.data?.data?.payment;
   const availablePaymentMethods =
     paymentResponse?.data?.data?.available_payment_methods || [];
   const paymentStatus = paymentData?.status;
   const paymentMessage = paymentResponse?.data?.message;
-
-  // Debug: Log data structure
-  console.log("=== PAYMENT DEBUG ===");
-  console.log("Full Payment Response:", paymentResponse);
-  console.log("Payment Data:", paymentData);
-  console.log("Available Payment Methods:", availablePaymentMethods);
-  console.log("Registration Data:", registrationData);
-  console.log("Payment Status:", paymentStatus);
-  console.log("====================");
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [countdown, setCountdown] = useState("");
@@ -86,11 +75,8 @@ export default function Pembayaran() {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [hasTriedSubmit, setHasTriedSubmit] = useState(false);
 
-  // Auto-submit registration if not submitted yet
   useEffect(() => {
     const autoSubmitRegistration = async () => {
-      // Jika payment response mengatakan "Selesaikan pendaftaran terlebih dahulu"
-      // dan belum pernah coba submit, maka submit registration
       if (
         !isLoading &&
         !paymentData &&
@@ -101,13 +87,10 @@ export default function Pembayaran() {
           setHasTriedSubmit(true);
           console.log("Auto-submitting registration...");
           await submitRegistrationMutation.mutateAsync();
-          // Setelah berhasil submit, refetch payment
           await refetchPayment();
           toast.success("Pendaftaran berhasil disubmit");
         } catch (error) {
           console.error("Failed to submit registration:", error);
-          // Jika gagal submit, mungkin sudah submitted atau ada error lain
-          // Tetap coba refetch payment
           await refetchPayment();
         }
       }
@@ -160,7 +143,6 @@ export default function Pembayaran() {
     return () => clearInterval(interval);
   }, [paymentData?.deadline]);
 
-  // Redirect hanya untuk status verified (final)
   useEffect(() => {
     if (!isLoading && paymentStatus === "verified") {
       router.push("/pendaftaran/status");
@@ -218,7 +200,6 @@ export default function Pembayaran() {
     try {
       setUploading(true);
 
-      // Check if this is re-upload (rejected status) or first upload
       if (paymentStatus === "rejected") {
         await reUploadProofMutation.mutateAsync({
           paymentId: paymentData.id,
@@ -232,7 +213,6 @@ export default function Pembayaran() {
       }
 
       setUploadSuccess(true);
-      // Redirect setelah 2 detik
       setTimeout(() => {
         setIsDialogOpen(false);
         router.push("/pendaftaran/status");

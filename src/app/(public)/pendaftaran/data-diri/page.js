@@ -124,22 +124,18 @@ export default function DataDiri() {
     },
   });
 
-  // Fetch existing data on mount
   useEffect(() => {
     refetch();
   }, [refetch]);
 
-  // Auto-fill form with existing profile data
   useEffect(() => {
     const profile = registrationData?.data?.data?.profile;
     if (profile) {
-      // Convert backend graduation status to frontend format
       const graduationStatusReverseMap = {
         "Sudah Lulus": "graduated",
         "Belum Lulus": "not_graduated",
       };
 
-      // Convert backend last ijazah to frontend format (lowercase)
       const ijazahReverseMap = {
         SMA: "sma",
         SMK: "smk",
@@ -173,11 +169,11 @@ export default function DataDiri() {
           ? profile.birth_date.split("T")[0]
           : "",
         nik: profile.nik || "",
-        ktp: null, // Can't auto-fill file
+        ktp: null,
         noAkta: profile.birth_certificate_number || "",
-        akta: null, // Can't auto-fill file
+        akta: null,
         noKK: profile.no_kk || "",
-        kk: null, // Can't auto-fill file
+        kk: null,
         kewarganegaraan: profile.citizenship || "",
         anakKe: profile.birth_order?.toString() || "",
         jumlahSaudara: profile.number_of_siblings?.toString() || "",
@@ -185,12 +181,10 @@ export default function DataDiri() {
     }
   }, [registrationData, form]);
 
-  // Helper functions for file handling
   const handleFileChange = (fieldName, event) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type (images and PDF)
     const validTypes = [
       "image/jpeg",
       "image/jpg",
@@ -202,16 +196,13 @@ export default function DataDiri() {
       return;
     }
 
-    // Validate file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
       toast.error("Ukuran file maksimal 2MB");
       return;
     }
 
-    // Set file in form
     form.setValue(fieldName, file);
 
-    // Set preview
     setFilePreviews((prev) => ({ ...prev, [fieldName]: file.name }));
   };
 
@@ -220,18 +211,12 @@ export default function DataDiri() {
     setFilePreviews((prev) => ({ ...prev, [fieldName]: null }));
   };
 
-  // Step 1 (Data Diri) is always accessible - no guard needed
-  // Users should be able to edit their data anytime
-
   async function onSubmit(data) {
-    // Create FormData for file uploads
     const formData = new FormData();
 
-    // Required fields - match backend expectations
     formData.append("id_program", data.programStudi);
     formData.append("previous_school", data.sekolahAsal);
 
-    // Convert graduation status to backend format
     const graduationStatusMap = {
       graduated: "Sudah Lulus",
       not_graduated: "Belum Lulus",
@@ -241,7 +226,6 @@ export default function DataDiri() {
       graduationStatusMap[data.statusKelulusan] || data.statusKelulusan
     );
 
-    // Convert last ijazah to backend format (uppercase)
     const ijazahMap = {
       sma: "SMA",
       smk: "SMK",
@@ -255,29 +239,26 @@ export default function DataDiri() {
 
     formData.append("full_name", data.namaLengkap);
     formData.append("email", data.email);
-    // Backend gender enum: 'Laki-laki' or 'Perempuan'
     formData.append(
       "gender",
       data.jenisKelamin === "male" ? "Laki-laki" : "Perempuan"
     );
     formData.append("religion", data.agama);
-    formData.append("phone_number", data.noPonsel); // Backend expect phone_number, not phone
+    formData.append("phone_number", data.noPonsel);
     formData.append("birth_place", data.tempatLahir);
     formData.append("birth_date", data.tanggalLahir);
-    formData.append("nik", data.nik); // Backend expect nik, not nik_kitas
+    formData.append("nik", data.nik);
     formData.append("citizenship", data.kewarganegaraan);
-    formData.append("birth_order", parseInt(data.anakKe)); // Backend: birth_order
-    formData.append("number_of_siblings", parseInt(data.jumlahSaudara)); // Backend: number_of_siblings
+    formData.append("birth_order", parseInt(data.anakKe));
+    formData.append("number_of_siblings", parseInt(data.jumlahSaudara));
 
-    // Optional fields
     if (data.noAkta) {
       formData.append("birth_certificate_number", data.noAkta);
     }
     if (data.noKK) {
-      formData.append("no_kk", data.noKK); // Backend: no_kk
+      formData.append("no_kk", data.noKK);
     }
 
-    // File uploads - only if files exist
     if (data.ktp && data.ktp instanceof File) {
       formData.append("ktp_kitas_file", data.ktp);
     }
@@ -290,12 +271,9 @@ export default function DataDiri() {
 
     storeMutation.mutate(formData, {
       onSuccess: async () => {
-        // Toast handled by hook - just handle navigation
-        // Wait longer for query invalidation and refetch to complete
         await new Promise((resolve) => setTimeout(resolve, 1000));
         router.push("/pendaftaran/data-alamat");
       },
-      // Error toast also handled by hook, but keep this for any additional page-specific logic if needed
     });
   }
 

@@ -148,7 +148,6 @@ export const useResetPassword = () => {
   return useMutation({
     mutationFn: authService.resetPassword,
     onSuccess: (response) => {
-      // API response structure: { success, message }
       toast.success(
         response.data?.message || "Password berhasil direset! Silakan login."
       );
@@ -167,9 +166,8 @@ export const useChangeEmail = () => {
   return useMutation({
     mutationFn: authService.changeEmail,
     onSuccess: (response) => {
-      // API response structure: { success, message, data: { user } }
       const { user } = response.data.data;
-      updateUser(user); // Update user di context dengan email baru
+      updateUser(user);
       toast.success(response.data?.message || "Email berhasil diubah");
       queryClient.invalidateQueries({ queryKey: ["profile"] });
     },

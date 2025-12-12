@@ -18,7 +18,6 @@ export default function PendaftaranPage() {
   const router = useRouter();
   const [isReady, setIsReady] = React.useState(false);
 
-  // Wait for auth to be ready before fetching
   React.useEffect(() => {
     const timer = setTimeout(() => setIsReady(true), 300);
     return () => clearTimeout(timer);
@@ -44,7 +43,6 @@ export default function PendaftaranPage() {
   };
 
   const getNextIncompleteStep = () => {
-    // If error or no data (e.g., first-time user with no profile), start from beginning
     if (isError || !progressData?.data) {
       return "/pendaftaran/data-diri";
     }

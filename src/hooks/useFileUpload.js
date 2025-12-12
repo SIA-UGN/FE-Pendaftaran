@@ -1,16 +1,8 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-/**
- * Hook untuk handle file upload dengan validasi
- * @param {Object} options - Configuration options
- * @param {number} options.maxSize - Maximum file size in bytes (default: 2MB)
- * @param {string[]} options.allowedTypes - Allowed MIME types
- * @param {Function} options.onUpload - Upload handler function
- * @returns {Object} Upload utilities
- */
 export const useFileUpload = ({
-  maxSize = 2 * 1024 * 1024, // 2MB default
+  maxSize = 2 * 1024 * 1024,
   allowedTypes = ["image/jpeg", "image/png", "image/jpg", "application/pdf"],
   onUpload,
 } = {}) => {
@@ -48,12 +40,10 @@ export const useFileUpload = ({
       const formData = new FormData();
       formData.append("file", file);
 
-      // Append additional data
       Object.keys(additionalData).forEach((key) => {
         formData.append(key, additionalData[key]);
       });
 
-      // Simulate progress
       const progressInterval = setInterval(() => {
         setProgress((prev) => {
           if (prev >= 90) {

@@ -156,10 +156,8 @@ export default function DataOrangtua() {
   }, [existingGuardians, form]);
 
   async function onSubmit(data) {
-    // Build array of guardians to submit
     const guardians = [];
 
-    // Add Father
     guardians.push({
       relationship_type: "Father",
       full_name: data.namaAyah,
@@ -170,7 +168,6 @@ export default function DataOrangtua() {
       income_range: data.penghasilanAyah,
     });
 
-    // Add Mother
     guardians.push({
       relationship_type: "Mother",
       full_name: data.namaIbu,
@@ -181,7 +178,6 @@ export default function DataOrangtua() {
       income_range: data.penghasilanIbu,
     });
 
-    // Add Guardian (optional)
     if (data.namaWali) {
       guardians.push({
         relationship_type: "Guardian",
@@ -194,20 +190,16 @@ export default function DataOrangtua() {
       });
     }
 
-    // Submit each guardian sequentially
     try {
       for (const guardian of guardians) {
         await addGuardianMutation.mutateAsync(guardian);
       }
 
-      // Show success toast once after all guardians saved
       toast.success("Data orang tua/wali berhasil disimpan!");
 
-      // Wait for query invalidation then redirect
       await new Promise((resolve) => setTimeout(resolve, 1000));
       router.push("/pendaftaran/data-akademik");
     } catch (error) {
-      // Error already handled by mutation
       console.error("Failed to save guardians:", error);
     }
   }

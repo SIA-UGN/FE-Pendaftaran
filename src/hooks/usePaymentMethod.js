@@ -2,28 +2,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { paymentMethodService } from "@/services/paymentMethodService";
 import toast from "react-hot-toast";
 
-// ==========================================
-// PUBLIC/APPLICANT HOOKS
-// ==========================================
-
-/**
- * Get available payment methods for applicants (public endpoint)
- */
 export const useAvailablePaymentMethods = () => {
   return useQuery({
     queryKey: ["availablePaymentMethods"],
     queryFn: paymentMethodService.getAvailable,
-    staleTime: 5 * 60 * 1000, // 5 minutes - payment methods don't change often
+    staleTime: 5 * 60 * 1000,
   });
 };
 
-// ==========================================
-// ADMIN HOOKS
-// ==========================================
-
-/**
- * Get all payment methods with params (Admin only)
- */
 export const usePaymentMethods = (params = {}) => {
   return useQuery({
     queryKey: ["paymentMethods", params],
