@@ -8,7 +8,7 @@ import {
   useDeleteNotification,
   useMarkAllAsRead,
   useMarkAsRead,
-  useNotification,
+  useNotifications,
 } from "@/hooks/useNotification";
 import { CheckCheck, Trash2, Mail } from "lucide-react";
 import toast from "react-hot-toast";
@@ -94,7 +94,7 @@ export default function Notification() {
     isLoading,
     isError,
     error,
-  } = useNotification();
+  } = useNotifications();
 
   const { mutate: markAsRead, isPending: isLoadingMarkAsRead } =
     useMarkAsRead();
@@ -102,10 +102,6 @@ export default function Notification() {
     useMarkAllAsRead();
   const { mutate: deleteNotification, isPending: isLoadingDeleteNotification } =
     useDeleteNotification();
-  const {
-    mutate: clearReadNotifications,
-    isPending: isLoadingClearReadNotifications,
-  } = useClearReadNotifications();
 
   if (isLoading) {
     return (
@@ -123,7 +119,7 @@ export default function Notification() {
     );
   }
 
-  const data = notificationData?.data?.data?.data || [];
+  const data = notificationData?.data?.data?.notifications || [];
   const hasUnreadNotifications = data.some(
     (notification) => !notification.read_at
   );
@@ -164,16 +160,8 @@ export default function Notification() {
     });
   };
 
-  const handleClearRead = () => {
-    clearReadNotifications(undefined, {
-      onSuccess: () => {
-        toast.success("All read notifications cleared");
-      },
-      onError: () => {
-        toast.error("Failed to clear read notifications");
-      },
-    });
-  };
+  console.log(notificationData);
+  console.log(data);
 
   return (
     <div className="flex flex-col items-center py-8 md:py-12 lg:py-16 px-4 sm:px-6 md:px-8 lg:px-12 w-full max-w-7xl mx-auto">
@@ -194,15 +182,17 @@ export default function Notification() {
             </Button>
           )}
           {hasReadNotifications && (
-            <Button
-              onClick={handleClearRead}
-              disabled={isLoadingClearReadNotifications}
-              variant="outline"
-              className="border-red-600 text-red-600 hover:bg-red-50"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              {isLoadingClearReadNotifications ? "Clearing..." : "Clear Read"}
-            </Button>
+            <>
+            </>
+            // <Button
+            //   onClick={handleClearRead}
+            //   disabled={isLoadingClearReadNotifications}
+            //   variant="outline"
+            //   className="border-red-600 text-red-600 hover:bg-red-50"
+            // >
+            //   <Trash2 className="w-4 h-4 mr-2" />
+            //   {isLoadingClearReadNotifications ? "Clearing..." : "Clear Read"}
+            // </Button>
           )}
         </div>
       )}
