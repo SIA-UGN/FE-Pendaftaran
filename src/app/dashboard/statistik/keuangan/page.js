@@ -28,7 +28,7 @@ export default function Page() {
     );
 
   const responseData = data?.data?.data || {};
-  
+
   console.log("Financial Statistics Backend Data:", responseData);
 
   // Backend returns: { total_revenue, verified_revenue, pending_revenue, total_payments, verified_payments, pending_payments }
@@ -36,31 +36,34 @@ export default function Page() {
   const chartData = {
     verified: responseData?.verified_payments || 0,
     rejected: 0, // Backend doesn't track rejected payments
-    pending: responseData?.pending_payments || 0
+    pending: responseData?.pending_payments || 0,
   };
 
   const summary = {
     total_income: responseData?.total_revenue || 0,
     approved: responseData?.verified_payments || 0,
     rejected: 0,
-    pending: responseData?.pending_payments || 0
+    pending: responseData?.pending_payments || 0,
   };
 
   // Calculate comparison from yearly revenue data
   const yearlyRevenue = yearlyData?.data?.data?.monthly_revenue || {};
-  const currentYearTotal = Object.values(yearlyRevenue).reduce((sum, val) => sum + Number(val || 0), 0);
-  
+  const currentYearTotal = Object.values(yearlyRevenue).reduce(
+    (sum, val) => sum + Number(val || 0),
+    0
+  );
+
   // For last year comparison, we would need last year's data
   // Since backend doesn't provide it, we'll show current year data
   const comparison = {
     last_year_income: 0, // Backend doesn't provide last year data
-    growth_percentage: 0 // Can't calculate without last year data
+    growth_percentage: 0, // Can't calculate without last year data
   };
 
   return (
     <div className="flex flex-col items-center px-4 sm:px-8 max-w-6xl my-12 w-full gap-8 mx-auto">
       {/* Heading Keuangan */}
-      <Heading title={"Keuangan"} variant="first"/>
+      <Heading title={"Keuangan"} variant="first" />
 
       {/* Pie Chart */}
       <div className="w-full flex justify-center">
@@ -73,7 +76,9 @@ export default function Page() {
       {/* Total Income */}
       <div className="grid w-full max-w-3xl gap-6 justify-items-center">
         <StatCard
-          value={`Rp${Number(summary?.total_income || 0).toLocaleString("id-ID")}`}
+          value={`Rp${Number(summary?.total_income || 0).toLocaleString(
+            "id-ID"
+          )}`}
           label={"Total Income"}
         />
       </div>
@@ -91,8 +96,16 @@ export default function Page() {
       <ChartBarLabel />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 w-full gap-6 sm:gap-8">
-        <StatCard value={`Rp${Number(comparison?.last_year_income || 0).toLocaleString("id-ID")}`} label={"Pemasukan Tahun Lalu"} />
-        <StatCard value={`${comparison?.growth_percentage || 0}%`} label={"Growth"} />
+        <StatCard
+          value={`Rp${Number(comparison?.last_year_income || 0).toLocaleString(
+            "id-ID"
+          )}`}
+          label={"Pemasukan Tahun Lalu"}
+        />
+        <StatCard
+          value={`${comparison?.growth_percentage || 0}%`}
+          label={"Growth"}
+        />
       </div>
     </div>
   );

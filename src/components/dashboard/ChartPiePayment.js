@@ -87,14 +87,17 @@ export function ChartPiePayment({ data }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   console.log("ChartPiePayment data:", data);
-  
+
   const chartData = [
     { name: "Accepted", value: data?.verified || 0, color: "#22c55e" },
     { name: "Rejected", value: data?.rejected || 0, color: "#ef4444" },
     { name: "Pending", value: data?.pending || 0, color: "#facc15" },
   ];
 
-  const total = chartData.reduce((sum, item) => sum + (Number(item.value) || 0), 0);
+  const total = chartData.reduce(
+    (sum, item) => sum + (Number(item.value) || 0),
+    0
+  );
 
   return (
     <Card className="flex flex-col w-full shadow-md gap-0">

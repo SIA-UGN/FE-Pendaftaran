@@ -119,7 +119,10 @@ export function ChartPiePrograms({ data }) {
   console.log("ChartPiePrograms data:", data);
 
   const colors = generateColors(data.length);
-  const total = data.reduce((sum, item) => sum + (Number(item.value) || Number(item.count) || 0), 0);
+  const total = data.reduce(
+    (sum, item) => sum + (Number(item.value) || Number(item.count) || 0),
+    0
+  );
 
   return (
     <Card className="flex flex-col w-full shadow-md gap-0">

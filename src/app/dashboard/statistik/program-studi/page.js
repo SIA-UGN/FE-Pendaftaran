@@ -30,18 +30,22 @@ export default function Page() {
 
   // Backend returns array of programs: [{ program_name, total_applicants, approved, pending, rejected }]
   // Transform for ChartPiePrograms - expects array with name and value
-  const chartData = Array.isArray(responseData) ? responseData.map(program => ({
-    name: program.program_name,
-    value: program.total_applicants,
-    fill: `hsl(var(--chart-${Math.floor(Math.random() * 5) + 1}))`
-  })) : [];
+  const chartData = Array.isArray(responseData)
+    ? responseData.map((program) => ({
+        name: program.program_name,
+        value: program.total_applicants,
+        fill: `hsl(var(--chart-${Math.floor(Math.random() * 5) + 1}))`,
+      }))
+    : [];
 
   // Top programs is just the data itself
-  const topPrograms = Array.isArray(responseData) ? responseData.map(program => ({
-    program: program.program_name,
-    registrants: program.total_applicants,
-    description: `Approved: ${program.approved}, Pending: ${program.pending}, Rejected: ${program.rejected}`
-  })) : [];
+  const topPrograms = Array.isArray(responseData)
+    ? responseData.map((program) => ({
+        program: program.program_name,
+        registrants: program.total_applicants,
+        description: `Approved: ${program.approved}, Pending: ${program.pending}, Rejected: ${program.rejected}`,
+      }))
+    : [];
 
   const allPrograms = responseData;
 

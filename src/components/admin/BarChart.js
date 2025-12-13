@@ -52,17 +52,30 @@ export function ChartBarLabel() {
 
   const responseData = yearlyRevenueData?.data?.data || {};
   console.log("Yearly Revenue Data:", responseData);
-  
+
   // Backend returns: { year: 2025, monthly_revenue: { 1: 0, 2: 0, ..., 11: "9500000.00", 12: "11500000.00" } }
   const monthlyRevenue = responseData?.monthly_revenue || {};
-  
+
   // Transform to array format for BarChart
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   const yearly_revenue = monthNames.map((month, index) => ({
     month: month,
-    revenue: Number(monthlyRevenue[index + 1] || 0)
+    revenue: Number(monthlyRevenue[index + 1] || 0),
   }));
-  
+
   const year = responseData?.year || new Date().getFullYear();
   const range = { start: `January ${year}`, end: `December ${year}` };
 
