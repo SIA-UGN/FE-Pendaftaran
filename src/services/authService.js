@@ -9,8 +9,14 @@ export const authService = {
 
   // Password Management
   changePassword: (data) => apiClient.post("/change-password", data),
-  forgotPassword: (data) => apiClient.post("/forgot-password", data),
-  resetPassword: (data) => apiClient.post("/reset-password", data),
+  forgotPassword: (data) =>
+    apiClient.post("/forgot-password", data, {
+      timeout: Number(process.env.NEXT_PUBLIC_API_TIMEOUT) || 30000,
+    }),
+  resetPassword: (data) =>
+    apiClient.post("/reset-password", data, {
+      timeout: Number(process.env.NEXT_PUBLIC_API_TIMEOUT) || 30000,
+    }),
 
   // Email Management
   changeEmail: (data) => apiClient.post("/change-email", data),

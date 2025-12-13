@@ -45,8 +45,17 @@ export default function ForgotPassword() {
       { email },
       {
         onSuccess: () => {
-          setShowDialog(true);
-          setStep(2);
+          setStep(2); // Step diset dulu
+          setTimeout(() => {
+            // Delay sedikit
+            setShowDialog(true); // Baru buka dialog
+          }, 100);
+        },
+        onError: (error) => {
+          const message =
+            error.response?.data?.message || error.message ||
+            "Gagal mengirim kode verifikasi";
+          toast.error(message);
         },
       }
     );
@@ -75,7 +84,7 @@ export default function ForgotPassword() {
     resetPasswordMutation.mutate(
       {
         email,
-        code,
+        token: code,
         password,
         password_confirmation: passwordConfirmation,
       },
@@ -87,6 +96,12 @@ export default function ForgotPassword() {
           setPassword("");
           setPasswordConfirmation("");
           setStep(1);
+        },
+        onError: (error) => {
+          const message =
+            error.response?.data?.message || error.message ||
+            "Gagal reset password";
+          toast.error(message);
         },
       }
     );

@@ -130,8 +130,9 @@ export const useForgotPassword = () => {
       );
     },
     onError: (error) => {
+      console.log(error);
       toast.error(
-        error.response?.data?.message || "Gagal mengirim kode verifikasi"
+        error.message || error.response?.data?.message || "Gagal mengirim kode"
       );
     },
   });

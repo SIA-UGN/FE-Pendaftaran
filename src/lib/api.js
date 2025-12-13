@@ -1,12 +1,14 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 
+const DEFAULT_TIMEOUT = Number(process.env.NEXT_PUBLIC_API_TIMEOUT) || 10000;
+
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://be-ugn.test/api",
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10000,
+  timeout: DEFAULT_TIMEOUT,
 });
 
 apiClient.interceptors.request.use((config) => {
@@ -60,7 +62,14 @@ apiClient.interceptors.response.use(
     }
 
     if (!error.response) {
-      toast.error("Koneksi terputus. Silakan periksa jaringan Anda.");
+      // Distinguish timeout vs other network errors for clearer messaging
+      if (error.code === "ECONNABORTED") {
+        toast.error(
+          "Permintaan melebihi waktu tunggu. Silakan periksa koneksi atau coba lagi."
+        );
+      } else {
+        toast.error("Koneksi terputus. Silakan periksa jaringan Anda.");
+      }
     }
 
     return Promise.reject(error);

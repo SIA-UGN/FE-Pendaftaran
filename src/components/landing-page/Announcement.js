@@ -18,6 +18,8 @@ export default function Announcement() {
     [handleSearch]
   );
 
+  console.log(announcements);
+
   if (isLoading && !announcements.length) {
     return (
       <div className="flex items-center justify-center min-h-[200px] w-full">
