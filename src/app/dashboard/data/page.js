@@ -82,6 +82,7 @@ export default function Page() {
 
   console.log("Applicants Response:", applicantsData?.data);
   console.log("Applicants List:", applicantsList);
+  
 
   // Backend structure: { id_profile, id_user, full_name, email, program_name, registration_number, registration_status, created_at, phone_number }
   // Map to frontend expected structure

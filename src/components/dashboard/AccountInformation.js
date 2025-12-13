@@ -19,10 +19,10 @@ export default function AccountInformation() {
 
   console.log(data.data.data);
 
-  const total_applicants = data.data.data.overview.total_applicants;
-  const approved = data.data.data.overview.approved;
-  const rejected = data.data.data.overview.rejected;
-  const pending = data.data.data.overview.pending;
+  const total_applicants = data.data.data.total_applicants;
+  const approved = data.data.data.approved_applicants;
+  const rejected = data.data.data.rejected_applicants;
+  const pending = data.data.data.pending_applicants;
 
   return (
     <div className="flex flex-col items-center px-4 sm:px-8 max-w-screen-xl mx-auto my-12 w-full gap-12">

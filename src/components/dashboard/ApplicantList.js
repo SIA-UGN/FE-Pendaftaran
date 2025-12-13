@@ -35,7 +35,6 @@ export default function ApplicantList({ data, type }) {
     { value: "all", label: "Semua Status" },
     { value: "approved", label: "Approved" },
     { value: "rejected", label: "Rejected" },
-    { value: "under_review", label: "Under Review" },
     { value: "submitted", label: "Submitted" },
   ];
 

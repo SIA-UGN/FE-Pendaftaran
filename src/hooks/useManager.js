@@ -102,7 +102,28 @@ export const useManagerVerifyPayment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }) => managerService.verifyPayment(id, data),
+    mutationFn: ({ id, data }) => {
+      const mapped = {
+        action:
+          data?.status === "verified"
+            ? "verify"
+            : data?.status === "rejected"
+            ? "reject"
+            : data?.action || "verify",
+        ...(data?.notes && { notes: data.notes }),
+        ...(data?.verification_notes && { notes: data.verification_notes }),
+        ...(data?.rejection_reason && {
+          rejection_reason: data.rejection_reason,
+        }),
+      };
+      // When rejecting, allow the UI to pass verification_notes; map that to rejection_reason too
+      if (data?.status === "rejected") {
+        if (data?.verification_notes)
+          mapped.rejection_reason = data.verification_notes;
+        if (data?.notes) mapped.rejection_reason = data.notes;
+      }
+      return managerService.verifyPayment(id, mapped);
+    },
     onSuccess: () => {
       toast.success("Pembayaran berhasil diverifikasi");
       queryClient.invalidateQueries({

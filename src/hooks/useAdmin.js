@@ -194,7 +194,24 @@ export const useVerifyPayment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }) => adminService.verifyPayment(id, data),
+    mutationFn: ({ id, data }) => {
+      // Map existing usage which sometimes passes { status, notes }
+      // to the API payload { action, notes, rejection_reason }
+      const mapped = {
+        action:
+          data?.status === "verified"
+            ? "verify"
+            : data?.status === "rejected"
+            ? "reject"
+            : data?.action || "verify",
+        ...(data?.notes && { notes: data.notes }),
+        ...(data?.rejection_reason && { rejection_reason: data.rejection_reason }),
+      };
+      if (data?.status === "rejected" && data?.notes) {
+        mapped.rejection_reason = data.notes;
+      }
+      return adminService.verifyPayment(id, mapped);
+    },
     onSuccess: () => {
       toast.success("Pembayaran berhasil diverifikasi");
       queryClient.invalidateQueries({ queryKey: ["paymentVerification"] });

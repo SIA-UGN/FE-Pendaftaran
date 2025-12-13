@@ -25,6 +25,7 @@ export default function ApplicantInformation({
 
   // Safe access dengan default values
   const verificationData = VerificationTable?.data || [];
+  console.log("Verification Data:", verificationData);
   const graduationData = GraduationTable?.data || [];
 
   return (

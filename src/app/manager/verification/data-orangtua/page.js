@@ -49,7 +49,7 @@ import {
   InputGroupButton,
 } from "@/components/ui/input-group";
 
-import { useApplicantDetail } from "@/hooks/useManager";
+import { useManagerApplicantDetail } from "@/hooks/useManager";
 
 const FormSchema = z.object({
   namaAyah: z.string().min(2, { message: "Nama Ayah harus diisi." }),
@@ -134,10 +134,14 @@ export default function DataOrangtua() {
     return <div>Error loading applicant: {applicantError.message}</div>;
 
   const applicant = applicantData?.data?.data;
-  const father = applicant.steps.father;
-  const mother = applicant.steps.mother;
+  console.log("Applicant Data:", applicant);
+  const guardians = applicant.profile.guardians || {};
 
   console.log(id);
+  console.log(guardians);
+
+  const father = guardians[0] || {};
+  const mother = guardians[1] || {};
 
   return (
     <>
@@ -220,7 +224,7 @@ export default function DataOrangtua() {
                         <FormLabel>Nama Ayah Kandung</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder={father.name}
+                            placeholder={father.full_name}
                             {...field}
                             readOnly
                           />
@@ -256,7 +260,7 @@ export default function DataOrangtua() {
                           <FormControl>
                             <Input
                               type="tel"
-                              placeholder={father.phone}
+                              placeholder={father.phone_number}
                               {...field}
                               readOnly
                             />
@@ -290,7 +294,7 @@ export default function DataOrangtua() {
                           <FormLabel>Pendidikan Terakhir Ayah</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder={formatEducation(father.education)}
+                              placeholder={formatEducation(father.last_education)}
                               readOnly
                             />
                           </FormControl>
@@ -306,7 +310,7 @@ export default function DataOrangtua() {
                           <FormLabel>Penghasilan Ayah</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder={formatIncome(father.income)}
+                              placeholder={formatIncome(father.income_range)}
                               {...field}
                               readOnly
                             />
@@ -328,7 +332,7 @@ export default function DataOrangtua() {
                         <FormLabel>Nama Ibu Kandung</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder={mother.name}
+                            placeholder={mother.full_name}
                             {...field}
                             readOnly
                           />
@@ -364,7 +368,7 @@ export default function DataOrangtua() {
                           <FormControl>
                             <Input
                               type="tel"
-                              placeholder={mother.phone}
+                              placeholder={mother.phone_number}
                               {...field}
                               readOnly
                             />
@@ -398,7 +402,7 @@ export default function DataOrangtua() {
                           <FormLabel>Pendidikan Terakhir Ibu</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder={formatEducation(mother.education)}
+                              placeholder={formatEducation(mother.last_education)}
                               {...field}
                               readOnly
                             />
@@ -415,7 +419,7 @@ export default function DataOrangtua() {
                           <FormLabel>Penghasilan Ibu</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder={formatIncome(mother.income)}
+                              placeholder={formatIncome(mother.income_range)}
                               {...field}
                               readOnly
                             />

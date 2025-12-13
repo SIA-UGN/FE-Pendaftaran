@@ -35,36 +35,158 @@ import {
 } from "@/hooks/useRegistration";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const FormSchema = z.object({
-  namaAyah: z.string().min(2, { message: "Nama Ayah harus diisi." }),
-  alamatAyah: z.string().min(5, { message: "Alamat Ayah harus diisi." }),
-  telpAyah: z.string().min(10, { message: "No. HP Ayah tidak valid." }),
-  pekerjaanAyah: z.string().min(2, { message: "Pekerjaan Ayah harus diisi." }),
-  pendidikanAyah: z.string({
-    required_error: "Pendidikan Ayah harus dipilih.",
-  }),
-  penghasilanAyah: z.string({
-    required_error: "Penghasilan Ayah harus dipilih.",
-  }),
+const FormSchema = z
+  .object({
+    namaAyah: z.string().min(2).optional(),
+    alamatAyah: z.string().min(5).optional(),
+    telpAyah: z.string().min(10).optional(),
+    pekerjaanAyah: z.string().min(2).optional(),
+    pendidikanAyah: z.string().optional(),
+    penghasilanAyah: z.string().optional(),
 
-  namaIbu: z.string().min(2, { message: "Nama Ibu harus diisi." }),
-  alamatIbu: z.string().min(5, { message: "Alamat Ibu harus diisi." }),
-  telpIbu: z.string().min(10, { message: "No. HP Ibu tidak valid." }),
-  pekerjaanIbu: z.string().min(2, { message: "Pekerjaan Ibu harus diisi." }),
-  pendidikanIbu: z.string({
-    required_error: "Pendidikan Ibu harus dipilih.",
-  }),
-  penghasilanIbu: z.string({
-    required_error: "Penghasilan Ibu harus dipilih.",
-  }),
+    namaIbu: z.string().min(2).optional(),
+    alamatIbu: z.string().min(5).optional(),
+    telpIbu: z.string().min(10).optional(),
+    pekerjaanIbu: z.string().min(2).optional(),
+    pendidikanIbu: z.string().optional(),
+    penghasilanIbu: z.string().optional(),
 
-  namaWali: z.string().optional(),
-  alamatWali: z.string().optional(),
-  telpWali: z.string().optional(),
-  pekerjaanWali: z.string().optional(),
-  pendidikanWali: z.string().optional(),
-  penghasilanWali: z.string().optional(),
-});
+    namaWali: z.string().optional(),
+    alamatWali: z.string().optional(),
+    telpWali: z.string().min(10).optional(),
+    pekerjaanWali: z.string().min(2).optional(),
+    pendidikanWali: z.string().optional(),
+    penghasilanWali: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    const hasParent =
+      (data.namaAyah && data.namaAyah.trim().length > 0) ||
+      (data.namaIbu && data.namaIbu.trim().length > 0);
+    const hasWali = data.namaWali && data.namaWali.trim().length > 0;
+
+    if (!hasParent && !hasWali) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Harap isi data orang tua atau wali.",
+      });
+    }
+
+    // if guardian name is provided, ensure other fields are present and valid
+    if (hasWali) {
+      if (!data.alamatWali || !data.alamatWali.trim()) {
+        ctx.addIssue({
+          path: ["alamatWali"],
+          code: z.ZodIssueCode.custom,
+          message: "Alamat Wali harus diisi.",
+        });
+      }
+      if (!data.telpWali || data.telpWali.trim().length < 10) {
+        ctx.addIssue({
+          path: ["telpWali"],
+          code: z.ZodIssueCode.custom,
+          message: "No. HP Wali tidak valid.",
+        });
+      }
+      if (!data.pekerjaanWali || !data.pekerjaanWali.trim()) {
+        ctx.addIssue({
+          path: ["pekerjaanWali"],
+          code: z.ZodIssueCode.custom,
+          message: "Pekerjaan Wali harus diisi.",
+        });
+      }
+      if (!data.pendidikanWali || !data.pendidikanWali.trim()) {
+        ctx.addIssue({
+          path: ["pendidikanWali"],
+          code: z.ZodIssueCode.custom,
+          message: "Pendidikan Wali harus dipilih.",
+        });
+      }
+      if (!data.penghasilanWali || !data.penghasilanWali.trim()) {
+        ctx.addIssue({
+          path: ["penghasilanWali"],
+          code: z.ZodIssueCode.custom,
+          message: "Penghasilan Wali harus dipilih.",
+        });
+      }
+    }
+
+    // validate parent details if parent name is provided
+    if (data.namaAyah && data.namaAyah.trim()) {
+      if (!data.alamatAyah || !data.alamatAyah.trim()) {
+        ctx.addIssue({
+          path: ["alamatAyah"],
+          code: z.ZodIssueCode.custom,
+          message: "Alamat Ayah harus diisi.",
+        });
+      }
+      if (!data.telpAyah || data.telpAyah.trim().length < 10) {
+        ctx.addIssue({
+          path: ["telpAyah"],
+          code: z.ZodIssueCode.custom,
+          message: "No. HP Ayah tidak valid.",
+        });
+      }
+      if (!data.pekerjaanAyah || !data.pekerjaanAyah.trim()) {
+        ctx.addIssue({
+          path: ["pekerjaanAyah"],
+          code: z.ZodIssueCode.custom,
+          message: "Pekerjaan Ayah harus diisi.",
+        });
+      }
+      if (!data.pendidikanAyah || !data.pendidikanAyah.trim()) {
+        ctx.addIssue({
+          path: ["pendidikanAyah"],
+          code: z.ZodIssueCode.custom,
+          message: "Pendidikan Ayah harus dipilih.",
+        });
+      }
+      if (!data.penghasilanAyah || !data.penghasilanAyah.trim()) {
+        ctx.addIssue({
+          path: ["penghasilanAyah"],
+          code: z.ZodIssueCode.custom,
+          message: "Penghasilan Ayah harus dipilih.",
+        });
+      }
+    }
+
+    if (data.namaIbu && data.namaIbu.trim()) {
+      if (!data.alamatIbu || !data.alamatIbu.trim()) {
+        ctx.addIssue({
+          path: ["alamatIbu"],
+          code: z.ZodIssueCode.custom,
+          message: "Alamat Ibu harus diisi.",
+        });
+      }
+      if (!data.telpIbu || data.telpIbu.trim().length < 10) {
+        ctx.addIssue({
+          path: ["telpIbu"],
+          code: z.ZodIssueCode.custom,
+          message: "No. HP Ibu tidak valid.",
+        });
+      }
+      if (!data.pekerjaanIbu || !data.pekerjaanIbu.trim()) {
+        ctx.addIssue({
+          path: ["pekerjaanIbu"],
+          code: z.ZodIssueCode.custom,
+          message: "Pekerjaan Ibu harus diisi.",
+        });
+      }
+      if (!data.pendidikanIbu || !data.pendidikanIbu.trim()) {
+        ctx.addIssue({
+          path: ["pendidikanIbu"],
+          code: z.ZodIssueCode.custom,
+          message: "Pendidikan Ibu harus dipilih.",
+        });
+      }
+      if (!data.penghasilanIbu || !data.penghasilanIbu.trim()) {
+        ctx.addIssue({
+          path: ["penghasilanIbu"],
+          code: z.ZodIssueCode.custom,
+          message: "Penghasilan Ibu harus dipilih.",
+        });
+      }
+    }
+  });
 
 export default function DataOrangtua() {
   const router = useRouter();
@@ -158,25 +280,29 @@ export default function DataOrangtua() {
   async function onSubmit(data) {
     const guardians = [];
 
-    guardians.push({
-      relationship_type: "Father",
-      full_name: data.namaAyah,
-      address: data.alamatAyah,
-      phone_number: data.telpAyah,
-      occupation: data.pekerjaanAyah,
-      last_education: data.pendidikanAyah,
-      income_range: data.penghasilanAyah,
-    });
+    if (data.namaAyah && data.namaAyah.trim()) {
+      guardians.push({
+        relationship_type: "Father",
+        full_name: data.namaAyah,
+        address: data.alamatAyah,
+        phone_number: data.telpAyah,
+        occupation: data.pekerjaanAyah,
+        last_education: data.pendidikanAyah,
+        income_range: data.penghasilanAyah,
+      });
+    }
 
-    guardians.push({
-      relationship_type: "Mother",
-      full_name: data.namaIbu,
-      address: data.alamatIbu,
-      phone_number: data.telpIbu,
-      occupation: data.pekerjaanIbu,
-      last_education: data.pendidikanIbu,
-      income_range: data.penghasilanIbu,
-    });
+    if (data.namaIbu && data.namaIbu.trim()) {
+      guardians.push({
+        relationship_type: "Mother",
+        full_name: data.namaIbu,
+        address: data.alamatIbu,
+        phone_number: data.telpIbu,
+        occupation: data.pekerjaanIbu,
+        last_education: data.pendidikanIbu,
+        income_range: data.penghasilanIbu,
+      });
+    }
 
     if (data.namaWali) {
       guardians.push({
@@ -589,6 +715,7 @@ export default function DataOrangtua() {
                         <FormControl>
                           <Input placeholder="Nama lengkap Wali" {...field} />
                         </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -603,6 +730,7 @@ export default function DataOrangtua() {
                         <FormControl>
                           <Input placeholder="Alamat lengkap Wali" {...field} />
                         </FormControl>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -618,6 +746,7 @@ export default function DataOrangtua() {
                           <FormControl>
                             <Input type="tel" placeholder="08..." {...field} />
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -633,6 +762,7 @@ export default function DataOrangtua() {
                           <FormControl>
                             <Input placeholder="Pekerjaan" {...field} />
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -667,6 +797,7 @@ export default function DataOrangtua() {
                               <SelectItem value="lainnya">Lainnya</SelectItem>
                             </SelectContent>
                           </Select>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -700,6 +831,7 @@ export default function DataOrangtua() {
                               </SelectItem>
                             </SelectContent>
                           </Select>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />

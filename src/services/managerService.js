@@ -19,8 +19,9 @@ export const managerService = {
     apiClient.put(`/admin/documents/${id}/verify`, data),
 
   // Payment Verification
-  getPaymentVerification: (id) =>
-    apiClient.get(`/admin/payments/${id}/verification`),
+  // backend uses /payments/:id for fetching payment details
+  getPaymentVerification: (id) => apiClient.get(`/payments/${id}`),
+  // manager uses admin verify endpoint
   verifyPayment: (id, data) => apiClient.put(`/payments/${id}/verify`, data),
 
   // Notifications

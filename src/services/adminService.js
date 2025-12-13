@@ -40,6 +40,5 @@ export const adminService = {
 
   // Payment Verification
   getPaymentVerification: (id) => apiClient.get(`/payments/${id}`),
-  verifyPayment: (id, data) =>
-    apiClient.put(`/admin/payments/${id}/verify`, data),
+  verifyPayment: (id, data) => apiClient.put(`/admin/payments/${id}`, data),
 };

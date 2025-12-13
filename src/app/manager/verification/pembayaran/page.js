@@ -88,6 +88,8 @@ import {
 
 import { Heading } from "@/components/Heading";
 
+import { useUpdateApplicantStatus } from "@/hooks/useAdmin";
+
 export default function Pembayaran() {
   const router = useRouter();
 
@@ -96,6 +98,12 @@ export default function Pembayaran() {
 
   const { mutate: setRegistrationStatus, isLoading: isRegistrationLoading } =
     useVerifyApplicant();
+
+  const {
+    mutateAsync: setApplicantStatus,
+    isLoading: isApplicantStatusLoading,
+  } = useUpdateApplicantStatus();
+
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const payment_id = searchParams.get("payment_id");
@@ -113,7 +121,8 @@ export default function Pembayaran() {
   const [paymentRejectionNote, setPaymentRejectionNote] = useState("");
   const [openProof, setOpenProof] = useState(false);
 
-  console.log(id);
+  // console.log(id);
+
   const { data, isLoading, isError, error } =
     useManagerPaymentVerification(payment_id);
 
@@ -121,6 +130,7 @@ export default function Pembayaran() {
   if (isError) return <div>Error loading payment: {error.message}</div>;
 
   console.log(data);
+  // console.log(paymentDatas);
 
   const paymentData = data.data.data;
 
@@ -128,7 +138,7 @@ export default function Pembayaran() {
 
   const handleRegistration = async (statusType, note = "") => {
     const payload = {
-      id: Number(id),
+      id: Number(payment_id),
       data: {
         status: statusType,
         ...(note && { notes: note }),
@@ -136,8 +146,7 @@ export default function Pembayaran() {
     };
 
     console.log("Sending Registration:", payload);
-
-    await setRegistrationStatus(payload);
+    await setApplicantStatus(payload);
   };
 
   const handlePayment = async (statusType, note = "") => {
@@ -146,6 +155,7 @@ export default function Pembayaran() {
       data: {
         status: statusType,
         ...(note && { verification_notes: note }),
+        ...(statusType === "rejected" && note && { rejection_reason: note }),
       },
     };
 
@@ -163,10 +173,10 @@ export default function Pembayaran() {
           Ringkasan Pembayaran
         </h1>
         <div className="ms-6 gap-4">
-          <p>{paymentData.user_info.name}</p>
-          <p>{paymentData.user_info.registration_number}</p>
-          <p>{paymentData.payment_summary.amount}</p>
-          <p>{paymentData.payment_summary.payment_method}</p>
+          <p>{paymentData.applicant_name}</p>
+          <p>{paymentData.registration_number}</p>
+          <p>{paymentData.paid_amount}</p>
+          <p>{paymentData.payment_method.account_holder}</p>
         </div>
       </Card>
 
@@ -188,7 +198,7 @@ export default function Pembayaran() {
             </DialogHeader>
             <div className="flex items-center justify-center p-4">
               <img
-                src={`/${paymentData.payment_proof.download_url}`}
+                src={`/${paymentData.payment_proof_url}`}
                 alt="Bukti Pembayaran"
                 className="max-w-full h-auto rounded-lg"
               />
@@ -201,7 +211,7 @@ export default function Pembayaran() {
       <Form {...form}>
         <div className="space-y-6">
           <div className="flex flex-col gap-5 p-12 border rounded-xl mx-0 md:mx-12 bg-[var(--light-cream)]">
-            {paymentData.validation_notes}
+            {paymentData.rejection_reason}
           </div>
           <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
             <Link href="/manager/verification">
@@ -328,7 +338,7 @@ export default function Pembayaran() {
                         "Selamat! Pendaftaran Anda telah disetujui."
                       );
                       setShowRegistrationDialog(false);
-                      router.push(`/manager/verification?id=${id}`);
+                      router.push(`/manager/verification?id=${payment_id}`);
                     }}
                   >
                     Ya, Sesuai
@@ -358,7 +368,7 @@ export default function Pembayaran() {
                         "Mohon maaf, pendaftaran Anda ditolak."
                       );
                       setShowRegistrationActionDialog(false);
-                      router.push(`/manager/verification?id=${id}`);
+                      router.push(`/manager/verification?id=${payment_id}`);
                     }}
                     disabled={isRegistrationLoading}
                   >
@@ -482,7 +492,7 @@ export default function Pembayaran() {
                       }
 
                       setShowRevisionDialog(false);
-                      router.push(`/manager/verification?id=${id}`);
+                      router.push(`/manager/verification?id=${payment_id}`);
                     }}
                   >
                     Simpan dan Kirim Revisi

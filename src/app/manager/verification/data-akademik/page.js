@@ -56,7 +56,7 @@ import {
 } from "@/components/ui/input-group";
 import { useState } from "react";
 
-import { useApplicantDetail } from "@/hooks/useManager";
+import { useManagerApplicantDetail } from "@/hooks/useManager";
 
 const MAX_FILE_SIZE = 5000000;
 const ACCEPTED_FILE_TYPES = [
@@ -137,9 +137,10 @@ export default function DataAkademik() {
     return <div>Error loading applicant: {applicantError.message}</div>;
 
   const applicant = applicantData?.data?.data;
-  const data = applicant.steps.academic;
+  const data = applicant?.profile;
 
   console.log(id);
+  console.log(data);
 
   return (
     <>
@@ -171,7 +172,7 @@ export default function DataAkademik() {
                   <FormLabel>Sekolah Asal</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={data.school_origin}
+                      placeholder={data.previous_school}
                       {...field}
                       readOnly
                     />
@@ -217,8 +218,8 @@ export default function DataAkademik() {
                       <FormControl>
                         <Input
                           placeholder={
-                            data.last_certificate
-                              ? data.last_certificate.toUpperCase()
+                            data.last_ijazah
+                              ? data.last_ijazah.toUpperCase()
                               : ""
                           }
                           {...field}
@@ -256,7 +257,7 @@ export default function DataAkademik() {
                         </DialogHeader>
                         <div className="flex items-center justify-center p-4">
                           <img
-                            src={`/${data.certification_file}`}
+                            src={`http://be-ugn.test/${data.documents[0]?.file_path}`}
                             alt="Ijazah"
                             className="max-w-full h-auto rounded-lg"
                           />

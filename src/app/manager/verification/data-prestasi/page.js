@@ -49,7 +49,7 @@ import {
 } from "@/components/ui/input-group";
 import { useState } from "react";
 
-import { useApplicantDetail } from "@/hooks/useManager";
+import { useManagerApplicantDetail } from "@/hooks/useManager";
 
 const FormSchema = z.object({
   uploadSertifikat: z.any().optional(),
@@ -83,7 +83,7 @@ export default function DataPrestasi() {
 
   console.log(applicant);
 
-  const data = applicant.steps.achievements;
+  const data = applicant?.achievements;
 
   console.log(data);
 
@@ -112,7 +112,7 @@ export default function DataPrestasi() {
       <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
         <Button variant={"green"}>Kembali</Button>
         <Link
-          href={`/manager/verification/pembayaran?payment_id=${applicant.payment_info.id}&id=${id}`}
+          href={`/manager/verification/pembayaran?payment_id=${id}`}
         >
           <Button variant="matcha">Lanjut</Button>
         </Link>

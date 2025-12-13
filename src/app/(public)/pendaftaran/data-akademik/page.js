@@ -144,7 +144,7 @@ export default function UploadDokumen() {
       toast.success("Semua dokumen berhasil diupload!");
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      router.push("/pendaftaran/prestasi");
+      router.push("/pendaftaran/data-prestasi");
     } catch (error) {
       console.error("Failed to upload documents:", error);
     } finally {

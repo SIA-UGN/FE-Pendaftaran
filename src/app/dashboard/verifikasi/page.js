@@ -47,12 +47,21 @@ export default function Keuangan() {
   const { mutate: verifyPayment, isLoading: isVerifying } = useVerifyPayment();
 
   const handleVerifyPayment = (status) => {
+    const action =
+      status === "verified"
+        ? "verify"
+        : status === "rejected"
+        ? "reject"
+        : status;
     verifyPayment(
       {
         id: Number(id),
         data: {
-          status,
-          notes: status === "rejected" ? rejectNotes : undefined,
+          action,
+          ...(status === "rejected" && {
+            notes: rejectNotes,
+            rejection_reason: rejectNotes,
+          }),
         },
       },
       {
@@ -74,7 +83,7 @@ export default function Keuangan() {
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error: {error.message}</div>;
 
-  const data = paymentData?.data;
+  const data = paymentData?.data?.data;
 
   console.log(data);
 
@@ -83,14 +92,14 @@ export default function Keuangan() {
       <Card className="w-full flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl shadow-md bg-[var(--light-cream)] justify-between items-start sm:items-center">
         <div className="flex flex-col w-full sm:w-2/3 space-y-1">
           <h2 className="font-bold text-lg sm:text-xl">
-            {data.data.user.name}
+            {data.applicant_name}
           </h2>
           <h3 className="text-gray-500 text-sm sm:text-base">
-            {data.data.user.registration_number}
+            {data.registration_number}
           </h3>
-          <p className="text-gray-500 text-sm sm:text-base">
+          {/* <p className="text-gray-500 text-sm sm:text-base">
             {data.data.user.email}
-          </p>
+          </p> */}
         </div>
         <Button
           variant="yellow"
@@ -109,19 +118,19 @@ export default function Keuangan() {
           <div className="flex gap-3 items-start">
             <UserRound className="w-5 h-5 flex-shrink-0 mt-0.5" />
             <span className="text-sm sm:text-base">
-              Nama Pengguna: {data.data.payment_details.sender_name}
+              Nama Pengguna: {data.sender_account_holder}
             </span>
           </div>
           <div className="flex gap-3 items-start">
             <IdCard className="w-5 h-5 flex-shrink-0 mt-0.5" />
             <span className="text-sm sm:text-base">
-              Nomor Pendaftaran: {data.data.payment_details.registration_number}
+              Nomor Pendaftaran: {data.registration_number}
             </span>
           </div>
           <div className="flex gap-3 items-start">
             <WalletMinimal className="w-5 h-5 flex-shrink-0 mt-0.5" />
             <span className="text-sm sm:text-base font-semibold">
-              {data.data.payment_details.amount}
+              {data.paid_amount}
             </span>
           </div>
         </div>
@@ -153,7 +162,7 @@ export default function Keuangan() {
 
           <div className="flex justify-center my-4">
             <Image
-              src={data.data.payment.payment_proof_url}
+              src={data.payment_proof_url}
               alt="Bukti Pembayaran"
               className="rounded-lg shadow-md object-contain w-full h-auto"
               width={400}

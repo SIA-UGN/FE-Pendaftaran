@@ -65,6 +65,7 @@ export default function Profile() {
     return <div>Error loading applicant: {applicantError.message}</div>;
 
   const applicant = applicantData?.data?.data;
+
   if (!applicant) return <div>Applicant not found</div>;
 
   const handleGraduation = (statusType) => {
@@ -76,6 +77,8 @@ export default function Profile() {
 
   console.log(applicant);
 
+  const user = applicant.user || {};
+
   return (
     <div className="flex flex-col items-center px-4 sm:px-8 max-w-11/12 my-12 w-full gap-3 mx-auto">
       <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
@@ -85,7 +88,7 @@ export default function Profile() {
       <Card className="w-full flex flex-col md:flex-row gap-6 p-8 rounded-2xl shadow-md bg-white">
         <Image
           alt="Profile banner"
-          src={applicant.user.avatar_url}
+          src=""
           width={180}
           height={300}
           className="w-full sm:w-1/4 h-[300px] rounded-xl object-cover"
@@ -94,21 +97,17 @@ export default function Profile() {
         <div className="flex flex-col p-2 w-full sm:w-2/3 space-y-2 items-start">
           <h2 className="font-bold text-xl">{applicant.user.name}</h2>
           <h3 className="text-gray-500">
-            {applicant.user.registration_number}
+            {user.username || "Username tidak tersedia"}
           </h3>
           <p className="text-gray-500">{applicant.user.email}</p>
-
-          <div className="flex gap-2 mt-2">
-            <StatusBadge status={applicant.verification_status} />
-            <StatusBadge status={applicant.graduation_status} />
-          </div>
+          <p className="text-gray-500">{applicant.program.name_program}</p>
         </div>
       </Card>
 
-      {(applicant.verification_status === "pending" ||
-        applicant.verification_status === "revision_needed" ||
-        applicant.verification_status === "under_review" ||
-        applicant.verification_status === "submitted") && (
+      {(applicant.profile.registration_status === "pending" ||
+        applicant.profile.registration_status === "revision_needed" ||
+        applicant.profile.registration_status === "under_review" ||
+        applicant.profile.registration_status === "submitted") && (
         <>
           <h2 className="text-3xl sm:text-2xl font-semibold mb-2 mt-6 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
             Status Verifikasi Pendaftar
@@ -137,10 +136,10 @@ export default function Profile() {
         </>
       )}
 
-      {applicant.verification_status === "rejected" && (
+      {applicant.profile.registration_status === "rejected" && (
         <>
           <h2 className="text-xl font-semibold mt-6">Status Verifikasi</h2>
-          <Button variant="green" className="w-full" disabled>
+          <Button className="w-full bg-red-500 hover:bg-red-500 rounded-4xl" disabled>
             Rejected
           </Button>
 
@@ -151,7 +150,7 @@ export default function Profile() {
         </>
       )}
 
-      {applicant.verification_status === "accepted" && (
+      {applicant.profile.registration_status === "approved" && (
         <>
           <h2 className="text-xl font-semibold mt-6">Status Verifikasi</h2>
           <Button variant="green" className="w-full" disabled>
@@ -178,8 +177,7 @@ export default function Profile() {
                   </Link>
 
                   <Button
-                    variant="green"
-                    className="w-full"
+                    className="w-full bg-green-500 hover:bg-green-500 rounded-4xl"
                     onClick={() => handleGraduation("graduated")}
                     disabled={isGraduationLoading}
                   >
@@ -187,8 +185,7 @@ export default function Profile() {
                   </Button>
 
                   <Button
-                    variant="green"
-                    className="w-full"
+                    className="w-full bg-red-500 hover:bg-red-500 rounded-4xl"
                     onClick={() => handleGraduation("not_graduated")}
                     disabled={isGraduationLoading}
                   >

@@ -40,7 +40,7 @@ import {
 } from "@/components/ui/input-group";
 import { useState } from "react";
 
-import { useApplicantDetail } from "@/hooks/useManager";
+import { useManagerApplicantDetail } from "@/hooks/useManager";
 
 export default function DataAlamat() {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
@@ -73,7 +73,9 @@ export default function DataAlamat() {
 
   const applicant = applicantData?.data?.data;
 
-  const data = applicant.steps.address;
+  const data = applicant.profile;
+
+  console.log(data)
 
   console.log(id);
 
@@ -140,7 +142,7 @@ export default function DataAlamat() {
                   <FormItem>
                     <FormLabel>Kecamatan</FormLabel>
                     <FormControl>
-                      <Input placeholder={data.district} {...field} readOnly />
+                      <Input placeholder={data.kecamatan} {...field} readOnly />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -154,7 +156,7 @@ export default function DataAlamat() {
                   <FormItem>
                     <FormLabel>Kelurahan</FormLabel>
                     <FormControl>
-                      <Input placeholder={data.village} {...field} readOnly />
+                      <Input placeholder={data.kelurahan} {...field} readOnly />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -187,7 +189,7 @@ export default function DataAlamat() {
                   <FormItem>
                     <FormLabel>Nama Dusun</FormLabel>
                     <FormControl>
-                      <Input placeholder={data.village} {...field} readOnly />
+                      <Input placeholder={data.dusun} {...field} readOnly />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

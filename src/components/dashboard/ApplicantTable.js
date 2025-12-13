@@ -40,12 +40,12 @@ export function ApplicantTable({ data, type }) {
       header: ({ column }) => {
         return (
           <Button variant="ghost" className="w-full">
-            ID
+            No
           </Button>
         );
       },
       cell: ({ row }) => (
-        <div className="text-center font-medium">{row.getValue("user_id")}</div>
+        <div className="text-center font-medium">{row.index + 1}</div>
       ),
     },
     {
@@ -74,6 +74,7 @@ export function ApplicantTable({ data, type }) {
           approved: "Approved",
           rejected: "Rejected",
           under_review: "Under Review",
+          submitted: "Submitted",
         };
         return (
           <div className="text-center">

@@ -136,20 +136,7 @@ export default function Profile() {
       </div>
 
       <Heading title={"Verifikasi"} />
-      <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
-        {/* Verifikasi Data Pendaftar */}
-        <Link
-          href={`/dashboard/edit/pendaftaran/data-diri?id=${profile.id_profile}`}
-          className="w-full"
-        >
-          <Button
-            variant="green"
-            className="rounded-lg w-full text-sm sm:text-base py-2 sm:py-3 flex items-center justify-center gap-2"
-          >
-            <FileCheck className="w-4 h-4" />
-            Verifikasi Data
-          </Button>
-        </Link>
+      <div className="w-full grid grid-cols-1 gap-3 sm:gap-4 lg:gap-6">
 
         {/* Verifikasi Pembayaran */}
         {payment ? (

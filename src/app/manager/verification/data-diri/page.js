@@ -27,7 +27,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { useApplicantDetail } from "@/hooks/useManager";
+import { useManagerApplicantDetail } from "@/hooks/useManager";
+import { useApplicantProfile } from "@/hooks/useAdmin";
+
 
 const formatValue = (value) => {
   if (!value) return "";
@@ -76,6 +78,13 @@ export default function DataDiri() {
     error: applicantError,
   } = useManagerApplicantDetail(id);
 
+  const {
+    data: applicantProfileData,
+    isLoading: isApplicantProfileLoading,
+    isError: isApplicantProfileError,
+    error: applicantProfileError,
+  } = useApplicantProfile(id);
+
   const form = useForm({
     defaultValues: {
       namaLengkap: "",
@@ -94,25 +103,31 @@ export default function DataDiri() {
     },
   });
 
+  if (isApplicantProfileLoading) return <div>Loading applicant...</div>;
   if (isApplicantLoading) return <div>Loading applicant...</div>;
   if (isApplicantError)
     return <div>Error loading applicant: {applicantError.message}</div>;
 
-  const applicant = applicantData?.data?.data;
-  const data = applicant.steps.student_profile;
+  const registrationData = applicantProfileData?.data?.data;
 
-  console.log(data);
+  const applicant = applicantData?.data?.data;
+
+  console.log(applicant)
+
+  console.log(registrationData);
+
+  const profile = registrationData?.profile || {};
 
   return (
     <ProtectedRoute>
       <div className="mx-3 md:mx-12 mt-6 grid grid-cols-1 gap-12">
         <Card className="w-full flex flex-col md:flex-row gap-6 p-8 rounded-2xl shadow-md bg-[var(--light-cream)] justify-between">
           <div className="flex flex-col p-2 w-full sm:w-2/3 space-y-1 items-start">
-            <h2 className="font-bold text-xl">{applicant.user.name}</h2>
+            <h2 className="font-bold text-xl">{profile.full_name}</h2>
             <h3 className="text-gray-500">
               {applicant.user.registration_number}
             </h3>
-            <p className="text-gray-500">{applicant.user.email}</p>
+            <p className="text-gray-500">{registrationData?.user?.email}</p>
           </div>
           <Button variant={"yellow"}>{applicant.user.status}</Button>
         </Card>
@@ -133,7 +148,7 @@ export default function DataDiri() {
                 <FormItem>
                   <FormLabel>Nama Lengkap</FormLabel>
                   <FormControl>
-                    <Input placeholder={data.full_name} {...field} readOnly />
+                    <Input placeholder={profile.full_name} {...field} readOnly />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -149,7 +164,7 @@ export default function DataDiri() {
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder={data.email}
+                      placeholder={registrationData?.user?.email}
                       {...field}
                       readOnly
                     />
@@ -168,7 +183,7 @@ export default function DataDiri() {
                     <FormLabel>Jenis Kelamin</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder={formatValue(data.gender)}
+                        placeholder={formatValue(profile.gender)}
                         {...field}
                         readOnly
                       />
@@ -185,7 +200,7 @@ export default function DataDiri() {
                   <FormItem>
                     <FormLabel>Agama</FormLabel>
                     <FormControl>
-                      <Input placeholder={data.religion} {...field} readOnly />
+                      <Input placeholder={profile.religion} {...field} readOnly />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -199,7 +214,7 @@ export default function DataDiri() {
                   <FormItem>
                     <FormLabel>Nomer Ponsel</FormLabel>
                     <FormControl>
-                      <Input placeholder={data.phone} {...field} readOnly />
+                      <Input placeholder={profile.phone_number} {...field} readOnly />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -214,7 +229,7 @@ export default function DataDiri() {
                     <FormLabel>Tempat Lahir</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder={data.birth_place}
+                        placeholder={profile.birth_place}
                         {...field}
                         readOnly
                       />
@@ -234,7 +249,7 @@ export default function DataDiri() {
                       <Input
                         type="text"
                         {...field}
-                        placeholder={data.birth_date}
+                        placeholder={profile.birth_date}
                         readOnly
                       />
                     </FormControl>
@@ -251,7 +266,7 @@ export default function DataDiri() {
                     <FormLabel>NIK</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder={data.family_card_number}
+                        placeholder={profile.nik}
                         {...field}
                         readOnly
                       />
@@ -285,7 +300,7 @@ export default function DataDiri() {
                         </DialogHeader>
                         <div className="flex items-center justify-center p-4">
                           <img
-                            src={`/${data.family_card_file}`}
+                            src={`/${profile.family_card_file}`}
                             alt="KTP"
                             className="max-w-full h-auto rounded-lg"
                           />
@@ -306,7 +321,7 @@ export default function DataDiri() {
                   <FormLabel>Nomor Registrasi Akta Lahir</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={data.birth_certificate_number}
+                      placeholder={profile?.birth_certificate_number}
                       {...field}
                       readOnly
                     />
@@ -339,7 +354,7 @@ export default function DataDiri() {
                         </DialogHeader>
                         <div className="flex items-center justify-center p-4">
                           <img
-                            src={`/${data.birth_certificate_file}`}
+                            src={`/${profile.birth_certificate_file}`}
                             alt="Akta Kelahiran"
                             className="max-w-full h-auto rounded-lg"
                           />
@@ -360,7 +375,7 @@ export default function DataDiri() {
                   <FormLabel>Nomor Kartu Keluarga</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={data.family_card_number}
+                      placeholder={profile.no_kk}
                       {...field}
                       readOnly
                     />
@@ -393,7 +408,7 @@ export default function DataDiri() {
                         </DialogHeader>
                         <div className="flex items-center justify-center p-4">
                           <img
-                            src={`/${data.family_card_file}`}
+                            src={`/${profile.family_card_file}`}
                             alt="Kartu Keluarga"
                             className="max-w-full h-auto rounded-lg"
                           />
@@ -414,7 +429,7 @@ export default function DataDiri() {
                   <FormLabel>Kewarganegaraan</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={formatValue(data.citizenship)}
+                      placeholder={formatValue(profile.citizenship)}
                       {...field}
                       readOnly
                     />
@@ -434,7 +449,7 @@ export default function DataDiri() {
                     <FormControl>
                       <Input
                         type="number"
-                        placeholder={data.child_number}
+                        placeholder={profile?.birth_order}
                         {...field}
                         readOnly
                       />
@@ -453,7 +468,7 @@ export default function DataDiri() {
                     <FormControl>
                       <Input
                         type="number"
-                        placeholder={data.siblings_count}
+                        placeholder={profile.number_of_siblings}
                         {...field}
                         readOnly
                       />
