@@ -24,6 +24,8 @@ export default function Profil() {
   const { data: profileData, isPending: isLoadingProfile } = useProfile();
   const user = profileData?.data?.data?.user;
 
+  console.log(user);
+
   const uploadAvatarMutation = useUploadAvatar();
   const changePasswordMutation = useChangePassword();
   const changeEmailMutation = useChangeEmail();
@@ -146,7 +148,7 @@ export default function Profil() {
           />
           <div className="relative w-72 h-96 rounded-xl cursor-pointer group">
             <Image
-              src={user?.avatar_url || "/logo.jpg"}
+              src={"/logo.jpg"}
               fill
               alt="profile-image"
               className="object-cover rounded-2xl transition duration-300 group-hover:opacity-70"

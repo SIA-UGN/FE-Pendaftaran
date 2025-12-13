@@ -34,159 +34,29 @@ import {
   useGuardians,
 } from "@/hooks/useRegistration";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+const FormSchema = z.object({
+  namaAyah: z.string().optional(),
+  alamatAyah: z.string().optional(),
+  telpAyah: z.string().optional(),
+  pekerjaanAyah: z.string().optional(),
+  pendidikanAyah: z.string().optional(),
+  penghasilanAyah: z.string().optional(),
 
-const FormSchema = z
-  .object({
-    namaAyah: z.string().min(2).optional(),
-    alamatAyah: z.string().min(5).optional(),
-    telpAyah: z.string().min(10).optional(),
-    pekerjaanAyah: z.string().min(2).optional(),
-    pendidikanAyah: z.string().optional(),
-    penghasilanAyah: z.string().optional(),
+  namaIbu: z.string().optional(),
+  alamatIbu: z.string().optional(),
+  telpIbu: z.string().optional(),
+  pekerjaanIbu: z.string().optional(),
+  pendidikanIbu: z.string().optional(),
+  penghasilanIbu: z.string().optional(),
 
-    namaIbu: z.string().min(2).optional(),
-    alamatIbu: z.string().min(5).optional(),
-    telpIbu: z.string().min(10).optional(),
-    pekerjaanIbu: z.string().min(2).optional(),
-    pendidikanIbu: z.string().optional(),
-    penghasilanIbu: z.string().optional(),
-
-    namaWali: z.string().optional(),
-    alamatWali: z.string().optional(),
-    telpWali: z.string().min(10).optional(),
-    pekerjaanWali: z.string().min(2).optional(),
-    pendidikanWali: z.string().optional(),
-    penghasilanWali: z.string().optional(),
-  })
-  .superRefine((data, ctx) => {
-    const hasParent =
-      (data.namaAyah && data.namaAyah.trim().length > 0) ||
-      (data.namaIbu && data.namaIbu.trim().length > 0);
-    const hasWali = data.namaWali && data.namaWali.trim().length > 0;
-
-    if (!hasParent && !hasWali) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Harap isi data orang tua atau wali.",
-      });
-    }
-
-    // if guardian name is provided, ensure other fields are present and valid
-    if (hasWali) {
-      if (!data.alamatWali || !data.alamatWali.trim()) {
-        ctx.addIssue({
-          path: ["alamatWali"],
-          code: z.ZodIssueCode.custom,
-          message: "Alamat Wali harus diisi.",
-        });
-      }
-      if (!data.telpWali || data.telpWali.trim().length < 10) {
-        ctx.addIssue({
-          path: ["telpWali"],
-          code: z.ZodIssueCode.custom,
-          message: "No. HP Wali tidak valid.",
-        });
-      }
-      if (!data.pekerjaanWali || !data.pekerjaanWali.trim()) {
-        ctx.addIssue({
-          path: ["pekerjaanWali"],
-          code: z.ZodIssueCode.custom,
-          message: "Pekerjaan Wali harus diisi.",
-        });
-      }
-      if (!data.pendidikanWali || !data.pendidikanWali.trim()) {
-        ctx.addIssue({
-          path: ["pendidikanWali"],
-          code: z.ZodIssueCode.custom,
-          message: "Pendidikan Wali harus dipilih.",
-        });
-      }
-      if (!data.penghasilanWali || !data.penghasilanWali.trim()) {
-        ctx.addIssue({
-          path: ["penghasilanWali"],
-          code: z.ZodIssueCode.custom,
-          message: "Penghasilan Wali harus dipilih.",
-        });
-      }
-    }
-
-    // validate parent details if parent name is provided
-    if (data.namaAyah && data.namaAyah.trim()) {
-      if (!data.alamatAyah || !data.alamatAyah.trim()) {
-        ctx.addIssue({
-          path: ["alamatAyah"],
-          code: z.ZodIssueCode.custom,
-          message: "Alamat Ayah harus diisi.",
-        });
-      }
-      if (!data.telpAyah || data.telpAyah.trim().length < 10) {
-        ctx.addIssue({
-          path: ["telpAyah"],
-          code: z.ZodIssueCode.custom,
-          message: "No. HP Ayah tidak valid.",
-        });
-      }
-      if (!data.pekerjaanAyah || !data.pekerjaanAyah.trim()) {
-        ctx.addIssue({
-          path: ["pekerjaanAyah"],
-          code: z.ZodIssueCode.custom,
-          message: "Pekerjaan Ayah harus diisi.",
-        });
-      }
-      if (!data.pendidikanAyah || !data.pendidikanAyah.trim()) {
-        ctx.addIssue({
-          path: ["pendidikanAyah"],
-          code: z.ZodIssueCode.custom,
-          message: "Pendidikan Ayah harus dipilih.",
-        });
-      }
-      if (!data.penghasilanAyah || !data.penghasilanAyah.trim()) {
-        ctx.addIssue({
-          path: ["penghasilanAyah"],
-          code: z.ZodIssueCode.custom,
-          message: "Penghasilan Ayah harus dipilih.",
-        });
-      }
-    }
-
-    if (data.namaIbu && data.namaIbu.trim()) {
-      if (!data.alamatIbu || !data.alamatIbu.trim()) {
-        ctx.addIssue({
-          path: ["alamatIbu"],
-          code: z.ZodIssueCode.custom,
-          message: "Alamat Ibu harus diisi.",
-        });
-      }
-      if (!data.telpIbu || data.telpIbu.trim().length < 10) {
-        ctx.addIssue({
-          path: ["telpIbu"],
-          code: z.ZodIssueCode.custom,
-          message: "No. HP Ibu tidak valid.",
-        });
-      }
-      if (!data.pekerjaanIbu || !data.pekerjaanIbu.trim()) {
-        ctx.addIssue({
-          path: ["pekerjaanIbu"],
-          code: z.ZodIssueCode.custom,
-          message: "Pekerjaan Ibu harus diisi.",
-        });
-      }
-      if (!data.pendidikanIbu || !data.pendidikanIbu.trim()) {
-        ctx.addIssue({
-          path: ["pendidikanIbu"],
-          code: z.ZodIssueCode.custom,
-          message: "Pendidikan Ibu harus dipilih.",
-        });
-      }
-      if (!data.penghasilanIbu || !data.penghasilanIbu.trim()) {
-        ctx.addIssue({
-          path: ["penghasilanIbu"],
-          code: z.ZodIssueCode.custom,
-          message: "Penghasilan Ibu harus dipilih.",
-        });
-      }
-    }
-  });
+  namaWali: z.string().optional(),
+  alamatWali: z.string().optional(),
+  telpWali: z.string().optional(),
+  pekerjaanWali: z.string().optional(),
+  pendidikanWali: z.string().optional(),
+  penghasilanWali: z.string().optional(),
+});
+// All validation is optional; fields are intentionally permissive.
 
 export default function DataOrangtua() {
   const router = useRouter();
