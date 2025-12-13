@@ -2,7 +2,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://be-ugn.test/api",
   headers: {
     "Content-Type": "application/json",
   },
