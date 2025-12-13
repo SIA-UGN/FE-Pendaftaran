@@ -89,10 +89,17 @@ export default function DetailPaymentMethod() {
   const data = paymentMethodData?.data?.data;
 
   const onSubmit = (formData) => {
-    updatePaymentMethod({
-      id: id,
-      data: formData,
-    });
+    updatePaymentMethod(
+      {
+        id: id,
+        data: formData,
+      },
+      {
+        onSuccess: () => {
+          router.push("/dashboard/edit/pembayaran");
+        },
+      }
+    );
   };
 
   return (

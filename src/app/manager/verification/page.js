@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/input-group";
 
 import {
-  useApplicantDetail,
-  useSetGraduationStatus,
+  useManagerApplicantDetail,
+  useManagerSetGraduationStatus,
   useVerifyApplicant,
 } from "@/hooks/useManager";
 
@@ -51,14 +51,14 @@ export default function Profile() {
 
   const { mutate: setRegistrationStatus } = useVerifyApplicant();
   const { mutate: setGraduationStatus, isLoading: isGraduationLoading } =
-    useSetGraduationStatus();
+    useManagerSetGraduationStatus();
 
   const {
     data: applicantData,
     isLoading: isApplicantLoading,
     isError: isApplicantError,
     error: applicantError,
-  } = useApplicantDetail(id);
+  } = useManagerApplicantDetail(id);
 
   if (isApplicantLoading) return <div>Loading applicant...</div>;
   if (isApplicantError)

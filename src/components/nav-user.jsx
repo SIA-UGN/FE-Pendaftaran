@@ -22,30 +22,29 @@ import { useRouter } from "next/navigation";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useLogout, useAuth } from "@/hooks/useAuth";
+import { useLogout } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function NavUser() {
   const logoutMutation = useLogout();
   const { isMobile } = useSidebar();
-  const { data: user, isLoading, isError, error } = useAuth(); // ambil data user
-  const [loading, setLoading] = useState(false);
+  const { user, loading } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = () => {
-    setLoading(true);
+    setIsLoggingOut(true);
     logoutMutation.mutate({
       onSuccess: () => {
-        setLoading(false);
+        setIsLoggingOut(false);
       },
       onError: () => {
-        setLoading(false);
+        setIsLoggingOut(false);
       },
     });
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error: {error?.message}</div>;
-
-  console.log(user)
+  if (loading) return <div>Loading...</div>;
+  if (!user) return null;
 
   return (
     <SidebarMenu>

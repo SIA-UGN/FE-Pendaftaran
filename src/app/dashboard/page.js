@@ -26,15 +26,13 @@ export default function Page() {
       </div>
     );
 
-  console.log(data);
+  const totalApplicants = data?.data?.data?.total_applicants;
+  const totalManagers = data?.data?.data?.total_managers;
 
-  const totalApplicants = data?.data?.data?.overview?.total_applicants;
-  const totalManagers = data?.data?.data?.overview?.total_managers;
+  const revenue = data?.data?.data?.total_revenue;
+  const growthPercentage = data?.data?.data?.growth_percentage;
 
-  const revenue = data?.data?.data?.quick_status?.total_revenue;
-  const growthPercentage = data?.data?.data?.quick_status?.growth_percentage;
-
-  const top_programs = data?.data?.data?.top_programs;
+  const top_programs = data?.data?.data?.programs;
 
   return (
     <div className="w-full min-h-screen">

@@ -119,7 +119,7 @@ export function ChartPiePrograms({ data }) {
   console.log("ChartPiePrograms data:", data);
 
   const colors = generateColors(data.length);
-  const total = data.reduce((sum, item) => sum + item.count, 0);
+  const total = data.reduce((sum, item) => sum + (Number(item.value) || Number(item.count) || 0), 0);
 
   return (
     <Card className="flex flex-col w-full shadow-md gap-0">
@@ -149,8 +149,8 @@ export function ChartPiePrograms({ data }) {
                     activeIndex={activeIndex}
                     activeShape={renderActiveShape}
                     data={data}
-                    dataKey="count"
-                    nameKey="program"
+                    dataKey={(entry) => entry.value || entry.count || 0}
+                    nameKey="name"
                     cx="50%"
                     cy="50%"
                     innerRadius="45%"

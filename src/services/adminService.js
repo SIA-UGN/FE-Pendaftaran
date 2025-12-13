@@ -25,6 +25,7 @@ export const adminService = {
   // Applicants Management
   getApplicants: (params) => apiClient.get("/admin/applicants", { params }),
   getApplicantDetail: (id) => apiClient.get(`/admin/applicants/${id}`),
+  getApplicantPayment: (id) => apiClient.get(`/admin/applicants/${id}/payment`),
   updateApplicantStatus: (id, data) =>
     apiClient.put(`/admin/applicants/${id}/status`, data),
   setGraduationStatus: (id, data) =>
@@ -38,6 +39,7 @@ export const adminService = {
   serveDocument: (id) => apiClient.get(`/admin/document-file/${id}`),
 
   // Payment Verification
-  getPaymentVerification: (id) =>
-    apiClient.get(`/admin/payments/${id}/verification`),
+  getPaymentVerification: (id) => apiClient.get(`/payments/${id}`),
+  verifyPayment: (id, data) =>
+    apiClient.put(`/admin/payments/${id}/verify`, data),
 };

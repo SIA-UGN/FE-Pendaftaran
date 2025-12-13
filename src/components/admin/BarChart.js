@@ -50,9 +50,21 @@ export function ChartBarLabel() {
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error: {error?.message}</div>;
 
-  const data = yearlyRevenueData?.data?.data;
-  console.log(data);
-  const yearly_revenue = data?.yearly_revenue;
+  const responseData = yearlyRevenueData?.data?.data || {};
+  console.log("Yearly Revenue Data:", responseData);
+  
+  // Backend returns: { year: 2025, monthly_revenue: { 1: 0, 2: 0, ..., 11: "9500000.00", 12: "11500000.00" } }
+  const monthlyRevenue = responseData?.monthly_revenue || {};
+  
+  // Transform to array format for BarChart
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const yearly_revenue = monthNames.map((month, index) => ({
+    month: month,
+    revenue: Number(monthlyRevenue[index + 1] || 0)
+  }));
+  
+  const year = responseData?.year || new Date().getFullYear();
+  const range = { start: `January ${year}`, end: `December ${year}` };
 
   return (
     <Card className="w-full">
@@ -61,7 +73,7 @@ export function ChartBarLabel() {
           Bar Chart - Label
         </CardTitle>
         <CardDescription className="text-xs sm:text-sm">
-          {data.range.start} - {data.range.end}
+          {range.start} - {range.end}
         </CardDescription>
       </CardHeader>
       <CardContent className="px-2 sm:px-4 lg:px-6 pb-4 sm:pb-6">
@@ -82,7 +94,7 @@ export function ChartBarLabel() {
             >
               <CartesianGrid vertical={false} strokeDasharray="3 3" />
               <XAxis
-                dataKey="year"
+                dataKey="month"
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
@@ -99,20 +111,14 @@ export function ChartBarLabel() {
                 tickLine={false}
                 axisLine={false}
                 tick={{ fontSize: 12 }}
-                width={40}
-                label={{
-                  value: "Jumlah",
-                  angle: -90,
-                  position: "insideLeft",
-                  offset: 10,
-                  style: { fontSize: 14, textAnchor: "middle" },
-                }}
+                width={60}
+                tickFormatter={(value) => `${(value / 1000000).toFixed(0)}jt`}
               />
               <ChartTooltip
                 cursor={false}
                 content={<ChartTooltipContent hideLabel />}
               />
-              <Bar dataKey="desktop" radius={8} maxBarSize={60}>
+              <Bar dataKey="revenue" radius={8} maxBarSize={60}>
                 {yearly_revenue.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}

@@ -73,7 +73,7 @@ export default function DataPrestasi() {
     isLoading: isApplicantLoading,
     isError: isApplicantError,
     error: applicantError,
-  } = useApplicantDetail(id);
+  } = useManagerApplicantDetail(id);
 
   if (isApplicantLoading) return <div>Loading applicant...</div>;
   if (isApplicantError)
@@ -107,11 +107,13 @@ export default function DataPrestasi() {
         </div>
       </div>
 
-      <Prestasi Data={data}/>
+      <Prestasi Data={data} />
 
       <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
         <Button variant={"green"}>Kembali</Button>
-        <Link href={`/manager/verification/pembayaran?payment_id=${applicant.payment_info.id}&id=${id}`}>
+        <Link
+          href={`/manager/verification/pembayaran?payment_id=${applicant.payment_info.id}&id=${id}`}
+        >
           <Button variant="matcha">Lanjut</Button>
         </Link>
       </div>

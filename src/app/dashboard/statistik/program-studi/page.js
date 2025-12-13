@@ -8,16 +8,42 @@ import { ChartPiePrograms } from "@/components/dashboard/ChartPiePrograms";
 export default function Page() {
   const { data, isLoading, isError, error } = useProgramStatistics();
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error: {error.message}</div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Loading...
+      </div>
+    );
 
-  console.log(data.data.data.donut_chart);
+  if (isError)
+    return (
+      <div className="flex items-center justify-center min-h-screen p-4">
+        <div className="text-red-500 text-center">
+          Error: {error?.response?.data?.message || error?.message}
+        </div>
+      </div>
+    );
 
-  const chartData = data.data.data.donut_chart;
-  const topPrograms = data.data.data.top_programs;
-  const allPrograms = data.data.data.all_programs;
+  const responseData = data?.data?.data || [];
 
-  console.log(chartData);
+  console.log("Program Statistics Backend Data:", responseData);
+
+  // Backend returns array of programs: [{ program_name, total_applicants, approved, pending, rejected }]
+  // Transform for ChartPiePrograms - expects array with name and value
+  const chartData = Array.isArray(responseData) ? responseData.map(program => ({
+    name: program.program_name,
+    value: program.total_applicants,
+    fill: `hsl(var(--chart-${Math.floor(Math.random() * 5) + 1}))`
+  })) : [];
+
+  // Top programs is just the data itself
+  const topPrograms = Array.isArray(responseData) ? responseData.map(program => ({
+    program: program.program_name,
+    registrants: program.total_applicants,
+    description: `Approved: ${program.approved}, Pending: ${program.pending}, Rejected: ${program.rejected}`
+  })) : [];
+
+  const allPrograms = responseData;
 
   return (
     <div className="flex flex-col items-center px-4 sm:px-6 lg:px-8 max-w-6xl my-6 sm:my-8 lg:my-12 w-full gap-3 mx-auto">

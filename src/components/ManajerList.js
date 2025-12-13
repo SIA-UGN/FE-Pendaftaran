@@ -25,7 +25,13 @@ export default function ManajerList() {
       </div>
     );
 
-  const dataManager = data.data.data.managers;
+  const responseData = data?.data?.data || {};
+  // Backend returns array directly in data, not nested in data.managers
+  // Response: { success: true, data: [...] } where data is UserResource::collection
+  const dataManager = Array.isArray(responseData) ? responseData : [];
+
+  console.log("Managers Data:", data?.data);
+  console.log("Managers List:", dataManager);
 
   // Filter sederhana (nama atau email)
   const filteredManager = dataManager.filter((manager) => {

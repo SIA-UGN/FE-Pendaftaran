@@ -39,10 +39,7 @@ export function ApplicantTable({ data, type }) {
       accessorKey: "user_id",
       header: ({ column }) => {
         return (
-          <Button
-            variant="ghost"
-            className="w-full"
-          >
+          <Button variant="ghost" className="w-full">
             ID
           </Button>
         );
@@ -54,13 +51,7 @@ export function ApplicantTable({ data, type }) {
     {
       accessorKey: "registration_number",
       header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-          >
-            Nomor Peserta
-          </Button>
-        );
+        return <Button variant="ghost">Nomor Peserta</Button>;
       },
       cell: ({ row }) => (
         <div className="text-center">{row.getValue("registration_number")}</div>
@@ -91,8 +82,8 @@ export function ApplicantTable({ data, type }) {
                 status === "approved"
                   ? "bg-green-100 text-green-700"
                   : status === "rejected"
-                    ? "bg-red-100 text-red-700"
-                    : "bg-yellow-100 text-yellow-700"
+                  ? "bg-red-100 text-red-700"
+                  : "bg-yellow-100 text-yellow-700"
               }`}
             >
               {statusLabels[status] || status}
@@ -118,8 +109,8 @@ export function ApplicantTable({ data, type }) {
             <Link
               href={
                 type === "manager"
-                  ? `/manager/verification?id=${applicant.id}`
-                  : `/dashboard/profile?id=${applicant.user_id}`
+                  ? `/manager/verification?id=${applicant.id_profile}`
+                  : `/dashboard/profile?id=${applicant.id_profile}`
               }
             >
               <Button
@@ -250,8 +241,8 @@ export function ApplicantTable({ data, type }) {
                         applicant.status === "approved"
                           ? "bg-green-100 text-green-700"
                           : applicant.status === "rejected"
-                            ? "bg-red-100 text-red-700"
-                            : "bg-yellow-100 text-yellow-700"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-yellow-100 text-yellow-700"
                       }`}
                     >
                       {applicant.status}

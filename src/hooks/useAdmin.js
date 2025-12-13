@@ -77,6 +77,33 @@ export const useDeleteManager = () => {
   });
 };
 
+// User Profile
+export const useUserProfile = (id) => {
+  return useQuery({
+    queryKey: ["userProfile", id],
+    queryFn: () => adminService.getUserProfile(id),
+    enabled: !!id,
+  });
+};
+
+// Applicant Profile (for dashboard/profile page)
+export const useApplicantProfile = (id) => {
+  return useQuery({
+    queryKey: ["applicantProfile", id],
+    queryFn: () => adminService.getApplicantDetail(id),
+    enabled: !!id,
+  });
+};
+
+// Applicant Payment
+export const useApplicantPayment = (id) => {
+  return useQuery({
+    queryKey: ["applicantPayment", id],
+    queryFn: () => adminService.getApplicantPayment(id),
+    enabled: !!id,
+  });
+};
+
 // Applicants
 export const useApplicants = (params = {}) => {
   return useQuery({
@@ -149,6 +176,33 @@ export const useUpdateDocumentStatus = () => {
     onError: (error) => {
       toast.error(
         error.response?.data?.message || "Gagal memperbarui status dokumen"
+      );
+    },
+  });
+};
+
+// Payment Verification
+export const usePaymentVerification = (id) => {
+  return useQuery({
+    queryKey: ["paymentVerification", id],
+    queryFn: () => adminService.getPaymentVerification(id),
+    enabled: !!id,
+  });
+};
+
+export const useVerifyPayment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }) => adminService.verifyPayment(id, data),
+    onSuccess: () => {
+      toast.success("Pembayaran berhasil diverifikasi");
+      queryClient.invalidateQueries({ queryKey: ["paymentVerification"] });
+      queryClient.invalidateQueries({ queryKey: ["applicants"] });
+    },
+    onError: (error) => {
+      toast.error(
+        error.response?.data?.message || "Gagal verifikasi pembayaran"
       );
     },
   });

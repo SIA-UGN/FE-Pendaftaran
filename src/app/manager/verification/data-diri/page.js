@@ -74,7 +74,7 @@ export default function DataDiri() {
     isLoading: isApplicantLoading,
     isError: isApplicantError,
     error: applicantError,
-  } = useApplicantDetail(id);
+  } = useManagerApplicantDetail(id);
 
   const form = useForm({
     defaultValues: {
@@ -126,7 +126,6 @@ export default function DataDiri() {
       <Form {...form}>
         <form className="space-y-6">
           <div className="flex flex-col gap-5 p-12 border rounded-xl md:m-12 bg-[var(--light-cream)]">
-
             <FormField
               control={form.control}
               name="namaLengkap"
@@ -161,7 +160,6 @@ export default function DataDiri() {
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
               <FormField
                 control={form.control}
                 name="jenisKelamin"

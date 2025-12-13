@@ -22,8 +22,9 @@ import { useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import { InputGroup, InputGroupAddon } from "@/components/ui/input-group";
 import Image from "next/image";
-import { usePaymentVerification } from "@/hooks/useAdmin";
+import { usePaymentVerification, useVerifyPayment } from "@/hooks/useAdmin";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function Keuangan() {
   const router = useRouter();
@@ -34,6 +35,7 @@ export default function Keuangan() {
   const [openConfirm, setOpenConfirm] = useState(false);
   const [openCancel, setOpenCancel] = useState(false);
   const [openBukti, setOpenBukti] = useState(false);
+  const [rejectNotes, setRejectNotes] = useState("");
 
   const {
     data: paymentData,
@@ -41,6 +43,33 @@ export default function Keuangan() {
     isError,
     error,
   } = usePaymentVerification(id);
+
+  const { mutate: verifyPayment, isLoading: isVerifying } = useVerifyPayment();
+
+  const handleVerifyPayment = (status) => {
+    verifyPayment(
+      {
+        id: Number(id),
+        data: {
+          status,
+          notes: status === "rejected" ? rejectNotes : undefined,
+        },
+      },
+      {
+        onSuccess: () => {
+          setOpenFirst(false);
+          setOpenConfirm(false);
+          setOpenCancel(false);
+          if (status === "verified") {
+            setOpenConfirm(true);
+          }
+          setTimeout(() => {
+            router.push("/dashboard/data");
+          }, 1500);
+        },
+      }
+    );
+  };
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error: {error.message}</div>;
@@ -177,14 +206,21 @@ export default function Keuangan() {
               </AlertDialogHeader>
               <AlertDialogFooter className="flex-col sm:flex-row gap-2">
                 <AlertDialogCancel
-                  onClick={() => setOpenCancel(true)}
+                  onClick={() => {
+                    setOpenFirst(false);
+                    setOpenCancel(true);
+                  }}
                   className="w-full sm:w-auto"
                 >
-                  Batal
+                  Tolak
                 </AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={() => setOpenConfirm(true)}
+                  onClick={() => {
+                    setOpenFirst(false);
+                    handleVerifyPayment("verified");
+                  }}
                   className="w-full sm:w-auto"
+                  disabled={isVerifying}
                 >
                   Ya, Verifikasi
                 </AlertDialogAction>
@@ -215,9 +251,9 @@ export default function Keuangan() {
           <AlertDialog open={openCancel} onOpenChange={setOpenCancel}>
             <AlertDialogContent className="w-[90vw] sm:w-full max-w-lg">
               <AlertDialogHeader>
-                <AlertDialogTitle>Catatan Perubahan</AlertDialogTitle>
+                <AlertDialogTitle>Catatan Penolakan</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Tuliskan perubahan untuk dokumen pendaftar
+                  Tuliskan alasan penolakan pembayaran
                 </AlertDialogDescription>
               </AlertDialogHeader>
 
@@ -225,16 +261,28 @@ export default function Keuangan() {
                 <TextareaAutosize
                   data-slot="input-group-control"
                   className="flex field-sizing-content min-h-32 w-full resize-none rounded-md bg-transparent px-3 py-2.5 text-sm sm:text-base transition-[color,box-shadow] outline-none border border-gray-300"
-                  placeholder="Masukkan catatan perubahan..."
+                  placeholder="Masukkan alasan penolakan..."
+                  value={rejectNotes}
+                  onChange={(e) => setRejectNotes(e.target.value)}
                 />
               </InputGroup>
 
               <AlertDialogFooter>
-                <AlertDialogAction
-                  onClick={() => setOpenCancel(false)}
+                <AlertDialogCancel
+                  onClick={() => {
+                    setOpenCancel(false);
+                    setRejectNotes("");
+                  }}
                   className="w-full sm:w-auto"
                 >
-                  Simpan
+                  Batal
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => handleVerifyPayment("rejected")}
+                  disabled={!rejectNotes.trim() || isVerifying}
+                  className="w-full sm:w-auto"
+                >
+                  Tolak Pembayaran
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

@@ -87,16 +87,16 @@ export function ChartPieApplicant({ data }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const chartData = [
-    { name: "Approved", value: data.approved, color: "#22c55e" },
-    { name: "Rejected", value: data.rejected, color: "#ef4444" },
-    { name: "Pending", value: data.pending, color: "#facc15" },
+    { name: "Approved", value: data?.approved || 0, color: "#22c55e" },
+    { name: "Rejected", value: data?.rejected || 0, color: "#ef4444" },
+    { name: "Pending", value: data?.pending || 0, color: "#facc15" },
   ];
 
-  const total = chartData.reduce((sum, item) => sum + item.value, 0);
+  const total = chartData.reduce((sum, item) => sum + (Number(item.value) || 0), 0);
 
   return (
     <Card className="flex flex-col w-full shadow-md gap-0">
-      {data.approved === 0 && data.rejected === 0 && data.pending === 0 ? (
+      {(data?.approved === 0 && data?.rejected === 0 && data?.pending === 0) || !data ? (
         <div className="flex flex-col items-center justify-center py-12 text-center text-gray-600 px-4">
           <p className="text-base sm:text-lg font-medium">
             Belum ada data pendaftar terdata.

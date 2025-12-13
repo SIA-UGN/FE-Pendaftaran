@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useDeleteManager } from "@/hooks/useAdmin";
 import { useState } from "react";
+import { ArrowUpDown, Eye, Trash2 } from "lucide-react";
 
 export function ManajerTable({ data }) {
   const [sorting, setSorting] = React.useState([]);
@@ -53,10 +54,7 @@ export function ManajerTable({ data }) {
       accessorKey: "id",
       header: ({ column }) => {
         return (
-          <Button
-            variant="ghost"
-            className="w-full"
-          >
+          <Button variant="ghost" className="w-full">
             No
           </Button>
         );
@@ -68,13 +66,7 @@ export function ManajerTable({ data }) {
     {
       accessorKey: "name",
       header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-          >
-            Nama
-          </Button>
-        );
+        return <Button variant="ghost">Nama</Button>;
       },
       cell: ({ row }) => <div>{row.getValue("name")}</div>,
     },
@@ -100,7 +92,7 @@ export function ManajerTable({ data }) {
         const manager = row.original;
         return (
           <div className="text-center">
-            <Link href={`/dashboard/manajer/profile?id=${manager.id}`}>
+            <Link href={`/dashboard/manajer/profile?id=${manager.id_user}`}>
               <Button
                 size="sm"
                 variant="yellow"
@@ -127,7 +119,7 @@ export function ManajerTable({ data }) {
               className="hover:opacity-90 transition-all"
               disabled={deleteLoading}
               onClick={() => {
-                setDeleteId(manager.id);
+                setDeleteId(manager.id_user);
                 setOpen(true);
               }}
             >
@@ -173,7 +165,7 @@ export function ManajerTable({ data }) {
     }
   };
 
-  const selectedManager = data.find((m) => m.id === deleteId);
+  const selectedManager = data.find((m) => m.id_user === deleteId);
 
   return (
     <div className="w-full space-y-4">
@@ -253,7 +245,7 @@ export function ManajerTable({ data }) {
 
                   <div className="flex gap-2 pt-2">
                     <Link
-                      href={`/dashboard/manajer/profile?id=${manager.id}`}
+                      href={`/dashboard/manajer/profile?id=${manager.id_user}`}
                       className="flex-1"
                     >
                       <Button
@@ -269,7 +261,7 @@ export function ManajerTable({ data }) {
                       className="flex-1 text-sm hover:opacity-90 transition-all"
                       disabled={deleteLoading}
                       onClick={() => {
-                        setDeleteId(manager.id);
+                        setDeleteId(manager.id_user);
                         setOpen(true);
                       }}
                     >

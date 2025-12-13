@@ -34,16 +34,13 @@ export const useLogin = () => {
       localStorage.setItem("user", JSON.stringify(user));
       setAuth(user, token);
 
-      // Fetch fresh profile data to get avatar_url
       try {
         const profileResponse = await profileService.getProfile();
 
         const freshUser = profileResponse.data.data.user;
 
-        // Update localStorage with fresh user data including avatar_url
         localStorage.setItem("user", JSON.stringify(freshUser));
 
-        // Dispatch event to update Navbar
         window.dispatchEvent(
           new CustomEvent("userUpdated", { detail: freshUser })
         );
@@ -116,7 +113,6 @@ export const useChangePassword = () => {
   return useMutation({
     mutationFn: authService.changePassword,
     onSuccess: (response) => {
-      // API response structure: { success, message }
       toast.success(response.data?.message || "Password berhasil diubah");
     },
     onError: (error) => {
@@ -129,7 +125,6 @@ export const useForgotPassword = () => {
   return useMutation({
     mutationFn: authService.forgotPassword,
     onSuccess: (response) => {
-      // API response structure: { success, message }
       toast.success(
         response.data?.message || "Kode verifikasi telah dikirim ke email Anda"
       );

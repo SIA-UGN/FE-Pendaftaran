@@ -65,7 +65,7 @@ export default function DataAlamat() {
     isLoading: isApplicantLoading,
     isError: isApplicantError,
     error: applicantError,
-  } = useApplicantDetail(id);
+  } = useManagerApplicantDetail(id);
 
   if (isApplicantLoading) return <div>Loading applicant...</div>;
   if (isApplicantError)

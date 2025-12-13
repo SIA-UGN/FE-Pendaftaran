@@ -55,9 +55,9 @@ import {
 } from "@/components/ui/input-group";
 import { useState } from "react";
 import {
-  usePaymentVerification,
+  useManagerPaymentVerification,
   useVerifyApplicant,
-  useVerifyPayment,
+  useManagerVerifyPayment,
 } from "@/hooks/useManager";
 
 const FormSchema = z.object({
@@ -92,7 +92,7 @@ export default function Pembayaran() {
   const router = useRouter();
 
   const { mutate: setPaymentStatus, isLoading: isPaymentLoading } =
-    useVerifyPayment();
+    useManagerVerifyPayment();
 
   const { mutate: setRegistrationStatus, isLoading: isRegistrationLoading } =
     useVerifyApplicant();
@@ -114,7 +114,8 @@ export default function Pembayaran() {
   const [openProof, setOpenProof] = useState(false);
 
   console.log(id);
-  const { data, isLoading, isError, error } = usePaymentVerification(payment_id);
+  const { data, isLoading, isError, error } =
+    useManagerPaymentVerification(payment_id);
 
   if (isLoading) return <div>Loading payment...</div>;
   if (isError) return <div>Error loading payment: {error.message}</div>;
@@ -395,35 +396,35 @@ export default function Pembayaran() {
                 <div className="w-full mt-4">
                   <Accordion type="multiple" className="w-full">
                     {[
-                      { 
-                        key: "identity", 
+                      {
+                        key: "identity",
                         label: "Catatan Identitas Pendaftar",
-                        heading: "Data Diri"
+                        heading: "Data Diri",
                       },
-                      { 
-                        key: "address", 
+                      {
+                        key: "address",
                         label: "Catatan Alamat Pendaftar",
-                        heading: "Alamat"
+                        heading: "Alamat",
                       },
-                      { 
-                        key: "parents", 
+                      {
+                        key: "parents",
                         label: "Catatan Data Orang Tua",
-                        heading: "Data Orang Tua"
+                        heading: "Data Orang Tua",
                       },
-                      { 
-                        key: "academic", 
+                      {
+                        key: "academic",
                         label: "Catatan Data Akademik",
-                        heading: "Data Akademik"
+                        heading: "Data Akademik",
                       },
-                      { 
-                        key: "achievement", 
+                      {
+                        key: "achievement",
                         label: "Catatan Prestasi",
-                        heading: "Prestasi"
+                        heading: "Prestasi",
                       },
-                      { 
-                        key: "payment", 
+                      {
+                        key: "payment",
                         label: "Catatan Pembayaran",
-                        heading: "Pembayaran"
+                        heading: "Pembayaran",
                       },
                     ].map((item) => (
                       <AccordionItem key={item.key} value={item.key}>
@@ -465,7 +466,7 @@ export default function Pembayaran() {
                             `#notes-${section.key}`
                           );
                           const value = textarea?.value?.trim();
-                          
+
                           if (value) {
                             return `**${section.heading}**: ${value}`;
                           }

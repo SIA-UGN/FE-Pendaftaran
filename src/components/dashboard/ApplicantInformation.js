@@ -15,19 +15,26 @@ export default function ApplicantInformation({
   GraduationTable,
   type,
 }) {
-  console.log(Approved);
-  console.log(Rejected);
-  console.log(Pending);
+  console.log("Approved:", Approved);
+  console.log("Rejected:", Rejected);
+  console.log("Pending:", Pending);
 
-  console.log(VerificationTable.data);
-  console.log(GraduationTable.data);
-  console.log(`type : ${type}`);
+  console.log("VerificationTable:", VerificationTable);
+  console.log("GraduationTable:", GraduationTable);
+  console.log("Type:", type);
+
+  // Safe access dengan default values
+  const verificationData = VerificationTable?.data || [];
+  const graduationData = GraduationTable?.data || [];
 
   return (
     <div className="w-full">
       <section className="w-full">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-7xl">
-          <Heading title={"Data Verifikasi Dokumen Pendaftar"} variant="first"/>
+          <Heading
+            title={"Data Verifikasi Dokumen Pendaftar"}
+            variant="first"
+          />
 
           <div
             className="
@@ -42,7 +49,7 @@ export default function ApplicantInformation({
           </div>
 
           <div className="w-full">
-            {VerificationTable.data.length === 0 ? (
+            {verificationData.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 sm:py-16 px-4">
                 <div className="text-center">
                   <svg
@@ -93,7 +100,7 @@ export default function ApplicantInformation({
           </div>
 
           <div className="w-full">
-            {GraduationTable.data.length === 0 ? (
+            {graduationData.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 sm:py-16 px-4">
                 <div className="text-center">
                   <svg

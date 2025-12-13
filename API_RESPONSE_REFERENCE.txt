@@ -1,0 +1,4378 @@
+================================================================================
+API RESPONSE REFERENCE - SIA GLOBAL BACKEND
+================================================================================
+Laravel 11 + Sanctum Authentication
+Generated: December 10, 2025
+Total Endpoints: 85+
+
+================================================================================
+📋 TABLE OF CONTENTS
+================================================================================
+1. AUTHENTICATION ENDPOINTS
+2. REGISTRATION ENDPOINTS  
+3. PAYMENT ENDPOINTS
+4. NOTIFICATION ENDPOINTS
+5. OFFICIAL EMAIL ENDPOINTS
+6. ADMIN & MANAGER ENDPOINTS
+7. PROFILE ENDPOINTS
+8. ANNOUNCEMENT ENDPOINTS
+9. RESOURCE STRUCTURES
+10. COMMON ERROR RESPONSES
+11. NOTES & SPECIFICATIONS
+
+================================================================================
+🔐 AUTHENTICATION STRUCTURE
+================================================================================
+
+All protected endpoints require Bearer Token (Sanctum):
+
+Header:
+Authorization: Bearer {token}
+
+Alternative (via middleware api.token.query):
+?token={token}
+
+Token Format:
+{id}|{plainTextToken}
+Example: 1|abcdefghijklmnopqrstuvwxyz123456789
+
+================================================================================
+✅ STANDARD RESPONSE FORMAT
+================================================================================
+
+Success Response:
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": { /* actual data */ }
+}
+
+Error Response:
+{
+  "success": false,
+  "message": "Error message",
+  "error": "Detailed error (optional)"
+}
+
+Validation Error (422):
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "field_name": ["Error message 1", "Error message 2"]
+  }
+}
+
+================================================================================
+1. AUTHENTICATION ENDPOINTS
+================================================================================
+
+--------------------------------------------------------------------------------
+POST /api/register
+--------------------------------------------------------------------------------
+Description: Register new user as 'pendaftar'
+Auth: No
+Content-Type: application/json
+
+Request Body:
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123",
+  "password_confirmation": "password123",
+  "g-recaptcha-response": "captcha-token-from-google"
+}
+
+Success Response (201):
+{
+  "success": true,
+  "message": "Registrasi berhasil",
+  "data": {
+    "user": {
+      "id_user": 1,
+      "name": "John Doe",
+      "email": "john@example.com",
+      "username": "john123",
+      "role": "pendaftar",
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00.000000Z"
+    },
+    "token": "1|abcdefghijklmnopqrstuvwxyz123456789"
+  }
+}
+
+Error Responses:
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "email": ["The email has already been taken."],
+    "password": ["The password must be at least 8 characters."],
+    "g-recaptcha-response": ["The recaptcha verification failed."]
+  }
+}
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Gagal melakukan registrasi",
+  "error": "Database connection error..."
+}
+
+--------------------------------------------------------------------------------
+POST /api/login
+--------------------------------------------------------------------------------
+Description: Login user (Pendaftar, Admin, Manager)
+Auth: No
+Content-Type: application/json
+
+Request Body:
+{
+  "email": "john@example.com",
+  "password": "password123",
+  "g-recaptcha-response": "captcha-token-from-google"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Login berhasil",
+  "data": {
+    "user": {
+      "id_user": 1,
+      "name": "John Doe",
+      "email": "john@example.com",
+      "username": "john123",
+      "role": "pendaftar",
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00.000000Z"
+    },
+    "token": "1|abcdefghijklmnopqrstuvwxyz123456789"
+  }
+}
+
+Error Responses:
+
+401 Unauthorized:
+{
+  "success": false,
+  "message": "Email atau password salah"
+}
+
+403 Forbidden (Account not active):
+{
+  "success": false,
+  "message": "Akun Anda belum diaktifkan"
+}
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "email": ["The email field is required."],
+    "g-recaptcha-response": ["The recaptcha verification failed."]
+  }
+}
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Gagal melakukan login",
+  "error": "Server error details..."
+}
+
+--------------------------------------------------------------------------------
+GET /api/user
+--------------------------------------------------------------------------------
+Description: Get authenticated user data
+Auth: Bearer Token (Required)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id_user": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "username": "john123",
+    "role": "pendaftar",
+    "is_active": true,
+    "created_at": "2025-01-01T00:00:00.000000Z"
+  }
+}
+
+Error Responses:
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Gagal mengambil data user",
+  "error": "Error details..."
+}
+
+--------------------------------------------------------------------------------
+POST /api/logout
+--------------------------------------------------------------------------------
+Description: Logout user and invalidate current token
+Auth: Bearer Token (Required)
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Logout berhasil"
+}
+
+Error Responses:
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Gagal melakukan logout",
+  "error": "Error details..."
+}
+
+--------------------------------------------------------------------------------
+POST /api/forgot-password
+--------------------------------------------------------------------------------
+Description: Send 6-digit reset code to email
+Auth: No
+Content-Type: application/json
+
+Request Body:
+{
+  "email": "john@example.com"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Email reset password telah dikirim."
+}
+
+Error Responses:
+
+422 Email Not Found:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "email": ["We can't find a user with that email address."]
+  }
+}
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Gagal mengirim email reset password",
+  "error": "Mail service error..."
+}
+
+--------------------------------------------------------------------------------
+POST /api/reset-password
+--------------------------------------------------------------------------------
+Description: Reset password using 6-digit code from email
+Auth: No
+Content-Type: application/json
+
+Request Body:
+{
+  "email": "john@example.com",
+  "token": "123456",
+  "password": "newpassword123",
+  "password_confirmation": "newpassword123"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Password berhasil direset"
+}
+
+Error Responses:
+
+400 Invalid/Expired Token:
+{
+  "success": false,
+  "message": "Token tidak valid atau sudah kadaluarsa"
+}
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "password": ["The password must be at least 8 characters."],
+    "password_confirmation": ["The password confirmation does not match."]
+  }
+}
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Gagal reset password",
+  "error": "Error details..."
+}
+
+--------------------------------------------------------------------------------
+POST /api/change-password
+--------------------------------------------------------------------------------
+Description: Change password for authenticated user
+Auth: Bearer Token (Required)
+Content-Type: application/json
+
+Request Body:
+{
+  "current_password": "oldpassword123",
+  "password": "newpassword123",
+  "password_confirmation": "newpassword123"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Password berhasil diubah"
+}
+
+Error Responses:
+
+401 Current Password Incorrect:
+{
+  "success": false,
+  "message": "Password saat ini salah"
+}
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "password": ["The password must be at least 8 characters."],
+    "current_password": ["The current password field is required."]
+  }
+}
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Gagal mengubah password",
+  "error": "Error details..."
+}
+
+--------------------------------------------------------------------------------
+POST /api/change-email
+--------------------------------------------------------------------------------
+Description: Change email for authenticated user
+Auth: Bearer Token (Required)
+Content-Type: application/json
+
+Request Body:
+{
+  "email": "newemail@example.com",
+  "password": "currentpassword123"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Email berhasil diubah",
+  "data": {
+    "id_user": 1,
+    "name": "John Doe",
+    "email": "newemail@example.com",
+    "username": "john123",
+    "role": "pendaftar",
+    "is_active": true,
+    "created_at": "2025-01-01T00:00:00.000000Z"
+  }
+}
+
+Error Responses:
+
+401 Password Incorrect:
+{
+  "success": false,
+  "message": "Password salah"
+}
+
+422 Email Already Taken:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "email": ["The email has already been taken."]
+  }
+}
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Gagal mengubah email",
+  "error": "Error details..."
+}
+
+================================================================================
+2. REGISTRATION ENDPOINTS
+================================================================================
+
+--------------------------------------------------------------------------------
+GET /api/programs
+--------------------------------------------------------------------------------
+Description: Get active study programs (public endpoint)
+Auth: No
+
+Success Response (200):
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "program_name": "Teknik Informatika",
+      "program_code": "TI",
+      "description": "Program studi ilmu komputer dan teknologi informasi",
+      "tuition_fee": 5000000,
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00.000000Z",
+      "updated_at": "2025-01-01T00:00:00.000000Z"
+    },
+    {
+      "id": 2,
+      "program_name": "Sistem Informasi",
+      "program_code": "SI",
+      "description": "Program studi sistem informasi bisnis",
+      "tuition_fee": 4500000,
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00.000000Z",
+      "updated_at": "2025-01-01T00:00:00.000000Z"
+    }
+  ]
+}
+
+Error Response:
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Gagal mengambil data program studi",
+  "error": "Database error..."
+}
+
+--------------------------------------------------------------------------------
+GET /api/public/provinces
+--------------------------------------------------------------------------------
+Description: Get provinces list (public endpoint)
+Auth: No
+
+Success Response (200):
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name": "DKI Jakarta"
+    },
+    {
+      "id": 2,
+      "name": "Jawa Barat"
+    },
+    {
+      "id": 3,
+      "name": "Jawa Tengah"
+    }
+  ]
+}
+
+Error Response:
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Gagal mengambil data provinsi",
+  "error": "Error details..."
+}
+
+--------------------------------------------------------------------------------
+GET /api/public/cities/{id_province}
+--------------------------------------------------------------------------------
+Description: Get cities by province ID (public endpoint)
+Auth: No
+URL Params: id_province (integer)
+
+Example: GET /api/public/cities/1
+
+Success Response (200):
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "id_province": 1,
+      "name": "Jakarta Selatan"
+    },
+    {
+      "id": 2,
+      "id_province": 1,
+      "name": "Jakarta Pusat"
+    },
+    {
+      "id": 3,
+      "id_province": 1,
+      "name": "Jakarta Utara"
+    }
+  ]
+}
+
+Error Response:
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Gagal mengambil data kota",
+  "error": "Error details..."
+}
+
+--------------------------------------------------------------------------------
+GET /api/registration/document-types
+--------------------------------------------------------------------------------
+Description: Get required document types for registration
+Auth: Bearer Token (Required)
+
+Success Response (200):
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "document_name": "KTP",
+      "description": "Kartu Tanda Penduduk",
+      "is_required": true,
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00.000000Z"
+    },
+    {
+      "id": 2,
+      "document_name": "Ijazah",
+      "description": "Ijazah SMA/SMK/Sederajat",
+      "is_required": true,
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00.000000Z"
+    },
+    {
+      "id": 3,
+      "document_name": "Kartu Keluarga",
+      "description": "Kartu Keluarga",
+      "is_required": true,
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00.000000Z"
+    }
+  ]
+}
+
+Error Response:
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Gagal mengambil data tipe dokumen",
+  "error": "Error details..."
+}
+
+--------------------------------------------------------------------------------
+POST /api/registration/profile
+--------------------------------------------------------------------------------
+Description: Store or update applicant profile (auto-save supported)
+Auth: Bearer Token (Required)
+Content-Type: application/json
+
+Request Body:
+{
+  "id_program": 1,
+  "id_program_2": 2,
+  "id_program_3": null,
+  "full_name": "John Doe",
+  "gender": "male",
+  "religion": "Islam",
+  "birth_place": "Jakarta",
+  "birth_date": "2000-01-01",
+  "nik": "1234567890123456",
+  "birth_certificate_number": "ABC123456789",
+  "no_kk": "1234567890123456",
+  "citizenship": "WNI",
+  "birth_order": 1,
+  "number_of_siblings": 2,
+  "full_address": "Jl. Contoh No. 123",
+  "dusun": "Dusun 1",
+  "kelurahan": "Kelurahan A",
+  "kecamatan": "Kecamatan B",
+  "city_regency": "Jakarta Selatan",
+  "province": "DKI Jakarta",
+  "postal_code": "12345",
+  "phone_number": "08123456789",
+  "previous_school": "SMA Negeri 1 Jakarta",
+  "graduation_status": "graduated",
+  "last_ijazah": "SMA",
+  "email": "john@example.com"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Profil berhasil disimpan",
+  "data": {
+    "id_profile": 1,
+    "id_user": 1,
+    "id_program": 1,
+    "id_program_2": 2,
+    "id_program_3": null,
+    "email": "john@example.com",
+    "registration_number": "REG-2025-0001",
+    "registration_status": "draft",
+    "full_name": "John Doe",
+    "gender": "male",
+    "religion": "Islam",
+    "birth_place": "Jakarta",
+    "birth_date": "2000-01-01",
+    "nik": "1234567890123456",
+    "birth_certificate_number": "ABC123456789",
+    "no_kk": "1234567890123456",
+    "citizenship": "WNI",
+    "birth_order": 1,
+    "number_of_siblings": 2,
+    "full_address": "Jl. Contoh No. 123",
+    "dusun": "Dusun 1",
+    "kelurahan": "Kelurahan A",
+    "kecamatan": "Kecamatan B",
+    "city_regency": "Jakarta Selatan",
+    "province": "DKI Jakarta",
+    "postal_code": "12345",
+    "phone_number": "08123456789",
+    "previous_school": "SMA Negeri 1 Jakarta",
+    "graduation_status": "graduated",
+    "last_ijazah": "SMA",
+    "created_at": "2025-01-01T00:00:00.000000Z",
+    "updated_at": "2025-01-01T00:00:00.000000Z",
+    "program": {
+      "id": 1,
+      "program_name": "Teknik Informatika",
+      "program_code": "TI",
+      "is_active": true
+    }
+  }
+}
+
+Error Responses:
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "nik": ["The nik must be 16 characters."],
+    "phone_number": ["The phone number format is invalid."]
+  }
+}
+
+500 Database Error:
+{
+  "success": false,
+  "message": "Gagal menyimpan profil: Ada field wajib database yang kosong.",
+  "error_detail": "SQLSTATE[23000]: Integrity constraint violation..."
+}
+
+--------------------------------------------------------------------------------
+GET /api/registration/profile
+--------------------------------------------------------------------------------
+Description: Get applicant profile
+Auth: Bearer Token (Required)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id_profile": 1,
+    "id_user": 1,
+    "id_program": 1,
+    "id_program_2": 2,
+    "id_program_3": null,
+    "email": "john@example.com",
+    "registration_number": "REG-2025-0001",
+    "registration_status": "draft",
+    "full_name": "John Doe",
+    "gender": "male",
+    "religion": "Islam",
+    "birth_place": "Jakarta",
+    "birth_date": "2000-01-01",
+    "nik": "1234567890123456",
+    "birth_certificate_number": "ABC123456789",
+    "no_kk": "1234567890123456",
+    "citizenship": "WNI",
+    "birth_order": 1,
+    "number_of_siblings": 2,
+    "full_address": "Jl. Contoh No. 123",
+    "dusun": "Dusun 1",
+    "kelurahan": "Kelurahan A",
+    "kecamatan": "Kecamatan B",
+    "city_regency": "Jakarta Selatan",
+    "province": "DKI Jakarta",
+    "postal_code": "12345",
+    "phone_number": "08123456789",
+    "previous_school": "SMA Negeri 1 Jakarta",
+    "graduation_status": "graduated",
+    "last_ijazah": "SMA",
+    "created_at": "2025-01-01T00:00:00.000000Z",
+    "updated_at": "2025-01-01T00:00:00.000000Z",
+    "program": {
+      "id": 1,
+      "program_name": "Teknik Informatika",
+      "program_code": "TI",
+      "is_active": true
+    }
+  }
+}
+
+Error Responses:
+
+404 Profile Not Found:
+{
+  "success": false,
+  "message": "Profil tidak ditemukan",
+  "error": "No query results for model..."
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+--------------------------------------------------------------------------------
+POST /api/registration/documents
+--------------------------------------------------------------------------------
+Description: Upload document
+Auth: Bearer Token (Required)
+Content-Type: multipart/form-data
+
+Request Body:
+id_document_type: 1
+document_file: [binary file - jpg, jpeg, png, pdf | max 2MB]
+
+Success Response (201):
+{
+  "success": true,
+  "message": "Dokumen berhasil diupload",
+  "data": {
+    "id_document": 1,
+    "id_profile": 1,
+    "id_document_type": 1,
+    "document_name": "KTP",
+    "file_path": "documents/ktp_1234567890.pdf",
+    "file_url": "http://localhost/storage/documents/ktp_1234567890.pdf",
+    "verification_status": "pending",
+    "rejection_reason": null,
+    "upload_date": "2025-01-01 10:30:00",
+    "created_at": "2025-01-01 10:30:00",
+    "updated_at": "2025-01-01 10:30:00"
+  }
+}
+
+Error Responses:
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "document_file": [
+      "The document file must be a file of type: jpg, jpeg, png, pdf.",
+      "The document file must not be greater than 2048 kilobytes."
+    ],
+    "id_document_type": ["The id document type field is required."]
+  }
+}
+
+500 Upload Failed:
+{
+  "success": false,
+  "message": "Gagal upload dokumen",
+  "error": "File system error..."
+}
+
+--------------------------------------------------------------------------------
+GET /api/registration/documents
+--------------------------------------------------------------------------------
+Description: Get applicant documents
+Auth: Bearer Token (Required)
+
+Success Response (200):
+{
+  "success": true,
+  "data": [
+    {
+      "id_document": 1,
+      "id_profile": 1,
+      "id_document_type": 1,
+      "document_name": "KTP",
+      "file_path": "documents/ktp_1234567890.pdf",
+      "file_url": "http://localhost/storage/documents/ktp_1234567890.pdf",
+      "verification_status": "pending",
+      "rejection_reason": null,
+      "upload_date": "2025-01-01 10:30:00",
+      "created_at": "2025-01-01 10:30:00",
+      "updated_at": "2025-01-01 10:30:00"
+    },
+    {
+      "id_document": 2,
+      "id_profile": 1,
+      "id_document_type": 2,
+      "document_name": "Ijazah",
+      "file_path": "documents/ijazah_9876543210.pdf",
+      "file_url": "http://localhost/storage/documents/ijazah_9876543210.pdf",
+      "verification_status": "verified",
+      "rejection_reason": null,
+      "upload_date": "2025-01-01 11:00:00",
+      "created_at": "2025-01-01 11:00:00",
+      "updated_at": "2025-01-02 09:00:00"
+    }
+  ]
+}
+
+Error Response:
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+--------------------------------------------------------------------------------
+DELETE /api/registration/documents/{id}
+--------------------------------------------------------------------------------
+Description: Delete document
+Auth: Bearer Token (Required)
+URL Params: id (integer - id_document)
+
+Example: DELETE /api/registration/documents/1
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Dokumen berhasil dihapus"
+}
+
+Error Responses:
+
+403 Unauthorized:
+{
+  "success": false,
+  "message": "Unauthorized"
+}
+
+404 Document Not Found:
+{
+  "success": false,
+  "message": "Dokumen tidak ditemukan"
+}
+
+500 Delete Failed:
+{
+  "success": false,
+  "message": "Gagal menghapus dokumen",
+  "error": "File system error..."
+}
+
+--------------------------------------------------------------------------------
+POST /api/registration/achievements
+--------------------------------------------------------------------------------
+Description: Add achievement
+Auth: Bearer Token (Required)
+Content-Type: multipart/form-data
+
+Request Body:
+achievement_name: "Juara 1 Olimpiade Informatika"
+year: 2024
+achievement_type: "academic"
+achievement_level: "national"
+organizer: "Kemendikbud"
+ranking: "1st"
+certificate_file: [binary file - jpg, jpeg, png, pdf | max 2MB]
+
+Success Response (201):
+{
+  "success": true,
+  "message": "Prestasi berhasil ditambahkan",
+  "data": {
+    "id_achievement": 1,
+    "id_profile": 1,
+    "achievement_name": "Juara 1 Olimpiade Informatika",
+    "year": 2024,
+    "achievement_type": "academic",
+    "achievement_level": "national",
+    "organizer": "Kemendikbud",
+    "ranking": "1st",
+    "certificate_path": "achievements/cert_1234567890.pdf",
+    "certificate_url": "http://localhost/storage/achievements/cert_1234567890.pdf",
+    "created_at": "2025-01-01T00:00:00.000000Z"
+  }
+}
+
+Error Responses:
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "achievement_name": ["The achievement name field is required."],
+    "certificate_file": ["The certificate file must be a file of type: jpg, jpeg, png, pdf."]
+  }
+}
+
+500 Upload Failed:
+{
+  "success": false,
+  "message": "Gagal menambahkan prestasi",
+  "error": "File system error..."
+}
+
+--------------------------------------------------------------------------------
+GET /api/registration/achievements
+--------------------------------------------------------------------------------
+Description: Get applicant achievements
+Auth: Bearer Token (Required)
+
+Success Response (200):
+{
+  "success": true,
+  "data": [
+    {
+      "id_achievement": 1,
+      "id_profile": 1,
+      "achievement_name": "Juara 1 Olimpiade Informatika",
+      "year": 2024,
+      "achievement_type": "academic",
+      "achievement_level": "national",
+      "organizer": "Kemendikbud",
+      "ranking": "1st",
+      "certificate_path": "achievements/cert_1234567890.pdf",
+      "certificate_url": "http://localhost/storage/achievements/cert_1234567890.pdf",
+      "created_at": "2025-01-01T00:00:00.000000Z"
+    }
+  ]
+}
+
+Error Response:
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+--------------------------------------------------------------------------------
+DELETE /api/registration/achievements/{id}
+--------------------------------------------------------------------------------
+Description: Delete achievement
+Auth: Bearer Token (Required)
+URL Params: id (integer - id_achievement)
+
+Example: DELETE /api/registration/achievements/1
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Prestasi berhasil dihapus"
+}
+
+Error Responses:
+
+403 Unauthorized:
+{
+  "success": false,
+  "message": "Unauthorized"
+}
+
+404 Achievement Not Found:
+{
+  "success": false,
+  "message": "Prestasi tidak ditemukan"
+}
+
+500 Delete Failed:
+{
+  "success": false,
+  "message": "Gagal menghapus prestasi",
+  "error": "File system error..."
+}
+
+--------------------------------------------------------------------------------
+POST /api/registration/guardians
+--------------------------------------------------------------------------------
+Description: Add guardian/parent data
+Auth: Bearer Token (Required)
+Content-Type: application/json
+
+Request Body:
+{
+  "relationship_type": "father",
+  "full_name": "Jane Doe",
+  "address": "Jl. Contoh No. 123",
+  "phone_number": "08123456789",
+  "occupation": "Teacher",
+  "last_education": "S1",
+  "income_range": "5000000-10000000"
+}
+
+Success Response (201):
+{
+  "success": true,
+  "message": "Data wali berhasil ditambahkan",
+  "data": {
+    "id_guardian": 1,
+    "id_profile": 1,
+    "relationship_type": "father",
+    "full_name": "Jane Doe",
+    "address": "Jl. Contoh No. 123",
+    "phone_number": "08123456789",
+    "occupation": "Teacher",
+    "last_education": "S1",
+    "income_range": "5000000-10000000",
+    "created_at": "2025-01-01T00:00:00.000000Z"
+  }
+}
+
+Error Responses:
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "relationship_type": ["The relationship type field is required."],
+    "full_name": ["The full name field is required."]
+  }
+}
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Gagal menambahkan data wali",
+  "error": "Database error..."
+}
+
+--------------------------------------------------------------------------------
+GET /api/registration/guardians
+--------------------------------------------------------------------------------
+Description: Get applicant guardians
+Auth: Bearer Token (Required)
+
+Success Response (200):
+{
+  "success": true,
+  "data": [
+    {
+      "id_guardian": 1,
+      "id_profile": 1,
+      "relationship_type": "father",
+      "full_name": "Jane Doe",
+      "address": "Jl. Contoh No. 123",
+      "phone_number": "08123456789",
+      "occupation": "Teacher",
+      "last_education": "S1",
+      "income_range": "5000000-10000000",
+      "created_at": "2025-01-01T00:00:00.000000Z"
+    },
+    {
+      "id_guardian": 2,
+      "id_profile": 1,
+      "relationship_type": "mother",
+      "full_name": "Mary Doe",
+      "address": "Jl. Contoh No. 123",
+      "phone_number": "08123456780",
+      "occupation": "Doctor",
+      "last_education": "S2",
+      "income_range": "10000000-20000000",
+      "created_at": "2025-01-01T00:00:00.000000Z"
+    }
+  ]
+}
+
+Error Response:
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+--------------------------------------------------------------------------------
+PUT /api/registration/guardians/{id}
+--------------------------------------------------------------------------------
+Description: Update guardian data
+Auth: Bearer Token (Required)
+URL Params: id (integer - id_guardian)
+Content-Type: application/json
+
+Example: PUT /api/registration/guardians/1
+
+Request Body:
+{
+  "relationship_type": "father",
+  "full_name": "Jane Doe Updated",
+  "address": "Jl. New Address No. 456",
+  "phone_number": "08123456789",
+  "occupation": "Professor",
+  "last_education": "S3",
+  "income_range": "10000000-20000000"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Data wali berhasil diupdate",
+  "data": {
+    "id_guardian": 1,
+    "id_profile": 1,
+    "relationship_type": "father",
+    "full_name": "Jane Doe Updated",
+    "address": "Jl. New Address No. 456",
+    "phone_number": "08123456789",
+    "occupation": "Professor",
+    "last_education": "S3",
+    "income_range": "10000000-20000000",
+    "created_at": "2025-01-01T00:00:00.000000Z"
+  }
+}
+
+Error Responses:
+
+403 Unauthorized:
+{
+  "success": false,
+  "message": "Unauthorized"
+}
+
+404 Guardian Not Found:
+{
+  "success": false,
+  "message": "Data wali tidak ditemukan"
+}
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "phone_number": ["The phone number format is invalid."]
+  }
+}
+
+--------------------------------------------------------------------------------
+DELETE /api/registration/guardians/{id}
+--------------------------------------------------------------------------------
+Description: Delete guardian
+Auth: Bearer Token (Required)
+URL Params: id (integer - id_guardian)
+
+Example: DELETE /api/registration/guardians/1
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Data wali berhasil dihapus"
+}
+
+Error Responses:
+
+403 Unauthorized:
+{
+  "success": false,
+  "message": "Unauthorized"
+}
+
+404 Guardian Not Found:
+{
+  "success": false,
+  "message": "Data wali tidak ditemukan"
+}
+
+500 Delete Failed:
+{
+  "success": false,
+  "message": "Gagal menghapus data wali",
+  "error": "Database error..."
+}
+
+--------------------------------------------------------------------------------
+POST /api/registration/submit
+--------------------------------------------------------------------------------
+Description: Submit registration for review
+Auth: Bearer Token (Required)
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Pendaftaran berhasil disubmit"
+}
+
+Error Responses:
+
+400 Missing Required Data:
+{
+  "success": false,
+  "message": "Lengkapi data profil terlebih dahulu"
+}
+
+Or:
+{
+  "success": false,
+  "message": "Upload minimal 3 dokumen wajib"
+}
+
+Or:
+{
+  "success": false,
+  "message": "Tambahkan minimal 1 data orang tua/wali"
+}
+
+422 Already Submitted:
+{
+  "success": false,
+  "message": "Pendaftaran sudah pernah disubmit"
+}
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Gagal submit pendaftaran",
+  "error": "Database error..."
+}
+
+--------------------------------------------------------------------------------
+GET /api/registration/status
+--------------------------------------------------------------------------------
+Description: Get registration status and progress
+Auth: Bearer Token (Required)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "registration_status": "submitted",
+    "registration_number": "REG-2025-0001",
+    "progress": {
+      "profile": true,
+      "documents": true,
+      "achievements": false,
+      "guardians": true,
+      "submitted": true
+    },
+    "profile": {
+      "id_profile": 1,
+      "id_user": 1,
+      "id_program": 1,
+      "id_program_2": 2,
+      "id_program_3": null,
+      "email": "john@example.com",
+      "registration_number": "REG-2025-0001",
+      "registration_status": "submitted",
+      "full_name": "John Doe",
+      "gender": "male",
+      "religion": "Islam",
+      "birth_place": "Jakarta",
+      "birth_date": "2000-01-01",
+      "nik": "1234567890123456",
+      "birth_certificate_number": "ABC123456789",
+      "no_kk": "1234567890123456",
+      "citizenship": "WNI",
+      "birth_order": 1,
+      "number_of_siblings": 2,
+      "full_address": "Jl. Contoh No. 123",
+      "dusun": "Dusun 1",
+      "kelurahan": "Kelurahan A",
+      "kecamatan": "Kecamatan B",
+      "city_regency": "Jakarta Selatan",
+      "province": "DKI Jakarta",
+      "postal_code": "12345",
+      "phone_number": "08123456789",
+      "previous_school": "SMA Negeri 1 Jakarta",
+      "graduation_status": "graduated",
+      "last_ijazah": "SMA",
+      "created_at": "2025-01-01T00:00:00.000000Z",
+      "updated_at": "2025-01-01T00:00:00.000000Z",
+      "program": {
+        "id": 1,
+        "program_name": "Teknik Informatika",
+        "program_code": "TI",
+        "is_active": true
+      }
+    },
+    "documents_count": 3,
+    "achievements_count": 1,
+    "guardians_count": 2
+  }
+}
+
+Error Responses:
+
+404 Profile Not Found:
+{
+  "success": false,
+  "message": "Profil tidak ditemukan"
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+================================================================================
+3. PAYMENT ENDPOINTS
+================================================================================
+
+--------------------------------------------------------------------------------
+GET /api/payments/my
+--------------------------------------------------------------------------------
+Description: Get or create current user's payment
+Auth: Bearer Token (Required)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "payment": {
+      "id": 1,
+      "payment_code": "PAY-2025-0001",
+      "invoice_number": "INV-2025-0001",
+      "amount": 5000000,
+      "paid_amount": 5000000,
+      "status": "pending",
+      "due_date": "2025-12-31T23:59:59.000000Z",
+      "paid_at": null,
+      "verified_at": null,
+      "payment_method": {
+        "id": 1,
+        "bank_name": "Bank BCA",
+        "account_number": "1234567890",
+        "account_holder": "PT Universitas Global Nusantara"
+      },
+      "destination_bank": "Bank BCA",
+      "destination_account_number": "1234567890",
+      "destination_account_holder": "PT Universitas Global Nusantara",
+      "sender_bank": null,
+      "sender_account_number": null,
+      "sender_account_holder": null,
+      "payment_proof_url": null,
+      "payment_notes": null,
+      "verification_notes": null,
+      "rejected_by": null,
+      "rejection_reason": null,
+      "rejecter": null,
+      "applicant_name": "John Doe",
+      "registration_number": "REG-2025-0001",
+      "created_at": "2025-01-01T00:00:00.000000Z",
+      "updated_at": "2025-01-01T00:00:00.000000Z"
+    },
+    "available_payment_methods": [
+      {
+        "id": 1,
+        "bank_name": "Bank BCA",
+        "account_number": "1234567890",
+        "account_holder": "PT Universitas Global Nusantara",
+        "is_active": true,
+        "created_at": "2025-01-01T00:00:00.000000Z"
+      },
+      {
+        "id": 2,
+        "bank_name": "Bank Mandiri",
+        "account_number": "9876543210",
+        "account_holder": "PT Universitas Global Nusantara",
+        "is_active": true,
+        "created_at": "2025-01-01T00:00:00.000000Z"
+      }
+    ]
+  }
+}
+
+Error Responses:
+
+404 Profile Not Found:
+{
+  "success": false,
+  "message": "Profil pendaftar tidak ditemukan"
+}
+
+400 Registration Not Submitted:
+{
+  "success": false,
+  "message": "Selesaikan pendaftaran terlebih dahulu"
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+--------------------------------------------------------------------------------
+POST /api/payments/{payment}/upload-proof
+--------------------------------------------------------------------------------
+Description: Upload payment proof (first upload - all fields required)
+Auth: Bearer Token (Required)
+URL Params: payment (integer - payment id)
+Content-Type: multipart/form-data
+
+Example: POST /api/payments/1/upload-proof
+
+Request Body:
+payment_proof: [binary file - jpg, jpeg, png, pdf | max 2MB]
+sender_bank: "Bank BCA"
+sender_account_number: "1234567890"
+sender_account_holder: "John Doe"
+paid_amount: 5000000
+payment_notes: "Transfer via mobile banking"
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Bukti pembayaran berhasil diupload",
+  "data": {
+    "id": 1,
+    "payment_code": "PAY-2025-0001",
+    "invoice_number": "INV-2025-0001",
+    "amount": 5000000,
+    "paid_amount": 5000000,
+    "status": "waiting_verification",
+    "due_date": "2025-12-31T23:59:59.000000Z",
+    "paid_at": "2025-01-15T10:30:00.000000Z",
+    "verified_at": null,
+    "payment_method": {
+      "id": 1,
+      "bank_name": "Bank BCA",
+      "account_number": "1234567890",
+      "account_holder": "PT Universitas Global Nusantara"
+    },
+    "destination_bank": "Bank BCA",
+    "destination_account_number": "1234567890",
+    "destination_account_holder": "PT Universitas Global Nusantara",
+    "sender_bank": "Bank BCA",
+    "sender_account_number": "1234567890",
+    "sender_account_holder": "John Doe",
+    "payment_proof_url": "http://localhost/storage/payments/proof_1234567890.jpg",
+    "payment_notes": "Transfer via mobile banking",
+    "verification_notes": null,
+    "rejected_by": null,
+    "rejection_reason": null,
+    "rejecter": null,
+    "applicant_name": "John Doe",
+    "registration_number": "REG-2025-0001",
+    "created_at": "2025-01-01T00:00:00.000000Z",
+    "updated_at": "2025-01-15T10:30:00.000000Z"
+  }
+}
+
+Error Responses:
+
+403 Unauthorized:
+{
+  "success": false,
+  "message": "Unauthorized"
+}
+
+400 Invalid Payment Status:
+{
+  "success": false,
+  "message": "Payment tidak dapat diupdate pada status saat ini"
+}
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "payment_proof": [
+      "The payment proof field is required.",
+      "The payment proof must be a file of type: jpg, jpeg, png, pdf.",
+      "The payment proof must not be greater than 2048 kilobytes."
+    ],
+    "sender_bank": ["The sender bank field is required."],
+    "sender_account_number": ["The sender account number field is required."],
+    "sender_account_holder": ["The sender account holder field is required."],
+    "paid_amount": ["The paid amount field is required."]
+  }
+}
+
+500 Upload Failed:
+{
+  "success": false,
+  "message": "Gagal upload bukti pembayaran",
+  "error": "File system error..."
+}
+
+--------------------------------------------------------------------------------
+POST /api/payments/{payment}/re-upload-proof
+--------------------------------------------------------------------------------
+Description: Re-upload payment proof after rejection (only file required, other fields optional)
+Auth: Bearer Token (Required)
+URL Params: payment (integer - payment id)
+Content-Type: multipart/form-data
+
+Example: POST /api/payments/1/re-upload-proof
+
+Request Body (only payment_proof is required):
+payment_proof: [binary file - jpg, jpeg, png, pdf | max 2MB] (REQUIRED)
+sender_bank: "Bank Mandiri" (OPTIONAL - update if needed)
+sender_account_number: "9876543210" (OPTIONAL - update if needed)
+sender_account_holder: "John Doe" (OPTIONAL - update if needed)
+paid_amount: 5000000 (OPTIONAL - update if needed)
+payment_notes: "Re-upload with clearer image" (OPTIONAL)
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Bukti pembayaran berhasil diupload ulang",
+  "data": {
+    "id": 1,
+    "payment_code": "PAY-2025-0001",
+    "invoice_number": "INV-2025-0001",
+    "amount": 5000000,
+    "paid_amount": 5000000,
+    "status": "waiting_verification",
+    "due_date": "2025-12-31T23:59:59.000000Z",
+    "paid_at": "2025-01-16T14:20:00.000000Z",
+    "verified_at": null,
+    "payment_method": {
+      "id": 1,
+      "bank_name": "Bank BCA",
+      "account_number": "1234567890",
+      "account_holder": "PT Universitas Global Nusantara"
+    },
+    "destination_bank": "Bank BCA",
+    "destination_account_number": "1234567890",
+    "destination_account_holder": "PT Universitas Global Nusantara",
+    "sender_bank": "Bank Mandiri",
+    "sender_account_number": "9876543210",
+    "sender_account_holder": "John Doe",
+    "payment_proof_url": "http://localhost/storage/payments/proof_9876543210.jpg",
+    "payment_notes": "Re-upload with clearer image",
+    "verification_notes": null,
+    "rejected_by": null,
+    "rejection_reason": null,
+    "rejecter": null,
+    "applicant_name": "John Doe",
+    "registration_number": "REG-2025-0001",
+    "created_at": "2025-01-01T00:00:00.000000Z",
+    "updated_at": "2025-01-16T14:20:00.000000Z"
+  }
+}
+
+Error Responses:
+
+403 Unauthorized:
+{
+  "success": false,
+  "message": "Unauthorized"
+}
+
+400 Payment Not Rejected:
+{
+  "success": false,
+  "message": "Re-upload hanya bisa dilakukan untuk payment yang ditolak"
+}
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "payment_proof": [
+      "The payment proof field is required.",
+      "The payment proof must be a file of type: jpg, jpeg, png, pdf."
+    ]
+  }
+}
+
+500 Upload Failed:
+{
+  "success": false,
+  "message": "Gagal upload ulang bukti pembayaran",
+  "error": "File system error..."
+}
+
+--------------------------------------------------------------------------------
+GET /api/payments/statistics
+--------------------------------------------------------------------------------
+Description: Get payment statistics (Admin/Manager only)
+Auth: Bearer Token (Required)
+Roles: admin, manager
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "total_payments": 100,
+    "pending": 20,
+    "waiting_verification": 30,
+    "verified": 40,
+    "rejected": 5,
+    "expired": 5,
+    "total_amount": 500000000,
+    "verified_amount": 200000000,
+    "pending_amount": 100000000,
+    "average_payment": 5000000
+  }
+}
+
+Error Responses:
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+403 Forbidden:
+{
+  "success": false,
+  "message": "Unauthorized access"
+}
+
+--------------------------------------------------------------------------------
+GET /api/payments
+--------------------------------------------------------------------------------
+Description: Get all payments with filtering (Admin/Manager only)
+Auth: Bearer Token (Required)
+Roles: admin, manager
+Query Params:
+  - status: "pending|waiting_verification|verified|rejected|expired"
+  - search: "payment code, invoice number, or applicant name"
+  - page: 1
+  - per_page: 15
+
+Example: GET /api/payments?status=waiting_verification&search=john&page=1&per_page=15
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "data": [
+      {
+        "id": 1,
+        "payment_code": "PAY-2025-0001",
+        "invoice_number": "INV-2025-0001",
+        "amount": 5000000,
+        "paid_amount": 5000000,
+        "status": "waiting_verification",
+        "due_date": "2025-12-31T23:59:59.000000Z",
+        "paid_at": "2025-01-15T10:30:00.000000Z",
+        "verified_at": null,
+        "payment_method": {
+          "id": 1,
+          "bank_name": "Bank BCA",
+          "account_number": "1234567890",
+          "account_holder": "PT Universitas Global Nusantara"
+        },
+        "destination_bank": "Bank BCA",
+        "destination_account_number": "1234567890",
+        "destination_account_holder": "PT Universitas Global Nusantara",
+        "sender_bank": "Bank BCA",
+        "sender_account_number": "1234567890",
+        "sender_account_holder": "John Doe",
+        "payment_proof_url": "http://localhost/storage/payments/proof_1234567890.jpg",
+        "payment_notes": "Transfer via mobile banking",
+        "verification_notes": null,
+        "rejected_by": null,
+        "rejection_reason": null,
+        "rejecter": null,
+        "applicant_name": "John Doe",
+        "registration_number": "REG-2025-0001",
+        "created_at": "2025-01-01T00:00:00.000000Z",
+        "updated_at": "2025-01-15T10:30:00.000000Z"
+      }
+    ],
+    "links": {
+      "first": "http://localhost/api/payments?page=1",
+      "last": "http://localhost/api/payments?page=10",
+      "prev": null,
+      "next": "http://localhost/api/payments?page=2"
+    },
+    "meta": {
+      "current_page": 1,
+      "from": 1,
+      "last_page": 10,
+      "path": "http://localhost/api/payments",
+      "per_page": 15,
+      "to": 15,
+      "total": 150
+    }
+  }
+}
+
+Error Responses:
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+403 Forbidden:
+{
+  "success": false,
+  "message": "Unauthorized access"
+}
+
+--------------------------------------------------------------------------------
+GET /api/payments/{payment}
+--------------------------------------------------------------------------------
+Description: Get single payment detail (Admin/Manager only)
+Auth: Bearer Token (Required)
+Roles: admin, manager
+URL Params: payment (integer - payment id)
+
+Example: GET /api/payments/1
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "payment_code": "PAY-2025-0001",
+    "invoice_number": "INV-2025-0001",
+    "amount": 5000000,
+    "paid_amount": 5000000,
+    "status": "waiting_verification",
+    "due_date": "2025-12-31T23:59:59.000000Z",
+    "paid_at": "2025-01-15T10:30:00.000000Z",
+    "verified_at": null,
+    "payment_method": {
+      "id": 1,
+      "bank_name": "Bank BCA",
+      "account_number": "1234567890",
+      "account_holder": "PT Universitas Global Nusantara"
+    },
+    "destination_bank": "Bank BCA",
+    "destination_account_number": "1234567890",
+    "destination_account_holder": "PT Universitas Global Nusantara",
+    "sender_bank": "Bank BCA",
+    "sender_account_number": "1234567890",
+    "sender_account_holder": "John Doe",
+    "payment_proof_url": "http://localhost/storage/payments/proof_1234567890.jpg",
+    "payment_notes": "Transfer via mobile banking",
+    "verification_notes": null,
+    "rejected_by": null,
+    "rejection_reason": null,
+    "rejecter": null,
+    "applicant_name": "John Doe",
+    "registration_number": "REG-2025-0001",
+    "created_at": "2025-01-01T00:00:00.000000Z",
+    "updated_at": "2025-01-15T10:30:00.000000Z"
+  }
+}
+
+Error Responses:
+
+404 Payment Not Found:
+{
+  "success": false,
+  "message": "Payment tidak ditemukan"
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+403 Forbidden:
+{
+  "success": false,
+  "message": "Unauthorized access"
+}
+
+--------------------------------------------------------------------------------
+PUT /api/payments/{payment}/verify
+--------------------------------------------------------------------------------
+Description: Verify or reject payment (Admin/Manager only)
+Auth: Bearer Token (Required)
+Roles: admin, manager
+URL Params: payment (integer - payment id)
+Content-Type: application/json
+
+Example: PUT /api/payments/1/verify
+
+Request Body (Verify):
+{
+  "status": "verified",
+  "verification_notes": "Payment verified successfully"
+}
+
+Request Body (Reject):
+{
+  "status": "rejected",
+  "verification_notes": "Payment rejected",
+  "rejection_reason": "Bukti pembayaran tidak jelas"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Payment berhasil diverifikasi",
+  "data": {
+    "id": 1,
+    "payment_code": "PAY-2025-0001",
+    "invoice_number": "INV-2025-0001",
+    "amount": 5000000,
+    "paid_amount": 5000000,
+    "status": "verified",
+    "due_date": "2025-12-31T23:59:59.000000Z",
+    "paid_at": "2025-01-15T10:30:00.000000Z",
+    "verified_at": "2025-01-16T09:00:00.000000Z",
+    "payment_method": {
+      "id": 1,
+      "bank_name": "Bank BCA",
+      "account_number": "1234567890",
+      "account_holder": "PT Universitas Global Nusantara"
+    },
+    "destination_bank": "Bank BCA",
+    "destination_account_number": "1234567890",
+    "destination_account_holder": "PT Universitas Global Nusantara",
+    "sender_bank": "Bank BCA",
+    "sender_account_number": "1234567890",
+    "sender_account_holder": "John Doe",
+    "payment_proof_url": "http://localhost/storage/payments/proof_1234567890.jpg",
+    "payment_notes": "Transfer via mobile banking",
+    "verification_notes": "Payment verified successfully",
+    "rejected_by": null,
+    "rejection_reason": null,
+    "rejecter": null,
+    "applicant_name": "John Doe",
+    "registration_number": "REG-2025-0001",
+    "created_at": "2025-01-01T00:00:00.000000Z",
+    "updated_at": "2025-01-16T09:00:00.000000Z"
+  }
+}
+
+Error Responses:
+
+400 Invalid Payment Status:
+{
+  "success": false,
+  "message": "Payment tidak dapat diverifikasi pada status saat ini"
+}
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "status": ["The status field must be either verified or rejected."],
+    "rejection_reason": ["The rejection reason field is required when status is rejected."]
+  }
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+403 Forbidden:
+{
+  "success": false,
+  "message": "Unauthorized access"
+}
+
+================================================================================
+4. NOTIFICATION ENDPOINTS
+================================================================================
+
+--------------------------------------------------------------------------------
+GET /api/notifications
+--------------------------------------------------------------------------------
+Description: Get user notifications
+Auth: Bearer Token (Required)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "notifications": [
+      {
+        "id": 1,
+        "id_user": 1,
+        "title": "Pengumuman Penting",
+        "message": "Silakan cek status pendaftaran Anda",
+        "type": "info",
+        "is_read": false,
+        "created_at": "2025-01-01T00:00:00.000000Z",
+        "updated_at": "2025-01-01T00:00:00.000000Z"
+      },
+      {
+        "id": 2,
+        "id_user": 1,
+        "title": "Pembayaran Diverifikasi",
+        "message": "Pembayaran Anda telah diverifikasi",
+        "type": "success",
+        "is_read": true,
+        "created_at": "2025-01-02T00:00:00.000000Z",
+        "updated_at": "2025-01-02T10:00:00.000000Z"
+      },
+      {
+        "id": 3,
+        "id_user": 1,
+        "title": "Dokumen Ditolak",
+        "message": "Dokumen KTP ditolak, mohon upload ulang",
+        "type": "warning",
+        "is_read": false,
+        "created_at": "2025-01-03T00:00:00.000000Z",
+        "updated_at": "2025-01-03T00:00:00.000000Z"
+      }
+    ],
+    "total": 3,
+    "unread_count": 2
+  }
+}
+
+Error Responses:
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Failed to get notifications: Database error..."
+}
+
+--------------------------------------------------------------------------------
+GET /api/notifications/unread-count
+--------------------------------------------------------------------------------
+Description: Get unread notifications count
+Auth: Bearer Token (Required)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "unread_count": 3
+  }
+}
+
+Error Responses:
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Failed to get unread count: Database error..."
+}
+
+--------------------------------------------------------------------------------
+POST /api/notifications/{id}/read
+--------------------------------------------------------------------------------
+Description: Mark notification as read
+Auth: Bearer Token (Required)
+URL Params: id (integer - notification id)
+
+Example: POST /api/notifications/1/read
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Notification marked as read"
+}
+
+Error Responses:
+
+404 Notification Not Found:
+{
+  "success": false,
+  "message": "Notification not found"
+}
+
+403 Unauthorized:
+{
+  "success": false,
+  "message": "Unauthorized"
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Failed to mark notification as read",
+  "error": "Database error..."
+}
+
+--------------------------------------------------------------------------------
+POST /api/notifications/mark-all-read
+--------------------------------------------------------------------------------
+Description: Mark all notifications as read
+Auth: Bearer Token (Required)
+
+Success Response (200):
+{
+  "success": true,
+  "message": "All notifications marked as read",
+  "data": {
+    "updated_count": 5
+  }
+}
+
+Error Responses:
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Failed to mark all notifications as read",
+  "error": "Database error..."
+}
+
+--------------------------------------------------------------------------------
+POST /api/notifications/send
+--------------------------------------------------------------------------------
+Description: Send notification to filtered applicants (Admin/Manager only)
+Auth: Bearer Token (Required)
+Roles: admin, manager
+Content-Type: application/json
+
+Request Body:
+{
+  "title": "Pengumuman Penting",
+  "message": "Silakan cek status pendaftaran Anda",
+  "type": "info",
+  "registration_status": "submitted"
+}
+
+Field Options:
+- type: "info", "warning", "important", "success"
+- registration_status: "submitted", "approved", "rejected" (optional filter)
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Notification sent to 10 applicants",
+  "data": {
+    "recipients_count": 10,
+    "filter_applied": "registration_status: submitted"
+  }
+}
+
+Error Responses:
+
+403 Forbidden (Not Admin/Manager):
+{
+  "success": false,
+  "message": "Unauthorized. Only admin/manager can send notifications"
+}
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "title": ["The title field is required."],
+    "message": ["The message field is required."],
+    "type": ["The type must be one of: info, warning, important, success."]
+  }
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Failed to send notification",
+  "error": "Database error..."
+}
+
+--------------------------------------------------------------------------------
+DELETE /api/notifications/{id}
+--------------------------------------------------------------------------------
+Description: Delete notification (Admin/Manager only)
+Auth: Bearer Token (Required)
+Roles: admin, manager
+URL Params: id (integer - notification id)
+
+Example: DELETE /api/notifications/1
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Notification deleted successfully"
+}
+
+Error Responses:
+
+404 Notification Not Found:
+{
+  "success": false,
+  "message": "Notification not found"
+}
+
+403 Forbidden:
+{
+  "success": false,
+  "message": "Unauthorized"
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Failed to delete notification",
+  "error": "Database error..."
+}
+
+================================================================================
+5. OFFICIAL EMAIL ENDPOINTS
+================================================================================
+
+--------------------------------------------------------------------------------
+GET /api/official-email/format-options
+--------------------------------------------------------------------------------
+Description: Get email format options (Approved applicants only)
+Auth: Bearer Token (Required)
+Prerequisites: registration_status must be "approved"
+
+Success Response (200):
+{
+  "status": "success",
+  "data": {
+    "format_options": [
+      {
+        "type": "full_name",
+        "example": "john.doe@mail.ugn.ac.id",
+        "label": "Full Name Format",
+        "description": "Format: firstname.lastname"
+      },
+      {
+        "type": "full_name_birth_year",
+        "example": "john.doe.2000@mail.ugn.ac.id",
+        "label": "Full Name + Birth Year",
+        "description": "Format: firstname.lastname.year"
+      },
+      {
+        "type": "first_last_name",
+        "example": "j.doe@mail.ugn.ac.id",
+        "label": "First & Last Name Initial",
+        "description": "Format: firstinitial.lastname"
+      }
+    ]
+  }
+}
+
+Error Responses:
+
+404 Registration Not Found:
+{
+  "status": "error",
+  "message": "Applicant profile not found"
+}
+
+403 Registration Not Approved:
+{
+  "status": "error",
+  "message": "Email can only be created for approved applicants"
+}
+
+400 Email Already Created:
+{
+  "status": "error",
+  "message": "Official email has already been created for this applicant"
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+500 Server Error:
+{
+  "status": "error",
+  "message": "Failed to get format options: Error details..."
+}
+
+--------------------------------------------------------------------------------
+POST /api/official-email/create
+--------------------------------------------------------------------------------
+Description: Create official email (Approved applicants only)
+Auth: Bearer Token (Required)
+Prerequisites: registration_status must be "approved"
+Content-Type: application/json
+
+Request Body:
+{
+  "format_type": "full_name"
+}
+
+Format Type Options:
+- "full_name": john.doe@mail.ugn.ac.id
+- "full_name_birth_year": john.doe.2000@mail.ugn.ac.id
+- "first_last_name": j.doe@mail.ugn.ac.id
+
+Success Response (201):
+{
+  "status": "success",
+  "message": "Official email created successfully",
+  "data": {
+    "official_email": {
+      "id": 1,
+      "id_user": 1,
+      "email": "john.doe@mail.ugn.ac.id",
+      "format_type": "full_name",
+      "password": "TempPass123",
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00.000000Z",
+      "updated_at": "2025-01-01T00:00:00.000000Z"
+    }
+  }
+}
+
+Note: Password temporary akan dikirim ke email personal user
+
+Error Responses:
+
+404 Registration Not Found:
+{
+  "status": "error",
+  "message": "Applicant profile not found"
+}
+
+403 Registration Not Approved:
+{
+  "status": "error",
+  "message": "Email can only be created for approved applicants"
+}
+
+400 Email Already Created:
+{
+  "status": "error",
+  "message": "Official email has already been created for this applicant"
+}
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "format_type": [
+      "The format type field is required.",
+      "The format type must be one of: full_name, full_name_birth_year, first_last_name."
+    ]
+  }
+}
+
+409 Email Already Exists:
+{
+  "status": "error",
+  "message": "Email john.doe@mail.ugn.ac.id already exists. Please try another format."
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+500 Server Error:
+{
+  "status": "error",
+  "message": "Failed to create official email: Database error..."
+}
+
+--------------------------------------------------------------------------------
+GET /api/official-email/status
+--------------------------------------------------------------------------------
+Description: Get official email status
+Auth: Bearer Token (Required)
+
+Success Response (200) - Email Created:
+{
+  "status": "success",
+  "data": {
+    "has_email": true,
+    "email": "john.doe@mail.ugn.ac.id",
+    "format_type": "full_name",
+    "is_active": true,
+    "created_at": "2025-01-01T00:00:00.000000Z"
+  }
+}
+
+Success Response (200) - Email Not Created:
+{
+  "status": "success",
+  "data": {
+    "has_email": false,
+    "message": "Official email not created yet"
+  }
+}
+
+Error Responses:
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+500 Server Error:
+{
+  "status": "error",
+  "message": "Failed to get email status: Database error..."
+}
+
+================================================================================
+6. ADMIN & MANAGER ENDPOINTS
+================================================================================
+
+--------------------------------------------------------------------------------
+GET /api/admin/dashboard
+--------------------------------------------------------------------------------
+Description: Get dashboard statistics (Admin/Manager)
+Auth: Bearer Token (Required)
+Roles: admin, manager
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "total_applicants": 100,
+    "draft": 20,
+    "submitted": 30,
+    "approved": 40,
+    "rejected": 10,
+    "total_payments_verified": 35,
+    "total_revenue": 175000000,
+    "pending_verifications": 15,
+    "recent_registrations": [
+      {
+        "id_profile": 1,
+        "id_user": 1,
+        "registration_number": "REG-2025-0001",
+        "full_name": "John Doe",
+        "registration_status": "submitted",
+        "created_at": "2025-01-01T00:00:00.000000Z"
+      }
+    ]
+  }
+}
+
+Error Responses:
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+403 Forbidden:
+{
+  "success": false,
+  "message": "Unauthorized access"
+}
+
+--------------------------------------------------------------------------------
+GET /api/admin/applicants
+--------------------------------------------------------------------------------
+Description: Get all applicants with filtering (Admin/Manager)
+Auth: Bearer Token (Required)
+Roles: admin, manager
+Query Params:
+  - status: "draft|submitted|approved|rejected"
+  - search: "name or registration number"
+  - program: program_id
+  - page: 1
+  - per_page: 15
+
+Example: GET /api/admin/applicants?status=submitted&search=john&program=1&page=1&per_page=15
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "data": [
+      {
+        "id_profile": 1,
+        "id_user": 1,
+        "id_program": 1,
+        "id_program_2": 2,
+        "id_program_3": null,
+        "email": "john@example.com",
+        "registration_number": "REG-2025-0001",
+        "registration_status": "submitted",
+        "full_name": "John Doe",
+        "gender": "male",
+        "religion": "Islam",
+        "birth_place": "Jakarta",
+        "birth_date": "2000-01-01",
+        "nik": "1234567890123456",
+        "phone_number": "08123456789",
+        "previous_school": "SMA Negeri 1 Jakarta",
+        "created_at": "2025-01-01T00:00:00.000000Z",
+        "updated_at": "2025-01-01T00:00:00.000000Z",
+        "program": {
+          "id": 1,
+          "program_name": "Teknik Informatika",
+          "program_code": "TI",
+          "is_active": true
+        }
+      }
+    ],
+    "links": {
+      "first": "http://localhost/api/admin/applicants?page=1",
+      "last": "http://localhost/api/admin/applicants?page=10",
+      "prev": null,
+      "next": "http://localhost/api/admin/applicants?page=2"
+    },
+    "meta": {
+      "current_page": 1,
+      "from": 1,
+      "last_page": 10,
+      "path": "http://localhost/api/admin/applicants",
+      "per_page": 15,
+      "to": 15,
+      "total": 150
+    }
+  }
+}
+
+Error Responses:
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+403 Forbidden:
+{
+  "success": false,
+  "message": "Unauthorized access"
+}
+
+--------------------------------------------------------------------------------
+GET /api/admin/applicants/{id}
+--------------------------------------------------------------------------------
+Description: Get applicant detail (Admin/Manager)
+Auth: Bearer Token (Required)
+Roles: admin, manager
+URL Params: id (integer - id_profile)
+
+Example: GET /api/admin/applicants/1
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "profile": {
+      "id_profile": 1,
+      "id_user": 1,
+      "id_program": 1,
+      "id_program_2": 2,
+      "id_program_3": null,
+      "email": "john@example.com",
+      "registration_number": "REG-2025-0001",
+      "registration_status": "submitted",
+      "full_name": "John Doe",
+      "gender": "male",
+      "religion": "Islam",
+      "birth_place": "Jakarta",
+      "birth_date": "2000-01-01",
+      "nik": "1234567890123456",
+      "birth_certificate_number": "ABC123456789",
+      "no_kk": "1234567890123456",
+      "citizenship": "WNI",
+      "birth_order": 1,
+      "number_of_siblings": 2,
+      "full_address": "Jl. Contoh No. 123",
+      "dusun": "Dusun 1",
+      "kelurahan": "Kelurahan A",
+      "kecamatan": "Kecamatan B",
+      "city_regency": "Jakarta Selatan",
+      "province": "DKI Jakarta",
+      "postal_code": "12345",
+      "phone_number": "08123456789",
+      "previous_school": "SMA Negeri 1 Jakarta",
+      "graduation_status": "graduated",
+      "last_ijazah": "SMA",
+      "created_at": "2025-01-01T00:00:00.000000Z",
+      "updated_at": "2025-01-01T00:00:00.000000Z",
+      "program": {
+        "id": 1,
+        "program_name": "Teknik Informatika",
+        "program_code": "TI",
+        "is_active": true
+      }
+    },
+    "documents": [
+      {
+        "id_document": 1,
+        "id_profile": 1,
+        "id_document_type": 1,
+        "document_name": "KTP",
+        "file_path": "documents/ktp_1234567890.pdf",
+        "file_url": "http://localhost/storage/documents/ktp_1234567890.pdf",
+        "verification_status": "verified",
+        "rejection_reason": null,
+        "upload_date": "2025-01-01 10:30:00",
+        "created_at": "2025-01-01 10:30:00",
+        "updated_at": "2025-01-02 09:00:00"
+      }
+    ],
+    "achievements": [
+      {
+        "id_achievement": 1,
+        "id_profile": 1,
+        "achievement_name": "Juara 1 Olimpiade Informatika",
+        "year": 2024,
+        "achievement_type": "academic",
+        "achievement_level": "national",
+        "organizer": "Kemendikbud",
+        "ranking": "1st",
+        "certificate_path": "achievements/cert_1234567890.pdf",
+        "certificate_url": "http://localhost/storage/achievements/cert_1234567890.pdf",
+        "created_at": "2025-01-01T00:00:00.000000Z"
+      }
+    ],
+    "guardians": [
+      {
+        "id_guardian": 1,
+        "id_profile": 1,
+        "relationship_type": "father",
+        "full_name": "Jane Doe",
+        "address": "Jl. Contoh No. 123",
+        "phone_number": "08123456789",
+        "occupation": "Teacher",
+        "last_education": "S1",
+        "income_range": "5000000-10000000",
+        "created_at": "2025-01-01T00:00:00.000000Z"
+      }
+    ],
+    "payment": {
+      "id": 1,
+      "payment_code": "PAY-2025-0001",
+      "invoice_number": "INV-2025-0001",
+      "amount": 5000000,
+      "paid_amount": 5000000,
+      "status": "verified",
+      "payment_proof_url": "http://localhost/storage/payments/proof_1234567890.jpg",
+      "created_at": "2025-01-01T00:00:00.000000Z"
+    }
+  }
+}
+
+Error Responses:
+
+404 Applicant Not Found:
+{
+  "success": false,
+  "message": "Applicant tidak ditemukan"
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+403 Forbidden:
+{
+  "success": false,
+  "message": "Unauthorized access"
+}
+
+--------------------------------------------------------------------------------
+PUT /api/admin/applicants/{id}/status
+--------------------------------------------------------------------------------
+Description: Update applicant registration status (Admin/Manager)
+Auth: Bearer Token (Required)
+Roles: admin, manager
+URL Params: id (integer - id_profile)
+Content-Type: application/json
+
+Example: PUT /api/admin/applicants/1/status
+
+Request Body (Approve):
+{
+  "registration_status": "approved"
+}
+
+Request Body (Reject):
+{
+  "registration_status": "rejected",
+  "rejection_reason": "Dokumen tidak lengkap"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Status pendaftar berhasil diupdate",
+  "data": {
+    "id_profile": 1,
+    "id_user": 1,
+    "registration_number": "REG-2025-0001",
+    "registration_status": "approved",
+    "full_name": "John Doe",
+    "created_at": "2025-01-01T00:00:00.000000Z",
+    "updated_at": "2025-01-16T10:00:00.000000Z"
+  }
+}
+
+Error Responses:
+
+404 Applicant Not Found:
+{
+  "success": false,
+  "message": "Applicant tidak ditemukan"
+}
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "registration_status": ["The registration status must be one of: approved, rejected."],
+    "rejection_reason": ["The rejection reason field is required when status is rejected."]
+  }
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+403 Forbidden:
+{
+  "success": false,
+  "message": "Unauthorized access"
+}
+
+--------------------------------------------------------------------------------
+PUT /api/admin/applicants/{id}/graduation
+--------------------------------------------------------------------------------
+Description: Set graduation status (Admin/Manager)
+Auth: Bearer Token (Required)
+Roles: admin, manager
+URL Params: id (integer - id_profile)
+Content-Type: application/json
+
+Example: PUT /api/admin/applicants/1/graduation
+
+Request Body:
+{
+  "graduation_status": "graduated"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Status kelulusan berhasil diupdate",
+  "data": {
+    "id_profile": 1,
+    "registration_number": "REG-2025-0001",
+    "full_name": "John Doe",
+    "graduation_status": "graduated",
+    "updated_at": "2025-06-01T00:00:00.000000Z"
+  }
+}
+
+Error Responses:
+
+404 Applicant Not Found:
+{
+  "success": false,
+  "message": "Applicant tidak ditemukan"
+}
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "graduation_status": ["The graduation status must be one of: graduated, not_yet."]
+  }
+}
+
+--------------------------------------------------------------------------------
+GET /api/admin/applicants/{id}/documents
+--------------------------------------------------------------------------------
+Description: Get applicant documents (Admin/Manager)
+Auth: Bearer Token (Required)
+Roles: admin, manager
+URL Params: id (integer - id_profile)
+
+Example: GET /api/admin/applicants/1/documents
+
+Success Response (200):
+{
+  "success": true,
+  "data": [
+    {
+      "id_document": 1,
+      "id_profile": 1,
+      "id_document_type": 1,
+      "document_name": "KTP",
+      "file_path": "documents/ktp_1234567890.pdf",
+      "file_url": "http://localhost/storage/documents/ktp_1234567890.pdf",
+      "verification_status": "verified",
+      "rejection_reason": null,
+      "upload_date": "2025-01-01 10:30:00",
+      "created_at": "2025-01-01 10:30:00",
+      "updated_at": "2025-01-02 09:00:00"
+    },
+    {
+      "id_document": 2,
+      "id_profile": 1,
+      "id_document_type": 2,
+      "document_name": "Ijazah",
+      "file_path": "documents/ijazah_9876543210.pdf",
+      "file_url": "http://localhost/storage/documents/ijazah_9876543210.pdf",
+      "verification_status": "pending",
+      "rejection_reason": null,
+      "upload_date": "2025-01-01 11:00:00",
+      "created_at": "2025-01-01 11:00:00",
+      "updated_at": "2025-01-01 11:00:00"
+    }
+  ]
+}
+
+Error Responses:
+
+404 Applicant Not Found:
+{
+  "success": false,
+  "message": "Applicant tidak ditemukan"
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+--------------------------------------------------------------------------------
+PUT /api/admin/documents/{id}/verify
+--------------------------------------------------------------------------------
+Description: Verify or reject document (Admin/Manager)
+Auth: Bearer Token (Required)
+Roles: admin, manager
+URL Params: id (integer - id_document)
+Content-Type: application/json
+
+Example: PUT /api/admin/documents/1/verify
+
+Request Body (Verify):
+{
+  "verification_status": "verified"
+}
+
+Request Body (Reject):
+{
+  "verification_status": "rejected",
+  "rejection_reason": "Dokumen tidak jelas, mohon upload ulang"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Status dokumen berhasil diupdate",
+  "data": {
+    "id_document": 1,
+    "id_profile": 1,
+    "id_document_type": 1,
+    "document_name": "KTP",
+    "file_path": "documents/ktp_1234567890.pdf",
+    "file_url": "http://localhost/storage/documents/ktp_1234567890.pdf",
+    "verification_status": "verified",
+    "rejection_reason": null,
+    "upload_date": "2025-01-01 10:30:00",
+    "created_at": "2025-01-01 10:30:00",
+    "updated_at": "2025-01-02 09:00:00"
+  }
+}
+
+Error Responses:
+
+404 Document Not Found:
+{
+  "success": false,
+  "message": "Dokumen tidak ditemukan"
+}
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "verification_status": ["The verification status must be one of: verified, rejected."],
+    "rejection_reason": ["The rejection reason field is required when status is rejected."]
+  }
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+--------------------------------------------------------------------------------
+GET /api/admin/applicants/{id}/achievements
+--------------------------------------------------------------------------------
+Description: Get applicant achievements (Admin/Manager)
+Auth: Bearer Token (Required)
+Roles: admin, manager
+URL Params: id (integer - id_profile)
+
+Example: GET /api/admin/applicants/1/achievements
+
+Success Response (200):
+{
+  "success": true,
+  "data": [
+    {
+      "id_achievement": 1,
+      "id_profile": 1,
+      "achievement_name": "Juara 1 Olimpiade Informatika",
+      "year": 2024,
+      "achievement_type": "academic",
+      "achievement_level": "national",
+      "organizer": "Kemendikbud",
+      "ranking": "1st",
+      "certificate_path": "achievements/cert_1234567890.pdf",
+      "certificate_url": "http://localhost/storage/achievements/cert_1234567890.pdf",
+      "created_at": "2025-01-01T00:00:00.000000Z"
+    }
+  ]
+}
+
+--------------------------------------------------------------------------------
+GET /api/admin/applicants/{id}/payment
+--------------------------------------------------------------------------------
+Description: Get applicant payment (Admin/Manager)
+Auth: Bearer Token (Required)
+Roles: admin, manager
+URL Params: id (integer - id_profile or id_user)
+
+Example: GET /api/admin/applicants/1/payment
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "payment_code": "PAY-2025-0001",
+    "invoice_number": "INV-2025-0001",
+    "amount": 5000000,
+    "paid_amount": 5000000,
+    "status": "verified",
+    "payment_proof_url": "http://localhost/storage/payments/proof_1234567890.jpg",
+    "sender_bank": "Bank BCA",
+    "sender_account_number": "1234567890",
+    "sender_account_holder": "John Doe",
+    "created_at": "2025-01-01T00:00:00.000000Z"
+  }
+}
+
+--------------------------------------------------------------------------------
+GET /api/admin/statistics/applicants
+--------------------------------------------------------------------------------
+Description: Get detailed applicant statistics (Admin only)
+Auth: Bearer Token (Required)
+Roles: admin
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "total": 100,
+    "by_status": {
+      "draft": 20,
+      "submitted": 30,
+      "approved": 40,
+      "rejected": 10
+    },
+    "by_program": [
+      {
+        "program_id": 1,
+        "program_name": "Teknik Informatika",
+        "count": 50
+      },
+      {
+        "program_id": 2,
+        "program_name": "Sistem Informasi",
+        "count": 30
+      }
+    ],
+    "monthly_registrations": [
+      {
+        "month": "January",
+        "count": 15
+      },
+      {
+        "month": "February",
+        "count": 20
+      }
+    ]
+  }
+}
+
+Error Responses:
+
+403 Forbidden (Not Admin):
+{
+  "success": false,
+  "message": "Hanya admin yang dapat mengakses statistik ini"
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+--------------------------------------------------------------------------------
+GET /api/admin/statistics/programs
+--------------------------------------------------------------------------------
+Description: Get program statistics (Admin only)
+Auth: Bearer Token (Required)
+Roles: admin
+
+Success Response (200):
+{
+  "success": true,
+  "data": [
+    {
+      "program_id": 1,
+      "program_name": "Teknik Informatika",
+      "program_code": "TI",
+      "total_applicants": 50,
+      "approved": 40,
+      "rejected": 5,
+      "pending": 5
+    },
+    {
+      "program_id": 2,
+      "program_name": "Sistem Informasi",
+      "program_code": "SI",
+      "total_applicants": 30,
+      "approved": 25,
+      "rejected": 3,
+      "pending": 2
+    }
+  ]
+}
+
+--------------------------------------------------------------------------------
+GET /api/admin/statistics/financial
+--------------------------------------------------------------------------------
+Description: Get financial statistics (Admin only)
+Auth: Bearer Token (Required)
+Roles: admin
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "total_revenue": 500000000,
+    "verified_payments": 40,
+    "pending_verifications": 10,
+    "rejected_payments": 5,
+    "average_payment": 5000000,
+    "monthly_revenue": [
+      {
+        "month": "January",
+        "amount": 50000000,
+        "payment_count": 10
+      },
+      {
+        "month": "February",
+        "amount": 75000000,
+        "payment_count": 15
+      }
+    ]
+  }
+}
+
+--------------------------------------------------------------------------------
+GET /api/admin/statistics/yearly-revenue
+--------------------------------------------------------------------------------
+Description: Get yearly revenue (Admin only)
+Auth: Bearer Token (Required)
+Roles: admin
+Query Params:
+  - year: 2025 (optional, default current year)
+
+Example: GET /api/admin/statistics/yearly-revenue?year=2025
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "year": 2025,
+    "monthly_data": [
+      {
+        "month": 1,
+        "month_name": "January",
+        "revenue": 50000000,
+        "payment_count": 10
+      },
+      {
+        "month": 2,
+        "month_name": "February",
+        "revenue": 75000000,
+        "payment_count": 15
+      }
+    ],
+    "total_revenue": 500000000,
+    "total_payments": 100,
+    "average_monthly_revenue": 41666666.67
+  }
+}
+
+--------------------------------------------------------------------------------
+GET /api/admin/managers
+--------------------------------------------------------------------------------
+Description: Get manager list (Admin only)
+Auth: Bearer Token (Required)
+Roles: admin
+
+Success Response (200):
+{
+  "success": true,
+  "data": [
+    {
+      "id_user": 2,
+      "name": "Manager John",
+      "email": "manager@example.com",
+      "username": "managerjohn",
+      "role": "manager",
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00.000000Z"
+    }
+  ]
+}
+
+Error Responses:
+
+403 Forbidden (Not Admin):
+{
+  "success": false,
+  "message": "Hanya admin yang dapat mengakses daftar manager"
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+--------------------------------------------------------------------------------
+POST /api/admin/managers
+--------------------------------------------------------------------------------
+Description: Create new manager (Admin only)
+Auth: Bearer Token (Required)
+Roles: admin
+Content-Type: application/json
+
+Request Body:
+{
+  "name": "Manager Name",
+  "email": "manager@example.com",
+  "username": "manager123",
+  "password": "password123",
+  "password_confirmation": "password123"
+}
+
+Success Response (201):
+{
+  "success": true,
+  "message": "Manager berhasil dibuat",
+  "data": {
+    "id_user": 3,
+    "name": "Manager Name",
+    "email": "manager@example.com",
+    "username": "manager123",
+    "role": "manager",
+    "is_active": true,
+    "created_at": "2025-01-16T00:00:00.000000Z"
+  }
+}
+
+Error Responses:
+
+403 Forbidden (Not Admin):
+{
+  "success": false,
+  "message": "Hanya admin yang dapat membuat manager"
+}
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "email": ["The email has already been taken."],
+    "password": ["The password must be at least 8 characters."]
+  }
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+--------------------------------------------------------------------------------
+DELETE /api/admin/managers/{id}
+--------------------------------------------------------------------------------
+Description: Delete manager (Admin only)
+Auth: Bearer Token (Required)
+Roles: admin
+URL Params: id (integer - id_user)
+
+Example: DELETE /api/admin/managers/3
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Manager berhasil dihapus"
+}
+
+Error Responses:
+
+404 Manager Not Found:
+{
+  "success": false,
+  "message": "Manager tidak ditemukan"
+}
+
+403 Forbidden (Not Admin):
+{
+  "success": false,
+  "message": "Hanya admin yang dapat menghapus manager"
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+--------------------------------------------------------------------------------
+GET /api/admin/users
+--------------------------------------------------------------------------------
+Description: Get user list (Admin only)
+Auth: Bearer Token (Required)
+Roles: admin
+
+Success Response (200):
+{
+  "success": true,
+  "data": [
+    {
+      "id_user": 2,
+      "name": "Manager John",
+      "email": "manager@example.com",
+      "username": "managerjohn",
+      "role": "manager",
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00.000000Z"
+    },
+    {
+      "id_user": 3,
+      "name": "Admin Super",
+      "email": "admin@example.com",
+      "username": "superadmin",
+      "role": "admin",
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00.000000Z"
+    }
+  ]
+}
+
+Note: Tidak termasuk user dengan role "pendaftar"
+
+--------------------------------------------------------------------------------
+POST /api/admin/users
+--------------------------------------------------------------------------------
+Description: Create new user (Admin only)
+Auth: Bearer Token (Required)
+Roles: admin
+Content-Type: application/json
+
+Request Body:
+{
+  "name": "New Admin",
+  "email": "newadmin@example.com",
+  "username": "newadmin",
+  "password": "password123",
+  "password_confirmation": "password123",
+  "role": "admin",
+  "phone": "08123456789"
+}
+
+Success Response (201):
+{
+  "success": true,
+  "message": "User berhasil dibuat",
+  "data": {
+    "id_user": 4,
+    "name": "New Admin",
+    "email": "newadmin@example.com",
+    "username": "newadmin",
+    "role": "admin",
+    "is_active": true,
+    "created_at": "2025-01-16T00:00:00.000000Z"
+  }
+}
+
+--------------------------------------------------------------------------------
+PUT /api/admin/users/{id}
+--------------------------------------------------------------------------------
+Description: Update user (Admin only)
+Auth: Bearer Token (Required)
+Roles: admin
+URL Params: id (integer - id_user)
+Content-Type: application/json
+
+Example: PUT /api/admin/users/3
+
+Request Body:
+{
+  "name": "Updated Name",
+  "email": "updatedemail@example.com",
+  "username": "updatedusername",
+  "role": "manager",
+  "is_active": true,
+  "password": "newpassword123"
+}
+
+Note: Password optional, hanya kirim jika ingin mengubah password
+
+Success Response (200):
+{
+  "success": true,
+  "message": "User berhasil diubah",
+  "data": {
+    "id_user": 3,
+    "name": "Updated Name",
+    "email": "updatedemail@example.com",
+    "username": "updatedusername",
+    "role": "manager",
+    "is_active": true,
+    "created_at": "2025-01-01T00:00:00.000000Z"
+  }
+}
+
+--------------------------------------------------------------------------------
+DELETE /api/admin/users/{id}
+--------------------------------------------------------------------------------
+Description: Delete user (Admin only)
+Auth: Bearer Token (Required)
+Roles: admin
+URL Params: id (integer - id_user)
+
+Example: DELETE /api/admin/users/3
+
+Success Response (200):
+{
+  "success": true,
+  "message": "User berhasil dihapus"
+}
+
+Error Responses:
+
+404 User Not Found:
+{
+  "success": false,
+  "message": "User tidak ditemukan"
+}
+
+403 Forbidden:
+{
+  "success": false,
+  "message": "Hanya admin yang dapat menghapus user"
+}
+
+--------------------------------------------------------------------------------
+GET /api/admin/document-file/{id}
+--------------------------------------------------------------------------------
+Description: Serve/download document file (Admin/Manager)
+Auth: Bearer Token (Required)
+Roles: admin, manager
+URL Params: id (integer - id_document)
+
+Example: GET /api/admin/document-file/1
+
+Success Response (200):
+Returns: Binary file stream (PDF/Image)
+Content-Type: application/pdf or image/jpeg or image/png
+
+Error Responses:
+
+404 Document Not Found:
+{
+  "success": false,
+  "message": "Dokumen tidak ditemukan"
+}
+
+403 Forbidden:
+{
+  "success": false,
+  "message": "Unauthorized access"
+}
+
+--------------------------------------------------------------------------------
+GET /api/admin/achievement-file/{id}
+--------------------------------------------------------------------------------
+Description: Serve/download achievement certificate file (Admin/Manager)
+Auth: Bearer Token (Required)
+Roles: admin, manager
+URL Params: id (integer - id_achievement)
+
+Example: GET /api/admin/achievement-file/1
+
+Success Response (200):
+Returns: Binary file stream (PDF/Image)
+Content-Type: application/pdf or image/jpeg or image/png
+
+Error Responses:
+
+404 Achievement Not Found:
+{
+  "success": false,
+  "message": "Sertifikat tidak ditemukan"
+}
+
+403 Forbidden:
+{
+  "success": false,
+  "message": "Unauthorized access"
+}
+
+--------------------------------------------------------------------------------
+GET /api/admin/payment-file/{id}
+--------------------------------------------------------------------------------
+Description: Serve/download payment proof file (Admin/Manager)
+Auth: Bearer Token (Required)
+Roles: admin, manager
+URL Params: id (integer - payment id)
+
+Example: GET /api/admin/payment-file/1
+
+Success Response (200):
+Returns: Binary file stream (PDF/Image)
+Content-Type: application/pdf or image/jpeg or image/png
+
+Error Responses:
+
+404 Payment Not Found:
+{
+  "success": false,
+  "message": "Bukti pembayaran tidak ditemukan"
+}
+
+403 Forbidden:
+{
+  "success": false,
+  "message": "Unauthorized access"
+}
+
+================================================================================
+7. PROFILE ENDPOINTS
+================================================================================
+
+--------------------------------------------------------------------------------
+GET /api/profile
+--------------------------------------------------------------------------------
+Description: Get user profile
+Auth: Bearer Token (Required)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "user": {
+      "id_user": 1,
+      "name": "John Doe",
+      "email": "john@example.com",
+      "username": "john123",
+      "role": "pendaftar",
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00.000000Z"
+    },
+    "avatar_url": "http://localhost/storage/avatars/user_1.jpg"
+  }
+}
+
+Error Responses:
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+--------------------------------------------------------------------------------
+PUT /api/profile
+--------------------------------------------------------------------------------
+Description: Update user profile
+Auth: Bearer Token (Required)
+Content-Type: application/json
+
+Request Body:
+{
+  "name": "Updated Name",
+  "username": "newusername"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Profile updated successfully",
+  "data": {
+    "id_user": 1,
+    "name": "Updated Name",
+    "email": "john@example.com",
+    "username": "newusername",
+    "role": "pendaftar",
+    "is_active": true,
+    "created_at": "2025-01-01T00:00:00.000000Z"
+  }
+}
+
+Error Responses:
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "username": ["The username has already been taken."]
+  }
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+--------------------------------------------------------------------------------
+POST /api/profile/avatar
+--------------------------------------------------------------------------------
+Description: Upload avatar
+Auth: Bearer Token (Required)
+Content-Type: multipart/form-data
+
+Request Body:
+avatar: [binary file - jpg, jpeg, png | max 2MB]
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Avatar uploaded successfully",
+  "data": {
+    "avatar_url": "http://localhost/storage/avatars/user_1.jpg"
+  }
+}
+
+Error Responses:
+
+422 Validation Failed:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "avatar": [
+      "The avatar must be a file of type: jpg, jpeg, png.",
+      "The avatar must not be greater than 2048 kilobytes."
+    ]
+  }
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+500 Upload Failed:
+{
+  "success": false,
+  "message": "Failed to upload avatar",
+  "error": "File system error..."
+}
+
+--------------------------------------------------------------------------------
+DELETE /api/profile/avatar
+--------------------------------------------------------------------------------
+Description: Delete avatar
+Auth: Bearer Token (Required)
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Avatar deleted successfully"
+}
+
+Error Responses:
+
+404 Avatar Not Found:
+{
+  "success": false,
+  "message": "Avatar not found"
+}
+
+401 Unauthenticated:
+{
+  "message": "Unauthenticated."
+}
+
+500 Delete Failed:
+{
+  "success": false,
+  "message": "Failed to delete avatar",
+  "error": "File system error..."
+}
+
+================================================================================
+8. ANNOUNCEMENT ENDPOINTS
+================================================================================
+
+--------------------------------------------------------------------------------
+GET /api/announcements
+--------------------------------------------------------------------------------
+Description: Get public announcements
+Auth: No
+Query Params:
+  - page: 1
+  - per_page: 10
+
+Example: GET /api/announcements?page=1&per_page=10
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "data": [
+      {
+        "id": 1,
+        "title": "Pengumuman Pendaftaran Gelombang 1",
+        "content": "Pendaftaran gelombang 1 dibuka mulai 1 Januari 2025...",
+        "is_active": true,
+        "created_at": "2025-01-01T00:00:00.000000Z",
+        "updated_at": "2025-01-01T00:00:00.000000Z"
+      },
+      {
+        "id": 2,
+        "title": "Info Biaya Pendaftaran",
+        "content": "Biaya pendaftaran untuk tahun ajaran 2025/2026 adalah...",
+        "is_active": true,
+        "created_at": "2025-01-02T00:00:00.000000Z",
+        "updated_at": "2025-01-02T00:00:00.000000Z"
+      }
+    ],
+    "links": {
+      "first": "http://localhost/api/announcements?page=1",
+      "last": "http://localhost/api/announcements?page=5",
+      "prev": null,
+      "next": "http://localhost/api/announcements?page=2"
+    },
+    "meta": {
+      "current_page": 1,
+      "from": 1,
+      "last_page": 5,
+      "path": "http://localhost/api/announcements",
+      "per_page": 10,
+      "to": 10,
+      "total": 50
+    }
+  }
+}
+
+Error Response:
+
+500 Server Error:
+{
+  "success": false,
+  "message": "Gagal mengambil data pengumuman",
+  "error": "Database error..."
+}
+
+================================================================================
+9. RESOURCE STRUCTURES (Detailed)
+================================================================================
+
+All resources are returned within the "data" key of success responses.
+
+--------------------------------------------------------------------------------
+UserResource
+--------------------------------------------------------------------------------
+{
+  "id_user": 1,
+  "name": "John Doe",
+  "email": "john@example.com",
+  "username": "john123",
+  "role": "pendaftar|manager|admin",
+  "is_active": true,
+  "created_at": "2025-01-01T00:00:00.000000Z"
+}
+
+Field Details:
+- id_user: Integer, primary key (non-standard naming)
+- name: String, user full name
+- email: String, unique email address
+- username: String, unique username (nullable)
+- role: Enum (pendaftar, manager, admin)
+- is_active: Boolean, account active status
+- created_at: ISO 8601 datetime
+
+--------------------------------------------------------------------------------
+PaymentResource
+--------------------------------------------------------------------------------
+{
+  "id": 1,
+  "payment_code": "PAY-2025-0001",
+  "invoice_number": "INV-2025-0001",
+  "amount": 5000000,
+  "paid_amount": 5000000,
+  "status": "pending|waiting_verification|verified|rejected|expired",
+  "due_date": "2025-12-31T23:59:59.000000Z",
+  "paid_at": "2025-01-15T10:30:00.000000Z",
+  "verified_at": "2025-01-16T09:00:00.000000Z",
+  "payment_method": {
+    "id": 1,
+    "bank_name": "Bank BCA",
+    "account_number": "1234567890",
+    "account_holder": "PT Universitas Global Nusantara"
+  },
+  "destination_bank": "Bank BCA",
+  "destination_account_number": "1234567890",
+  "destination_account_holder": "PT Universitas Global Nusantara",
+  "sender_bank": "Bank BCA",
+  "sender_account_number": "1234567890",
+  "sender_account_holder": "John Doe",
+  "payment_proof_url": "http://localhost/storage/payments/proof_1234567890.jpg",
+  "payment_notes": "Transfer via mobile banking",
+  "verification_notes": "Payment verified successfully",
+  "rejected_by": 2,
+  "rejection_reason": "Bukti pembayaran tidak jelas",
+  "rejecter": {
+    "id_user": 2,
+    "name": "Manager John"
+  },
+  "applicant_name": "John Doe",
+  "registration_number": "REG-2025-0001",
+  "created_at": "2025-01-01T00:00:00.000000Z",
+  "updated_at": "2025-01-16T09:00:00.000000Z"
+}
+
+Field Details:
+- status: pending (belum bayar), waiting_verification (menunggu verifikasi), 
+         verified (terverifikasi), rejected (ditolak), expired (kadaluarsa)
+- payment_proof_url: Full URL to payment proof file, null if not uploaded
+- rejected_by: id_user of admin/manager who rejected, null if not rejected
+- rejecter: UserResource of rejecter, loaded when available
+
+--------------------------------------------------------------------------------
+ApplicantProfileResource
+--------------------------------------------------------------------------------
+{
+  "id_profile": 1,
+  "id_user": 1,
+  "id_program": 1,
+  "id_program_2": 2,
+  "id_program_3": null,
+  "email": "john@example.com",
+  "registration_number": "REG-2025-0001",
+  "registration_status": "draft|submitted|approved|rejected",
+  "full_name": "John Doe",
+  "gender": "male|female",
+  "religion": "Islam|Kristen|Katolik|Hindu|Buddha|Konghucu",
+  "birth_place": "Jakarta",
+  "birth_date": "2000-01-01",
+  "nik": "1234567890123456",
+  "birth_certificate_number": "ABC123456789",
+  "no_kk": "1234567890123456",
+  "citizenship": "WNI|WNA",
+  "birth_order": 1,
+  "number_of_siblings": 2,
+  "full_address": "Jl. Contoh No. 123",
+  "dusun": "Dusun 1",
+  "kelurahan": "Kelurahan A",
+  "kecamatan": "Kecamatan B",
+  "city_regency": "Jakarta Selatan",
+  "province": "DKI Jakarta",
+  "postal_code": "12345",
+  "phone_number": "08123456789",
+  "previous_school": "SMA Negeri 1 Jakarta",
+  "graduation_status": "graduated|not_yet",
+  "last_ijazah": "SMA|SMK|Paket C",
+  "created_at": "2025-01-01T00:00:00.000000Z",
+  "updated_at": "2025-01-01T00:00:00.000000Z",
+  "program": {
+    "id": 1,
+    "program_name": "Teknik Informatika",
+    "program_code": "TI",
+    "is_active": true
+  }
+}
+
+Field Details:
+- registration_status: draft (belum submit), submitted (sudah submit), 
+                      approved (disetujui), rejected (ditolak)
+- id_program: Primary program choice
+- id_program_2: Second program choice (nullable)
+- id_program_3: Third program choice (nullable)
+- nik: 16 characters, Indonesian ID number
+- no_kk: 16 characters, Family Card number
+- program: Loaded Program relation
+
+--------------------------------------------------------------------------------
+GuardianResource
+--------------------------------------------------------------------------------
+{
+  "id_guardian": 1,
+  "id_profile": 1,
+  "relationship_type": "father|mother|other",
+  "full_name": "Jane Doe",
+  "address": "Jl. Contoh No. 123",
+  "phone_number": "08123456789",
+  "occupation": "Teacher",
+  "last_education": "SD|SMP|SMA|D3|S1|S2|S3",
+  "income_range": "< 1000000|1000000-3000000|3000000-5000000|5000000-10000000|> 10000000",
+  "created_at": "2025-01-01T00:00:00.000000Z"
+}
+
+Field Details:
+- relationship_type: father (ayah), mother (ibu), other (wali lain)
+- income_range: Monthly income range in IDR
+
+--------------------------------------------------------------------------------
+ApplicantDocumentResource
+--------------------------------------------------------------------------------
+{
+  "id_document": 1,
+  "id_profile": 1,
+  "id_document_type": 1,
+  "document_name": "KTP",
+  "file_path": "documents/ktp_1234567890.pdf",
+  "file_url": "http://localhost/storage/documents/ktp_1234567890.pdf",
+  "verification_status": "pending|verified|rejected",
+  "rejection_reason": null,
+  "upload_date": "2025-01-01 10:30:00",
+  "created_at": "2025-01-01 10:30:00",
+  "updated_at": "2025-01-02 09:00:00"
+}
+
+Field Details:
+- verification_status: pending (belum diverifikasi), verified (terverifikasi), 
+                      rejected (ditolak)
+- file_url: Full URL to document file
+- rejection_reason: Reason if rejected, null otherwise
+
+--------------------------------------------------------------------------------
+ApplicantAchievementResource
+--------------------------------------------------------------------------------
+{
+  "id_achievement": 1,
+  "id_profile": 1,
+  "achievement_name": "Juara 1 Olimpiade Informatika",
+  "year": 2024,
+  "achievement_type": "academic|non_academic",
+  "achievement_level": "national|international|regional|district|school",
+  "organizer": "Kemendikbud",
+  "ranking": "1st|2nd|3rd|Participant",
+  "certificate_path": "achievements/cert_1234567890.pdf",
+  "certificate_url": "http://localhost/storage/achievements/cert_1234567890.pdf",
+  "created_at": "2025-01-01T00:00:00.000000Z"
+}
+
+Field Details:
+- achievement_type: academic (akademik), non_academic (non-akademik)
+- achievement_level: Scope of achievement
+- certificate_url: Full URL to certificate file
+
+================================================================================
+10. COMMON ERROR RESPONSES
+================================================================================
+
+--------------------------------------------------------------------------------
+401 Unauthenticated
+--------------------------------------------------------------------------------
+Description: Token missing, invalid, or expired
+HTTP Status: 401
+
+Response:
+{
+  "message": "Unauthenticated."
+}
+
+Causes:
+- No Authorization header
+- Invalid token format
+- Expired token
+- Token revoked (after logout)
+
+Solution:
+- Login again to get new token
+- Check Authorization header format: "Bearer {token}"
+
+--------------------------------------------------------------------------------
+403 Forbidden
+--------------------------------------------------------------------------------
+Description: Authenticated but not authorized for this resource
+HTTP Status: 403
+
+Response:
+{
+  "success": false,
+  "message": "Unauthorized access"
+}
+
+Or:
+{
+  "success": false,
+  "message": "Hanya admin yang dapat mengakses resource ini"
+}
+
+Causes:
+- Wrong role (e.g., pendaftar accessing admin endpoint)
+- Not owner of resource
+- Account not active
+
+Solution:
+- Check user role
+- Verify resource ownership
+- Contact admin if account inactive
+
+--------------------------------------------------------------------------------
+404 Not Found
+--------------------------------------------------------------------------------
+Description: Resource not found
+HTTP Status: 404
+
+Response:
+{
+  "success": false,
+  "message": "Resource tidak ditemukan"
+}
+
+Or specific message:
+{
+  "success": false,
+  "message": "Profil tidak ditemukan"
+}
+
+Causes:
+- Invalid ID in URL parameter
+- Resource deleted
+- Resource never existed
+
+Solution:
+- Verify ID parameter
+- Check if resource exists
+- Use search/list endpoint first
+
+--------------------------------------------------------------------------------
+422 Validation Error
+--------------------------------------------------------------------------------
+Description: Request data validation failed
+HTTP Status: 422
+
+Response:
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "email": [
+      "The email field is required.",
+      "The email must be a valid email address.",
+      "The email has already been taken."
+    ],
+    "password": [
+      "The password must be at least 8 characters.",
+      "The password confirmation does not match."
+    ],
+    "nik": [
+      "The nik must be 16 characters."
+    ]
+  }
+}
+
+Causes:
+- Missing required fields
+- Invalid format (email, phone, etc.)
+- Field constraints violation (length, type, etc.)
+- Unique constraint violation
+
+Solution:
+- Check all required fields
+- Validate format before sending
+- Handle error messages in UI
+- Show field-specific errors to user
+
+--------------------------------------------------------------------------------
+500 Server Error
+--------------------------------------------------------------------------------
+Description: Internal server error
+HTTP Status: 500
+
+Response (Development):
+{
+  "success": false,
+  "message": "Gagal melakukan operasi",
+  "error": "SQLSTATE[23000]: Integrity constraint violation..."
+}
+
+Response (Production):
+{
+  "success": false,
+  "message": "Terjadi kesalahan server, silakan coba lagi"
+}
+
+Causes:
+- Database connection error
+- File system error
+- Third-party service error
+- Uncaught exceptions
+
+Solution:
+- Retry request
+- Check server logs
+- Contact support if persists
+
+================================================================================
+11. NOTES & SPECIFICATIONS
+================================================================================
+
+--------------------------------------------------------------------------------
+Upload File Specifications
+--------------------------------------------------------------------------------
+
+Payment Proof:
+- Accepted formats: jpg, jpeg, png, pdf
+- Maximum size: 2MB (2048 KB)
+- Field name: payment_proof
+- Stored in: storage/app/public/payments/
+
+Documents (KTP, Ijazah, etc.):
+- Accepted formats: jpg, jpeg, png, pdf
+- Maximum size: 2MB (2048 KB)
+- Field name: document_file
+- Stored in: storage/app/public/documents/
+
+Achievement Certificates:
+- Accepted formats: jpg, jpeg, png, pdf
+- Maximum size: 2MB (2048 KB)
+- Field name: certificate_file
+- Stored in: storage/app/public/achievements/
+
+Avatar:
+- Accepted formats: jpg, jpeg, png
+- Maximum size: 2MB (2048 KB)
+- Field name: avatar
+- Stored in: storage/app/public/avatars/
+
+Frontend Configuration:
+- Axios timeout for file uploads: 60 seconds (60000ms)
+- Content-Type: multipart/form-data
+- Use FormData object for file uploads
+
+Example Frontend Upload:
+```javascript
+const formData = new FormData();
+formData.append('payment_proof', file);
+formData.append('sender_bank', 'Bank BCA');
+formData.append('paid_amount', 5000000);
+
+await apiClient.post(`/payments/${paymentId}/upload-proof`, formData, {
+  timeout: 60000,
+  headers: { 'Content-Type': 'multipart/form-data' },
+  onUploadProgress: (progressEvent) => {
+    const percentCompleted = Math.round(
+      (progressEvent.loaded * 100) / progressEvent.total
+    );
+    console.log(percentCompleted);
+  }
+});
+```
+
+--------------------------------------------------------------------------------
+Authentication & Token Management
+--------------------------------------------------------------------------------
+
+Token Type: Sanctum Bearer Token
+Token Format: {id}|{plainTextToken}
+Example: 1|abcdefghijklmnopqrstuvwxyz123456789
+
+Header Format:
+Authorization: Bearer {token}
+
+Alternative (via middleware api.token.query):
+Query parameter: ?token={token}
+
+Token Storage (Frontend):
+- localStorage key: "access_token" (NOT "token")
+- Storage format: Plain string, no JSON
+- Clear on logout
+
+Example:
+```javascript
+// Store token after login
+localStorage.setItem("access_token", response.data.data.token);
+
+// Retrieve token
+const token = localStorage.getItem("access_token");
+
+// Clear on logout
+localStorage.removeItem("access_token");
+localStorage.removeItem("user");
+```
+
+Token Lifecycle:
+- Created on: /api/register, /api/login
+- Used for: All protected endpoints
+- Invalidated on: /api/logout
+- No expiration: Tokens don't expire (until logout)
+
+Axios Configuration:
+```javascript
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem("access_token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+```
+
+--------------------------------------------------------------------------------
+Pagination
+--------------------------------------------------------------------------------
+
+Default Settings:
+- per_page: 15
+- page: 1 (first page)
+
+Query Parameters:
+- page: Page number (integer, >= 1)
+- per_page: Items per page (integer, 1-100)
+
+Response Structure:
+```json
+{
+  "success": true,
+  "data": {
+    "data": [ /* array of items */ ],
+    "links": {
+      "first": "http://localhost/api/endpoint?page=1",
+      "last": "http://localhost/api/endpoint?page=10",
+      "prev": null,
+      "next": "http://localhost/api/endpoint?page=2"
+    },
+    "meta": {
+      "current_page": 1,
+      "from": 1,
+      "last_page": 10,
+      "path": "http://localhost/api/endpoint",
+      "per_page": 15,
+      "to": 15,
+      "total": 150
+    }
+  }
+}
+```
+
+Frontend Implementation (TanStack Query):
+```javascript
+const { data, isLoading } = useQuery({
+  queryKey: ['items', page, perPage],
+  queryFn: () => getItems(page, perPage),
+  placeholderData: keepPreviousData, // Smooth transition
+});
+
+const totalPages = data?.data?.meta?.last_page || 1;
+```
+
+--------------------------------------------------------------------------------
+Date & Time Formats
+--------------------------------------------------------------------------------
+
+ISO 8601 (Standard):
+Format: "2025-01-01T00:00:00.000000Z"
+Usage: created_at, updated_at, verified_at
+Timezone: UTC (Z suffix)
+
+Date Only:
+Format: "2025-01-01"
+Usage: birth_date, due_date
+
+Datetime (MySQL):
+Format: "2025-01-01 10:30:00"
+Usage: upload_date, paid_at
+
+Frontend Parsing:
+```javascript
+// ISO 8601
+const date = new Date(isoString);
+const formatted = date.toLocaleDateString('id-ID');
+
+// Or using date-fns
+import { format, parseISO } from 'date-fns';
+const formatted = format(parseISO(isoString), 'dd MMM yyyy HH:mm');
+```
+
+Backend Generation:
+- Laravel Carbon: $carbon->toISOString()
+- Format: Y-m-d for dates, Y-m-d H:i:s for datetime
+
+--------------------------------------------------------------------------------
+Status Enum Values
+--------------------------------------------------------------------------------
+
+Registration Status (registration_status):
+- draft: Belum submit, masih dalam pengisian
+- submitted: Sudah submit, menunggu review
+- approved: Disetujui oleh admin/manager
+- rejected: Ditolak oleh admin/manager
+
+Payment Status (status):
+- pending: Belum upload bukti pembayaran
+- waiting_verification: Sudah upload, menunggu verifikasi
+- verified: Terverifikasi oleh admin/manager
+- rejected: Ditolak oleh admin/manager
+- expired: Melewati batas waktu pembayaran
+
+Document Verification Status (verification_status):
+- pending: Belum diverifikasi
+- verified: Terverifikasi oleh admin/manager
+- rejected: Ditolak oleh admin/manager
+
+Notification Type (type):
+- info: Informasi biasa (blue icon)
+- warning: Peringatan (yellow icon)
+- important: Penting (red icon)
+- success: Sukses (green icon)
+
+User Role (role):
+- pendaftar: Mahasiswa pendaftar
+- manager: Manager (dapat verifikasi)
+- admin: Administrator (full access)
+
+--------------------------------------------------------------------------------
+Database Schema Notes
+--------------------------------------------------------------------------------
+
+Primary Key Naming:
+- User: id_user (non-standard, not 'id')
+- ApplicantProfile: id_profile
+- Guardian: id_guardian
+- Payment: id
+- ApplicantDocument: id_document
+- ApplicantAchievement: id_achievement
+- Notification: id
+
+Foreign Key Naming:
+- Consistent with table: id_user, id_profile, id_program, id_document_type
+
+Important Relationships:
+- User hasOne ApplicantProfile (via id_user)
+- ApplicantProfile belongsTo User (via id_user)
+- ApplicantProfile hasMany ApplicantDocument (via id_profile)
+- ApplicantProfile hasMany ApplicantAchievement (via id_profile)
+- ApplicantProfile hasMany Guardian (via id_profile)
+- User hasOne Payment (via id_user)
+- Payment belongsTo PaymentMethod (via id_payment_method)
+- Payment belongsTo User as rejecter (via rejected_by -> id_user)
+
+--------------------------------------------------------------------------------
+CORS Configuration
+--------------------------------------------------------------------------------
+
+Allowed Origins: Frontend domain (configured in config/cors.php)
+Allowed Methods: GET, POST, PUT, DELETE, OPTIONS
+Allowed Headers: Authorization, Content-Type, Accept
+Credentials: true (supports cookies if needed)
+
+Frontend Axios Config:
+```javascript
+const apiClient = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
+  withCredentials: false, // Sanctum doesn't need cookies for token auth
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
+});
+```
+
+--------------------------------------------------------------------------------
+Error Handling Best Practices
+--------------------------------------------------------------------------------
+
+Frontend Pattern:
+```javascript
+try {
+  const response = await apiCall();
+  toast.success(response.data.message);
+  return response.data.data;
+} catch (error) {
+  if (error.response) {
+    // Server responded with error
+    const status = error.response.status;
+    const message = error.response.data.message;
+    
+    switch(status) {
+      case 401:
+        // Unauthenticated - redirect to login
+        localStorage.removeItem('access_token');
+        router.push('/login');
+        break;
+      case 403:
+        toast.error('Anda tidak memiliki akses');
+        break;
+      case 422:
+        // Validation errors - show field errors
+        const errors = error.response.data.errors;
+        Object.values(errors).flat().forEach(err => toast.error(err));
+        break;
+      case 404:
+        toast.error('Data tidak ditemukan');
+        break;
+      default:
+        toast.error(message || 'Terjadi kesalahan');
+    }
+  } else if (error.request) {
+    // Request made but no response
+    toast.error('Tidak dapat terhubung ke server');
+  } else {
+    // Something else happened
+    toast.error('Terjadi kesalahan');
+  }
+  throw error;
+}
+```
+
+Backend Pattern:
+```php
+try {
+    // Business logic
+    return response()->json([
+        'success' => true,
+        'message' => 'Operation successful',
+        'data' => $data
+    ], 200);
+} catch (\Exception $e) {
+    return response()->json([
+        'success' => false,
+        'message' => 'Operation failed',
+        'error' => $e->getMessage() // Only in dev
+    ], 500);
+}
+```
+
+--------------------------------------------------------------------------------
+Security Considerations
+--------------------------------------------------------------------------------
+
+1. Authentication:
+   - Always send token in Authorization header
+   - Never expose token in URL (except via ?token= for downloads)
+   - Clear tokens on logout
+   - Validate token on every request
+
+2. File Uploads:
+   - Validate file type and size server-side
+   - Sanitize filenames
+   - Store files outside public directory
+   - Serve files via controller (authorization check)
+
+3. Input Validation:
+   - Always validate on server-side (Laravel Requests)
+   - Client-side validation for UX only
+   - Sanitize user input
+   - Use parameterized queries (Eloquent ORM)
+
+4. CSRF Protection:
+   - Disabled for API routes (Sanctum token auth)
+   - Use CSRF tokens for web routes only
+
+5. Rate Limiting:
+   - Applied to sensitive endpoints (login, register)
+   - Default: 60 requests per minute
+   - Returns 429 Too Many Requests if exceeded
+
+--------------------------------------------------------------------------------
+Testing & Development
+--------------------------------------------------------------------------------
+
+Base URL:
+- Development: http://localhost:8000/api
+- Production: https://api.ugn.ac.id/api
+
+Test Accounts:
+- Admin: admin@ugn.ac.id / password123
+- Manager: manager@ugn.ac.id / password123
+- Pendaftar: Test via /api/register
+
+Postman Collection:
+- Available at: /storage/api-docs/postman-collection.json
+- Import to Postman for testing
+
+API Documentation:
+- Swagger UI: http://localhost:8000/api/documentation
+- ReDoc: http://localhost:8000/docs/api
+
+Debugging:
+- Enable debug mode in .env: APP_DEBUG=true
+- Check logs: storage/logs/laravel.log
+- Use Telescope for request inspection (if installed)
+
+================================================================================
+END OF DOCUMENTATION
+================================================================================
+
+Total Endpoints Documented: 85+
+Total Sections: 11
+Total Batches: 6
+
+Summary of Endpoints by Category:
+- Authentication: 8 endpoints
+- Registration: 17 endpoints  
+- Payment: 7 endpoints
+- Notification: 6 endpoints
+- Official Email: 3 endpoints
+- Admin & Manager: 35+ endpoints
+- Profile: 4 endpoints
+- Announcement: 1 endpoint
+
+Response Formats Documented:
+- UserResource
+- PaymentResource  
+- ApplicantProfileResource
+- GuardianResource
+- ApplicantDocumentResource
+- ApplicantAchievementResource
+
+Common Errors Documented:
+- 401 Unauthenticated
+- 403 Forbidden
+- 404 Not Found
+- 422 Validation Error
+- 500 Server Error
+
+Additional Documentation:
+- File upload specifications
+- Authentication & token management
+- Pagination structure
+- Date & time formats
+- Status enum values
+- Database schema notes
+- CORS configuration
+- Error handling patterns
+- Security considerations
+- Testing & development guidelines
+
+================================================================================
+Document Version: 1.0
+Last Updated: December 10, 2025
+Backend: Laravel 11 + Sanctum
+Frontend: Next.js 15 + TanStack Query v5
+Database: MySQL
+Author: GitHub Copilot AI Assistant
+================================================================================

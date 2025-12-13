@@ -7,15 +7,37 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Heading } from "@/components/Heading";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useApplicantStatistics } from "@/hooks/useAdmin";
+import { useApplicantStatistics, useApplicants } from "@/hooks/useAdmin";
 
 export default function Page() {
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState("pendaftar");
 
-  const { data, isLoading, isError, error } = useApplicantStatistics({per_page: 100});
+  // Get statistics summary
+  const {
+    data: statsData,
+    isLoading: statsLoading,
+    isError: statsError,
+    error: statsErrorMsg,
+  } = useApplicantStatistics({
+    per_page: 100,
+  });
 
-  console.log(data);
+  // Get applicants list for table display
+  const {
+    data: applicantsData,
+    isLoading: applicantsLoading,
+    isError: applicantsError,
+  } = useApplicants({
+    per_page: 100,
+  });
+
+  const isLoading = statsLoading || applicantsLoading;
+  const isError = statsError || applicantsError;
+  const error = statsErrorMsg;
+
+  console.log("Stats Data:", statsData);
+  console.log("Applicants Data:", applicantsData);
 
   if (isLoading) {
     return (
@@ -43,17 +65,73 @@ export default function Page() {
     );
   }
 
-  const Approved = data.data.data.verification_summary.approved;
-  const Pending = data.data.data.verification_summary.pending;
-  const Rejected = data.data.data.verification_summary.rejected;
+  const responseData = statsData?.data?.data || {};
+  const applicantsResponse = applicantsData?.data?.data || {};
 
-  const Lulus = data.data.data.graduation_summary.lulus;
-  const TidakLulus = data.data.data.graduation_summary.tidak_lulus;
+  const Approved = responseData?.by_status?.approved || 0;
+  const Pending = responseData?.by_status?.pending || 0;
+  const Rejected = responseData?.by_status?.rejected || 0;
 
-  console.log(data.data.data);
+  // FIX: Mapping graduation status - "Sudah Lulus" = Lulus, "Belum Lulus" = Tidak Lulus
+  const Lulus = responseData?.by_graduation_status?.["Sudah Lulus"] || 0;
+  const TidakLulus = responseData?.by_graduation_status?.["Belum Lulus"] || 0;
 
-  const VerificationTable = data.data.data.verification_table;
-  const GraduationTable = data.data.data.graduation_table;
+  // Get applicants list from /admin/applicants endpoint
+  // Backend returns: { success: true, data: [...] } - array langsung, bukan nested
+  const applicantsList = applicantsResponse || [];
+
+  console.log("Applicants Response:", applicantsData?.data);
+  console.log("Applicants List:", applicantsList);
+
+  // Backend structure: { id_profile, id_user, full_name, email, program_name, registration_number, registration_status, created_at, phone_number }
+  // Map to frontend expected structure
+  const mappedApplicants = applicantsList.map((app) => ({
+    id_profile: app.id_profile,
+    user_id: app.id_user,
+    registration_number: app.registration_number,
+    user: {
+      id: app.id_user,
+      name: app.full_name, // Backend uses full_name directly
+      email: app.email, // Backend uses email directly
+    },
+    status: app.registration_status,
+    registration_status: app.registration_status,
+    graduation_status: app.graduation_status,
+    program: app.program_name,
+    created_at: app.created_at,
+    phone_number: app.phone_number,
+  }));
+
+  console.log("Mapped Applicants:", mappedApplicants);
+
+  // Filter by registration_status for verification table
+  const verificationApplicants = mappedApplicants.filter((app) =>
+    ["submitted", "reviewed", "approved", "rejected"].includes(
+      app.registration_status
+    )
+  );
+
+  // Filter by graduation_status for graduation table
+  const graduationApplicants = mappedApplicants.filter(
+    (app) =>
+      app.graduation_status &&
+      ["Sudah Lulus", "Belum Lulus"].includes(app.graduation_status)
+  );
+
+  console.log("Verification Applicants:", verificationApplicants);
+  console.log("Graduation Applicants:", graduationApplicants);
+
+  const VerificationTable = {
+    data: verificationApplicants,
+    current_page: 1,
+    total: verificationApplicants.length,
+  };
+
+  const GraduationTable = {
+    data: graduationApplicants,
+    current_page: 1,
+    total: graduationApplicants.length,
+  };
 
   return (
     <div className="w-full min-h-screen">

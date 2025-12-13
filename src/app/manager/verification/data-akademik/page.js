@@ -130,7 +130,7 @@ export default function DataAkademik() {
     isLoading: isApplicantLoading,
     isError: isApplicantError,
     error: applicantError,
-  } = useApplicantDetail(id);
+  } = useManagerApplicantDetail(id);
 
   if (isApplicantLoading) return <div>Loading applicant...</div>;
   if (isApplicantError)
@@ -195,8 +195,8 @@ export default function DataAkademik() {
                             data.graduation_status === "graduated"
                               ? "Lulus"
                               : data.graduation_status === "not_graduated"
-                                ? "Tidak Lulus"
-                                : data.graduation_status
+                              ? "Tidak Lulus"
+                              : data.graduation_status
                           }
                           {...field}
                           readOnly
