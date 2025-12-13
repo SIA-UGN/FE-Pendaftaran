@@ -68,8 +68,10 @@ export default function Page() {
   const responseData = statsData?.data?.data || {};
   const applicantsResponse = applicantsData?.data?.data || {};
 
+  console.log("Response Data:", responseData);
+
   const Approved = responseData?.by_status?.approved || 0;
-  const Pending = responseData?.by_status?.pending || 0;
+  const Pending = responseData?.by_status?.submitted || 0;
   const Rejected = responseData?.by_status?.rejected || 0;
 
   // FIX: Mapping graduation status - "Sudah Lulus" = Lulus, "Belum Lulus" = Tidak Lulus

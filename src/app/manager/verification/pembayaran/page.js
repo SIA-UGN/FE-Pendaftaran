@@ -1,31 +1,13 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-
-import { Info, AlertCircle, XCircle, CheckCircle, Eye } from "lucide-react";
+import { Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import RegistrationProgress from "@/components/registrations/RegistrationProgress";
-
 import { Card } from "@/components/ui/card";
 import {
   Dialog,
@@ -35,7 +17,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,17 +29,21 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import TextareaAutosize from "react-textarea-autosize";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-} from "@/components/ui/input-group";
 import { useState } from "react";
 import {
   useManagerPaymentVerification,
   useVerifyApplicant,
   useManagerVerifyPayment,
 } from "@/hooks/useManager";
+import { useRouter } from "next/navigation";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Heading } from "@/components/Heading";
+import { useUpdateApplicantStatus } from "@/hooks/useAdmin";
 
 const FormSchema = z.object({
   rekening: z.string({
@@ -76,19 +61,6 @@ const FormSchema = z.object({
       "Format file harus .pdf, .jpg, atau .png"
     ),
 });
-
-import { useRouter } from "next/navigation";
-
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-
-import { Heading } from "@/components/Heading";
-
-import { useUpdateApplicantStatus } from "@/hooks/useAdmin";
 
 export default function Pembayaran() {
   const router = useRouter();
@@ -121,7 +93,15 @@ export default function Pembayaran() {
   const [paymentRejectionNote, setPaymentRejectionNote] = useState("");
   const [openProof, setOpenProof] = useState(false);
 
-  // console.log(id);
+  // PERBAIKAN: State untuk revision notes
+  const [revisionNotes, setRevisionNotes] = useState({
+    identity: "",
+    address: "",
+    parents: "",
+    academic: "",
+    achievement: "",
+    payment: "",
+  });
 
   const { data, isLoading, isError, error } =
     useManagerPaymentVerification(payment_id);
@@ -130,7 +110,6 @@ export default function Pembayaran() {
   if (isError) return <div>Error loading payment: {error.message}</div>;
 
   console.log(data);
-  // console.log(paymentDatas);
 
   const paymentData = data.data.data;
 
@@ -162,6 +141,59 @@ export default function Pembayaran() {
     console.log("Sending Payment:", payload);
 
     await setPaymentStatus(payload);
+  };
+
+  // PERBAIKAN: Handler untuk update revision notes
+  const handleRevisionNoteChange = (section, value) => {
+    setRevisionNotes((prev) => ({
+      ...prev,
+      [section]: value,
+    }));
+  };
+
+  // PERBAIKAN: Handler untuk submit revision
+  const handleSubmitRevision = async () => {
+    const sections = [
+      { key: "identity", heading: "Data Diri" },
+      { key: "address", heading: "Alamat" },
+      { key: "parents", heading: "Data Orang Tua" },
+      { key: "academic", heading: "Data Akademik" },
+      { key: "achievement", heading: "Prestasi" },
+      { key: "payment", heading: "Pembayaran" },
+    ];
+
+    const notes = sections
+      .map((section) => {
+        const value = revisionNotes[section.key]?.trim();
+        if (value) {
+          return `**${section.heading}**: ${value}`;
+        }
+        return null;
+      })
+      .filter(Boolean)
+      .join("\n\n");
+
+    console.log("Notes collected:", notes);
+
+    if (notes) {
+      await handleRegistration("submitted", notes);
+      // Reset revision notes after submit
+      setRevisionNotes({
+        identity: "",
+        address: "",
+        parents: "",
+        academic: "",
+        achievement: "",
+        payment: "",
+      });
+    } else {
+      // Jika tidak ada catatan, beri peringatan
+      alert("Silakan isi minimal satu catatan revisi");
+      return;
+    }
+
+    setShowRevisionDialog(false);
+    router.push(`/manager/verification?id=${payment_id}`);
   };
 
   return (
@@ -211,7 +243,7 @@ export default function Pembayaran() {
       <Form {...form}>
         <div className="space-y-6">
           <div className="flex flex-col gap-5 p-12 border rounded-xl mx-0 md:mx-12 bg-[var(--light-cream)]">
-            {paymentData.rejection_reason}
+            {paymentData.rejection_reason || "Tidak ada catatan"}
           </div>
           <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
             <Link href="/manager/verification">
@@ -441,10 +473,12 @@ export default function Pembayaran() {
                         <AccordionTrigger>{item.label}</AccordionTrigger>
                         <AccordionContent>
                           <TextareaAutosize
-                            id={`notes-${item.key}`}
-                            data-heading={item.heading}
                             className="w-full min-h-24 mt-2 p-3 border rounded-md resize-none"
                             placeholder={`Tulis ${item.label.toLowerCase()}...`}
+                            value={revisionNotes[item.key]}
+                            onChange={(e) =>
+                              handleRevisionNoteChange(item.key, e.target.value)
+                            }
                           />
                         </AccordionContent>
                       </AccordionItem>
@@ -454,46 +488,24 @@ export default function Pembayaran() {
 
                 <AlertDialogFooter>
                   <AlertDialogCancel
-                    onClick={() => setShowRevisionDialog(false)}
+                    onClick={() => {
+                      setShowRevisionDialog(false);
+                      // Reset notes when cancel
+                      setRevisionNotes({
+                        identity: "",
+                        address: "",
+                        parents: "",
+                        academic: "",
+                        achievement: "",
+                        payment: "",
+                      });
+                    }}
                   >
                     Batal
                   </AlertDialogCancel>
                   <AlertDialogAction
                     disabled={isRegistrationLoading}
-                    onClick={async () => {
-                      const sections = [
-                        { key: "identity", heading: "Data Diri" },
-                        { key: "address", heading: "Alamat" },
-                        { key: "parents", heading: "Data Orang Tua" },
-                        { key: "academic", heading: "Data Akademik" },
-                        { key: "achievement", heading: "Prestasi" },
-                        { key: "payment", heading: "Pembayaran" },
-                      ];
-
-                      const notes = sections
-                        .map((section) => {
-                          const textarea = document.querySelector(
-                            `#notes-${section.key}`
-                          );
-                          const value = textarea?.value?.trim();
-
-                          if (value) {
-                            return `**${section.heading}**: ${value}`;
-                          }
-                          return null;
-                        })
-                        .filter(Boolean)
-                        .join("\n\n");
-
-                      console.log("Notes collected:", notes);
-
-                      if (notes) {
-                        await handleRegistration("revision_needed", notes);
-                      }
-
-                      setShowRevisionDialog(false);
-                      router.push(`/manager/verification?id=${payment_id}`);
-                    }}
+                    onClick={handleSubmitRevision}
                   >
                     Simpan dan Kirim Revisi
                   </AlertDialogAction>

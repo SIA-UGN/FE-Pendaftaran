@@ -43,7 +43,7 @@ export default function Pendaftar() {
   const applicantsResponse = applicantsData?.data?.data || {};
 
   const Approved = responseData?.by_status?.approved || 0;
-  const Pending = responseData?.by_status?.pending || 0;
+  const Pending = responseData?.by_status?.submitted || 0;
   const Rejected = responseData?.by_status?.rejected || 0;
 
   // FIX: Mapping graduation status - "Sudah Lulus" = Lulus, "Belum Lulus" = Tidak Lulus
