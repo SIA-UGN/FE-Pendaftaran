@@ -20,13 +20,19 @@ export default function Pendaftar() {
     error,
   } = useManagerApplicants({ per_page: 100 });
 
-  if (statsLoading || applicantsLoading) return <div>Loading...</div>;
+  if (statsLoading || applicantsLoading)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Loading...
+      </div>
+    );
 
   if (statsError || applicantsError)
     return (
-      <div>
-        Error fetching applicant data:{" "}
-        {error?.response?.data?.message || error?.message}
+      <div className="flex items-center justify-center min-h-screen p-4">
+        <div className="text-red-500 text-center">
+          Error: {error?.response?.data?.message || error?.message}
+        </div>
       </div>
     );
 
