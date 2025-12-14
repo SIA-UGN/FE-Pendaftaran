@@ -5,14 +5,12 @@ import { useManagerApplicants } from "@/hooks/useManager";
 import { useApplicantStatistics } from "@/hooks/useAdmin";
 
 export default function Pendaftar() {
-  // Get statistics (summary counts)
   const {
     data: statsData,
     isLoading: statsLoading,
     isError: statsError,
   } = useApplicantStatistics({ per_page: 100 });
 
-  // Get full applicants list
   const {
     data: applicantsData,
     isLoading: applicantsLoading,
@@ -20,24 +18,21 @@ export default function Pendaftar() {
     error,
   } = useManagerApplicants({ per_page: 100 });
 
-  
   if (statsError || applicantsError)
     return (
-  <div className="flex items-center justify-center min-h-screen p-4">
+      <div className="flex items-center justify-center min-h-screen p-4">
         <div className="text-red-500 text-center">
           Error: {error?.response?.data?.message || error?.message}
         </div>
       </div>
     );
-    
-    if (statsLoading || applicantsLoading)
-      return (
-        <div className="flex items-center justify-center min-h-screen">
-          Loading...
-        </div>
-      );
-    console.log("Stats Data:", statsData);
-    console.log("Applicants Data:", applicantsData);
+
+  if (statsLoading || applicantsLoading)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Loading...
+      </div>
+    );
 
   const responseData = statsData?.data?.data || {};
   const applicantsResponse = applicantsData?.data?.data || {};
@@ -96,9 +91,6 @@ export default function Pendaftar() {
     current_page: 1,
     total: graduationApplicants.length,
   };
-
-  console.log("Verification Summary:", responseData?.verification_summary);
-  console.log("Verification Table:", VerificationTable);
 
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-6xl mx-auto">

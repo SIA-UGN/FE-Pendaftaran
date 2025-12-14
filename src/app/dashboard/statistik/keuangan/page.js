@@ -29,13 +29,9 @@ export default function Page() {
 
   const responseData = data?.data?.data || {};
 
-  console.log("Financial Statistics Backend Data:", responseData);
-
-  // Backend returns: { total_revenue, verified_revenue, pending_revenue, total_payments, verified_payments, pending_payments }
-  // ChartPiePayment expects object: { verified, rejected, pending }
   const chartData = {
     verified: responseData?.verified_payments || 0,
-    rejected: 0, // Backend doesn't track rejected payments
+    rejected: 0,
     pending: responseData?.pending_payments || 0,
   };
 
@@ -46,18 +42,15 @@ export default function Page() {
     pending: responseData?.pending_payments || 0,
   };
 
-  // Calculate comparison from yearly revenue data
   const yearlyRevenue = yearlyData?.data?.data?.monthly_revenue || {};
   const currentYearTotal = Object.values(yearlyRevenue).reduce(
     (sum, val) => sum + Number(val || 0),
     0
   );
 
-  // For last year comparison, we would need last year's data
-  // Since backend doesn't provide it, we'll show current year data
   const comparison = {
-    last_year_income: 0, // Backend doesn't provide last year data
-    growth_percentage: 0, // Can't calculate without last year data
+    last_year_income: 0,
+    growth_percentage: 0,
   };
 
   return (

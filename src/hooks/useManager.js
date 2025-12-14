@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { managerService } from "@/services/managerService";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export const useManagerDashboard = () => {
   return useQuery({
@@ -46,6 +47,7 @@ export const useVerifyApplicant = () => {
 
 export const useManagerSetGraduationStatus = () => {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   return useMutation({
     mutationFn: ({ id, data }) => managerService.setGraduationStatus(id, data),
@@ -53,6 +55,7 @@ export const useManagerSetGraduationStatus = () => {
       toast.success("Status kelulusan berhasil diperbarui");
       queryClient.invalidateQueries({ queryKey: ["managerApplicants"] });
       queryClient.invalidateQueries({ queryKey: ["managerApplicant"] });
+      router.push("/manager/pendaftar");
     },
     onError: (error) => {
       toast.error(

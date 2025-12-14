@@ -15,17 +15,7 @@ export default function ApplicantInformation({
   GraduationTable,
   type,
 }) {
-  console.log("Approved:", Approved);
-  console.log("Rejected:", Rejected);
-  console.log("Pending:", Pending);
-
-  console.log("VerificationTable:", VerificationTable);
-  console.log("GraduationTable:", GraduationTable);
-  console.log("Type:", type);
-
-  // Safe access dengan default values
   const verificationData = VerificationTable?.data || [];
-  console.log("Verification Data:", verificationData);
   const graduationData = GraduationTable?.data || [];
 
   return (

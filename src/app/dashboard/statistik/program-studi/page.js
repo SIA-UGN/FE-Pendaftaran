@@ -26,10 +26,6 @@ export default function Page() {
 
   const responseData = data?.data?.data || [];
 
-  console.log("Program Statistics Backend Data:", responseData);
-
-  // Backend returns array of programs: [{ program_name, total_applicants, approved, pending, rejected }]
-  // Transform for ChartPiePrograms - expects array with name and value
   const chartData = Array.isArray(responseData)
     ? responseData.map((program) => ({
         name: program.program_name,
@@ -38,7 +34,6 @@ export default function Page() {
       }))
     : [];
 
-  // Top programs is just the data itself
   const topPrograms = Array.isArray(responseData)
     ? responseData.map((program) => ({
         program: program.program_name,

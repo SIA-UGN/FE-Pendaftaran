@@ -57,6 +57,7 @@ import {
 import { useState } from "react";
 
 import { useManagerApplicantDetail } from "@/hooks/useManager";
+import DocumentPreviewDialog from "@/components/manager/DocumentPreviewDialog";
 
 const MAX_FILE_SIZE = 5000000;
 const ACCEPTED_FILE_TYPES = [
@@ -115,11 +116,6 @@ export default function DataAkademik() {
   });
 
   const [showCancelDialog, setShowCancelDialog] = useState(false);
-  const [openIjazah, setOpenIjazah] = useState(false);
-  const [openSkl, setOpenSkl] = useState(false);
-  const [openTranskrip, setOpenTranskrip] = useState(false);
-  const [openUn, setOpenUn] = useState(false);
-  const [openSertifikat, setOpenSertifikat] = useState(false);
 
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
@@ -139,8 +135,20 @@ export default function DataAkademik() {
   const applicant = applicantData?.data?.data;
   const data = applicant?.profile;
 
+  // Document Type IDs: 4=Ijazah, 5=Transkrip, 6=SKL, 7=UN, 8=Sertifikat
+  const ijazahDoc = data?.documents?.find((doc) => doc.id_document_type === 4);
+  const transkripDoc = data?.documents?.find(
+    (doc) => doc.id_document_type === 5
+  );
+  const sklDoc = data?.documents?.find((doc) => doc.id_document_type === 6);
+  const unDoc = data?.documents?.find((doc) => doc.id_document_type === 7);
+  const sertifikatDoc = data?.documents?.find(
+    (doc) => doc.id_document_type === 8
+  );
+
   console.log(id);
   console.log(data);
+  console.log("📄 Documents:", data?.documents);
 
   return (
     <>
@@ -241,30 +249,18 @@ export default function DataAkademik() {
                 <FormItem>
                   <FormLabel>Ijazah Terakhir</FormLabel>
                   <FormControl>
-                    <Dialog open={openIjazah} onOpenChange={setOpenIjazah}>
-                      <DialogTrigger asChild>
-                        <Button variant={"outline"} type="button">
-                          <Eye className="w-4 h-4 mr-2" />
-                          Lihat Ijazah Terakhir
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
-                        <DialogHeader>
-                          <DialogTitle>Ijazah Terakhir</DialogTitle>
-                          <DialogDescription>
-                            Dokumen ijazah terakhir pendaftar
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="flex items-center justify-center p-4">
-                          <img
-                            src={`http://be-ugn.test/${data.documents[0]?.file_path}`}
-                            alt="Ijazah"
-                            className="max-w-full h-auto rounded-lg"
-                          />
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                    <DocumentPreviewDialog
+                      document={ijazahDoc}
+                      title="Ijazah Terakhir"
+                      description="Dokumen ijazah terakhir pendaftar"
+                      buttonText="Lihat Ijazah"
+                    />
                   </FormControl>
+                  {!ijazahDoc && (
+                    <p className="text-sm text-amber-600">
+                      ⚠️ Dokumen Ijazah belum diupload
+                    </p>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -278,32 +274,18 @@ export default function DataAkademik() {
                 <FormItem>
                   <FormLabel>SKL</FormLabel>
                   <FormControl>
-                    <Dialog open={openSkl} onOpenChange={setOpenSkl}>
-                      <DialogTrigger asChild>
-                        <Button variant={"outline"} type="button">
-                          <Eye className="w-4 h-4 mr-2" />
-                          Lihat SKL
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
-                        <DialogHeader>
-                          <DialogTitle>
-                            Surat Keterangan Lulus (SKL)
-                          </DialogTitle>
-                          <DialogDescription>
-                            Dokumen SKL pendaftar
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="flex items-center justify-center p-4">
-                          <img
-                            src={`/${data.graduation_letter_file}`}
-                            alt="SKL"
-                            className="max-w-full h-auto rounded-lg"
-                          />
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                    <DocumentPreviewDialog
+                      document={sklDoc}
+                      title="Surat Keterangan Lulus (SKL)"
+                      description="Dokumen SKL pendaftar"
+                      buttonText="Lihat SKL"
+                    />
                   </FormControl>
+                  {!sklDoc && (
+                    <p className="text-sm text-amber-600">
+                      ⚠️ Dokumen SKL belum diupload
+                    </p>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -317,33 +299,18 @@ export default function DataAkademik() {
                 <FormItem>
                   <FormLabel>Transkrip Nilai</FormLabel>
                   <FormControl>
-                    <Dialog
-                      open={openTranskrip}
-                      onOpenChange={setOpenTranskrip}
-                    >
-                      <DialogTrigger asChild>
-                        <Button variant={"outline"} type="button">
-                          <Eye className="w-4 h-4 mr-2" />
-                          Lihat Transkrip Nilai
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
-                        <DialogHeader>
-                          <DialogTitle>Transkrip Nilai</DialogTitle>
-                          <DialogDescription>
-                            Dokumen transkrip nilai pendaftar
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="flex items-center justify-center p-4">
-                          <img
-                            src={`/${data.trancript_file}`}
-                            alt="Transkrip"
-                            className="max-w-full h-auto rounded-lg"
-                          />
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                    <DocumentPreviewDialog
+                      document={transkripDoc}
+                      title="Transkrip Nilai"
+                      description="Dokumen transkrip nilai pendaftar"
+                      buttonText="Lihat Transkrip"
+                    />
                   </FormControl>
+                  {!transkripDoc && (
+                    <p className="text-sm text-amber-600">
+                      ⚠️ Dokumen Transkrip belum diupload
+                    </p>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -357,30 +324,18 @@ export default function DataAkademik() {
                 <FormItem>
                   <FormLabel>Ujian Nasional</FormLabel>
                   <FormControl>
-                    <Dialog open={openUn} onOpenChange={setOpenUn}>
-                      <DialogTrigger asChild>
-                        <Button variant={"outline"} type="button">
-                          <Eye className="w-4 h-4 mr-2" />
-                          Lihat Nilai Ujian Nasional
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
-                        <DialogHeader>
-                          <DialogTitle>Nilai Ujian Nasional</DialogTitle>
-                          <DialogDescription>
-                            Dokumen nilai UN pendaftar
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="flex items-center justify-center p-4">
-                          <img
-                            src={`/${data.national_exam_file}`}
-                            alt="UN"
-                            className="max-w-full h-auto rounded-lg"
-                          />
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                    <DocumentPreviewDialog
+                      document={unDoc}
+                      title="Nilai Ujian Nasional"
+                      description="Dokumen nilai UN pendaftar"
+                      buttonText="Lihat Nilai UN"
+                    />
                   </FormControl>
+                  {!unDoc && (
+                    <p className="text-sm text-amber-600">
+                      ⚠️ Dokumen UN belum diupload
+                    </p>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -394,35 +349,18 @@ export default function DataAkademik() {
                 <FormItem>
                   <FormLabel>Sertifikat / Surat Rekomendasi</FormLabel>
                   <FormControl>
-                    <Dialog
-                      open={openSertifikat}
-                      onOpenChange={setOpenSertifikat}
-                    >
-                      <DialogTrigger asChild>
-                        <Button variant={"outline"} type="button">
-                          <Eye className="w-4 h-4 mr-2" />
-                          Lihat Sertifikat/Surat Rekomendasi
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
-                        <DialogHeader>
-                          <DialogTitle>
-                            Sertifikat / Surat Rekomendasi
-                          </DialogTitle>
-                          <DialogDescription>
-                            Dokumen sertifikat atau surat rekomendasi pendaftar
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="flex items-center justify-center p-4">
-                          <img
-                            src={`/${data.selection_test_file}`}
-                            alt="Sertifikat"
-                            className="max-w-full h-auto rounded-lg"
-                          />
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                    <DocumentPreviewDialog
+                      document={sertifikatDoc}
+                      title="Sertifikat / Surat Rekomendasi"
+                      description="Dokumen sertifikat atau surat rekomendasi pendaftar"
+                      buttonText="Lihat Sertifikat"
+                    />
                   </FormControl>
+                  {!sertifikatDoc && (
+                    <p className="text-sm text-amber-600">
+                      ⚠️ Dokumen Sertifikat belum diupload
+                    </p>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}

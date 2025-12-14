@@ -5,11 +5,14 @@ import { useDebounce } from "./useDebounce";
 export const useAnnouncementsWithSearch = () => {
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState({});
+  const [page, setPage] = useState(1);
   const debouncedSearch = useDebounce(search, 500);
 
   const params = {
     ...filters,
     search: debouncedSearch || undefined,
+    per_page: 1000, // Load max 1000 items, backend akan handle pagination
+    page,
   };
 
   const { data, isLoading, error, refetch } = useAnnouncements(params);
@@ -34,6 +37,11 @@ export const useAnnouncementsWithSearch = () => {
   const clearFilters = () => {
     setFilters({});
     setSearch("");
+    setPage(1);
+  };
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
   };
 
   return {
@@ -43,8 +51,10 @@ export const useAnnouncementsWithSearch = () => {
     error,
     search,
     filters,
+    page,
     handleSearch,
     handleFilterChange,
+    handlePageChange,
     clearFilters,
     refetch,
   };

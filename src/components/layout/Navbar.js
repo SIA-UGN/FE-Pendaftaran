@@ -39,10 +39,8 @@ export default function Navbar() {
   const [user, setUser] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mobileProfilOpen, setMobileProfilOpen] = useState(false);
-  const [hasNotification, setHasNotification] = useState(true);
-  const [canFetchNotifications, setCanFetchNotifications] = useState(false);
 
-  const shouldFetchNotifications = false;
+  const shouldFetchNotifications = isLoggedIn && user?.role === "pendaftar";
   const {
     data: unreadNotificationsData,
     isError,
@@ -77,22 +75,14 @@ export default function Navbar() {
           const userData = JSON.parse(userStr);
           setUser(userData);
           setIsLoggedIn(true);
-
-          // Wait 500ms after user is set before enabling notifications fetch
-          // This ensures token is ready in localStorage
-          setTimeout(() => {
-            setCanFetchNotifications(true);
-          }, 500);
         } catch (error) {
           localStorage.removeItem("user");
           setIsLoggedIn(false);
           setUser(null);
-          setCanFetchNotifications(false);
         }
       } else {
         setIsLoggedIn(false);
         setUser(null);
-        setCanFetchNotifications(false);
       }
     };
 

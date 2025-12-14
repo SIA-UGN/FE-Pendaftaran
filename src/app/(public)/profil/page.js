@@ -148,11 +148,15 @@ export default function Profil() {
           />
           <div className="relative w-72 h-96 rounded-xl cursor-pointer group">
             <Image
-              src={"/logo.jpg"}
-              fill
-              alt="profile-image"
-              className="object-cover rounded-2xl transition duration-300 group-hover:opacity-70"
-              key={user?.avatar_url || "default"}
+              alt="Profile banner"
+              src={
+                applicant.user.avatar_url
+                  ? applicant.user.avatar_url
+                  : "/logo.jpg"
+              }
+              width={180}
+              height={300}
+              className="w-full sm:w-1/4 h-[300px] rounded-xl object-cover"
             />
             <label
               htmlFor="picture"

@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 const DEFAULT_TIMEOUT = Number(process.env.NEXT_PUBLIC_API_TIMEOUT) || 10000;
 
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://be-ugn.test/api",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
   headers: {
     "Content-Type": "application/json",
   },

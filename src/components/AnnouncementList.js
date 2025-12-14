@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import {
   InputGroup,
   InputGroupAddon,
@@ -9,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { SearchIcon } from "lucide-react";
 import { AnnouncementTable } from "@/components/AnnouncementTable";
 
-export default function AnnouncementList({
+const AnnouncementList = React.memo(function AnnouncementList({
   data,
   onSearchChange,
   searchValue,
@@ -52,4 +53,6 @@ export default function AnnouncementList({
       )}
     </div>
   );
-}
+});
+
+export default AnnouncementList;

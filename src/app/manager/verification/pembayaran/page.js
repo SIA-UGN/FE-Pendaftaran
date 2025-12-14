@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Eye } from "lucide-react";
+import { Eye, Download, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -230,10 +230,40 @@ export default function Pembayaran() {
             </DialogHeader>
             <div className="flex items-center justify-center p-4">
               <img
-                src={`/${paymentData.payment_proof_url}`}
+                src={`http://localhost:8000${paymentData.payment_proof_url}`}
                 alt="Bukti Pembayaran"
                 className="max-w-full h-auto rounded-lg"
               />
+            </div>
+            <div className="flex gap-2 justify-end mt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const link = document.createElement("a");
+                  link.href = `http://localhost:8000${paymentData.payment_proof_url}`;
+                  link.download = `bukti-pembayaran-${paymentData.registration_number}.jpg`;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  window.open(
+                    `http://localhost:8000${paymentData.payment_proof_url}`,
+                    "_blank"
+                  );
+                }}
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Open in New Tab
+              </Button>
             </div>
           </DialogContent>
         </Dialog>

@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { notificationService } from "@/services/notificationService";
-import toast from "react-hot-toast";
 
 export const useNotifications = (params = {}) => {
   return useQuery({
@@ -31,9 +30,6 @@ export const useMarkAsRead = () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
       queryClient.invalidateQueries({ queryKey: ["unreadCount"] });
     },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || "Gagal menandai notifikasi");
-    },
   });
 };
 
@@ -43,14 +39,8 @@ export const useMarkAllAsRead = () => {
   return useMutation({
     mutationFn: notificationService.markAllAsRead,
     onSuccess: () => {
-      toast.success("Semua notifikasi ditandai sudah dibaca");
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
       queryClient.invalidateQueries({ queryKey: ["unreadCount"] });
-    },
-    onError: (error) => {
-      toast.error(
-        error.response?.data?.message || "Gagal menandai semua notifikasi"
-      );
     },
   });
 };
@@ -61,14 +51,8 @@ export const useDeleteNotification = () => {
   return useMutation({
     mutationFn: notificationService.delete,
     onSuccess: () => {
-      toast.success("Notifikasi berhasil dihapus");
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
       queryClient.invalidateQueries({ queryKey: ["unreadCount"] });
-    },
-    onError: (error) => {
-      toast.error(
-        error.response?.data?.message || "Gagal menghapus notifikasi"
-      );
     },
   });
 };

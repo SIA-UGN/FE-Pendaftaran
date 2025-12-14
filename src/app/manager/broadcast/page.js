@@ -58,15 +58,23 @@ export default function BroadcastMessage() {
   });
 
   const onSubmit = (data) => {
-
-    const payload = {
-      target_audience: data.targetAudience,
-      message_title: data.messageTitle,
-      message_content: data.messageContent,
-      schedule: `${data.scheduleDate} 23:59:59`,
+    const statusMap = {
+      all_applicants: null,
+      pending_applicants: "submitted",
+      approved_applicants: "approved",
+      rejected_applicants: "rejected",
     };
 
-    console.log("Sending payload:", payload);
+    const payload = {
+      title: data.messageTitle,
+      message: data.messageContent,
+      type: "info",
+    };
+
+    const mappedStatus = statusMap[data.targetAudience];
+    if (mappedStatus) {
+      payload.registration_status = mappedStatus;
+    }
 
     setBroadcast(payload, {
       onSuccess: () => {

@@ -73,9 +73,11 @@ export default function DataAlamat() {
 
   const applicant = applicantData?.data?.data;
 
-  const data = applicant.profile;
+  if (!applicant) return <div>Data tidak ditemukan</div>;
 
-  console.log(data)
+  const data = applicant?.profile || {};
+
+  console.log(data);
 
   console.log(id);
 

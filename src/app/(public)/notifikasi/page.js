@@ -160,9 +160,6 @@ export default function Notification() {
     });
   };
 
-  console.log(notificationData);
-  console.log(data);
-
   return (
     <div className="flex flex-col items-center py-8 md:py-12 lg:py-16 px-4 sm:px-6 md:px-8 lg:px-12 w-full max-w-7xl mx-auto">
       <Heading title="Notification" variant="first" />
@@ -180,19 +177,6 @@ export default function Notification() {
               <CheckCheck className="w-4 h-4 mr-2" />
               {isLoadingMarkAllAsRead ? "Processing..." : "Mark All as Read"}
             </Button>
-          )}
-          {hasReadNotifications && (
-            <>
-            </>
-            // <Button
-            //   onClick={handleClearRead}
-            //   disabled={isLoadingClearReadNotifications}
-            //   variant="outline"
-            //   className="border-red-600 text-red-600 hover:bg-red-50"
-            // >
-            //   <Trash2 className="w-4 h-4 mr-2" />
-            //   {isLoadingClearReadNotifications ? "Clearing..." : "Clear Read"}
-            // </Button>
           )}
         </div>
       )}

@@ -36,9 +36,6 @@ export default function Page() {
   const isError = statsError || applicantsError;
   const error = statsErrorMsg;
 
-  console.log("Stats Data:", statsData);
-  console.log("Applicants Data:", applicantsData);
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -68,8 +65,6 @@ export default function Page() {
   const responseData = statsData?.data?.data || {};
   const applicantsResponse = applicantsData?.data?.data || {};
 
-  console.log("Response Data:", responseData);
-
   const Approved = responseData?.by_status?.approved || 0;
   const Pending = responseData?.by_status?.submitted || 0;
   const Rejected = responseData?.by_status?.rejected || 0;
@@ -81,10 +76,6 @@ export default function Page() {
   // Get applicants list from /admin/applicants endpoint
   // Backend returns: { success: true, data: [...] } - array langsung, bukan nested
   const applicantsList = applicantsResponse || [];
-
-  console.log("Applicants Response:", applicantsData?.data);
-  console.log("Applicants List:", applicantsList);
-  
 
   // Backend structure: { id_profile, id_user, full_name, email, program_name, registration_number, registration_status, created_at, phone_number }
   // Map to frontend expected structure
@@ -105,8 +96,6 @@ export default function Page() {
     phone_number: app.phone_number,
   }));
 
-  console.log("Mapped Applicants:", mappedApplicants);
-
   // Filter by registration_status for verification table
   const verificationApplicants = mappedApplicants.filter((app) =>
     ["submitted", "reviewed", "approved", "rejected"].includes(
@@ -120,9 +109,6 @@ export default function Page() {
       app.graduation_status &&
       ["Sudah Lulus", "Belum Lulus"].includes(app.graduation_status)
   );
-
-  console.log("Verification Applicants:", verificationApplicants);
-  console.log("Graduation Applicants:", graduationApplicants);
 
   const VerificationTable = {
     data: verificationApplicants,

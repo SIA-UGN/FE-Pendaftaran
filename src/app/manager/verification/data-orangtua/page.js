@@ -135,6 +135,9 @@ export default function DataOrangtua() {
 
   const applicant = applicantData?.data?.data;
   console.log("Applicant Data:", applicant);
+
+  if (!applicant?.profile) return <div>Data profil tidak ditemukan</div>;
+
   const guardians = applicant.profile.guardians || {};
 
   console.log(id);
@@ -294,7 +297,9 @@ export default function DataOrangtua() {
                           <FormLabel>Pendidikan Terakhir Ayah</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder={formatEducation(father.last_education)}
+                              placeholder={formatEducation(
+                                father.last_education
+                              )}
                               readOnly
                             />
                           </FormControl>
@@ -402,7 +407,9 @@ export default function DataOrangtua() {
                           <FormLabel>Pendidikan Terakhir Ibu</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder={formatEducation(mother.last_education)}
+                              placeholder={formatEducation(
+                                mother.last_education
+                              )}
                               {...field}
                               readOnly
                             />

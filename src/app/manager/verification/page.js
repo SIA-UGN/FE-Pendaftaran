@@ -75,8 +75,6 @@ export default function Profile() {
     });
   };
 
-  console.log(applicant);
-
   const user = applicant.user || {};
 
   return (
@@ -86,11 +84,11 @@ export default function Profile() {
       </h2>
 
       <Card className="w-full flex flex-col md:flex-row gap-6 p-8 rounded-2xl shadow-md bg-white">
-        <Image
+        <img
           alt="Profile banner"
-          src=""
-          width={180}
-          height={300}
+          src={
+            applicant.user.avatar_url ? applicant.user.avatar_url : "/logo.jpg"
+          }
           className="w-full sm:w-1/4 h-[300px] rounded-xl object-cover"
         />
 
@@ -139,7 +137,10 @@ export default function Profile() {
       {applicant.profile.registration_status === "rejected" && (
         <>
           <h2 className="text-xl font-semibold mt-6">Status Verifikasi</h2>
-          <Button className="w-full bg-red-500 hover:bg-red-500 rounded-4xl" disabled>
+          <Button
+            className="w-full bg-red-500 hover:bg-red-500 rounded-4xl"
+            disabled
+          >
             Rejected
           </Button>
 
@@ -157,11 +158,11 @@ export default function Profile() {
             Accepted
           </Button>
           {(() => {
-            if (applicant.graduation_status === "graduated") {
+            if (applicant.graduation_status === "Sudah Lulus") {
               return <div>Pendaftar dinyatakan Lulus</div>;
             }
 
-            if (applicant.graduation_status === "not_graduated") {
+            if (applicant.graduation_status === "Belum Lulus") {
               return <div>Pendaftar dinyatakan Tidak Lulus</div>;
             }
 
@@ -178,7 +179,7 @@ export default function Profile() {
 
                   <Button
                     className="w-full bg-green-500 hover:bg-green-500 rounded-4xl"
-                    onClick={() => handleGraduation("graduated")}
+                    onClick={() => handleGraduation("Sudah Lulus")}
                     disabled={isGraduationLoading}
                   >
                     Lulus
@@ -186,7 +187,7 @@ export default function Profile() {
 
                   <Button
                     className="w-full bg-red-500 hover:bg-red-500 rounded-4xl"
-                    onClick={() => handleGraduation("not_graduated")}
+                    onClick={() => handleGraduation("Belum Lulus")}
                     disabled={isGraduationLoading}
                   >
                     Tidak Lulus

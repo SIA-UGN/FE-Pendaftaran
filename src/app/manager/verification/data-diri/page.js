@@ -2,7 +2,17 @@
 
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { Info, AlertCircle, XCircle, CheckCircle, Eye, X } from "lucide-react";
+import {
+  Info,
+  AlertCircle,
+  XCircle,
+  CheckCircle,
+  Eye,
+  X,
+  ExternalLink,
+  Download,
+  FileText,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import {
@@ -29,7 +39,7 @@ import {
 
 import { useManagerApplicantDetail } from "@/hooks/useManager";
 import { useApplicantProfile } from "@/hooks/useAdmin";
-
+import DocumentPreviewDialog from "@/components/manager/DocumentPreviewDialog";
 
 const formatValue = (value) => {
   if (!value) return "";
@@ -61,9 +71,6 @@ const formatValue = (value) => {
 export default function DataDiri() {
   const router = useRouter();
   const [showCancelDialog, setShowCancelDialog] = useState(false);
-  const [openKTP, setOpenKTP] = useState(false);
-  const [openAkta, setOpenAkta] = useState(false);
-  const [openKK, setOpenKK] = useState(false);
 
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
@@ -84,6 +91,9 @@ export default function DataDiri() {
     isError: isApplicantProfileError,
     error: applicantProfileError,
   } = useApplicantProfile(id);
+
+  console.log("🔍 [DataDiri] Applicant Data:", applicantData);
+  console.log("🔍 [DataDiri] Applicant Profile Data:", applicantProfileData);
 
   const form = useForm({
     defaultValues: {
@@ -112,11 +122,21 @@ export default function DataDiri() {
 
   const applicant = applicantData?.data?.data;
 
-  console.log(applicant)
+  console.log(applicant);
 
   console.log(registrationData);
 
   const profile = registrationData?.profile || {};
+
+  // Debug: log all documents with their types
+  console.log("📄 [Documents] All Documents:", profile.documents);
+  console.log(
+    "📄 [Documents] Document Types:",
+    profile.documents?.map((d) => ({
+      id: d.id_document_type,
+      path: d.file_path,
+    }))
+  );
 
   return (
     <ProtectedRoute>
@@ -148,7 +168,11 @@ export default function DataDiri() {
                 <FormItem>
                   <FormLabel>Nama Lengkap</FormLabel>
                   <FormControl>
-                    <Input placeholder={profile.full_name} {...field} readOnly />
+                    <Input
+                      placeholder={profile.full_name}
+                      {...field}
+                      readOnly
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -200,7 +224,11 @@ export default function DataDiri() {
                   <FormItem>
                     <FormLabel>Agama</FormLabel>
                     <FormControl>
-                      <Input placeholder={profile.religion} {...field} readOnly />
+                      <Input
+                        placeholder={profile.religion}
+                        {...field}
+                        readOnly
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -214,7 +242,11 @@ export default function DataDiri() {
                   <FormItem>
                     <FormLabel>Nomer Ponsel</FormLabel>
                     <FormControl>
-                      <Input placeholder={profile.phone_number} {...field} readOnly />
+                      <Input
+                        placeholder={profile.phone_number}
+                        {...field}
+                        readOnly
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -265,11 +297,7 @@ export default function DataDiri() {
                   <FormItem>
                     <FormLabel>NIK</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder={profile.nik}
-                        {...field}
-                        readOnly
-                      />
+                      <Input placeholder={profile.nik} {...field} readOnly />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -280,37 +308,31 @@ export default function DataDiri() {
             <FormField
               control={form.control}
               name="ktp"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>KTP / KITAS</FormLabel>
-                  <FormControl>
-                    <Dialog open={openKTP} onOpenChange={setOpenKTP}>
-                      <DialogTrigger asChild>
-                        <Button variant={"outline"} type="button">
-                          <Eye className="w-4 h-4 mr-2" />
-                          Lihat KTP
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
-                        <DialogHeader>
-                          <DialogTitle>KTP / KITAS</DialogTitle>
-                          <DialogDescription>
-                            Dokumen identitas pendaftar
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="flex items-center justify-center p-4">
-                          <img
-                            src={`/${profile.family_card_file}`}
-                            alt="KTP"
-                            className="max-w-full h-auto rounded-lg"
-                          />
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                const ktpDoc = profile.documents?.find(
+                  (doc) => doc.id_document_type === 1
+                );
+
+                return (
+                  <FormItem>
+                    <FormLabel>KTP / KITAS</FormLabel>
+                    <FormControl>
+                      <DocumentPreviewDialog
+                        document={ktpDoc}
+                        title="KTP / KITAS"
+                        description="Dokumen identitas pendaftar"
+                        buttonText="Lihat KTP"
+                      />
+                    </FormControl>
+                    {!ktpDoc && (
+                      <p className="text-sm text-amber-600">
+                        ⚠️ Pendaftar belum mengupload dokumen KTP
+                      </p>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
 
             <FormField
@@ -334,37 +356,31 @@ export default function DataDiri() {
             <FormField
               control={form.control}
               name="akta"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Akta Kelahiran</FormLabel>
-                  <FormControl>
-                    <Dialog open={openAkta} onOpenChange={setOpenAkta}>
-                      <DialogTrigger asChild>
-                        <Button variant={"outline"} type="button">
-                          <Eye className="w-4 h-4 mr-2" />
-                          Lihat Akta Kelahiran
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
-                        <DialogHeader>
-                          <DialogTitle>Akta Kelahiran</DialogTitle>
-                          <DialogDescription>
-                            Dokumen akta kelahiran pendaftar
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="flex items-center justify-center p-4">
-                          <img
-                            src={`/${profile.birth_certificate_file}`}
-                            alt="Akta Kelahiran"
-                            className="max-w-full h-auto rounded-lg"
-                          />
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                const aktaDoc = profile.documents?.find(
+                  (doc) => doc.id_document_type === 2
+                );
+
+                return (
+                  <FormItem>
+                    <FormLabel>Akta Kelahiran</FormLabel>
+                    <FormControl>
+                      <DocumentPreviewDialog
+                        document={aktaDoc}
+                        title="Akta Kelahiran"
+                        description="Dokumen akta kelahiran pendaftar"
+                        buttonText="Lihat Akta Kelahiran"
+                      />
+                    </FormControl>
+                    {!aktaDoc && (
+                      <p className="text-sm text-amber-600">
+                        ⚠️ Pendaftar belum mengupload dokumen Akta Kelahiran
+                      </p>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
 
             <FormField
@@ -374,11 +390,7 @@ export default function DataDiri() {
                 <FormItem>
                   <FormLabel>Nomor Kartu Keluarga</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder={profile.no_kk}
-                      {...field}
-                      readOnly
-                    />
+                    <Input placeholder={profile.no_kk} {...field} readOnly />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -388,37 +400,31 @@ export default function DataDiri() {
             <FormField
               control={form.control}
               name="kk"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Kartu Keluarga</FormLabel>
-                  <FormControl>
-                    <Dialog open={openKK} onOpenChange={setOpenKK}>
-                      <DialogTrigger asChild>
-                        <Button variant={"outline"} type="button">
-                          <Eye className="w-4 h-4 mr-2" />
-                          Lihat Kartu Keluarga
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
-                        <DialogHeader>
-                          <DialogTitle>Kartu Keluarga</DialogTitle>
-                          <DialogDescription>
-                            Dokumen kartu keluarga pendaftar
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="flex items-center justify-center p-4">
-                          <img
-                            src={`/${profile.family_card_file}`}
-                            alt="Kartu Keluarga"
-                            className="max-w-full h-auto rounded-lg"
-                          />
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                const kkDoc = profile.documents?.find(
+                  (doc) => doc.id_document_type === 3
+                );
+
+                return (
+                  <FormItem>
+                    <FormLabel>Kartu Keluarga</FormLabel>
+                    <FormControl>
+                      <DocumentPreviewDialog
+                        document={kkDoc}
+                        title="Kartu Keluarga"
+                        description="Dokumen kartu keluarga pendaftar"
+                        buttonText="Lihat Kartu Keluarga"
+                      />
+                    </FormControl>
+                    {!kkDoc && (
+                      <p className="text-sm text-amber-600">
+                        ⚠️ Pendaftar belum mengupload dokumen Kartu Keluarga
+                      </p>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
 
             <FormField

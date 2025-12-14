@@ -30,8 +30,11 @@ export default function Status() {
 
   useEffect(() => {
     if (registrationData?.data?.data?.profile) {
-      const regStatus = registrationData.data.data.profile.registration_status;
+      const profile = registrationData.data.data.profile;
+      const regStatus = profile.registration_status;
+      const graduationStatus = profile.graduation_status;
 
+      // Handle Registration Status Display
       if (regStatus === "approved") {
         setRegistrationStatus("Verified");
       } else if (regStatus === "rejected") {
@@ -42,6 +45,24 @@ export default function Status() {
         setRegistrationStatus("Pending");
       } else {
         setRegistrationStatus("Pending");
+      }
+
+      // Handle Global Status based on graduation_status
+      if (graduationStatus === "Sudah Lulus") {
+        setStatus("Lulus");
+      } else if (graduationStatus === "Belum Lulus") {
+        setStatus("Tidak Lulus");
+      } else {
+        // Fallback ke logika lama jika graduation_status belum di-set
+        const pymtStat = paymentData?.data?.data?.payment?.status;
+
+        if (regStatus === "approved" && pymtStat === "verified") {
+          setStatus("Accepted");
+        } else if (regStatus === "rejected" || pymtStat === "rejected") {
+          setStatus("Rejected");
+        } else {
+          setStatus("Pending");
+        }
       }
     }
 
@@ -60,21 +81,6 @@ export default function Status() {
         setPaymentStatus("Pending");
       }
     }
-
-    let globalStatus = "Pending";
-
-    const regStat = registrationData?.data?.data?.profile?.registration_status;
-    const pymtStat = paymentData?.data?.data?.payment?.status;
-
-    if (regStat === "approved" && pymtStat === "verified") {
-      globalStatus = "Accepted";
-    } else if (regStat === "rejected" || pymtStat === "rejected") {
-      globalStatus = "Rejected";
-    } else {
-      globalStatus = "Pending";
-    }
-
-    setStatus(globalStatus);
   }, [registrationData, paymentData]);
 
   const getStatusColor = (status) => {
@@ -141,13 +147,63 @@ export default function Status() {
   return (
     <div className="my-12 max-w-7xl mx-auto">
       <div className="w-10/12 mx-auto mt-8">
-        {/* === Kondisi Utama === */}
+        {/* === STATUS LULUS === */}
+        {status === "Lulus" && (
+          <div className="flex flex-col gap-5 items-center justify-center">
+            <p className="bg-green-700 font-bold text-lg w-full p-4 text-center text-white rounded-t-lg">
+              Selamat! 🎉
+            </p>
+            <p className="mt-6 text-center text-lg">
+              Anda dinyatakan{" "}
+              <span className="font-bold text-green-800">LULUS</span> seleksi
+              pendaftaran mahasiswa baru.
+            </p>
+            <p className="font-bold text-2xl text-[var(--green)]">
+              Universitas Global Nusantara
+            </p>
+            <ApplicantAnnouncement status="Lulus" />
+            <EmailPicker />
+            <div className="flex gap-5 w-full justify-end mt-6">
+              <Link href="/">
+                <Button variant="yellow">Home</Button>
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* === STATUS TIDAK LULUS === */}
+        {status === "Tidak Lulus" && (
+          <div className="flex flex-col gap-5 items-center justify-center">
+            <p className="bg-red-500 font-bold text-lg w-full p-4 text-center text-white rounded-t-lg">
+              Mohon Maaf
+            </p>
+            <p className="mt-6 text-center text-lg">
+              Anda dinyatakan{" "}
+              <span className="font-bold text-red-600">TIDAK LULUS</span>{" "}
+              seleksi pendaftaran mahasiswa baru.
+            </p>
+            <p className="font-bold text-2xl text-[var(--green)]">
+              Universitas Global Nusantara
+            </p>
+            <ApplicantAnnouncement status="Tidak Lulus" />
+            <p className="mt-4 text-gray-700">
+              Jangan Putus Asa dan Tetap Semangat! 💪
+            </p>
+            <div className="flex gap-5 w-full justify-end mt-6">
+              <Link href="/">
+                <Button variant="yellow">Home</Button>
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* === STATUS ACCEPTED (Legacy - untuk backward compatibility) === */}
         {status === "Accepted" && (
           <div className="flex flex-col gap-5 items-center justify-center">
-            <p className="bg-green-700 font-bold text-lg w-full p-4 text-center absolute top-30">
+            <p className="bg-green-700 font-bold text-lg w-full p-4 text-center text-white rounded-t-lg">
               Selamat
             </p>
-            <p className="mt-24 w-md text-center">
+            <p className="mt-6 text-center">
               Anda dinyatakan{" "}
               <span className="font-bold text-green-800">lulus</span> seleksi
               pendaftaran mahasiswa baru.
@@ -157,17 +213,15 @@ export default function Status() {
             </p>
             <ApplicantAnnouncement status="Lulus" />
             <EmailPicker />
-            <div className="flex gap-5 w-full">
-              <Link href="/" className={"ms-auto"}>
-                <Button variant={"yellow"}>Home</Button>
-              </Link>
+            <div className="flex gap-5 w-full justify-end">
               <Link href="/">
-                <Button variant={"green"}>Konfirmasi</Button>
+                <Button variant="yellow">Home</Button>
               </Link>
             </div>
           </div>
         )}
 
+        {/* === STATUS PENDING === */}
         {status === "Pending" && (
           <>
             <RegistrationProgress />
@@ -275,10 +329,10 @@ export default function Status() {
 
         {status === "Rejected" && (
           <div className="flex flex-col gap-5 items-center justify-center">
-            <p className="bg-red-500 font-bold text-lg w-full p-4 text-center absolute top-30 text-white">
+            <p className="bg-red-500 font-bold text-lg w-full p-4 text-center text-white rounded-t-lg">
               Mohon Maaf
             </p>
-            <p className="mt-24 w-md text-center">
+            <p className="mt-6 text-center">
               Anda dinyatakan{" "}
               <span className="font-bold text-red-600">tidak lulus</span>{" "}
               seleksi pendaftaran mahasiswa baru.
@@ -287,13 +341,10 @@ export default function Status() {
               Universitas Global Nusantara
             </p>
             <ApplicantAnnouncement status="Tidak Lulus" />
-            <p>Jangan Putus Asa dan Tetap Semangat!</p>
-            <div className="flex gap-5 w-full">
-              <Link href="/" className={"ms-auto"}>
-                <Button variant={"yellow"}>Home</Button>
-              </Link>
+            <p className="mt-4">Jangan Putus Asa dan Tetap Semangat!</p>
+            <div className="flex gap-5 w-full justify-end mt-6">
               <Link href="/">
-                <Button variant={"green"}>Konfirmasi</Button>
+                <Button variant="yellow">Home</Button>
               </Link>
             </div>
           </div>

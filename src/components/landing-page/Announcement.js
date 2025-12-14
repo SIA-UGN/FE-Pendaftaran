@@ -1,13 +1,16 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useAnnouncementsWithSearch } from "@/hooks/useAnnouncementsWithSearch";
 import { Heading } from "@/components/Heading";
 import AnnouncementList from "@/components/AnnouncementList";
 
 export default function Announcement() {
-  const { announcements, isLoading, error, search, handleSearch } =
+  const { announcements, isLoading, error, search, handleSearch, pagination } =
     useAnnouncementsWithSearch();
+
+  // Memoize data untuk prevent unnecessary processing
+  const memoizedAnnouncements = useMemo(() => announcements, [announcements]);
 
   const isError = !!error;
 
@@ -17,8 +20,6 @@ export default function Announcement() {
     },
     [handleSearch]
   );
-
-  console.log(announcements);
 
   if (isLoading && !announcements.length) {
     return (
@@ -80,9 +81,20 @@ export default function Announcement() {
   return (
     <div className="flex flex-col items-center pt-4 sm:pt-6 lg:pt-8 pb-12 sm:pb-14 lg:pb-16 px-4 sm:px-6 md:px-8 lg:px-12 max-w-7xl mx-auto w-full">
       <Heading title={"Pengumuman"} />
+
+      {/* Info: Total data loaded */}
+      {pagination?.total > 0 && (
+        <div className="w-full max-w-7xl mb-4 px-4">
+          <p className="text-sm text-gray-600">
+            Menampilkan {memoizedAnnouncements.length} dari {pagination.total}{" "}
+            pengumuman kelulusan
+          </p>
+        </div>
+      )}
+
       <div className="w-full overflow-x-auto">
         <AnnouncementList
-          data={announcements}
+          data={memoizedAnnouncements}
           onSearchChange={handleSearchChange}
           searchValue={search}
         />

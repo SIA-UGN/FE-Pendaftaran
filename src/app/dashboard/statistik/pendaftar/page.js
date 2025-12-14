@@ -27,13 +27,9 @@ export default function Page() {
 
   const responseData = data?.data?.data || {};
 
-  console.log("Raw Backend Data:", responseData);
-
-  // Backend returns: by_status, by_program, by_gender, by_graduation_status
   const byStatus = responseData?.by_status || {};
   const byGraduation = responseData?.by_graduation_status || {};
 
-  // Transform for ChartPieApplicant - expects { approved, rejected, pending }
   const chartData = {
     approved: byStatus?.approved || 0,
     rejected: byStatus?.rejected || 0,
@@ -43,14 +39,12 @@ export default function Page() {
       (byStatus?.draft || 0),
   };
 
-  // Verification summary from by_status
   const verificationData = {
     approved: byStatus?.approved || 0,
     rejected: byStatus?.rejected || 0,
     pending: (byStatus?.submitted || 0) + (byStatus?.reviewed || 0),
   };
 
-  // Graduation summary from by_graduation_status
   const graduationData = {
     lulus: byGraduation?.["Sudah Lulus"] || 0,
     tidak_lulus: byGraduation?.["Belum Lulus"] || 0,
