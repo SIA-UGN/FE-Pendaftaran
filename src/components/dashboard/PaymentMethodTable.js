@@ -302,7 +302,7 @@ export function PaymentMethodTable({ data }) {
       </div>
 
       {/* Pagination */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-2">
         <div className="text-sm text-gray-500">
           Menampilkan{" "}
           {table.getState().pagination.pageIndex *
