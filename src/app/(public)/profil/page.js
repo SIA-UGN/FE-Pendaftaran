@@ -36,6 +36,10 @@ export default function Profil() {
   const [alertType, setAlertType] = useState("");
   const [inputValue, setInputValue] = useState("");
 
+  const [emailPassword, setEmailPassword] = useState("");
+  const [emailPasswordConfirmation, setEmailPasswordConfirmation] =
+    useState("");
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
@@ -48,6 +52,8 @@ export default function Profil() {
     setCurrentPassword("");
     setNewPassword("");
     setPasswordConfirmation("");
+    setEmailPassword("");
+    setEmailPasswordConfirmation("");
     setOpen(true);
   };
 
@@ -111,12 +117,29 @@ export default function Profil() {
         toast.error("Email tidak valid!");
         return;
       }
+
+      if (!emailPassword) {
+        toast.error("Password harus diisi untuk mengganti email.");
+        return;
+      }
+
+      if (emailPassword !== emailPasswordConfirmation) {
+        toast.error("Konfirmasi password tidak cocok!");
+        return;
+      }
+
       changeEmailMutation.mutate(
-        { email: inputValue },
+        {
+          email: inputValue,
+          password: emailPassword,
+          password_confirmation: emailPasswordConfirmation,
+        },
         {
           onSuccess: () => {
             setOpen(false);
             setInputValue("");
+            setEmailPassword("");
+            setEmailPasswordConfirmation("");
           },
         }
       );
@@ -130,6 +153,10 @@ export default function Profil() {
       </div>
     );
   }
+
+  const applicant = profileData?.data?.data;
+
+  console.log(applicant);
 
   return (
     <div className="my-12">
@@ -152,7 +179,7 @@ export default function Profil() {
               src={
                 applicant.user.avatar_url
                   ? applicant.user.avatar_url
-                  : "/logo.jpg"
+                "/logo.jpg"
               }
               width={180}
               height={300}
@@ -250,13 +277,49 @@ export default function Profil() {
                 <p className="mb-2 text-foreground">{alertMessage}</p>
 
                 {alertType === "email" && (
-                  <Input
-                    type="email"
-                    placeholder="Masukkan email baru"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    className="mt-2"
-                  />
+                  <div className="space-y-3 mt-2">
+                    <Input
+                      type="email"
+                      placeholder="Masukkan email baru"
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      className="mt-2"
+                    />
+
+                    <div>
+                      <Label
+                        htmlFor="email-password"
+                        className="text-xs text-muted-foreground mb-1 block"
+                      >
+                        Password
+                      </Label>
+                      <Input
+                        id="email-password"
+                        type="password"
+                        placeholder="Masukkan password Anda"
+                        value={emailPassword}
+                        onChange={(e) => setEmailPassword(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <Label
+                        htmlFor="email-password-confirm"
+                        className="text-xs text-muted-foreground mb-1 block"
+                      >
+                        Konfirmasi Password
+                      </Label>
+                      <Input
+                        id="email-password-confirm"
+                        type="password"
+                        placeholder="Ulangi password Anda"
+                        value={emailPasswordConfirmation}
+                        onChange={(e) =>
+                          setEmailPasswordConfirmation(e.target.value)
+                        }
+                      />
+                    </div>
+                  </div>
                 )}
 
                 {alertType === "password" && (
@@ -313,15 +376,24 @@ export default function Profil() {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={changePasswordMutation.isPending}>
+              <AlertDialogCancel
+                disabled={
+                  changePasswordMutation.isLoading ||
+                  changeEmailMutation.isLoading
+                }
+              >
                 Batal
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleSave}
                 className="bg-[var(--green)] hover:bg-[var(--green)]/90"
-                disabled={changePasswordMutation.isPending}
+                disabled={
+                  changePasswordMutation.isLoading ||
+                  changeEmailMutation.isLoading
+                }
               >
-                {changePasswordMutation.isPending ? (
+                {changePasswordMutation.isLoading ||
+                changeEmailMutation.isLoading ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                     Menyimpan...
