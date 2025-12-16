@@ -95,7 +95,7 @@ export const columns = [
       }
 
       // Construct full URL - backend sends filename, we build the full path
-      const fullUrl = `http://localhost:8000/storage/${certificateFile}`;
+      const fullUrl = certificateFile;
       const isPdf = fullUrl.toLowerCase().endsWith(".pdf");
 
       return (

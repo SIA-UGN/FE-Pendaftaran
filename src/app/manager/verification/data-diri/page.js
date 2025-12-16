@@ -198,6 +198,46 @@ export default function DataDiri() {
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="sekolahAsal"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Sekolah Asal</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={profile.previous_school}
+                      {...field}
+                      readOnly
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="ijazahTerakhir"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ijazah Terakhir</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={
+                        profile.last_ijazah
+                          ? profile.last_ijazah.toUpperCase()
+                          : ""
+                      }
+                      {...field}
+                      readOnly
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}

@@ -43,7 +43,7 @@ export default function Page() {
   });
 
   useEffect(() => {
-    const userData = data?.data?.data?.find(m => m.id_user === parseInt(id));
+    const userData = data?.data?.data?.find((m) => m.id_user === parseInt(id));
     if (userData) {
       const name = userData.name || userData.full_name || "";
       const email = userData.email || "";
@@ -60,11 +60,9 @@ export default function Page() {
         email: values.email,
       };
       await updateUser.mutateAsync({ id, data: payload });
-      toast.success("Data berhasil diupdate");
-      router.push("/dashboard");
+      router.push("/dashboard/data");
     } catch (error) {
       console.error(error);
-      toast.error("Gagal mengupdate data");
     }
   }
 
@@ -78,7 +76,7 @@ export default function Page() {
     );
   }
 
-  const userData = data?.data?.data?.find(m => m.id_user === parseInt(id));
+  const userData = data?.data?.data?.find((m) => m.id_user === parseInt(id));
 
   return (
     <div className="flex flex-col items-center px-4 sm:px-6 lg:px-8 max-w-6xl my-6 sm:my-8 lg:mb-12 w-full">
@@ -126,7 +124,7 @@ export default function Page() {
                   <FormMessage className="text-xs sm:text-sm" />
                 </FormItem>
               )}
-            />           
+            />
           </div>
 
           <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3">

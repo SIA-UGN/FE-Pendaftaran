@@ -41,10 +41,7 @@ export function GraduationTable({ data, type }) {
       accessorKey: "user_id",
       header: ({ column }) => {
         return (
-          <Button
-            variant="ghost"
-            className="w-full"
-          >
+          <Button variant="ghost" className="w-full">
             ID
           </Button>
         );
@@ -56,13 +53,7 @@ export function GraduationTable({ data, type }) {
     {
       accessorKey: "registration_number",
       header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-          >
-            Nomor Peserta
-          </Button>
-        );
+        return <Button variant="ghost">Nomor Peserta</Button>;
       },
       cell: ({ row }) => (
         <div className="text-center">{row.getValue("registration_number")}</div>
@@ -82,18 +73,18 @@ export function GraduationTable({ data, type }) {
       cell: ({ row }) => {
         const status = row.getValue("graduation_status");
         const statusLabels = {
-          graduated: "Graduated",
-          not_graduated: "Not Graduated",
+          "Sudah Lulus": "Lulus",
+          "Belum Lulus": "Tidak Lulus",
         };
         return (
           <div className="text-center">
             <span
               className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                status === "graduated"
+                status === "Sudah Lulus"
                   ? "bg-green-100 text-green-700"
-                  : status === "not_graduated"
-                    ? "bg-red-100 text-red-700"
-                    : "bg-yellow-100 text-yellow-700"
+                  : status === "Belum Lulus"
+                  ? "bg-red-100 text-red-700"
+                  : "bg-yellow-100 text-yellow-700"
               }`}
             >
               {statusLabels[status] || status}
@@ -253,18 +244,18 @@ export function GraduationTable({ data, type }) {
                     </p>
                     <span
                       className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                        applicant.graduation_status === "graduated"
+                        applicant.graduation_status === "Sudah Lulus"
                           ? "bg-green-100 text-green-700"
-                          : applicant.graduation_status === "not_graduated"
-                            ? "bg-red-100 text-red-700"
-                            : "bg-yellow-100 text-yellow-700"
+                          : applicant.graduation_status === "Belum Lulus"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-yellow-100 text-yellow-700"
                       }`}
                     >
-                      {applicant.graduation_status === "graduated"
-                        ? "Graduated"
-                        : applicant.graduation_status === "not_graduated"
-                          ? "Not Graduated"
-                          : applicant.graduation_status}
+                      {applicant.graduation_status === "Sudah Lulus"
+                        ? "Lulus"
+                        : applicant.graduation_status === "Belum Lulus"
+                        ? "Tidak Lulus"
+                        : applicant.graduation_status}
                     </span>
                   </div>
 

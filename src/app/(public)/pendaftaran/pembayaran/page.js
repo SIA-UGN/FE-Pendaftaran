@@ -99,7 +99,6 @@ export default function Pembayaran() {
     autoSubmitRegistration();
   }, [isLoading, paymentData, paymentMessage, hasTriedSubmit]);
 
-  // Set default payment method
   useEffect(() => {
     if (paymentData?.payment_method_id) {
       setSelectedPaymentMethod(paymentData.payment_method_id);
@@ -108,7 +107,6 @@ export default function Pembayaran() {
     }
   }, [paymentData, availablePaymentMethods]);
 
-  // Countdown timer
   useEffect(() => {
     if (!paymentData?.deadline) return;
 
@@ -580,7 +578,7 @@ export default function Pembayaran() {
                   {(paymentStatus === "pending" ||
                     paymentStatus === "rejected") &&
                     !isExpired && (
-                      <Card >
+                      <Card>
                         <CardHeader>
                           <CardTitle>Upload Bukti Pembayaran</CardTitle>
                         </CardHeader>

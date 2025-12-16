@@ -33,7 +33,7 @@ export default function Prestasi({ Data }) {
       level: item.achievement_level,
       organizer: item.organizer,
       rank: item.ranking,
-      certificate_file: item.certificate_url || item.certificate_path,
+      certificate_file: item.certificate_url,
     }));
   } else {
     finalData = Data.map((item) => ({
@@ -44,7 +44,7 @@ export default function Prestasi({ Data }) {
       level: item.achievement_level,
       organizer: item.organizer,
       rank: item.ranking,
-      certificate_file: item.certificate_url || item.certificate_path,
+      certificate_file: item.certificate_url,
     }));
   }
 

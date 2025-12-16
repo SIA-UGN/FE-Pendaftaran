@@ -34,8 +34,6 @@ export default function Status() {
       const regStatus = profile.registration_status;
       const graduationStatus = profile.graduation_status;
 
-      console.log("Registration Status:", regStatus);
-
       // Handle Registration Status Display
       if (regStatus === "approved") {
         setRegistrationStatus("Verified");

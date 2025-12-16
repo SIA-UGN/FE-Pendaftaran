@@ -25,7 +25,7 @@ export default function GraduationList({ data, type }) {
 
   const applicants = data.data;
 
-  console.log(applicants)
+  console.log(applicants);
 
   const filteredApplicants = applicants.filter((applicant) => {
     const matchesSearch = applicant.user.name
@@ -38,9 +38,8 @@ export default function GraduationList({ data, type }) {
 
   const statusOptions = [
     { value: "all", label: "Semua Status" },
-    { value: "pending", label: "Pending" },
-    { value: "graduated", label: "Graduated" },
-    { value: "not_graduated", label: "Not Graduated" },
+    { value: "Sudah Lulus", label: "Lulus" },
+    { value: "Belum Lulus", label: "Tidak Lulus" },
   ];
 
   const getStatusLabel = () => {

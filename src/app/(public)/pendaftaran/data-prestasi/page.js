@@ -20,14 +20,16 @@ import Prestasi from "@/components/prestasi/Prestasi";
 import RegistrationProgress from "@/components/registrations/RegistrationProgress";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import toast from "react-hot-toast";
-import { useRegistrationProgress } from "@/hooks/useRegistration";
+import {
+  useRegistrationProgress,
+  useSubmitRegistration,
+} from "@/hooks/useRegistration";
 import { useAchievements } from "@/hooks/useAchievements";
 
 export default function DataPrestasi() {
   const router = useRouter();
   const { data: progressData, isLoading: progressLoading } =
     useRegistrationProgress();
-
   const {
     achievements,
     hasAchievements,
@@ -37,24 +39,20 @@ export default function DataPrestasi() {
     isLoading: registrationLoading,
     isSubmitting,
   } = useAchievements();
-
+  const submitRegistration = useSubmitRegistration();
   const progress = progressData?.data;
-
   useEffect(() => {
     refetch();
   }, [refetch]);
-
   useEffect(() => {
     if (!progressLoading && progress) {
       const accessibleSteps = progress.accessible_steps || [];
-
       if (!accessibleSteps.includes(5)) {
         toast.error("Silakan selesaikan tahapan sebelumnya terlebih dahulu");
         router.push("/pendaftaran");
       }
     }
   }, [progress, progressLoading, router]);
-
   if (progressLoading || registrationLoading) {
     return (
       <ProtectedRoute>
@@ -64,12 +62,10 @@ export default function DataPrestasi() {
       </ProtectedRoute>
     );
   }
-
   return (
     <ProtectedRoute>
       <div className="max-w-7xl mx-auto">
         <RegistrationProgress />
-
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-2 mx-4 sm:mx-6 md:mx-8 lg:mx-12 mt-4 sm:mt-6">
           <div className="flex items-center gap-2">
             <CheckCircle className="text-green-500 w-5 h-5 sm:w-6 sm:h-6" />
@@ -84,9 +80,7 @@ export default function DataPrestasi() {
             </Button>
           </Link>
         </div>
-
         <Prestasi Data={achievements?.data?.data} />
-
         <div className="flex flex-col mx-4 sm:mx-6 md:mx-8 lg:mx-12 my-6 gap-5 items-center">
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-5 items-center justify-end ms-auto">
             <Link href="/pendaftaran/data-akademik">
@@ -94,7 +88,6 @@ export default function DataPrestasi() {
                 Kembali
               </Button>
             </Link>
-
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button
@@ -116,17 +109,26 @@ export default function DataPrestasi() {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Batal</AlertDialogCancel>
-                  <AlertDialogAction onClick={skipAchievements}>
+                  <AlertDialogAction
+                    onClick={async () => {
+                      await skipAchievements();
+                      await submitRegistration.mutateAsync();
+                      router.push("/pendaftaran/status");
+                    }}
+                  >
                     Ya, Lewati
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-
             <Button
               variant="matcha"
               className="w-full sm:w-auto"
-              onClick={submitAchievements}
+              onClick={async () => {
+                await submitAchievements();
+                await submitRegistration.mutateAsync();
+                router.push("/pendaftaran/status");
+              }}
               disabled={isSubmitting}
             >
               {isSubmitting ? "Menyimpan..." : "Selesai"}

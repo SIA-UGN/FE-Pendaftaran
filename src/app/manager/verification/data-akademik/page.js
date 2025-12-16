@@ -135,20 +135,11 @@ export default function DataAkademik() {
   const applicant = applicantData?.data?.data;
   const data = applicant?.profile;
 
-  // Document Type IDs: 4=Ijazah, 5=Transkrip, 6=SKL, 7=UN, 8=Sertifikat
   const ijazahDoc = data?.documents?.find((doc) => doc.id_document_type === 4);
   const transkripDoc = data?.documents?.find(
     (doc) => doc.id_document_type === 5
   );
   const sklDoc = data?.documents?.find((doc) => doc.id_document_type === 6);
-  const unDoc = data?.documents?.find((doc) => doc.id_document_type === 7);
-  const sertifikatDoc = data?.documents?.find(
-    (doc) => doc.id_document_type === 8
-  );
-
-  console.log(id);
-  console.log(data);
-  console.log("📄 Documents:", data?.documents);
 
   return (
     <>
@@ -174,76 +165,6 @@ export default function DataAkademik() {
           <div className="flex flex-col gap-5 p-12 border rounded-xl m-0 md:m-12 bg-[var(--light-cream)]">
             <FormField
               control={form.control}
-              name="sekolahAsal"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Sekolah Asal</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={data.previous_school}
-                      {...field}
-                      readOnly
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="w-full">
-                <FormField
-                  control={form.control}
-                  name="statusKelulusan"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Status Kelulusan</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder={
-                            data.graduation_status === "graduated"
-                              ? "Lulus"
-                              : data.graduation_status === "not_graduated"
-                              ? "Tidak Lulus"
-                              : data.graduation_status
-                          }
-                          {...field}
-                          readOnly
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="w-full">
-                <FormField
-                  control={form.control}
-                  name="ijazahTerakhir"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Ijazah Terakhir</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder={
-                            data.last_ijazah
-                              ? data.last_ijazah.toUpperCase()
-                              : ""
-                          }
-                          {...field}
-                          readOnly
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-            {/* Ijazah Dialog */}
-            <FormField
-              control={form.control}
               name="uploadIjazah"
               render={({ field }) => (
                 <FormItem>
@@ -265,8 +186,6 @@ export default function DataAkademik() {
                 </FormItem>
               )}
             />
-
-            {/* SKL Dialog */}
             <FormField
               control={form.control}
               name="uploadSkl"
@@ -290,8 +209,6 @@ export default function DataAkademik() {
                 </FormItem>
               )}
             />
-
-            {/* Transkrip Dialog */}
             <FormField
               control={form.control}
               name="uploadTranskrip"
@@ -309,56 +226,6 @@ export default function DataAkademik() {
                   {!transkripDoc && (
                     <p className="text-sm text-amber-600">
                       ⚠️ Dokumen Transkrip belum diupload
-                    </p>
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* UN Dialog */}
-            <FormField
-              control={form.control}
-              name="uploadUn"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Ujian Nasional</FormLabel>
-                  <FormControl>
-                    <DocumentPreviewDialog
-                      document={unDoc}
-                      title="Nilai Ujian Nasional"
-                      description="Dokumen nilai UN pendaftar"
-                      buttonText="Lihat Nilai UN"
-                    />
-                  </FormControl>
-                  {!unDoc && (
-                    <p className="text-sm text-amber-600">
-                      ⚠️ Dokumen UN belum diupload
-                    </p>
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Sertifikat Dialog */}
-            <FormField
-              control={form.control}
-              name="uploadSertifikat"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Sertifikat / Surat Rekomendasi</FormLabel>
-                  <FormControl>
-                    <DocumentPreviewDialog
-                      document={sertifikatDoc}
-                      title="Sertifikat / Surat Rekomendasi"
-                      description="Dokumen sertifikat atau surat rekomendasi pendaftar"
-                      buttonText="Lihat Sertifikat"
-                    />
-                  </FormControl>
-                  {!sertifikatDoc && (
-                    <p className="text-sm text-amber-600">
-                      ⚠️ Dokumen Sertifikat belum diupload
                     </p>
                   )}
                   <FormMessage />

@@ -60,7 +60,12 @@ export default function Pendaftar() {
     },
     status: app.registration_status,
     registration_status: app.registration_status,
-    graduation_status: app.graduation_status,
+    graduation_status:
+      app.graduation_status === "graduated"
+        ? "Sudah Lulus"
+        : app.graduation_status === "not_graduated"
+        ? "Belum Lulus"
+        : app.graduation_status,
     program: app.program_name,
     created_at: app.created_at,
     phone_number: app.phone_number,

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useUploadDocument } from "@/hooks/useRegistration";
 import { CheckCircle, Upload, X, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
@@ -39,9 +40,6 @@ const FormSchema = z.object({
   programStudi2: z.string().optional(),
   programStudi3: z.string().optional(),
   sekolahAsal: z.string().min(3, { message: "Nama sekolah asal wajib diisi." }),
-  statusKelulusan: z.string({
-    required_error: "Status kelulusan harus dipilih.",
-  }),
   ijazahTerakhir: z.string({
     required_error: "Ijazah terakhir harus dipilih.",
   }),
@@ -89,6 +87,7 @@ export default function DataDiri() {
     useRegistrationProgress();
   const { data: registrationData, refetch } = useMyRegistration();
   const storeMutation = useStoreProfile();
+  const uploadDocument = useUploadDocument();
   const { data: programsData } = usePrograms();
 
   const progress = progressData?.data;
@@ -107,7 +106,6 @@ export default function DataDiri() {
       programStudi2: "",
       programStudi3: "",
       sekolahAsal: "",
-      statusKelulusan: "",
       ijazahTerakhir: "",
       namaLengkap: "",
       email: "",
@@ -150,10 +148,6 @@ export default function DataDiri() {
       form.reset({
         programStudi: profile.id_program?.toString() || "",
         sekolahAsal: profile.previous_school || "",
-        statusKelulusan:
-          graduationStatusReverseMap[profile.graduation_status] ||
-          profile.graduation_status ||
-          "",
         ijazahTerakhir:
           ijazahReverseMap[profile.last_ijazah] ||
           profile.last_ijazah?.toLowerCase() ||
@@ -229,15 +223,6 @@ export default function DataDiri() {
 
     formData.append("previous_school", data.sekolahAsal);
 
-    const graduationStatusMap = {
-      graduated: "Sudah Lulus",
-      not_graduated: "Belum Lulus",
-    };
-    formData.append(
-      "graduation_status",
-      graduationStatusMap[data.statusKelulusan] || data.statusKelulusan
-    );
-
     const ijazahMap = {
       sma: "SMA",
       smk: "SMK",
@@ -271,18 +256,28 @@ export default function DataDiri() {
       formData.append("no_kk", data.noKK);
     }
 
-    if (data.ktp && data.ktp instanceof File) {
-      formData.append("ktp_kitas_file", data.ktp);
-    }
-    if (data.akta && data.akta instanceof File) {
-      formData.append("birth_certificate_file", data.akta);
-    }
-    if (data.kk && data.kk instanceof File) {
-      formData.append("family_card_file", data.kk);
-    }
-
     storeMutation.mutate(formData, {
       onSuccess: async () => {
+        const uploadPromises = [];
+        if (data.ktp && data.ktp instanceof File) {
+          const fd = new FormData();
+          fd.append("id_document_type", "1");
+          fd.append("file", data.ktp);
+          uploadPromises.push(uploadDocument.mutateAsync(fd));
+        }
+        if (data.akta && data.akta instanceof File) {
+          const fd = new FormData();
+          fd.append("id_document_type", "2");
+          fd.append("file", data.akta);
+          uploadPromises.push(uploadDocument.mutateAsync(fd));
+        }
+        if (data.kk && data.kk instanceof File) {
+          const fd = new FormData();
+          fd.append("id_document_type", "3");
+          fd.append("file", data.kk);
+          uploadPromises.push(uploadDocument.mutateAsync(fd));
+        }
+        await Promise.all(uploadPromises);
         await new Promise((resolve) => setTimeout(resolve, 1000));
         router.push("/pendaftaran/data-alamat");
       },
@@ -456,34 +451,6 @@ export default function DataDiri() {
               />
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="statusKelulusan"
-                  render={({ field }) => (
-                    <FormItem className={"w-full"}>
-                      <FormLabel>
-                        Status Kelulusan <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl className="w-full">
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih status kelulusan" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="graduated">Sudah Lulus</SelectItem>
-                          <SelectItem value="not_graduated">
-                            Belum Lulus
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 <FormField
                   control={form.control}
                   name="ijazahTerakhir"
