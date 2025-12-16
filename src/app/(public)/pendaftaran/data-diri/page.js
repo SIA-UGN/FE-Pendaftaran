@@ -784,7 +784,7 @@ export default function DataDiri() {
                         Anak ke Berapa <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="1" {...field} />
+                        <Input type="number" placeholder="0" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
