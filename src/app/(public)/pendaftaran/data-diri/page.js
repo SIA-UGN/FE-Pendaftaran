@@ -332,20 +332,49 @@ export default function DataDiri() {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="programStudi"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Program Studi <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih Program Studi" />
-                        </SelectTrigger>
-                      </FormControl>
+              <div className="grid grid-cols-3">
+                <FormField
+                  control={form.control}
+                  name="programStudi"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Program Studi <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih Program Studi" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {programs.map((program) => (
+                            <SelectItem
+                              key={program.id_program}
+                              value={program.id_program.toString()}
+                            >
+                              {program.name_program}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Program Studi 2
+                    </label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih Program Studi" />
+                      </SelectTrigger>
                       <SelectContent>
                         {programs.map((program) => (
                           <SelectItem
@@ -357,10 +386,30 @@ export default function DataDiri() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Program Studi 3
+                    </label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih Program Studi" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {programs.map((program) => (
+                          <SelectItem
+                            key={program.id_program}
+                            value={program.id_program.toString()}
+                          >
+                            {program.name_program}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
 
               <FormField
                 control={form.control}
