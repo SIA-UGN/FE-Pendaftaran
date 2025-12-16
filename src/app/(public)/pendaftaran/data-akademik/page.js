@@ -223,7 +223,7 @@ export default function UploadDokumen() {
             {/* Transkrip */}
             <div className="space-y-2">
               <label className="text-sm font-medium">
-                Transkrip Nilai (Opsional)
+                Transkrip Nilai
               </label>
               <div className="border-2 border-dashed rounded-lg p-6 text-center bg-white">
                 {!previews.transkrip ? (
@@ -269,7 +269,7 @@ export default function UploadDokumen() {
             {/* SKL */}
             <div className="space-y-2">
               <label className="text-sm font-medium">
-                Surat Keterangan Lulus (SKL) (Opsional)
+                Surat Keterangan Lulus (SKL)
               </label>
               <div className="border-2 border-dashed rounded-lg p-6 text-center bg-white">
                 {!previews.skl ? (
