@@ -21,9 +21,9 @@ export default function DashboardLayout({ children }) {
     'dashboard': 'Dashboard',
     'data': 'Data Pendaftar dan Manager',
     'tambah': 'Pendaftaran Manager',
-    'pendaftar': 'Statistika Pendaftar',
-    'program-studi': "Statistika Program Studi",
-    'keuangan': "Statistika Keuangan"
+    'pendaftar': 'Statistik Pendaftar',
+    'program-studi': "Statistik Program Studi",
+    'keuangan': "Statistik Keuangan"
   };
   
   const breadcrumbLabel = labelMap[currentPage] || currentPage
