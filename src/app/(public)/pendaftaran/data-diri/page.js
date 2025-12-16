@@ -365,8 +365,6 @@ export default function DataDiri() {
                     </FormItem>
                   )}
                 />
-
-                <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">
                       Program Studi 2
@@ -408,7 +406,6 @@ export default function DataDiri() {
                       </SelectContent>
                     </Select>
                   </div>
-                </div>
               </div>
 
               <FormField
