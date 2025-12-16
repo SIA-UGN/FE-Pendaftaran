@@ -181,9 +181,9 @@ export default function Profil() {
                   ? applicant.user.avatar_url
                 : "/logo.jpg"
               }
-              width={180}
+              width={80}
               height={300}
-              className="w-full sm:w-1/4 h-[300px] rounded-xl object-cover"
+              className="w-full h-[300px] rounded-xl object-cover"
             />
             <label
               htmlFor="picture"

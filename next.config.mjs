@@ -13,8 +13,13 @@ const nextConfig = {
         hostname: "sia-globall.test",
         pathname: "/**",
       },
+      {
+        protocol: "http",
+        hostname: "be-ugn.test",
+        pathname: "/**",
+      },
     ],
-    domains: ["localhost"],
+    domains: ["localhost", "be-ugn.test"],
   },
   async headers() {
     return [
