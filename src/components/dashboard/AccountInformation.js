@@ -25,10 +25,10 @@ export default function AccountInformation() {
   const pending = data.data.data.pending_applicants;
 
   return (
-    <div className="flex flex-col items-center px-4 sm:px-8 max-w-screen-xl mx-auto my-12 w-full gap-12">
+    <div className="flex flex-col items-center px-4 sm:px-8 max-w-screen-xl mx-auto my-12 w-full gap-8">
       <Heading title={"Pendaftar"} variant="first"/>
 
-      <div className="grid grid-cols-1 sm:w-6/12 md:w-4/12 gap-12">
+      <div className="grid w-full md:w-md lg:w-lg grid-cols-1 gap-12">
         <Card className="flex items-center justify-center p-6 flex-col w-full gap-2 h-40 border border-black">
           <span className="font-bold text-4xl text-[var(--green)]">{total_applicants}</span>
           <span className="text-lg text-gray-500">Total Pendaftar</span>
