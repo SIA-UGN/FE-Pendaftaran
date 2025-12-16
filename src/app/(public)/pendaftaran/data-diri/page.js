@@ -36,6 +36,8 @@ import { usePrograms } from "@/hooks/useMasterData";
 
 const FormSchema = z.object({
   programStudi: z.string().min(1, { message: "Program Studi wajib dipilih." }),
+  programStudi2: z.string().optional(),
+  programStudi3: z.string().optional(),
   sekolahAsal: z.string().min(3, { message: "Nama sekolah asal wajib diisi." }),
   statusKelulusan: z.string({
     required_error: "Status kelulusan harus dipilih.",
@@ -102,6 +104,8 @@ export default function DataDiri() {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       programStudi: "",
+      programStudi2: "",
+      programStudi3: "",
       sekolahAsal: "",
       statusKelulusan: "",
       ijazahTerakhir: "",
@@ -215,6 +219,14 @@ export default function DataDiri() {
     const formData = new FormData();
 
     formData.append("id_program", data.programStudi);
+
+    if (data.programStudi2) {
+      formData.append("id_program_2", data.programStudi2);
+    }
+    if (data.programStudi3) {
+      formData.append("id_program_3", data.programStudi3);
+    }
+
     formData.append("previous_school", data.sekolahAsal);
 
     const graduationStatusMap = {
@@ -365,47 +377,66 @@ export default function DataDiri() {
                     </FormItem>
                   )}
                 />
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Program Studi 2
-                    </label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih Program Studi" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {programs.map((program) => (
-                          <SelectItem
-                            key={program.id_program}
-                            value={program.id_program.toString()}
-                          >
-                            {program.name_program}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Program Studi 3
-                    </label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih Program Studi" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {programs.map((program) => (
-                          <SelectItem
-                            key={program.id_program}
-                            value={program.id_program.toString()}
-                          >
-                            {program.name_program}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <FormField
+                  control={form.control}
+                  name="programStudi2"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Program Studi 2</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih Program Studi" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {programs.map((program) => (
+                            <SelectItem
+                              key={program.id_program}
+                              value={program.id_program.toString()}
+                            >
+                              {program.name_program}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="programStudi3"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Program Studi 3</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih Program Studi" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {programs.map((program) => (
+                            <SelectItem
+                              key={program.id_program}
+                              value={program.id_program.toString()}
+                            >
+                              {program.name_program}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
               <FormField
