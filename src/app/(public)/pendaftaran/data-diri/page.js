@@ -397,10 +397,8 @@ export default function DataDiri() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="graduated">Sudah Lulus</SelectItem>
-                          <SelectItem value="not_graduated">
-                            Belum Lulus
-                          </SelectItem>
+                          <SelectItem value="">Sudah Lulus</SelectItem>
+                          <SelectItem value="">Belum Lulus</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
