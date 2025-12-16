@@ -179,7 +179,7 @@ export default function Profil() {
               src={
                 applicant.user.avatar_url
                   ? applicant.user.avatar_url
-                "/logo.jpg"
+                : "/logo.jpg"
               }
               width={180}
               height={300}
