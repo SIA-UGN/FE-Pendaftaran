@@ -12,6 +12,14 @@ import {
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -33,7 +41,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useDeleteManager } from "@/hooks/useAdmin";
 import { useState } from "react";
-import { ArrowUpDown, Eye, Trash2 } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useUpdateUser } from "@/hooks/useAdmin";
+import { ArrowUpDown, Eye, Trash2, Edit } from "lucide-react";
 
 export function ManajerTable({ data }) {
   const [sorting, setSorting] = React.useState([]);
@@ -48,6 +60,136 @@ export function ManajerTable({ data }) {
     isError: deleteIsError,
     error: deleteError,
   } = useDeleteManager();
+
+  // Inline edit dialog component (per-row)
+  function InlineEditDialog({ manager }) {
+    const updateUser = useUpdateUser();
+    const [open, setOpen] = useState(false);
+
+    const schema = z
+      .object({
+        name: z.string().min(2, { message: "Nama harus diisi" }),
+        email: z.string().email({ message: "Email tidak valid" }),
+        newPassword: z.string().optional(),
+      })
+      .superRefine((vals, ctx) => {
+        if (
+          vals.newPassword &&
+          vals.newPassword.length > 0 &&
+          vals.newPassword.length < 8
+        ) {
+          ctx.addIssue({
+            path: ["newPassword"],
+            message: "Password minimal 8 karakter",
+            code: z.ZodIssueCode.custom,
+          });
+        }
+      });
+
+    const form = useForm({
+      resolver: zodResolver(schema),
+      defaultValues: {
+        name: manager.name || "",
+        email: manager.email || "",
+        newPassword: "",
+      },
+    });
+
+    async function handleSubmit(values) {
+      const payload = {
+        name: values.name,
+        email: values.email,
+        ...(values.newPassword && values.newPassword.length > 0
+          ? { password: values.newPassword }
+          : {}),
+      };
+
+      try {
+        await updateUser.mutateAsync({ id: manager.id_user, data: payload });
+        setOpen(false);
+      } catch (err) {
+        // error handled by hook
+      }
+    }
+
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button size="sm" variant="ghost" className="ml-2">
+            Edit Cepat
+          </Button>
+        </DialogTrigger>
+
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Manajer</DialogTitle>
+          </DialogHeader>
+
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-4"
+          >
+            <div>
+              <label className="block text-sm font-medium mb-1">Nama</label>
+              <input
+                className="w-full border rounded px-3 py-2"
+                {...form.register("name")}
+              />
+              {form.formState.errors.name && (
+                <p className="text-sm text-red-600 mt-1">
+                  {form.formState.errors.name.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Email</label>
+              <input
+                className="w-full border rounded px-3 py-2"
+                {...form.register("email")}
+              />
+              {form.formState.errors.email && (
+                <p className="text-sm text-red-600 mt-1">
+                  {form.formState.errors.email.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                New Password
+              </label>
+              <input
+                type="password"
+                className="w-full border rounded px-3 py-2"
+                {...form.register("newPassword")}
+              />
+              {form.formState.errors.newPassword && (
+                <p className="text-sm text-red-600 mt-1">
+                  {form.formState.errors.newPassword.message}
+                </p>
+              )}
+            </div>
+
+            <DialogFooter>
+              <div className="flex gap-2 justify-end w-full">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setOpen(false)}
+                >
+                  Batal
+                </Button>
+                <Button type="submit" disabled={updateUser.isLoading}>
+                  {updateUser.isLoading ? "Menyimpan..." : "Simpan"}
+                </Button>
+              </div>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   const columns = [
     {
@@ -91,7 +233,7 @@ export function ManajerTable({ data }) {
       cell: ({ row }) => {
         const manager = row.original;
         return (
-          <div className="text-center">
+          <div className="text-center flex items-center justify-center gap-2">
             <Link href={`/dashboard/manajer/profile?id=${manager.id_user}`}>
               <Button
                 size="sm"
@@ -102,6 +244,30 @@ export function ManajerTable({ data }) {
                 Lihat
               </Button>
             </Link>
+          </div>
+        );
+      },
+    },
+    {
+      id: "edit",
+      header: () => <div className="text-center">Edit</div>,
+      cell: ({ row }) => {
+        const manager = row.original;
+        return (
+          <div className="text-center flex items-center gap-2 justify-center">
+            <Link href={`/dashboard/manajer/edit?id=${manager.id_user}`}>
+              <Button
+                size="sm"
+                variant="yellow"
+                className="text-[var(--green)] hover:bg-[var(--green)] hover:text-white transition-all"
+              >
+                <Edit className="w-4 h-4 mr-1" />
+                Edit
+              </Button>
+            </Link>
+
+            {/* Quick edit modal */}
+            <InlineEditDialog manager={manager} />
           </div>
         );
       },
@@ -253,6 +419,18 @@ export function ManajerTable({ data }) {
                         className="w-full text-sm font-medium text-[var(--green)] hover:bg-[var(--green)] hover:text-white transition-all"
                       >
                         Lihat
+                      </Button>
+                    </Link>
+
+                    <Link
+                      href={`/dashboard/manajer/edit?id=${manager.id_user}`}
+                      className="flex-1"
+                    >
+                      <Button
+                        variant="outline"
+                        className="w-full text-sm hover:opacity-90 transition-all"
+                      >
+                        Edit
                       </Button>
                     </Link>
 

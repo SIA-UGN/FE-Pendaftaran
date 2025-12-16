@@ -129,7 +129,7 @@ export default function InputData() {
                       <FormLabel>
                         Upload Sertifikat Prestasi (Opsional)
                       </FormLabel>
-                      <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                      <div className="border-2 border-dashed rounded-lg p-6 text-center bg-white">
                         {!form.watch("sertifikatFile") ? (
                           <div>
                             <Upload className="mx-auto h-12 w-12 text-gray-400" />

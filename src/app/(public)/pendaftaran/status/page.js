@@ -34,6 +34,8 @@ export default function Status() {
       const regStatus = profile.registration_status;
       const graduationStatus = profile.graduation_status;
 
+      console.log("Registration Status:", regStatus);
+
       // Handle Registration Status Display
       if (regStatus === "approved") {
         setRegistrationStatus("Verified");
@@ -47,19 +49,34 @@ export default function Status() {
         setRegistrationStatus("Pending");
       }
 
-      // Handle Global Status based on graduation_status
-      if (graduationStatus === "Sudah Lulus") {
-        setStatus("Lulus");
-      } else if (graduationStatus === "Belum Lulus") {
-        setStatus("Tidak Lulus");
+      // Only evaluate graduation status when registration is approved
+      if (regStatus === "approved") {
+        if (graduationStatus === "Sudah Lulus") {
+          setStatus("Lulus");
+        } else if (graduationStatus === "Belum Lulus") {
+          setStatus("Tidak Lulus");
+        } else {
+          // Fallback jika graduation_status belum di-set
+          const pymtStat = paymentData?.data?.data?.payment?.status;
+
+          if (pymtStat === "verified") {
+            setStatus("Accepted");
+          } else if (pymtStat === "rejected") {
+            setStatus("Rejected");
+          } else {
+            setStatus("Pending");
+          }
+        }
       } else {
-        // Fallback ke logika lama jika graduation_status belum di-set
+        // Jika belum approved (mis. submitted, reviewed, rejected, draft), jangan periksa graduation_status
         const pymtStat = paymentData?.data?.data?.payment?.status;
 
-        if (regStatus === "approved" && pymtStat === "verified") {
-          setStatus("Accepted");
-        } else if (regStatus === "rejected" || pymtStat === "rejected") {
+        if (regStatus === "rejected" || pymtStat === "rejected") {
           setStatus("Rejected");
+        } else if (regStatus === "submitted" || regStatus === "reviewed") {
+          setStatus("Pending");
+        } else if (regStatus === "draft") {
+          setStatus("Pending");
         } else {
           setStatus("Pending");
         }

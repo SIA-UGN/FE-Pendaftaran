@@ -580,12 +580,12 @@ export default function Pembayaran() {
                   {(paymentStatus === "pending" ||
                     paymentStatus === "rejected") &&
                     !isExpired && (
-                      <Card>
+                      <Card >
                         <CardHeader>
                           <CardTitle>Upload Bukti Pembayaran</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                          <div>
+                          <div className="bg-white">
                             <input
                               type="file"
                               accept=".pdf,.jpg,.jpeg,.png"

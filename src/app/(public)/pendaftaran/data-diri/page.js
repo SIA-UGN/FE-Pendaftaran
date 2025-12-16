@@ -397,8 +397,10 @@ export default function DataDiri() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Sudah Lulus</SelectItem>
-                          <SelectItem value="">Belum Lulus</SelectItem>
+                          <SelectItem value="graduated">Sudah Lulus</SelectItem>
+                          <SelectItem value="not_graduated">
+                            Belum Lulus
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -571,9 +573,9 @@ export default function DataDiri() {
                     <FormLabel>
                       KTP / KITAS <span className="text-red-500">*</span>
                     </FormLabel>
-                    <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                    <div className="border-2 border-dashed rounded-lg p-6 text-center bg-white">
                       {!filePreviews.ktp ? (
-                        <div>
+                        <div className="">
                           <Upload className="mx-auto h-12 w-12 text-gray-400" />
                           <div className="mt-4">
                             <label
@@ -635,7 +637,7 @@ export default function DataDiri() {
                 render={({ field: { onChange, value, ...field } }) => (
                   <FormItem>
                     <FormLabel>Akta Kelahiran</FormLabel>
-                    <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                    <div className="border-2 border-dashed rounded-lg p-6 text-center bg-white">
                       {!filePreviews.akta ? (
                         <div>
                           <Upload className="mx-auto h-12 w-12 text-gray-400" />
@@ -704,7 +706,7 @@ export default function DataDiri() {
                     <FormLabel>
                       Kartu Keluarga <span className="text-red-500">*</span>
                     </FormLabel>
-                    <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                    <div className="border-2 border-dashed rounded-lg p-6 text-center bg-white">
                       {!filePreviews.kk ? (
                         <div>
                           <Upload className="mx-auto h-12 w-12 text-gray-400" />

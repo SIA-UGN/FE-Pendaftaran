@@ -21,6 +21,7 @@ export const adminService = {
 
   // User Management
   getUserProfile: (id) => apiClient.get(`/admin/users/${id}`),
+  updateUser: (id, data) => apiClient.put(`/admin/users/${id}`, data),
 
   // Applicants Management
   getApplicants: (params) => apiClient.get("/admin/applicants", { params }),

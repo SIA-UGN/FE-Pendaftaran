@@ -147,10 +147,78 @@ export default function DataOrangtua() {
     }
   }, [existingGuardians, form]);
 
-  async function onSubmit(data) {
+  async function onSubmit(data, mode = "both") {
+    // clear any previous field errors
+    form.clearErrors();
+
+    const requiredParentFields = [
+      "namaAyah",
+      "alamatAyah",
+      "telpAyah",
+      "pekerjaanAyah",
+      "pendidikanAyah",
+      "penghasilanAyah",
+      "namaIbu",
+      "alamatIbu",
+      "telpIbu",
+      "pekerjaanIbu",
+      "pendidikanIbu",
+      "penghasilanIbu",
+    ];
+
+    const requiredWaliFields = [
+      "namaWali",
+      "alamatWali",
+      "telpWali",
+      "pekerjaanWali",
+      "pendidikanWali",
+      "penghasilanWali",
+    ];
+
+    // Focus the appropriate tab so users see the fields when validation fails
+    if (mode === "wali") setActiveForm("wali");
+    if (mode === "orangTua") setActiveForm("orangTua");
+
+    // Perform simple runtime validation according to the mode
+    const missingFields = [];
+    if (mode === "orangTua" || mode === "both") {
+      for (const f of requiredParentFields) {
+        const val = data[f];
+        if (!val || String(val).trim() === "") {
+          missingFields.push(f);
+          form.setError(f, {
+            type: "required",
+            message: "Field ini wajib diisi.",
+          });
+        }
+      }
+    }
+
+    if (mode === "wali" || mode === "both") {
+      for (const f of requiredWaliFields) {
+        const val = data[f];
+        if (!val || String(val).trim() === "") {
+          missingFields.push(f);
+          form.setError(f, {
+            type: "required",
+            message: "Field ini wajib diisi.",
+          });
+        }
+      }
+    }
+
+    if (missingFields.length > 0) {
+      toast.error("Silakan lengkapi semua field yang wajib diisi.");
+      return;
+    }
+
     const guardians = [];
 
-    if (data.namaAyah && data.namaAyah.trim()) {
+    if (
+      (mode === "orangTua" || mode === "both") &&
+      data.namaAyah &&
+      data.namaAyah.trim()
+    ) {
       guardians.push({
         relationship_type: "Father",
         full_name: data.namaAyah,
@@ -162,7 +230,11 @@ export default function DataOrangtua() {
       });
     }
 
-    if (data.namaIbu && data.namaIbu.trim()) {
+    if (
+      (mode === "orangTua" || mode === "both") &&
+      data.namaIbu &&
+      data.namaIbu.trim()
+    ) {
       guardians.push({
         relationship_type: "Mother",
         full_name: data.namaIbu,
@@ -174,7 +246,11 @@ export default function DataOrangtua() {
       });
     }
 
-    if (data.namaWali) {
+    if (
+      (mode === "wali" || mode === "both") &&
+      data.namaWali &&
+      data.namaWali.trim()
+    ) {
       guardians.push({
         relationship_type: "Guardian",
         full_name: data.namaWali,
@@ -184,6 +260,11 @@ export default function DataOrangtua() {
         last_education: data.pendidikanWali,
         income_range: data.penghasilanWali,
       });
+    }
+
+    if (guardians.length === 0) {
+      toast.error("Tidak ada data yang dapat disimpan.");
+      return;
     }
 
     try {
@@ -264,7 +345,10 @@ export default function DataOrangtua() {
           </div>
         </div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form
+            onSubmit={form.handleSubmit((data) => onSubmit(data, activeForm))}
+            className="space-y-8"
+          >
             <div className="flex flex-col gap-5 sm:p-12 border rounded-xl m-4 sm:m-12 bg-[var(--light-cream)]">
               {activeForm === "orangTua" && (
                 <>

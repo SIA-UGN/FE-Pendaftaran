@@ -179,7 +179,7 @@ export default function UploadDokumen() {
                 Ijazah / Surat Keterangan Lulus{" "}
                 <span className="text-red-500">*</span>
               </label>
-              <div className="border-2 border-dashed rounded-lg p-6 text-center">
+              <div className="border-2 border-dashed rounded-lg p-6 text-center bg-white">
                 {!previews.ijazah ? (
                   <div>
                     <Upload className="mx-auto h-12 w-12 text-gray-400" />
@@ -225,7 +225,7 @@ export default function UploadDokumen() {
               <label className="text-sm font-medium">
                 Transkrip Nilai (Opsional)
               </label>
-              <div className="border-2 border-dashed rounded-lg p-6 text-center">
+              <div className="border-2 border-dashed rounded-lg p-6 text-center bg-white">
                 {!previews.transkrip ? (
                   <div>
                     <Upload className="mx-auto h-12 w-12 text-gray-400" />
@@ -271,7 +271,7 @@ export default function UploadDokumen() {
               <label className="text-sm font-medium">
                 Surat Keterangan Lulus (SKL) (Opsional)
               </label>
-              <div className="border-2 border-dashed rounded-lg p-6 text-center">
+              <div className="border-2 border-dashed rounded-lg p-6 text-center bg-white">
                 {!previews.skl ? (
                   <div>
                     <Upload className="mx-auto h-12 w-12 text-gray-400" />

@@ -86,6 +86,24 @@ export const useUserProfile = (id) => {
   });
 };
 
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }) => adminService.updateUser(id, data),
+    onSuccess: () => {
+      toast.success("Data pengguna berhasil diperbarui");
+      queryClient.invalidateQueries({ queryKey: ["managers"] });
+      queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+    },
+    onError: (error) => {
+      toast.error(
+        error.response?.data?.message || "Gagal memperbarui pengguna"
+      );
+    },
+  });
+};
+
 // Applicant Profile (for dashboard/profile page)
 export const useApplicantProfile = (id) => {
   return useQuery({
@@ -205,7 +223,9 @@ export const useVerifyPayment = () => {
             ? "reject"
             : data?.action || "verify",
         ...(data?.notes && { notes: data.notes }),
-        ...(data?.rejection_reason && { rejection_reason: data.rejection_reason }),
+        ...(data?.rejection_reason && {
+          rejection_reason: data.rejection_reason,
+        }),
       };
       if (data?.status === "rejected" && data?.notes) {
         mapped.rejection_reason = data.notes;
