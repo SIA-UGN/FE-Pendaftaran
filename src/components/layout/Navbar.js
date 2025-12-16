@@ -306,6 +306,7 @@ export default function Navbar() {
                 >
                   <DropdownMenuLabel>{user?.name}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  
                   <DropdownMenuItem asChild>
                     <Link
                       href="/profil"
@@ -328,6 +329,19 @@ export default function Navbar() {
                       Pendaftaran
                     </Link>
                   </DropdownMenuItem>
+                  {user?.role === "pendaftar" && (
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/pendaftaran/status"
+                        className={cn(
+                          isActivePath("/pendaftaran/status") &&
+                            "bg-[var(--yellow)]/10 font-semibold"
+                        )}
+                      >
+                        Hasil Seleksi
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={handleLogout}>
                     Logout
                   </DropdownMenuItem>
