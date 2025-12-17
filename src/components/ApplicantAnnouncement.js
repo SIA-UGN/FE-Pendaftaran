@@ -7,14 +7,6 @@ export default function ApplicantAnnouncement({ status }) {
   const { data: profileData } = useProfile();
   const { data: registrationData } = useMyRegistration();
 
-  // Console logs untuk debugging
-  console.log("🔍 [ApplicantAnnouncement] Profile Data:", profileData);
-  console.log(
-    "🔍 [ApplicantAnnouncement] Registration Data:",
-    registrationData
-  );
-
-  // Extract data dari API responses
   const profile = registrationData?.data?.data?.profile;
   const user = profileData?.data?.data?.user;
 
@@ -24,24 +16,14 @@ export default function ApplicantAnnouncement({ status }) {
     registrationData?.data?.data?.program?.name_program || "Loading...";
   const email = user?.email || "-";
 
-  // Profile photo URL from user.avatar (prioritize) atau profile accessor
-  const avatarPath = user?.avatar || profile?.profile_photo_url;
+  const avatarPath = user?.avatar_url || profile?.profile_photo_url;
+  console.log(avatarPath);
   const profilePhoto = avatarPath
     ? avatarPath.startsWith("http")
-      ? avatarPath // Jika sudah full URL
-      : `http://localhost:8000/storage/${avatarPath}` // Construct dari path relatif
-    : "/logo.jpg"; // Fallback ke logo jika tidak ada foto
+      ? avatarPath
+      : `http://localhost:8000/storage/${avatarPath}`
+    : "/logo.jpg";
 
-  console.log("📊 [ApplicantAnnouncement] Extracted Data:", {
-    fullName,
-    registrationNumber,
-    programName,
-    email,
-    avatarPath,
-    profilePhoto,
-  });
-
-  // Generate username dari email (bagian sebelum @)
   const username = email !== "-" ? `@${email.split("@")[0]}` : "-";
   return (
     <Card className="w-full flex flex-col sm:flex-row gap-6 p-8 rounded-2xl shadow-md">
