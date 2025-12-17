@@ -99,17 +99,15 @@ export function ManajerTable({ data }) {
       const payload = {
         name: values.name,
         email: values.email,
-        ...(values.newPassword && values.newPassword.length > 0
-          ? { password: values.newPassword }
-          : {}),
       };
-
+      if (values.newPassword && values.newPassword.length > 0) {
+        payload.password = values.newPassword;
+        payload.password_confirmation = values.newPassword;
+      }
       try {
         await updateUser.mutateAsync({ id: manager.id_user, data: payload });
         setOpen(false);
-      } catch (err) {
-        // error handled by hook
-      }
+      } catch (err) {}
     }
 
     return (
