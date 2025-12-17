@@ -41,14 +41,11 @@ export default function Pendaftar() {
   const Pending = responseData?.by_status?.submitted || 0;
   const Rejected = responseData?.by_status?.rejected || 0;
 
-  // FIX: Mapping graduation status - "Sudah Lulus" = Lulus, "Belum Lulus" = Tidak Lulus
   const Lulus = responseData?.by_graduation_status?.["Sudah Lulus"] || 0;
   const TidakLulus = responseData?.by_graduation_status?.["Belum Lulus"] || 0;
 
-  // Get applicants list - backend returns array directly in data
   const applicantsList = applicantsResponse || [];
 
-  // Map backend structure to expected frontend structure
   const mappedApplicants = applicantsList.map((app) => ({
     id_profile: app.id_profile,
     user_id: app.id_user,
@@ -71,14 +68,12 @@ export default function Pendaftar() {
     phone_number: app.phone_number,
   }));
 
-  // Filter by registration_status for verification table
   const verificationApplicants = mappedApplicants.filter((app) =>
     ["submitted", "reviewed", "approved", "rejected"].includes(
       app.registration_status
     )
   );
 
-  // Filter by graduation_status for graduation table
   const graduationApplicants = mappedApplicants.filter(
     (app) =>
       app.graduation_status &&

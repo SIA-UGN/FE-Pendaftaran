@@ -173,11 +173,8 @@ export default function Pembayaran() {
       .filter(Boolean)
       .join("\n\n");
 
-    console.log("Notes collected:", notes);
-
     if (notes) {
-      await handleRegistration("submitted", notes);
-      // Reset revision notes after submit
+      await handleRegistration("draft", notes);
       setRevisionNotes({
         identity: "",
         address: "",
@@ -186,6 +183,7 @@ export default function Pembayaran() {
         achievement: "",
         payment: "",
       });
+      router.push("/manager/pendaftar");
     } else {
       // Jika tidak ada catatan, beri peringatan
       alert("Silakan isi minimal satu catatan revisi");
