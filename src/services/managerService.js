@@ -21,6 +21,7 @@ export const managerService = {
   // Payment Verification
   // backend uses /payments/:id for fetching payment details
   getPaymentVerification: (id) => apiClient.get(`/payments/${id}`),
+  getApplicantPayment: (id) => apiClient.get(`/admin/applicants/${id}/payment`),
   // manager uses admin verify endpoint
   verifyPayment: (id, data) => apiClient.put(`/payments/${id}/verify`, data),
 

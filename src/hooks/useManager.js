@@ -101,6 +101,14 @@ export const useManagerPaymentVerification = (id) => {
   });
 };
 
+export const useManagerApplicantPayment = (id) => {
+  return useQuery({
+    queryKey: ["managerApplicantPayment", id],
+    queryFn: () => managerService.getApplicantPayment(id),
+    enabled: !!id,
+  });
+};
+
 export const useManagerVerifyPayment = () => {
   const queryClient = useQueryClient();
 

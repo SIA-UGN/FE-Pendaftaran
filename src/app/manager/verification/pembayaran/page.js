@@ -31,7 +31,7 @@ import {
 import TextareaAutosize from "react-textarea-autosize";
 import { useState } from "react";
 import {
-  useManagerPaymentVerification,
+  useManagerApplicantPayment,
   useVerifyApplicant,
   useManagerVerifyPayment,
 } from "@/hooks/useManager";
@@ -103,34 +103,29 @@ export default function Pembayaran() {
     payment: "",
   });
 
-  const { data, isLoading, isError, error } =
-    useManagerPaymentVerification(payment_id);
+  const { data, isLoading, isError, error } = useManagerApplicantPayment(id);
 
   if (isLoading) return <div>Loading payment...</div>;
   if (isError) return <div>Error loading payment: {error.message}</div>;
 
-  console.log(data);
-
-  const paymentData = data.data.data;
-
-  console.log(paymentData);
+  const paymentData = data?.data?.data?.payment;
+  const applicantData = data?.data?.data?.applicant;
 
   const handleRegistration = async (statusType, note = "") => {
     const payload = {
-      id: Number(payment_id),
+      id: Number(applicantData?.id_profile),
       data: {
         status: statusType,
         ...(note && { notes: note }),
       },
     };
 
-    console.log("Sending Registration:", payload);
     await setApplicantStatus(payload);
   };
 
   const handlePayment = async (statusType, note = "") => {
     const payload = {
-      id: Number(payment_id),
+      id: Number(paymentData?.id),
       data: {
         status: statusType,
         ...(note && { verification_notes: note }),
@@ -138,12 +133,9 @@ export default function Pembayaran() {
       },
     };
 
-    console.log("Sending Payment:", payload);
-
     await setPaymentStatus(payload);
   };
 
-  // PERBAIKAN: Handler untuk update revision notes
   const handleRevisionNoteChange = (section, value) => {
     setRevisionNotes((prev) => ({
       ...prev,
@@ -151,7 +143,6 @@ export default function Pembayaran() {
     }));
   };
 
-  // PERBAIKAN: Handler untuk submit revision
   const handleSubmitRevision = async () => {
     const sections = [
       { key: "identity", heading: "Data Diri" },
@@ -166,7 +157,7 @@ export default function Pembayaran() {
       .map((section) => {
         const value = revisionNotes[section.key]?.trim();
         if (value) {
-          return `**${section.heading}**: ${value}`;
+          return `**${section.heading}** : ${value}`;
         }
         return null;
       })
@@ -185,14 +176,24 @@ export default function Pembayaran() {
       });
       router.push("/manager/pendaftar");
     } else {
-      // Jika tidak ada catatan, beri peringatan
       alert("Silakan isi minimal satu catatan revisi");
       return;
     }
 
     setShowRevisionDialog(false);
-    router.push(`/manager/verification?id=${payment_id}`);
+    router.push(`/manager/verification?id=${id}`);
   };
+
+  // Gabungkan catatan pembayaran dan pendaftaran
+  const paymentNotes =
+    paymentData.rejection_reason || paymentData.verification_notes;
+  const applicantNotes = applicantData?.rejection_reason;
+  const validationNotes = [
+    paymentNotes && `Catatan Pembayaran: ${paymentNotes}`,
+    applicantNotes && `Catatan Pendaftaran: ${applicantNotes}`,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
 
   return (
     <div className="w-full w-max-6xl px-6 md:px-12">
@@ -203,8 +204,8 @@ export default function Pembayaran() {
           Ringkasan Pembayaran
         </h1>
         <div className="ms-6 gap-4">
-          <p>{paymentData.applicant_name}</p>
-          <p>{paymentData.registration_number}</p>
+          <p>{applicantData.full_name}</p>
+          <p>{applicantData.registration_number}</p>
           <p>{paymentData.paid_amount}</p>
           <p>{paymentData.payment_method.account_holder}</p>
         </div>
@@ -271,7 +272,29 @@ export default function Pembayaran() {
       <Form {...form}>
         <div className="space-y-6">
           <div className="flex flex-col gap-5 p-12 border rounded-xl mx-0 md:mx-12 bg-[var(--light-cream)]">
-            {paymentData.rejection_reason || "Tidak ada catatan"}
+            {paymentNotes && (
+              <div className="mb-4">
+                <span className="font-semibold text-green-800 block mb-1">
+                  Catatan Pembayaran:
+                </span>
+                <span className="block whitespace-pre-line">
+                  {paymentNotes}
+                </span>
+              </div>
+            )}
+            {applicantNotes && (
+              <div>
+                <span className="font-semibold text-green-800 block mb-1">
+                  Catatan Pendaftaran:
+                </span>
+                <span className="block whitespace-pre-line">
+                  {applicantNotes?.replace(/\*\*/g, "")}
+                </span>
+              </div>
+            )}
+            {!paymentNotes && !applicantNotes && (
+              <span className="text-gray-500">Tidak ada catatan</span>
+            )}
           </div>
           <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
             <Link href="/manager/verification">
@@ -398,7 +421,7 @@ export default function Pembayaran() {
                         "Selamat! Pendaftaran Anda telah disetujui."
                       );
                       setShowRegistrationDialog(false);
-                      router.push(`/manager/verification?id=${payment_id}`);
+                      router.push(`/manager/verification?id=${id}`);
                     }}
                   >
                     Ya, Sesuai
@@ -428,7 +451,7 @@ export default function Pembayaran() {
                         "Mohon maaf, pendaftaran Anda ditolak."
                       );
                       setShowRegistrationActionDialog(false);
-                      router.push(`/manager/verification?id=${payment_id}`);
+                      router.push(`/manager/verification?id=${id}`);
                     }}
                     disabled={isRegistrationLoading}
                   >

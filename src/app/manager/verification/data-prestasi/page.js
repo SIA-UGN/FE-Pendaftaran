@@ -110,7 +110,7 @@ export default function DataPrestasi() {
       <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
         <Button variant={"green"}>Kembali</Button>
         <Link
-          href={`/manager/verification/pembayaran?payment_id=${applicant.payment.id}`}
+          href={`/manager/verification/pembayaran?id=${applicant.payment.id_user}`}
         >
           <Button variant="matcha">Lanjut</Button>
         </Link>
