@@ -92,9 +92,6 @@ export default function DataDiri() {
     error: applicantProfileError,
   } = useApplicantProfile(id);
 
-  console.log("🔍 [DataDiri] Applicant Data:", applicantData);
-  console.log("🔍 [DataDiri] Applicant Profile Data:", applicantProfileData);
-
   const form = useForm({
     defaultValues: {
       namaLengkap: "",
@@ -128,16 +125,6 @@ export default function DataDiri() {
 
   const profile = registrationData?.profile || {};
 
-  // Debug: log all documents with their types
-  console.log("📄 [Documents] All Documents:", profile.documents);
-  console.log(
-    "📄 [Documents] Document Types:",
-    profile.documents?.map((d) => ({
-      id: d.id_document_type,
-      path: d.file_path,
-    }))
-  );
-
   return (
     <ProtectedRoute>
       <div className="mx-3 md:mx-12 mt-6 grid grid-cols-1 gap-12">
@@ -170,6 +157,28 @@ export default function DataDiri() {
                   <FormControl>
                     <Input
                       placeholder={profile.full_name}
+                      {...field}
+                      readOnly
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="programStudi"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Program Studi</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={
+                        profile.program?.name_program ||
+                        profile.program_name ||
+                        "-"
+                      }
                       {...field}
                       readOnly
                     />
