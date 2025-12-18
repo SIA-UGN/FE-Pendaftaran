@@ -85,7 +85,6 @@ export default function Pembayaran() {
       ) {
         try {
           setHasTriedSubmit(true);
-          console.log("Auto-submitting registration...");
           await submitRegistrationMutation.mutateAsync();
           await refetchPayment();
           toast.success("Pendaftaran berhasil disubmit");

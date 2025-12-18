@@ -86,8 +86,6 @@ const renderActiveShape = (props) => {
 export function ChartPiePayment({ data }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  console.log("ChartPiePayment data:", data);
-
   const chartData = [
     { name: "Accepted", value: data?.verified || 0, color: "#22c55e" },
     { name: "Rejected", value: data?.rejected || 0, color: "#ef4444" },

@@ -30,9 +30,6 @@ export default function ManajerList() {
   // Response: { success: true, data: [...] } where data is UserResource::collection
   const dataManager = Array.isArray(responseData) ? responseData : [];
 
-  console.log("Managers Data:", data?.data);
-  console.log("Managers List:", dataManager);
-
   // Filter sederhana (nama atau email)
   const filteredManager = dataManager.filter((manager) => {
     const query = search.toLowerCase();

@@ -76,8 +76,6 @@ export default function DataDiri() {
   const id = searchParams.get("id");
   const user_id = searchParams.get("user_id");
 
-  console.log(id);
-
   const {
     data: applicantData,
     isLoading: isApplicantLoading,
@@ -118,10 +116,6 @@ export default function DataDiri() {
   const registrationData = applicantProfileData?.data?.data;
 
   const applicant = applicantData?.data?.data;
-
-  console.log(applicant);
-
-  console.log(registrationData);
 
   const profile = registrationData?.profile || {};
 

@@ -17,7 +17,6 @@ export default function ApplicantAnnouncement({ status }) {
   const email = user?.email || "-";
 
   const avatarPath = user?.avatar_url || profile?.profile_photo_url;
-  console.log(avatarPath);
   const profilePhoto = avatarPath
     ? avatarPath.startsWith("http")
       ? avatarPath

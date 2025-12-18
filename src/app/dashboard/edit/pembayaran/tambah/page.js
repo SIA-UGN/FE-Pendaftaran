@@ -40,8 +40,6 @@ export default function TambahMetodePembayaran() {
   const { mutate: createPaymentMethod, isLoading } = useCreatePaymentMethod();
 
   const onSubmit = (data) => {
-    console.log("KIRIM DATA:", data);
-
     createPaymentMethod(data, {
       onSuccess: () => {
         router.push("/dashboard/edit/pembayaran");
@@ -55,9 +53,11 @@ export default function TambahMetodePembayaran() {
         <Heading title="Tambah Metode Pembayaran" variant="first" />
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6 w-full"
+          >
             <div className="flex flex-col gap-5 p-8 border rounded-xl bg-[var(--yellow)]">
-              
               <FormField
                 control={form.control}
                 name="method_type"
@@ -65,7 +65,10 @@ export default function TambahMetodePembayaran() {
                   <FormItem>
                     <FormLabel>Jenis Pembayaran</FormLabel>
                     <FormControl>
-                      <Input placeholder="Bank, E-Wallet, Transfer" {...field} />
+                      <Input
+                        placeholder="Bank, E-Wallet, Transfer"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -79,7 +82,10 @@ export default function TambahMetodePembayaran() {
                   <FormItem>
                     <FormLabel>Nama Bank</FormLabel>
                     <FormControl>
-                      <Input placeholder="Contoh: BCA, BRI, Mandiri" {...field} />
+                      <Input
+                        placeholder="Contoh: BCA, BRI, Mandiri"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -93,7 +99,10 @@ export default function TambahMetodePembayaran() {
                   <FormItem>
                     <FormLabel>Nomor Rekening</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nomor rekening pembayaran" {...field} />
+                      <Input
+                        placeholder="Nomor rekening pembayaran"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

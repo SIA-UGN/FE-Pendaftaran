@@ -130,7 +130,6 @@ export const useForgotPassword = () => {
       );
     },
     onError: (error) => {
-      console.log(error);
       toast.error(
         error.message || error.response?.data?.message || "Gagal mengirim kode"
       );

@@ -52,9 +52,6 @@ export default function Profile() {
     return <div>Manager tidak ditemukan</div>;
   }
 
-  console.log("Manager ID:", managerId);
-  console.log("Manager Data:", managerData);
-
   return (
     <div className="flex flex-col items-center px-4 sm:px-6 lg:px-8 max-w-7xl my-6 sm:my-8 lg:my-12 w-full gap-3 mx-auto">
       {/* Akun Manajer */}

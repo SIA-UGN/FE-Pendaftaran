@@ -85,8 +85,6 @@ export default function Keuangan() {
 
   const data = paymentData?.data?.data;
 
-  console.log(data);
-
   return (
     <div className="flex flex-col items-center px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto my-6 sm:my-8 lg:my-12 w-full gap-3">
       <Card className="w-full flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl shadow-md bg-[var(--light-cream)] justify-between items-start sm:items-center">

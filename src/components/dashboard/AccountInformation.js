@@ -17,8 +17,6 @@ export default function AccountInformation() {
       </div>
     );
 
-  console.log(data.data.data);
-
   const total_applicants = data.data.data.total_applicants;
   const approved = data.data.data.approved_applicants;
   const rejected = data.data.data.rejected_applicants;
@@ -26,11 +24,13 @@ export default function AccountInformation() {
 
   return (
     <div className="flex flex-col items-center px-4 sm:px-8 max-w-screen-xl mx-auto my-12 w-full gap-8">
-      <Heading title={"Pendaftar"} variant="first"/>
+      <Heading title={"Pendaftar"} variant="first" />
 
       <div className="grid w-full md:w-md lg:w-lg grid-cols-1 gap-12">
         <Card className="flex items-center justify-center p-6 flex-col w-full gap-2 h-40 border border-black">
-          <span className="font-bold text-4xl text-[var(--green)]">{total_applicants}</span>
+          <span className="font-bold text-4xl text-[var(--green)]">
+            {total_applicants}
+          </span>
           <span className="text-lg text-gray-500">Total Pendaftar</span>
         </Card>
       </div>

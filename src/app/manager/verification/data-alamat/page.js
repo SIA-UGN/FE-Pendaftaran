@@ -77,10 +77,6 @@ export default function DataAlamat() {
 
   const data = applicant?.profile || {};
 
-  console.log(data);
-
-  console.log(id);
-
   return (
     <>
       <div className="mx-3 md:mx-12 mt-6 grid grid-cols-1 gap-12">

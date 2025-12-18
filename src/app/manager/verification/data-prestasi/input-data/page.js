@@ -46,7 +46,6 @@ export default function InputData() {
   });
 
   function onSubmit(data) {
-    console.log(data);
     alert(
       "You submitted the following values:\n" + JSON.stringify(data, null, 2)
     );

@@ -51,7 +51,6 @@ export function ChartBarLabel() {
   if (isError) return <div>Error: {error?.message}</div>;
 
   const responseData = yearlyRevenueData?.data?.data || {};
-  console.log("Yearly Revenue Data:", responseData);
 
   // Backend returns: { year: 2025, monthly_revenue: { 1: 0, 2: 0, ..., 11: "9500000.00", 12: "11500000.00" } }
   const monthlyRevenue = responseData?.monthly_revenue || {};

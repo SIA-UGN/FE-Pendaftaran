@@ -34,8 +34,6 @@ export function GraduationTable({ data, type }) {
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
 
-  console.log(data);
-
   const columns = [
     {
       accessorKey: "user_id",

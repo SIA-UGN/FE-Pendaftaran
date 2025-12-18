@@ -18,14 +18,10 @@ import { GraduationTable } from "@/components/dashboard/GraduationTable";
 import { useState } from "react";
 
 export default function GraduationList({ data, type }) {
-  console.log(data);
-
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
   const applicants = data.data;
-
-  console.log(applicants);
 
   const filteredApplicants = applicants.filter((applicant) => {
     const matchesSearch = applicant.user.name

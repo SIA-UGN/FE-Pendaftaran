@@ -24,8 +24,6 @@ export default function Profil() {
   const { data: profileData, isPending: isLoadingProfile } = useProfile();
   const user = profileData?.data?.data?.user;
 
-  console.log(user);
-
   const uploadAvatarMutation = useUploadAvatar();
   const changePasswordMutation = useChangePassword();
   const changeEmailMutation = useChangeEmail();
@@ -156,8 +154,6 @@ export default function Profil() {
 
   const applicant = profileData?.data?.data;
 
-  console.log(applicant);
-
   return (
     <div className="my-12">
       <div className="flex flex-col items-center pt-4 pb-16 px-4 sm:px-8 max-w-11/12 mx-auto">
@@ -179,7 +175,7 @@ export default function Profil() {
               src={
                 applicant.user.avatar_url
                   ? applicant.user.avatar_url
-                : "/logo.jpg"
+                  : "/logo.jpg"
               }
               width={80}
               height={300}

@@ -24,8 +24,6 @@ export default function PaymentMethodList({ data, type }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBank, setSelectedBank] = useState("all");
 
-  console.log(paymentMethodData);
-
   // Fungsi untuk filter dan search data
   const filteredData = useMemo(() => {
     let filtered = paymentMethodData;
@@ -122,7 +120,6 @@ export default function PaymentMethodList({ data, type }) {
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-
       </div>
 
       {/* Tabel Pendaftar */}

@@ -33,9 +33,6 @@ export default function Profile() {
   const data = userData?.data?.data;
   const payment = paymentData?.data?.data;
 
-  console.log("Applicant Detail:", data);
-  console.log("Payment Data:", payment);
-
   // Early return if no data
   if (!data) {
     return <div>No data available</div>;
@@ -137,7 +134,6 @@ export default function Profile() {
 
       <Heading title={"Verifikasi"} />
       <div className="w-full grid grid-cols-1 gap-3 sm:gap-4 lg:gap-6">
-
         {/* Verifikasi Pembayaran */}
         {payment ? (
           <Link

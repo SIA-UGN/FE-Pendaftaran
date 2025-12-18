@@ -116,8 +116,6 @@ const generateColors = (count) => {
 export function ChartPiePrograms({ data }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  console.log("ChartPiePrograms data:", data);
-
   const colors = generateColors(data.length);
   const total = data.reduce(
     (sum, item) => sum + (Number(item.value) || Number(item.count) || 0),

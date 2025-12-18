@@ -19,12 +19,10 @@ export default function Page() {
 
   const data = paymentMethodData;
 
-  console.log(data);
-
   return (
     <div className="w-full max-w-6xl mx-auto">
       <Heading title="Menambah Metode Pembayaran" />
-      <PaymentMethodList data={data}/>
+      <PaymentMethodList data={data} />
     </div>
   );
 }

@@ -134,14 +134,10 @@ export default function DataOrangtua() {
     return <div>Error loading applicant: {applicantError.message}</div>;
 
   const applicant = applicantData?.data?.data;
-  console.log("Applicant Data:", applicant);
 
   if (!applicant?.profile) return <div>Data profil tidak ditemukan</div>;
 
   const guardians = applicant.profile.guardians || {};
-
-  console.log(id);
-  console.log(guardians);
 
   const father = guardians[0] || {};
   const mother = guardians[1] || {};
