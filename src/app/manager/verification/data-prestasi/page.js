@@ -81,13 +81,9 @@ export default function DataPrestasi() {
 
   const applicant = applicantData?.data?.data;
 
-  console.log(applicant);
-
   if (!applicant) return <div>Data tidak ditemukan</div>;
 
   const data = applicant?.achievements;
-
-  console.log(data);
 
   return (
     <>
@@ -113,7 +109,9 @@ export default function DataPrestasi() {
 
       <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
         <Button variant={"green"}>Kembali</Button>
-        <Link href={`/manager/verification/pembayaran?payment_id=${id}`}>
+        <Link
+          href={`/manager/verification/pembayaran?payment_id=${applicant.payment.id}`}
+        >
           <Button variant="matcha">Lanjut</Button>
         </Link>
       </div>
