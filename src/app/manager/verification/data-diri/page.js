@@ -182,6 +182,22 @@ export default function DataDiri() {
               )}
             />
 
+            <FormItem>
+              <FormLabel>Program Studi Pilihan 2</FormLabel>
+              <Input
+                placeholder={profile.program_2?.name_program || "-"}
+                readOnly
+              />
+            </FormItem>
+
+            <FormItem>
+              <FormLabel>Program Studi Pilihan 3</FormLabel>
+              <Input
+                placeholder={profile.program_3?.name_program || "-"}
+                readOnly
+              />
+            </FormItem>
+
             <FormField
               control={form.control}
               name="email"
