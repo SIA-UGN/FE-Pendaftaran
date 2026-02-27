@@ -1,5 +1,28 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## Environment Variables
+
+This project expects a few environment variables.
+
+1) Copy the template:
+
+```bash
+cp .env.example .env.local
+```
+
+On Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env.local
+```
+
+2) Adjust values in `.env.local` as needed:
+
+- `NEXT_PUBLIC_API_URL` (example: `http://localhost:8000/api`)
+- `NEXT_PUBLIC_API_TIMEOUT` (ms)
+- `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` (optional if login uses reCAPTCHA)
+- `APP_URL` (backend base url, example: `http://localhost:8000`)
+
 ## Getting Started
 
 First, run the development server:

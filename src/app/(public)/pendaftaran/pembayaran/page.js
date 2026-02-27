@@ -474,7 +474,7 @@ export default function Pembayaran() {
                       <CardTitle>
                         {selectedMethod
                           ? `Transfer ke ${selectedMethod.bank_name}`
-                          : "Transfer Bank"}
+                          : 'Transfer Bank'}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
