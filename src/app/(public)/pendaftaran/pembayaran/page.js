@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   CheckCircle,
@@ -61,8 +61,10 @@ export default function Pembayaran() {
     "http://localhost:8000";
 
   const paymentData = paymentResponse?.data?.data?.payment;
-  const availablePaymentMethods =
-    paymentResponse?.data?.data?.available_payment_methods || [];
+  const availablePaymentMethods = useMemo(
+    () => paymentResponse?.data?.data?.available_payment_methods || [],
+    [paymentResponse]
+  );
   const paymentStatus = paymentData?.status;
   const paymentMessage = paymentResponse?.data?.message;
 
@@ -96,7 +98,14 @@ export default function Pembayaran() {
     };
 
     autoSubmitRegistration();
-  }, [isLoading, paymentData, paymentMessage, hasTriedSubmit]);
+  }, [
+    isLoading,
+    paymentData,
+    paymentMessage,
+    hasTriedSubmit,
+    refetchPayment,
+    submitRegistrationMutation,
+  ]);
 
   useEffect(() => {
     if (paymentData?.payment_method_id) {
@@ -104,7 +113,7 @@ export default function Pembayaran() {
     } else if (!selectedPaymentMethod && availablePaymentMethods?.length > 0) {
       setSelectedPaymentMethod(availablePaymentMethods[0].id);
     }
-  }, [paymentData, availablePaymentMethods]);
+  }, [paymentData, availablePaymentMethods, selectedPaymentMethod]);
 
   useEffect(() => {
     if (!paymentData?.deadline) return;
@@ -549,8 +558,8 @@ export default function Pembayaran() {
                           </li>
                           <li>Simpan bukti transfer Anda</li>
                           <li>
-                            Upload bukti transfer melalui tombol "Konfirmasi
-                            Pembayaran"
+                            Upload bukti transfer melalui tombol
+                            &quot;Konfirmasi Pembayaran&quot;
                           </li>
                           <li>
                             Tunggu verifikasi dari admin (maksimal 1 x 24 jam)

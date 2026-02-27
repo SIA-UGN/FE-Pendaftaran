@@ -73,6 +73,7 @@ export default function DocumentPreviewDialog({
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center p-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={fileUrl}
                   alt={title}

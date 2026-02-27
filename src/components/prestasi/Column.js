@@ -135,14 +135,15 @@ export const columns = [
                           Preview tidak tersedia
                         </p>
                         <p className="text-sm text-gray-500">
-                          Silakan gunakan tombol "Buka di Tab Baru" atau
-                          "Download" di bawah
+                          Silakan gunakan tombol &quot;Buka di Tab Baru&quot; atau
+                          &quot;Download&quot; di bawah
                         </p>
                       </div>
                     </div>
                   </>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center p-4">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={fullUrl}
                       alt="Certificate"

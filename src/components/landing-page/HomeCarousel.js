@@ -43,6 +43,7 @@ export default function HomeCarousel() {
             <div className="w-full">
               <Card className="w-full h-[90vh] rounded-none p-0">
                 <CardContent className="flex items-center justify-center w-full h-full p-0 relative">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={image.url}
                     alt={`Slide ${index + 1}`}

@@ -18,7 +18,7 @@ import { PaymentMethodTable } from "@/components/dashboard/PaymentMethodTable";
 import Link from "next/link";
 
 export default function PaymentMethodList({ data, type }) {
-  const paymentMethodData = data?.data?.data?.data || [];
+  const paymentMethodData = useMemo(() => data?.data?.data?.data || [], [data]);
 
   // State untuk search query dan filter bank
   const [searchQuery, setSearchQuery] = useState("");

@@ -46,7 +46,7 @@ const AnnouncementList = React.memo(function AnnouncementList({
 
       {data.length === 0 && searchValue && (
         <div className="text-center py-8 text-gray-500">
-          Tidak ada hasil untuk "{searchValue}"
+          Tidak ada hasil untuk &quot;{searchValue}&quot;
         </div>
       )}
     </div>

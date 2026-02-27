@@ -228,6 +228,7 @@ export default function Pembayaran() {
               </DialogDescription>
             </DialogHeader>
             <div className="flex items-center justify-center p-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={`http://localhost:8000${paymentData.payment_proof_url}`}
                 alt="Bukti Pembayaran"

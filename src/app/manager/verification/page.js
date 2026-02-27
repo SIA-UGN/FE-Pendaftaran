@@ -84,6 +84,7 @@ export default function Profile() {
       </h2>
 
       <Card className="w-full flex flex-col md:flex-row gap-6 p-8 rounded-2xl shadow-md bg-white">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           alt="Profile banner"
           src={

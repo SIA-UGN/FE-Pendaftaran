@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +19,10 @@ export default function EmailPicker() {
   const { mutate: createEmail, isPending: isCreating } =
     useCreateOfficialEmail();
 
-  const formatOptions = formatOptionsData?.data?.data?.format_options || [];
+  const formatOptions = useMemo(
+    () => formatOptionsData?.data?.data?.format_options || [],
+    [formatOptionsData]
+  );
   const emailStatus = emailStatusData?.data?.data;
   const hasOfficialEmail = emailStatus?.official_email_created;
   const officialEmail = emailStatus?.official_email;
