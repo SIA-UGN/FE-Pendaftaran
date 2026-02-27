@@ -26,7 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Card } from "@/components/ui/card";
 import {
   Dialog,
@@ -69,6 +69,14 @@ const formatValue = (value) => {
 };
 
 export default function DataDiri() {
+  return (
+    <Suspense fallback={null}>
+      <DataDiriInner />
+    </Suspense>
+  );
+}
+
+function DataDiriInner() {
   const router = useRouter();
   const [showCancelDialog, setShowCancelDialog] = useState(false);
 

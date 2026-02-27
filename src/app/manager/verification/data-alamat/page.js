@@ -38,11 +38,19 @@ import {
   InputGroupAddon,
   InputGroupButton,
 } from "@/components/ui/input-group";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 
 import { useManagerApplicantDetail } from "@/hooks/useManager";
 
 export default function DataAlamat() {
+  return (
+    <Suspense fallback={null}>
+      <DataAlamatInner />
+    </Suspense>
+  );
+}
+
+function DataAlamatInner() {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
 
   const searchParams = useSearchParams();

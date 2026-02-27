@@ -1,11 +1,11 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 
 import {
@@ -44,6 +44,14 @@ const StatusBadge = ({ status }) => {
 };
 
 export default function Profile() {
+  return (
+    <Suspense fallback={null}>
+      <ProfileInner />
+    </Suspense>
+  );
+}
+
+function ProfileInner() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
 

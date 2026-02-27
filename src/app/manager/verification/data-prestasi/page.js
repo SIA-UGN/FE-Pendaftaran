@@ -47,7 +47,7 @@ import {
   InputGroupAddon,
   InputGroupButton,
 } from "@/components/ui/input-group";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 
 import { useManagerApplicantDetail } from "@/hooks/useManager";
 
@@ -62,6 +62,14 @@ const FormSchema = z.object({
 });
 
 export default function DataPrestasi() {
+  return (
+    <Suspense fallback={null}>
+      <DataPrestasiInner />
+    </Suspense>
+  );
+}
+
+function DataPrestasiInner() {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
 
   const searchParams = useSearchParams();

@@ -54,7 +54,7 @@ import {
   InputGroupAddon,
   InputGroupButton,
 } from "@/components/ui/input-group";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 
 import { useManagerApplicantDetail } from "@/hooks/useManager";
 import DocumentPreviewDialog from "@/components/manager/DocumentPreviewDialog";
@@ -108,6 +108,14 @@ const FormSchema = z.object({
 });
 
 export default function DataAkademik() {
+  return (
+    <Suspense fallback={null}>
+      <DataAkademikInner />
+    </Suspense>
+  );
+}
+
+function DataAkademikInner() {
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {

@@ -1,4 +1,4 @@
-import { ChartPieLegend } from "@/components/dashboard/ChartPieApplicant";
+import { ChartPieApplicant } from "@/components/dashboard/ChartPieApplicant";
 
 export default function Statistika() {
   return (
@@ -7,7 +7,7 @@ export default function Statistika() {
         <h2 className="text-3xl sm:text-2xl font-semibold mb-6 mt-6 border-b-2 border-black pb-2 text-[var(--green)] w-full">
           Statistik
         </h2>
-        <ChartPieLegend />
+        <ChartPieApplicant />
         <h2 className="text-3xl sm:text-2xl font-semibold mb-6 mt-6 border-b-2 border-black pb-2 text-[var(--green)] w-full">
           Deskripsi Statistik
         </h2>

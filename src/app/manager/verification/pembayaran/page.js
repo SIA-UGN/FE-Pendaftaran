@@ -29,7 +29,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import TextareaAutosize from "react-textarea-autosize";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import {
   useManagerApplicantPayment,
   useVerifyApplicant,
@@ -63,6 +63,14 @@ const FormSchema = z.object({
 });
 
 export default function Pembayaran() {
+  return (
+    <Suspense fallback={null}>
+      <PembayaranInner />
+    </Suspense>
+  );
+}
+
+function PembayaranInner() {
   const router = useRouter();
 
   const { mutate: setPaymentStatus, isLoading: isPaymentLoading } =

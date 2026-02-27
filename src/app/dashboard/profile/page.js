@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 import Image from "next/image";
 
@@ -12,6 +13,14 @@ import { useApplicantProfile, useApplicantPayment } from "@/hooks/useAdmin";
 import { FileCheck, WalletMinimal } from "lucide-react";
 
 export default function Profile() {
+  return (
+    <Suspense fallback={null}>
+      <ProfileInner />
+    </Suspense>
+  );
+}
+
+function ProfileInner() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
 

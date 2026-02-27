@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import Link from "next/link";
-import { useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import { InputGroup, InputGroupAddon } from "@/components/ui/input-group";
 import Image from "next/image";
@@ -27,6 +27,14 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 export default function Keuangan() {
+  return (
+    <Suspense fallback={null}>
+      <KeuanganInner />
+    </Suspense>
+  );
+}
+
+function KeuanganInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get("id");

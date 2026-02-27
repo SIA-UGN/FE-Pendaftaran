@@ -15,9 +15,17 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 
 export default function Profile() {
+  return (
+    <Suspense fallback={null}>
+      <ProfileInner />
+    </Suspense>
+  );
+}
+
+function ProfileInner() {
   const [open, setOpen] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();

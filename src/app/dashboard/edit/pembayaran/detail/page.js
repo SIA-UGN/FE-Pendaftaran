@@ -5,7 +5,7 @@ import {
   useUpdatePaymentMethod,
 } from "@/hooks/usePaymentMethod";
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import {
@@ -33,6 +33,14 @@ const FormSchema = z.object({
 });
 
 export default function DetailPaymentMethod() {
+  return (
+    <Suspense fallback={null}>
+      <DetailPaymentMethodInner />
+    </Suspense>
+  );
+}
+
+function DetailPaymentMethodInner() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const router = useRouter();
