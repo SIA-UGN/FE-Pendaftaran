@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -186,7 +186,7 @@ export default function BroadcastMessage() {
                 </Button>
               </Link>
               <Button
-                variant="green"
+                variant="primary"
                 className="w-full sm:w-48"
                 type="submit"
                 disabled={isBroadcastLoading}
@@ -200,3 +200,4 @@ export default function BroadcastMessage() {
     </ProtectedRoute>
   );
 }
+

@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import * as React from "react"
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
@@ -107,7 +107,7 @@ function AlertDialogDescription({
 
 function AlertDialogAction({
   className,
-  variant="green",
+  variant="primary",
   ...props
 }) {
   return (<AlertDialogPrimitive.Action className={cn(buttonVariants({ variant }), className)} {...props} />);
@@ -137,3 +137,4 @@ export {
   AlertDialogAction,
   AlertDialogCancel,
 }
+

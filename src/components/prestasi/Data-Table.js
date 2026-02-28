@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
  
 import {
   ColumnDef,
@@ -30,7 +30,7 @@ export function DataTable({
     <div className="w-full">
       <div className="overflow-x-auto rounded-md border">
         <Table>
-          <TableHeader>
+          <TableHeader style={{ backgroundColor: "#015023" }}>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {

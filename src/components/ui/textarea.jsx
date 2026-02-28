@@ -10,9 +10,15 @@ function Textarea({
     <textarea
       data-slot="textarea"
       className={cn(
-        "border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+        "placeholder:text-muted-foreground flex field-sizing-content min-h-[100px] w-full border bg-transparent px-4 py-3 text-sm",
+        "transition-[color,box-shadow] outline-none",
+        "disabled:cursor-not-allowed disabled:opacity-50",
+        "aria-invalid:border-red-500",
         className
       )}
+      style={{ borderRadius: '10px', borderColor: '#D1D5DB', fontFamily: 'Urbanist, system-ui, sans-serif' }}
+      onFocus={e => { e.target.style.borderColor = '#015023'; e.target.style.boxShadow = '0 0 0 3px rgba(1,80,35,0.15)'; }}
+      onBlur={e => { e.target.style.borderColor = '#D1D5DB'; e.target.style.boxShadow = 'none'; }}
       {...props} />
   );
 }

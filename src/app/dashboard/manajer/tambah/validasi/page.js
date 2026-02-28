@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Info, CheckCircle2 } from "lucide-react";
 import { Heading } from "@/components/Heading";
 import { Input } from "@/components/ui/input";
@@ -35,17 +34,11 @@ export default function TambahManajer() {
       <div className="flex flex-col items-center px-4 sm:px-8 max-w-6xl mt-12 w-full">
         <Heading title={"Pendaftaran Manajer Baru"} />
 
-        <Card
-          className="
-            rounded-lg shadow-md 
-            flex flex-col sm:flex-row gap-4 
-            p-4 sm:p-6 lg:p-8 
-            w-full 
-            bg-[var(--light-cream)] 
-            border border-gray-300
-          "
+        <div
+          className="flex flex-col sm:flex-row gap-4 p-4 sm:p-6 lg:p-8 w-full"
+          style={{ backgroundColor: '#E6EEE9', borderRadius: '16px', border: '1px solid #D9E5DE' }}
         >
-          <CardContent className="flex flex-col gap-4 sm:gap-5 w-full p-0">
+          <div className="flex flex-col gap-4 sm:gap-5 w-full">
             <h2
               className="
                 scroll-m-20 pb-2 border-b border-gray-500 
@@ -63,8 +56,8 @@ export default function TambahManajer() {
                 sistem akan mengirimkan aktivasi akun melalui email manajer.
               </p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* 🔹 Bagian Validasi Data */}
@@ -118,7 +111,7 @@ export default function TambahManajer() {
               <AlertDialogTrigger asChild>
                 <Button
                   type="button"
-                  variant={"green"}
+                  variant={"primary"}
                   className="w-full sm:w-48 rounded-md"
                 >
                   Konfirmasi

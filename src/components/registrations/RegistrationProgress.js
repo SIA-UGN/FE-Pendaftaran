@@ -148,23 +148,23 @@ export default function RegistrationProgress() {
     switch (status) {
       case "completed":
         return {
-          border: "border-green-500 bg-green-50",
-          text: "text-green-500",
-          icon: <CheckCircle className="text-green-500 bg-white" />,
+          border: "border-[#015023] bg-[#E6EEE9]",
+          text: "text-[#015023]",
+          icon: <CheckCircle className="bg-white" style={{ color: '#015023' }} />,
           clickable: true,
         };
       case "accessible":
         return {
-          border: "border-red-500 bg-red-50",
+          border: "border-red-400 bg-red-50",
           text: "text-red-500",
           icon: <CheckCircle className="text-red-500 bg-white" />,
           clickable: true,
         };
       case "locked":
         return {
-          border: "border-yellow-500 bg-yellow-50",
-          text: "text-yellow-500",
-          icon: <Lock className="text-yellow-500 bg-white" />,
+          border: "border-[#DABC4E] bg-yellow-50",
+          text: "text-[#8a7a30]",
+          icon: <Lock className="bg-white" style={{ color: '#DABC4E' }} />,
           clickable: false,
         };
       default:
@@ -219,8 +219,8 @@ export default function RegistrationProgress() {
             <div className="absolute top-1/2 left-[7%] right-[7%] transform -translate-y-1/2 h-[4px] bg-gray-200 rounded-full z-0"></div>
 
             <div
-              className="absolute top-1/2 left-[7%] transform -translate-y-1/2 h-[4px] bg-green-500 rounded-full z-0 transition-all duration-500"
-              style={{ width: `${progressPercent}%` }}
+              className="absolute top-1/2 left-[7%] transform -translate-y-1/2 h-[4px] rounded-full z-0 transition-all duration-500"
+              style={{ width: `${progressPercent}%`, backgroundColor: '#015023' }}
             ></div>
 
             {steps.map((step) => {

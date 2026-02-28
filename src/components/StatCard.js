@@ -1,14 +1,24 @@
-import { Card } from "@/components/ui/card";
-
-export function StatCard({ value, label, color = "text-gray-600" }) {
+export function StatCard({ value, label, color }) {
   return (
-    <Card className="flex items-center justify-center p-4 sm:p-5 lg:p-6 flex-col w-full stroke-black gap-2 h-[120px] sm:h-[140px] lg:h-[160px] border border-black shadow-lg hover:shadow-xl transition-shadow duration-300">
-      <span className={`font-bold text-2xl sm:text-3xl lg:text-4xl ${color}`}>
+    <div
+      className="flex items-center justify-center flex-col w-full gap-2 h-[130px] sm:h-[150px] transition-all duration-200 hover:shadow-md"
+      style={{
+        backgroundColor: '#ffffff',
+        border: '1px solid #E6EEE9',
+        borderRadius: '16px',
+        fontFamily: 'Urbanist, system-ui, sans-serif',
+        padding: '16px',
+      }}
+    >
+      <span
+        className="font-bold text-2xl sm:text-3xl lg:text-4xl"
+        style={{ color: color || '#015023' }}
+      >
         {value}
       </span>
-      <span className="text-sm sm:text-base lg:text-lg text-gray-500 text-center">
+      <span className="text-sm sm:text-base text-gray-500 text-center">
         {label}
       </span>
-    </Card>
+    </div>
   );
 }

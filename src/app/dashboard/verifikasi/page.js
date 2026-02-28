@@ -1,9 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 
-import { Card } from "@/components/ui/card";
+
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/Heading";
 import { IdCard, UserRound, WalletMinimal, ImageIcon } from "lucide-react";
@@ -95,7 +95,7 @@ function KeuanganInner() {
 
   return (
     <div className="flex flex-col items-center px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto my-6 sm:my-8 lg:my-12 w-full gap-3">
-      <Card className="w-full flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl shadow-md bg-[var(--light-cream)] justify-between items-start sm:items-center">
+      <div className="w-full flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8 justify-between items-start sm:items-center" style={{ backgroundColor: '#E6EEE9', borderRadius: '16px', border: '1px solid #D9E5DE' }}>
         <div className="flex flex-col w-full sm:w-2/3 space-y-1">
           <h2 className="font-bold text-lg sm:text-xl">
             {data.applicant_name}
@@ -113,10 +113,10 @@ function KeuanganInner() {
         >
           {data.status}
         </Button>
-      </Card>
+      </div>
 
       <Heading title="Rincian Pembayaran" />
-      <Card className="w-full flex flex-col gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8 rounded-xl shadow-md bg-[var(--light-cream)]">
+      <div className="w-full flex flex-col gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8" style={{ backgroundColor: '#E6EEE9', borderRadius: '16px', border: '1px solid #D9E5DE' }}>
         <h3 className="font-semibold text-base sm:text-lg">
           Ringkasan Pembayaran
         </h3>
@@ -140,14 +140,14 @@ function KeuanganInner() {
             </span>
           </div>
         </div>
-      </Card>
+      </div>
 
       <Heading title="Bukti Pembayaran" />
       <AlertDialog open={openBukti} onOpenChange={setOpenBukti}>
         <AlertDialogTrigger asChild>
-          <Card
-            className="w-full flex flex-col items-center justify-center border-2 border-dashed border-white-400 cursor-pointer transition hover:bg-[var(--green)]/90"
-            variant="green"
+          <div
+            className="w-full flex flex-col items-center justify-center border-2 border-dashed cursor-pointer transition"
+            style={{ borderRadius: '16px', borderColor: '#015023', backgroundColor: '#E6EEE9' }}
           >
             <div className="flex flex-col items-center gap-2 py-8 sm:py-10">
               <ImageIcon className="w-6 h-6 sm:w-8 sm:h-8" />
@@ -155,7 +155,7 @@ function KeuanganInner() {
                 Lihat Bukti Pembayaran
               </span>
             </div>
-          </Card>
+          </div>
         </AlertDialogTrigger>
 
         <AlertDialogContent className="max-w-xl w-[90vw] sm:w-full">
@@ -185,12 +185,12 @@ function KeuanganInner() {
       </AlertDialog>
 
       <Heading title="Validation Notes" />
-      <Card
-        className="w-full items-center justify-center border-1 border-black p-4 sm:p-6 text-center"
-        variant="yellow"
+      <div
+        className="w-full items-center justify-center p-4 sm:p-6 text-center"
+        style={{ backgroundColor: '#DABC4E', borderRadius: '16px', border: '1px solid #c4a83e' }}
       >
         <p className="text-sm sm:text-base">Payment verified amount matches</p>
-      </Card>
+      </div>
 
       <div className="w-full mt-6 sm:mt-8 lg:mt-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full sm:w-auto sm:ml-auto">
@@ -205,7 +205,7 @@ function KeuanganInner() {
           <AlertDialog open={openFirst} onOpenChange={setOpenFirst}>
             <AlertDialogTrigger asChild>
               <Button
-                variant="green"
+                variant="primary"
                 className="flex items-center justify-center gap-2 rounded-lg text-sm sm:text-base py-2 sm:py-3"
               >
                 Verifikasi Keuangan
@@ -307,3 +307,4 @@ function KeuanganInner() {
     </div>
   );
 }
+

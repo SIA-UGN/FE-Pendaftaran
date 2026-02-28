@@ -1,7 +1,5 @@
 import HomeCarousel from "@/components/landing-page/HomeCarousel";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/Heading";
 
 const data = [
@@ -87,7 +85,7 @@ export default function Fakultas() {
           <div className="flex flex-col gap-8 sm:gap-10 lg:gap-12 w-full">
             {data.map((fakultas, index) => (
               <div key={index} className="w-full">
-                <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold w-full border-b-2 border-gray-300 pb-3 text-[var(--green)] mt-2 sm:mt-2 mb-4 sm:mb-5">
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold w-full pb-3 mt-2 sm:mt-2 mb-4 sm:mb-5" style={{ color: '#015023', borderBottom: '2px solid #DABC4E' }}>
                   {fakultas.fakultas}
                 </h2>
 
@@ -97,19 +95,18 @@ export default function Fakultas() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
                   {fakultas.prodi.map((prodi, prodiIndex) => (
-                    <Card
+                    <div
                       key={prodiIndex}
-                      className="flex flex-col p-4 sm:p-5 lg:p-6 gap-3 sm:gap-4 hover:shadow-lg transition-shadow"
+                      className="flex flex-col gap-3 sm:gap-4 hover:shadow-lg transition-shadow"
+                      style={{ backgroundColor: '#ffffff', border: '1px solid #E6EEE9', borderRadius: '16px', padding: '16px 20px' }}
                     >
-                      <h3 className="text-md sm:text-lg lg:text-xl font-semibold border-b-2 border-gray-200 pb-2 text-[var(--green)]">
+                      <h3 className="text-md sm:text-lg lg:text-xl font-semibold pb-2" style={{ color: '#015023', borderBottom: '2px solid #E6EEE9' }}>
                         {prodi.nama}
                       </h3>
-
                       <p className="text-xs lg:text-base text-gray-500 leading-relaxed flex-grow">
                         {prodi.deskripsi}
                       </p>
-
-                    </Card>
+                    </div>
                   ))}
                 </div>
               </div>

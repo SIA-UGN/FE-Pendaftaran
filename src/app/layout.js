@@ -1,12 +1,12 @@
 import "./globals.css";
-import { Poppins } from "next/font/google";
+import { Urbanist } from "next/font/google";
 
 import Providers from "@/components/Providers";
 
-const poppins = Poppins({
+const urbanist = Urbanist({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-poppins",
+  variable: "--font-urbanist",
 });
 
 export const metadata = {
@@ -19,9 +19,9 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="id" suppressHydrationWarning>
       <body
-        className={`${poppins.variable} font-sans bg-white text-gray-900 antialiased`}
+        className={`${urbanist.variable} font-sans antialiased`}
         suppressHydrationWarning
       >
         <Providers>

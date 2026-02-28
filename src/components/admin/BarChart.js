@@ -13,14 +13,6 @@ import {
 } from "recharts";
 
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
@@ -28,7 +20,7 @@ import {
 } from "@/components/ui/chart";
 import { useYearlyRevenue } from "@/hooks/useAdmin";
 
-const colors = ["var(--green)", "var(--yellow)"];
+const colors = ['#015023', '#DABC4E'];
 
 export const description = "A bar chart with a label";
 
@@ -79,16 +71,16 @@ export function ChartBarLabel() {
   const range = { start: `January ${year}`, end: `December ${year}` };
 
   return (
-    <Card className="w-full">
-      <CardHeader className="px-4 sm:px-6 pt-4 sm:pt-6">
-        <CardTitle className="text-lg sm:text-xl lg:text-2xl">
+    <div className="w-full" style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #E6EEE9' }}>
+      <div className="px-4 sm:px-6 pt-4 sm:pt-6">
+        <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold" style={{ color: '#015023' }}>
           Bar Chart - Label
-        </CardTitle>
-        <CardDescription className="text-xs sm:text-sm">
+        </h3>
+        <p className="text-xs sm:text-sm text-gray-500">
           {range.start} - {range.end}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="px-2 sm:px-4 lg:px-6 pb-4 sm:pb-6">
+        </p>
+      </div>
+      <div className="px-2 sm:px-4 lg:px-6 pb-4 sm:pb-6">
         <ChartContainer
           config={chartConfig}
           className="h-[250px] sm:h-[300px] lg:h-[350px] w-full"
@@ -141,7 +133,7 @@ export function ChartBarLabel() {
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

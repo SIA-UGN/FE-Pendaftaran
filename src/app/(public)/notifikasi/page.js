@@ -1,6 +1,5 @@
-"use client";
+﻿"use client";
 
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/Heading";
 import {
@@ -171,7 +170,7 @@ export default function Notification() {
             <Button
               onClick={handleMarkAllAsRead}
               disabled={isLoadingMarkAllAsRead}
-              variant="green"
+              variant="primary"
               className="text-white"
             >
               <CheckCheck className="w-4 h-4 mr-2" />
@@ -184,22 +183,23 @@ export default function Notification() {
       {/* Notifications List */}
       <div className="flex flex-col gap-4 md:gap-6 w-full">
         {data.length === 0 ? (
-          <Card className="p-8 md:p-12 flex flex-col items-center justify-center gap-4">
+          <div className="p-8 md:p-12 flex flex-col items-center justify-center gap-4" style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #E6EEE9' }}>
             <Mail className="w-16 h-16 text-gray-300" />
             <p className="text-gray-500 text-center">No notifications yet</p>
-          </Card>
+          </div>
         ) : (
           data.map((notification, index) => (
-            <Card
+            <div
               key={`notifikasi-${index}`}
-              className={`relative p-4 md:p-5 lg:p-6 flex flex-col gap-3 md:gap-4 shadow-sm hover:shadow-md transition-shadow 
+              className={`relative p-4 md:p-5 lg:p-6 flex flex-col gap-3 md:gap-4 transition-shadow 
                 ${
-                  notification.read_at ? "opacity-70 bg-gray-50" : "opacity-100"
+                  notification.read_at ? "opacity-70" : "opacity-100"
                 }`}
+              style={{ backgroundColor: notification.read_at ? '#f9fafb' : '#ffffff', borderRadius: '16px', border: '1px solid #E6EEE9' }}
             >
               {/* Status Indicator */}
               {!notification.read_at && (
-                <div className="absolute top-3 left-3 w-2 h-2 bg-green-600 rounded-full"></div>
+                <div className="absolute top-3 left-3 w-2 h-2 rounded-full" style={{ backgroundColor: '#015023' }}></div>
               )}
 
               {/* Action Buttons */}
@@ -208,7 +208,8 @@ export default function Notification() {
                   <button
                     onClick={() => handleRead(notification.id)}
                     disabled={isLoadingMarkAsRead}
-                    className="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-md transition-colors disabled:opacity-50"
+                    className="text-xs text-white px-3 py-1.5 rounded-md transition-colors disabled:opacity-50"
+                    style={{ backgroundColor: '#015023' }}
                   >
                     Mark Read
                   </button>
@@ -225,7 +226,7 @@ export default function Notification() {
 
               {/* Content */}
               <div className="pr-32 md:pr-36">
-                <h1 className="font-bold text-lg sm:text-xl lg:text-2xl text-[var(--green)] break-words">
+                <h1 className="font-bold text-lg sm:text-xl lg:text-2xl break-words" style={{ color: '#015023' }}>
                   {notification.title}
                 </h1>
               </div>
@@ -250,10 +251,11 @@ export default function Notification() {
                   )}
                 </p>
               )}
-            </Card>
+            </div>
           ))
         )}
       </div>
     </div>
   );
 }
+

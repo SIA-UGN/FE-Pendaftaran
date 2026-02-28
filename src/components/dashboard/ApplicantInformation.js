@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import ApplicantList from "@/components/dashboard/ApplicantList";
 import GraduationList from "@/components/dashboard/GraduationList";
 import { Heading } from "@/components/Heading";

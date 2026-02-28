@@ -374,7 +374,7 @@ export default function Pembayaran() {
                   {/* Ringkasan Pembayaran */}
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-green-600">
+                      <CardTitle style={{ color: '#015023' }}>
                         Ringkasan Pembayaran
                       </CardTitle>
                     </CardHeader>
@@ -397,7 +397,7 @@ export default function Pembayaran() {
                         <span className="text-muted-foreground">
                           Biaya Pendaftaran
                         </span>
-                        <span className="font-bold text-lg text-green-600">
+                        <span className="font-bold text-lg" style={{ color: '#015023' }}>
                           Rp{" "}
                           {paymentData?.amount?.toLocaleString("id-ID") ||
                             "300.000"}
@@ -621,7 +621,7 @@ export default function Pembayaran() {
                             <AlertDialogTrigger asChild>
                               <Button
                                 className="w-full"
-                                variant="green"
+                                variant="primary"
                                 disabled={!selectedFile || isUploading}
                               >
                                 {isUploading
@@ -650,7 +650,7 @@ export default function Pembayaran() {
                                       Batal
                                     </Button>
                                     <Button
-                                      variant="green"
+                                      variant="primary"
                                       onClick={handleConfirmPayment}
                                       disabled={isUploading}
                                     >
@@ -711,7 +711,7 @@ export default function Pembayaran() {
                       }}
                     >
                       <Button
-                        variant="green"
+                        variant="primary"
                         className="w-full"
                         disabled={paymentStatus === "pending" && !uploadSuccess}
                       >
@@ -732,7 +732,7 @@ export default function Pembayaran() {
                   {/* Ringkasan Pembayaran */}
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-green-600">
+                      <CardTitle style={{ color: '#015023' }}>
                         Detail Pembayaran
                       </CardTitle>
                     </CardHeader>
@@ -755,7 +755,7 @@ export default function Pembayaran() {
                         <span className="text-muted-foreground">
                           Biaya Pendaftaran
                         </span>
-                        <span className="font-bold text-lg text-green-600">
+                        <span className="font-bold text-lg" style={{ color: '#015023' }}>
                           Rp{" "}
                           {paymentData?.amount?.toLocaleString("id-ID") ||
                             "300.000"}
@@ -766,7 +766,7 @@ export default function Pembayaran() {
                         <span
                           className={`font-semibold ${
                             paymentStatus === "verified"
-                              ? "text-green-600"
+                              ? "text-[#015023]"
                               : "text-yellow-600"
                           }`}
                         >
@@ -872,7 +872,7 @@ export default function Pembayaran() {
                     <Info
                       className={`h-4 w-4 ${
                         paymentStatus === "verified"
-                          ? "text-green-600"
+                          ? "text-[#015023]"
                           : "text-yellow-600"
                       }`}
                     />
@@ -937,7 +937,7 @@ export default function Pembayaran() {
                       </Button>
                     </Link>
                     <Link href="/pendaftaran/status" className="block">
-                      <Button variant="green" className="w-full">
+                      <Button variant="primary" className="w-full">
                         Lihat Status Pendaftaran
                       </Button>
                     </Link>
@@ -951,3 +951,4 @@ export default function Pembayaran() {
     </ProtectedRoute>
   );
 }
+

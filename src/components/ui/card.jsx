@@ -7,20 +7,25 @@ function Card({
   variant = "default",
   ...props
 }) {
-  const variantClasses = {
-    default: "bg-[var(--light-cream)] border-gray-200 text-black",
-    yellow: "bg-[var(--yellow)] border-yellow-300 text-[var(--green)]",
-    green: "bg-[var(--green)] border-green-300 text-white",
+  const variantStyles = {
+    default: { backgroundColor: '#ffffff', borderColor: '#E5E7EB', color: '#015023' },
+    yellow:  { backgroundColor: '#DABC4E', borderColor: '#DABC4E', color: '#015023' },
+    green:   { backgroundColor: '#015023', borderColor: '#015023', color: '#ffffff' },
+    sage:    { backgroundColor: '#E6EEE9', borderColor: '#D9E5DE', color: '#015023' },
   };
 
   return (
     <div
       data-slot="card"
       className={cn(
-        "flex flex-col gap-6 rounded-2xl border py-6 shadow-md transition-colors duration-200",
-        variantClasses[variant],
+        "flex flex-col gap-6 border py-6 shadow-sm transition-all duration-200",
         className
       )}
+      style={{
+        borderRadius: '16px',
+        fontFamily: 'Urbanist, system-ui, sans-serif',
+        ...(variantStyles[variant] || variantStyles.default),
+      }}
       {...props}
     />
   );

@@ -157,7 +157,7 @@ export default function Profil() {
   return (
     <div className="my-12">
       <div className="flex flex-col items-center pt-4 pb-16 px-4 sm:px-8 max-w-11/12 mx-auto">
-        <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
+        <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full pb-2" style={{ borderBottom: '2px solid #DABC4E', color: '#015023' }}>
           Profil Saya
         </h2>
         <div className="w-full h-full flex items-center justify-center relative flex-col gap-4 my-6">
@@ -188,7 +188,7 @@ export default function Profil() {
               <Button
                 type="button"
                 className="text-white font-semibold text-lg rounded-md cursor-pointer pointer-events-none"
-                variant={"green"}
+                variant={"primary"}
                 disabled={uploadAvatarMutation.isPending}
               >
                 {uploadAvatarMutation.isPending ? (
@@ -382,7 +382,8 @@ export default function Profil() {
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleSave}
-                className="bg-[var(--green)] hover:bg-[var(--green)]/90"
+                style={{ backgroundColor: '#015023', color: '#ffffff' }}
+                className="hover:opacity-90"
                 disabled={
                   changePasswordMutation.isLoading ||
                   changeEmailMutation.isLoading

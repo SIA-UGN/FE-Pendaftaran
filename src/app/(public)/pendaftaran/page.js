@@ -89,7 +89,7 @@ export default function PendaftaranPage() {
         <div className="w-full max-w-4xl px-6">
           <Button
             type="button"
-            variant="green"
+            variant="primary"
             className="w-full"
             onClick={handleContinue}
           >

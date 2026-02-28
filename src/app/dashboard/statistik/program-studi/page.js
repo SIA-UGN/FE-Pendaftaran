@@ -1,6 +1,5 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/Heading";
 import { useProgramStatistics } from "@/hooks/useAdmin";
 import { ChartPiePrograms } from "@/components/dashboard/ChartPiePrograms";
@@ -53,11 +52,12 @@ export default function Page() {
 
       <div className="grid grid-cols-1 w-full gap-3 sm:gap-4 lg:gap-6">
         {topPrograms.map((program, index) => (
-          <Card
-            className="flex items-start justify-center p-4 sm:p-5 lg:p-6 flex-col w-full stroke-black gap-2"
+          <div
+            className="flex items-start justify-center p-4 sm:p-5 lg:p-6 flex-col w-full gap-2"
+            style={{ backgroundColor: '#ffffff', border: '1px solid #E6EEE9', borderRadius: '16px' }}
             key={index}
           >
-            <span className="font-bold text-base sm:text-lg lg:text-xl text-[var(--green)]">
+            <span className="font-bold text-base sm:text-lg lg:text-xl" style={{ color: '#015023' }}>
               {program.program}
             </span>
             <span className="text-sm sm:text-base text-gray-500">
@@ -66,7 +66,7 @@ export default function Page() {
             <span className="text-xs sm:text-sm lg:text-base text-gray-500">
               {program.description}
             </span>
-          </Card>
+          </div>
         ))}
       </div>
     </div>

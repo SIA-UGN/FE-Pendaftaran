@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -146,7 +146,7 @@ function PageInner() {
             </Button>
             <Button
               type="submit"
-              variant="green"
+              variant="primary"
               className="w-full sm:w-40 lg:w-48 rounded-xl sm:rounded-2xl text-sm sm:text-base py-2 sm:py-3"
               disabled={updateUser.isPending}
             >
@@ -158,3 +158,4 @@ function PageInner() {
     </div>
   );
 }
+

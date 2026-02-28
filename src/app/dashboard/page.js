@@ -1,7 +1,6 @@
 "use client";
 
 import { MajorTable } from "@/components/MajorTable";
-import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/Heading";
 import { useAdminDashboard, useApplicantStatistics } from "@/hooks/useAdmin";
 import { StatCard } from "@/components/StatCard";

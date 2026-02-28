@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import ApplicantInformation from "@/components/dashboard/ApplicantInformation";
@@ -140,8 +140,8 @@ export default function Page() {
               <TabsTrigger
                 value="pendaftar"
                 className="rounded-full 
-                data-[state=active]:bg-green-800 
-                data-[state=active]:text-[var(--yellow)] 
+                data-[state=active]:bg-[#015023]
+                data-[state=active]:text-[#DABC4E]
                 data-[state=inactive]:text-gray-600
                 data-[state=inactive]:hover:text-gray-900
                 transition-all duration-200 cursor-pointer 
@@ -154,8 +154,8 @@ export default function Page() {
               <TabsTrigger
                 value="manajer"
                 className="rounded-full 
-                data-[state=active]:bg-green-800 
-                data-[state=active]:text-[var(--yellow)] 
+                data-[state=active]:bg-[#015023]
+                data-[state=active]:text-[#DABC4E]
                 data-[state=inactive]:text-gray-600
                 data-[state=inactive]:hover:text-gray-900
                 transition-all duration-200 cursor-pointer 
@@ -198,7 +198,7 @@ export default function Page() {
                     className="w-full sm:w-auto"
                   >
                     <Button
-                      variant="green"
+                      variant="primary"
                       className="w-full sm:w-auto rounded-lg px-6 py-2.5 sm:py-3 
                       text-sm sm:text-base font-medium
                       shadow-md hover:shadow-lg 
@@ -220,3 +220,4 @@ export default function Page() {
     </div>
   );
 }
+

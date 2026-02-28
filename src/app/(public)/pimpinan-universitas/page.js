@@ -80,7 +80,7 @@ export default function Pimpinan() {
               key={item.nama}
             >
               {/* Image Section */}
-              <div className="relative w-full md:w-80 lg:w-96 h-64 sm:h-80 md:h-96 rounded-xl overflow-hidden flex-shrink-0 shadow-md">
+              <div className="relative w-full md:w-80 lg:w-96 h-64 sm:h-80 md:h-96 overflow-hidden flex-shrink-0 shadow-md" style={{ borderRadius: '16px' }}>
                 <Image
                   src="/auth.png"
                   alt={item.nama}
@@ -92,12 +92,12 @@ export default function Pimpinan() {
               {/* Content Section */}
               <div className="flex flex-col gap-2 sm:gap-3 w-full">
                 {/* Nama */}
-                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[var(--green)] leading-tight">
+                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold leading-tight" style={{ color: '#015023' }}>
                   {item.nama}
                 </h3>
 
                 {/* Posisi */}
-                <p className="text-base sm:text-lg lg:text-xl font-semibold text-[var(--green)]">
+                <p className="text-base sm:text-lg lg:text-xl font-semibold" style={{ color: '#015023' }}>
                   {item.posisi}
                 </p>
 
@@ -112,7 +112,8 @@ export default function Pimpinan() {
                     <span className="font-medium">Contact:</span>{" "}
                     <a
                       href={`tel:${item.nomor}`}
-                      className="text-[var(--green)] hover:underline"
+                      className="hover:underline"
+                      style={{ color: '#015023' }}
                     >
                       {item.nomor}
                     </a>
@@ -121,7 +122,8 @@ export default function Pimpinan() {
                     <span className="font-medium">Email:</span>{" "}
                     <a
                       href={`mailto:${item.email}`}
-                      className="text-[var(--green)] hover:underline"
+                      className="hover:underline"
+                      style={{ color: '#015023' }}
                     >
                       {item.email}
                     </a>

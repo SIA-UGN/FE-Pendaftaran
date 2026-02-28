@@ -1,5 +1,3 @@
-import Image from "next/image";
-import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/Heading";
 
 export default function Ketentuan() {
@@ -7,7 +5,15 @@ export default function Ketentuan() {
     <div className="flex flex-col items-center pt-4 pb-6 max-w-11/12 w-full">
       <Heading title="Ketentuan" />
       <div className="flex gap-5 w-full">
-        <Card className="p-5">
+        <div
+          style={{
+            backgroundColor: '#ffffff',
+            border: '1px solid #E6EEE9',
+            borderRadius: '16px',
+            padding: '20px 24px',
+            width: '100%',
+          }}
+        >
           <ul className="list-disc list-inside space-y-4 text-gray-700 leading-relaxed">
             <li>
               Satu NIK hanya dapat dipakai untuk membuat satu akun pendaftaran.
@@ -49,14 +55,15 @@ export default function Ketentuan() {
               email ke{" "}
               <a
                 href="mailto:ugn@ugn.ac.id"
-                className="text-green-600 hover:underline"
+                className="hover:underline font-medium"
+                style={{ color: '#015023' }}
               >
                 ugn@ugn.ac.id
               </a>{" "}
               atau program studi tujuan Saudara.
             </li>
           </ul>
-        </Card>
+        </div>
       </div>
     </div>
   );

@@ -3,13 +3,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   AlertDialog,
   AlertDialogContent,
   AlertDialogDescription,
@@ -116,104 +109,114 @@ export default function ForgotPassword() {
   }
 
   return (
-    <div className="flex items-center gap-6 w-screen h-screen justify-center bg-[url('/auth.png')] bg-cover">
-      <Card className="w-3/4 max-w-11/12 flex flex-col md:flex-row gap-2 p-3 md:p-0 h-fit md:h-3/4 relative rounded-[5vw] bg-white justify-center items-center">
-        <div className="w-full md:w-3/8 min-h-fit h-11/10 bg-[var(--green)] hidden md:flex items-center justify-between flex-col px-4 md:gap-4 rounded-[5vw] md:absolute overflow-hidden left-md:[-10px] md:top-1/2 md:-translate-y-1/2 md:py-12 absolute left-0">
-          <div className="flex flex-row md:flex-col items-center gap-2 w-full h-3/4 justify-center abos">
-            <div className="relative w-32 h-32 sm:w-48 sm:h-48 md:w-60 md:h-60 lg:w-72 lg:h-72">
-              <Image
-                src="/logo.jpg"
-                alt="logo"
-                fill
-                style={{ objectFit: "contain" }}
-              />
+    <div
+      className="flex items-center justify-center w-screen min-h-screen bg-[url('/auth.png')] bg-cover bg-center"
+      style={{ fontFamily: 'Urbanist, system-ui, sans-serif' }}
+    >
+      {/* Card */}
+      <div
+        className="w-full max-w-4xl mx-4 flex flex-col md:flex-row overflow-hidden shadow-2xl"
+        style={{ borderRadius: '24px', minHeight: '480px' }}
+      >
+        {/* Left panel */}
+        <div
+          className="hidden md:flex flex-col items-center justify-between w-5/12 px-8 py-12 flex-shrink-0"
+          style={{ backgroundColor: '#015023' }}
+        >
+          <div className="flex flex-col items-center gap-4 flex-1 justify-center">
+            <div className="relative w-36 h-36">
+              <Image src="/logo.jpg" alt="logo" fill style={{ objectFit: 'contain' }} />
             </div>
-            <CardHeader className="text-[var(--cream)] text-center w-full p-0 scroll-m-20 text-lg md:text-3xl font-bold tracking-tight">
+            <h2 className="text-center font-bold text-xl leading-snug" style={{ color: '#DABC4E' }}>
               UNIVERSITAS GLOBAL NUSANTARA
-            </CardHeader>
+            </h2>
+            <p className="text-white/70 text-sm text-center mt-1">
+              Sistem Pendaftaran Mahasiswa Baru
+            </p>
           </div>
-          <div className="flex flex-row md:flex-col gap-2 w-full items-center h-1/4 justify-center">
-            <Link href="/login" className="w-8/10 flex-shrink">
-              <Button
-                variant={"yellow"}
-                className={
-                  "w-full rounded-full bg-[var(--light-cream)] text-[var(--green)] hover:bg-[var(--light-cream)]/80"
-                }
-              >
-                Login
+
+          <div className="flex flex-col w-full gap-3 mt-8">
+            <Link href="/login" className="w-full">
+              <Button variant="secondary" className="w-full font-semibold">
+                Masuk
               </Button>
             </Link>
-            <Link href="/register" className="w-8/10 flex-shrink">
+            <Link href="/register" className="w-full">
               <Button
-                variant={"yellow"}
-                className={
-                  "w-full rounded-full bg-white text-[var(--green)] hover:bg-white/80"
-                }
+                variant="outline"
+                className="w-full font-semibold"
+                style={{ borderColor: '#ffffff', color: '#ffffff', backgroundColor: 'transparent' }}
               >
-                Register
+                Daftar Sekarang
               </Button>
             </Link>
           </div>
         </div>
-        <div className="w-full flex items-center justify-end bg-white rounded-[5vw]">
-          <div className="py-6 w-full md:w-5/8 h-full flex flex-col justify-center gap-4 md:px-12">
-            <CardHeader className={"text-center"}>
-              <CardTitle
-                className={"font-bold text-2xl md:text-3xl text-[var(--green)]"}
+
+        {/* Right panel */}
+        <div className="flex-1 flex flex-col justify-center bg-white px-8 sm:px-12 py-10">
+          <div className="max-w-sm w-full mx-auto">
+            <h1 className="text-3xl font-bold mb-1" style={{ color: '#015023' }}>
+              Lupa Password
+            </h1>
+            <p className="text-gray-500 text-sm mb-8">
+              Masukkan email Anda untuk menerima kode verifikasi
+            </p>
+
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="email@example.com"
+                  required
+                />
+              </div>
+
+              <Button
+                type="submit"
+                variant="primary"
+                className="w-full font-semibold mt-1"
+                disabled={forgotPasswordMutation.isPending}
               >
-                Forgot Password
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form
-                onSubmit={handleSubmit}
-                className="grid gap-12 overflow-auto"
-              >
-                <div className="flex flex-col gap-6 w-full">
-                  <div className="grid gap-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="m@example.com"
-                      required
-                    />
-                  </div>
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full rounded-full text-white hover:text-white"
-                  variant="green"
-                  disabled={forgotPasswordMutation.isPending}
-                >
-                  {forgotPasswordMutation.isPending
-                    ? "Sending..."
-                    : "Send Verification Code"}
-                </Button>
-              </form>
-            </CardContent>
+                {forgotPasswordMutation.isPending ? "Mengirim..." : "Kirim Kode Verifikasi"}
+              </Button>
+            </form>
+
+            <div className="mt-6 flex flex-col items-center gap-2 text-sm">
+              <Link href="/login" className="font-semibold hover:underline" style={{ color: '#015023' }}>
+                ← Kembali ke Login
+              </Link>
+            </div>
           </div>
         </div>
-      </Card>
+      </div>
 
       <AlertDialog open={showDialog} onOpenChange={handleCloseDialog}>
-        <AlertDialogContent className="sm:max-w-md">
+        <AlertDialogContent
+          className="sm:max-w-md"
+          style={{ borderRadius: '16px', fontFamily: 'Urbanist, system-ui, sans-serif' }}
+        >
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-2xl font-bold text-[var(--green)]">
-              {step === 2 ? "Verify Code" : "Reset Password"}
+            <AlertDialogTitle
+              className="text-2xl font-bold"
+              style={{ color: '#015023' }}
+            >
+              {step === 2 ? "Verifikasi Kode" : "Reset Password"}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {step === 2
-                ? "Enter the 6-digit verification code sent to your email."
-                : "Enter your new password to complete the reset."}
+                ? "Masukkan kode verifikasi 6-digit yang dikirim ke email Anda."
+                : "Masukkan password baru Anda untuk menyelesaikan proses reset."}
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           {step === 2 && (
             <form onSubmit={handleVerifyCode} className="grid gap-4 mt-4">
-              <div className="grid gap-2">
+              <div className="flex flex-col gap-1.5">
                 <Label htmlFor="dialog-email">Email</Label>
                 <Input
                   id="dialog-email"
@@ -223,8 +226,8 @@ export default function ForgotPassword() {
                   className="bg-gray-100"
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="code">Verification Code</Label>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="code">Kode Verifikasi</Label>
                 <Input
                   id="code"
                   type="text"
@@ -233,31 +236,21 @@ export default function ForgotPassword() {
                     const value = e.target.value.replace(/\D/g, "").slice(0, 6);
                     setCode(value);
                   }}
-                  placeholder="Enter 6-digit code"
+                  placeholder="Masukkan kode 6-digit"
                   maxLength={6}
                   className="text-center text-2xl tracking-widest"
                   required
                 />
                 <p className="text-xs text-gray-500 text-center">
-                  Please check your email for the verification code
+                  Periksa kotak masuk email Anda
                 </p>
               </div>
-              <div className="flex gap-2 mt-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCloseDialog}
-                  className="flex-1"
-                >
-                  Cancel
+              <div className="flex gap-3 mt-2">
+                <Button type="button" variant="outline" onClick={handleCloseDialog} className="flex-1">
+                  Batal
                 </Button>
-                <Button
-                  type="submit"
-                  variant="green"
-                  className="flex-1 text-white"
-                  disabled={code.length !== 6}
-                >
-                  Verify Code
+                <Button type="submit" variant="primary" className="flex-1" disabled={code.length !== 6}>
+                  Verifikasi
                 </Button>
               </div>
             </form>
@@ -265,46 +258,39 @@ export default function ForgotPassword() {
 
           {step === 3 && (
             <form onSubmit={handleResetPassword} className="grid gap-4 mt-4">
-              <div className="grid gap-2">
-                <Label htmlFor="new-password">New Password</Label>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="new-password">Password Baru</Label>
                 <Input
                   id="new-password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter new password"
+                  placeholder="Masukkan password baru"
                   required
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="confirm-password">Confirm Password</Label>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="confirm-password">Konfirmasi Password</Label>
                 <Input
                   id="confirm-password"
                   type="password"
                   value={passwordConfirmation}
                   onChange={(e) => setPasswordConfirmation(e.target.value)}
-                  placeholder="Confirm new password"
+                  placeholder="Ulangi password baru"
                   required
                 />
               </div>
-              <div className="flex gap-2 mt-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCloseDialog}
-                  className="flex-1"
-                >
-                  Cancel
+              <div className="flex gap-3 mt-2">
+                <Button type="button" variant="outline" onClick={handleCloseDialog} className="flex-1">
+                  Batal
                 </Button>
                 <Button
                   type="submit"
-                  variant="green"
-                  className="flex-1 text-white"
+                  variant="primary"
+                  className="flex-1"
                   disabled={resetPasswordMutation.isPending}
                 >
-                  {resetPasswordMutation.isPending
-                    ? "Resetting..."
-                    : "Reset Password"}
+                  {resetPasswordMutation.isPending ? "Memproses..." : "Reset Password"}
                 </Button>
               </div>
             </form>

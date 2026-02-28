@@ -39,6 +39,18 @@ export default function Navbar() {
   const [user, setUser] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mobileProfilOpen, setMobileProfilOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    const handleResize = () => { if (window.innerWidth >= 768) setIsMobileMenuOpen(false); };
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const shouldFetchNotifications = isLoggedIn && user?.role === "pendaftar";
   const {
@@ -124,8 +136,29 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="w-full flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-12 bg-[var(--green)] z-[1000] fixed top-0 border-b-2 border-[var(--yellow)]">
-      <div className="py-3 sm:py-4 flex items-center gap-2 sm:gap-3">
+    <div
+      className={cn(
+        "w-full transition-all duration-300",
+        isScrolled
+          ? "fixed top-0 left-0 right-0 z-[1000] py-3 sm:py-4"
+          : "relative"
+      )}
+    >
+    <nav
+      className={cn(
+        "w-full flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-12 transition-all duration-300 ease-in-out",
+        isScrolled
+          ? "mx-auto rounded-[12px] sm:rounded-[18px] max-w-[calc(100%-2rem)] sm:max-w-[calc(100%-3rem)] lg:max-w-[calc(100%-4rem)]"
+          : "rounded-b-[16px] sm:rounded-b-[20px]"
+      )}
+      style={{
+        backgroundColor: '#015023',
+        boxShadow: isScrolled
+          ? '0 10px 40px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.1)'
+          : '0 4px 16px rgba(0,0,0,0.18)'
+      }}
+    >
+      <div className="py-1 sm:py-1 flex items-center gap-2 sm:gap-3">
         <Link href="/" className="flex items-center gap-2 sm:gap-3">
           <Image
             src="/logo.svg"
@@ -194,57 +227,28 @@ export default function Navbar() {
                   Profil
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <ul className="grid w-[200px] gap-4 text-center">
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link
-                          href="/sejarah"
-                          className={cn(
-                            "block py-2 hover:bg-[var(--yellow)]/10 rounded transition-colors",
-                            isActivePath("/sejarah") &&
-                              "bg-[var(--yellow)]/20 font-semibold"
-                          )}
-                        >
-                          Sejarah
-                        </Link>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <Link
-                          href="/visi-misi"
-                          className={cn(
-                            "block py-2 hover:bg-[var(--yellow)]/10 rounded transition-colors",
-                            isActivePath("/visi-misi") &&
-                              "bg-[var(--yellow)]/20 font-semibold"
-                          )}
-                        >
-                          Visi-Misi
-                        </Link>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <Link
-                          href="/pimpinan-universitas"
-                          className={cn(
-                            "block py-2 hover:bg-[var(--yellow)]/10 rounded transition-colors",
-                            isActivePath("/pimpinan-universitas") &&
-                              "bg-[var(--yellow)]/20 font-semibold"
-                          )}
-                        >
-                          Pimpinan Universitas
-                        </Link>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <Link
-                          href="/fakultas"
-                          className={cn(
-                            "block py-2 hover:bg-[var(--yellow)]/10 rounded transition-colors",
-                            isActivePath("/fakultas") &&
-                              "bg-[var(--yellow)]/20 font-semibold"
-                          )}
-                        >
-                          Fakultas
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
+                  <ul className="w-[200px] p-1.5">
+                    {[
+                      { href: '/sejarah',              label: 'Sejarah' },
+                      { href: '/visi-misi',            label: 'Visi & Misi' },
+                      { href: '/pimpinan-universitas', label: 'Pimpinan Universitas' },
+                      { href: '/fakultas',             label: 'Fakultas' },
+                    ].map(({ href, label }) => (
+                      <li key={href}>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            href={href}
+                            className={cn(
+                              'block px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-150',
+                              'text-white/80 hover:text-white hover:bg-white/10',
+                              isActivePath(href) && 'text-[#DABC4E] bg-[#DABC4E]/10 font-semibold'
+                            )}
+                          >
+                            {label}
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    ))}
                   </ul>
                 </NavigationMenuContent>
               </NavigationMenuItem>
@@ -351,7 +355,7 @@ export default function Navbar() {
           ) : (
             <Link
               href="/login"
-              className="text-[var(--cream)] font-bold text-md hover:bg-[var(--yellow)] px-4 py-2 bg-white rounded-lg hover:text-white"
+              className="text-[var(--green)] font-semibold text-sm hover:opacity-90 px-5 py-2 bg-[var(--yellow)] rounded-xl transition-all duration-200 shadow-sm"
             >
               Login
             </Link>
@@ -468,5 +472,6 @@ export default function Navbar() {
         )}
       </AnimatePresence>
     </nav>
+    </div>
   );
 }

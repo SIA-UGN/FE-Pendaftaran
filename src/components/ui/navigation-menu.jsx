@@ -51,7 +51,7 @@ function NavigationMenuItem({
 }
 
 const navigationMenuTriggerStyle = cva(
-  "group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-md font-medium text-white hover:bg-[var(--yellow)] hover:text-white focus-visible:ring-white/50 transition-colors focus-visible:ring-[3px] outline-none"
+  "group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-md font-medium text-white hover:bg-[var(--yellow)] hover:text-[var(--green)] focus-visible:ring-white/50 transition-colors focus-visible:ring-[3px] outline-none font-urbanist"
 )
 
 function NavigationMenuTrigger({
@@ -98,9 +98,10 @@ function NavigationMenuViewport({
       <NavigationMenuPrimitive.Viewport
         data-slot="navigation-menu-viewport"
         className={cn(
-          "origin-top-center bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border shadow md:w-[var(--radix-navigation-menu-viewport-width)]",
+          "origin-top-center data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 relative mt-2 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-xl shadow-2xl md:w-[var(--radix-navigation-menu-viewport-width)]",
           className
         )}
+        style={{ backgroundColor: '#013d1b', border: '1px solid rgba(218,188,78,0.3)' }}
         {...props} />
     </div>
   );

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import Link from "next/link";
 
-import { Card } from "@/components/ui/card";
 
 export default function ConfirmDialogClient() {
   const [firstOpen, setFirstOpen] = useState(false);
@@ -42,7 +41,7 @@ export default function ConfirmDialogClient() {
           <AlertDialogFooter>
             <AlertDialogCancel>Batal</AlertDialogCancel>
             <Button
-              variant="green"
+              variant="primary"
               onClick={() => {
                 setFirstOpen(false);
                 setTimeout(() => setSecondOpen(true), 200);
@@ -64,11 +63,12 @@ export default function ConfirmDialogClient() {
               nomor peserta anda.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <Card
-            className={"p-4 font-bold text-lg text-[var(--green)] text-center"}
+          <div
+            className="p-4 font-bold text-lg text-center"
+            style={{ backgroundColor: '#E6EEE9', borderRadius: '12px', color: '#015023' }}
           >
             140072569877
-          </Card>
+          </div>
 
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setSecondOpen(false)}>
@@ -85,3 +85,4 @@ export default function ConfirmDialogClient() {
     </>
   );
 }
+

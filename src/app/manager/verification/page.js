@@ -3,7 +3,6 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import Image from "next/image";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import TextareaAutosize from "react-textarea-autosize";
@@ -87,11 +86,11 @@ function ProfileInner() {
 
   return (
     <div className="flex flex-col items-center px-4 sm:px-8 max-w-11/12 my-12 w-full gap-3 mx-auto">
-      <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
+      <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[\#015023]">
         Akun Pendaftar
       </h2>
 
-      <Card className="w-full flex flex-col md:flex-row gap-6 p-8 rounded-2xl shadow-md bg-white">
+      <div className="w-full flex flex-col md:flex-row gap-6 p-8" style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #E6EEE9' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           alt="Profile banner"
@@ -109,30 +108,30 @@ function ProfileInner() {
           <p className="text-gray-500">{applicant.user.email}</p>
           <p className="text-gray-500">{applicant.program.name_program}</p>
         </div>
-      </Card>
+      </div>
 
       {(applicant.profile.registration_status === "pending" ||
         applicant.profile.registration_status === "revision_needed" ||
         applicant.profile.registration_status === "under_review" ||
         applicant.profile.registration_status === "submitted") && (
         <>
-          <h2 className="text-3xl sm:text-2xl font-semibold mb-2 mt-6 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
+          <h2 className="text-3xl sm:text-2xl font-semibold mb-2 mt-6 w-full border-b-1 border-gray-500 pb-2 text-[\#015023]">
             Status Verifikasi Pendaftar
           </h2>
 
           <div className="w-full">
-            <Button variant="green" className="w-full" disabled>
+            <Button variant="primary" className="w-full" disabled>
               Pending
             </Button>
           </div>
 
           <div className="w-full flex justify-end">
             <Link href={`/manager/verification/data-diri?id=${id}`}>
-              <Button variant="green">Verifikasi Data</Button>
+              <Button variant="primary">Verifikasi Data</Button>
             </Link>
           </div>
 
-          <h2 className="text-3xl sm:text-2xl font-semibold mb-2 mt-6 w-full border-b-1 border-gray-500 pb-2 text-[var(--green)]">
+          <h2 className="text-3xl sm:text-2xl font-semibold mb-2 mt-6 w-full border-b-1 border-gray-500 pb-2 text-[\#015023]">
             Status Kelulusan Pendaftar
           </h2>
 
@@ -163,7 +162,7 @@ function ProfileInner() {
       {applicant.profile.registration_status === "approved" && (
         <>
           <h2 className="text-xl font-semibold mt-6">Status Verifikasi</h2>
-          <Button variant="green" className="w-full" disabled>
+          <Button variant="primary" className="w-full" disabled>
             Accepted
           </Button>
           {(() => {
@@ -181,7 +180,7 @@ function ProfileInner() {
 
                 <div className="w-lg flex flex-col gap-2">
                   <Link href={`/manager/verification/data-diri?id=${id}`}>
-                    <Button variant="green" className="w-full">
+                    <Button variant="primary" className="w-full">
                       Lihat Data
                     </Button>
                   </Link>
@@ -210,3 +209,4 @@ function ProfileInner() {
     </div>
   );
 }
+

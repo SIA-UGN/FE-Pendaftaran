@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import { Heading } from "@/components/Heading";
 import { useDeleteManager, useManagers } from "@/hooks/useAdmin";
@@ -66,7 +65,7 @@ function ProfileInner() {
       <Heading title="Akun Manajer" variant="first" />
 
       {/* Profile Card */}
-      <Card className="w-full flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl shadow-md bg-[var(--light-cream)]/50">
+      <div className="w-full flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8" style={{ backgroundColor: '#E6EEE9', borderRadius: '16px', border: '1px solid #D9E5DE' }}>
         <Image
           alt={`Profile picture of ${managerData.name}`}
           src={managerData.avatar_url || "/default-avatar.png"}
@@ -88,7 +87,7 @@ function ProfileInner() {
             {managerData.phone || "Tidak ada nomor telepon"}
           </p>
         </div>
-      </Card>
+      </div>
 
       {/* Kelola Akun */}
       <Heading title="Kelola Akun" />

@@ -1,6 +1,5 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
 import { ChartPieApplicant } from "@/components/dashboard/ChartPieApplicant";
 import { Heading } from "@/components/Heading";
 import { StatCard } from "@/components/StatCard";

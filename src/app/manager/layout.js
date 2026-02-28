@@ -32,15 +32,19 @@ export default function DashboardLayout({ children }) {
     <SidebarProvider>
       <ManagerSidebar />
       <SidebarInset>
-        <header className="flex h-18 items-center gap-6 px-4 border-b bg-white fixed w-full z-10">
-          <SidebarTrigger className="-ml-1 text-xl" />
-          <Separator orientation="vertical" className="h-4 m-0 mx-2" />
+        <header
+          className="flex h-16 items-center gap-4 px-4 border-b fixed w-full z-10"
+          style={{ backgroundColor: '#015023', borderColor: '#DABC4E', fontFamily: 'Urbanist, system-ui, sans-serif' }}
+        >
+          <SidebarTrigger className="-ml-1 text-white hover:text-[#DABC4E]" />
+          <Separator orientation="vertical" className="h-4 m-0" style={{ backgroundColor: 'rgba(218,188,78,0.4)' }} />
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
                 <BreadcrumbLink
                   href={pathname}
-                  className="font-semibold text-2xl text-[var(--green)]"
+                  className="font-semibold text-xl"
+                  style={{ color: '#DABC4E' }}
                 >
                   {pageTitle}
                 </BreadcrumbLink>
@@ -50,7 +54,10 @@ export default function DashboardLayout({ children }) {
           </Breadcrumb>
         </header>
 
-        <main className="flex flex-1 flex-col gap-4 p-4 pt-0 bg-[var(--green-background)] min-h-screen mt-18">
+        <main
+          className="flex flex-1 flex-col gap-4 p-4 pt-0 min-h-screen mt-16"
+          style={{ backgroundColor: '#E6EEE9', fontFamily: 'Urbanist, system-ui, sans-serif' }}
+        >
           {children}
         </main>
       </SidebarInset>

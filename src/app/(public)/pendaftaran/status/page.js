@@ -1,8 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import RegistrationProgress from "@/components/registrations/RegistrationProgress";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Clock } from "lucide-react";
 import { useMyRegistration } from "@/hooks/useRegistration";
@@ -166,7 +165,7 @@ export default function Status() {
         {status === "Lulus" && (
           <div className="flex flex-col gap-5 items-center justify-center">
             <p className="bg-green-700 font-bold text-lg w-full p-4 text-center text-white rounded-t-lg">
-              Selamat! 🎉
+              Selamat! ðŸŽ‰
             </p>
             <p className="mt-6 text-center text-lg">
               Anda dinyatakan{" "}
@@ -202,7 +201,7 @@ export default function Status() {
             </p>
             <ApplicantAnnouncement status="Tidak Lulus" />
             <p className="mt-4 text-gray-700">
-              Jangan Putus Asa dan Tetap Semangat! 💪
+              Jangan Putus Asa dan Tetap Semangat! ðŸ’ª
             </p>
             <div className="flex gap-5 w-full justify-end mt-6">
               <Link href="/">
@@ -246,7 +245,7 @@ export default function Status() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Card Status Pendaftaran */}
-              <Card className="p-6 shadow-lg">
+              <div className="p-6" style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #E6EEE9' }}>
                 <div className="flex flex-col items-center gap-4">
                   {getStatusIcon(registrationStatus)}
                   <div className="text-center">
@@ -279,10 +278,10 @@ export default function Status() {
                       </div>
                     )}
                 </div>
-              </Card>
+              </div>
 
               {/* Card Status Pembayaran */}
-              <Card className="p-6 shadow-lg">
+              <div className="p-6" style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #E6EEE9' }}>
                 <div className="flex flex-col items-center gap-4">
                   {getStatusIcon(paymentStatus)}
                   <div className="text-center">
@@ -328,7 +327,7 @@ export default function Status() {
                     </div>
                   )}
                 </div>
-              </Card>
+              </div>
             </div>
 
             <div className="mt-8 flex justify-between">
@@ -336,7 +335,7 @@ export default function Status() {
                 Kembali
               </Button>
               <Link href="/pendaftaran/pembayaran">
-                <Button variant="green">Lihat Detail Pembayaran</Button>
+                <Button variant="primary">Lihat Detail Pembayaran</Button>
               </Link>
             </div>
           </>
@@ -368,3 +367,4 @@ export default function Status() {
     </div>
   );
 }
+

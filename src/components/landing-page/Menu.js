@@ -1,56 +1,58 @@
-import { Card } from "@/components/ui/card";
-
 import { GraduationCap, School, NotepadText } from "lucide-react";
-
 import Link from "next/link";
+
+const menuItems = [
+  {
+    href: "/sejarah",
+    icon: GraduationCap,
+    title: "Profil",
+    desc: "Temukan informasi lengkap mengenai sejarah, visi dan misi, serta nilai-nilai yang menjadi dasar kampus kami.",
+  },
+  {
+    href: "/fakultas",
+    icon: School,
+    title: "Fakultas",
+    desc: "Jelajahi berbagai fakultas dan program studi yang tersedia.",
+  },
+  {
+    href: "/pendaftaran",
+    icon: NotepadText,
+    title: "Pendaftaran",
+    desc: "Dapatkan informasi seputar persyaratan, alur pendaftaran, serta jadwal penting penerimaan mahasiswa baru.",
+    colSpan: true,
+  },
+];
 
 export default function Menu() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto my-3 py-8 sm:py-10 lg:py-12">
-      <Link href="/sejarah">
-        <Card className="flex items-center justify-center p-6 sm:p-8 flex-col w-full mx-auto cursor-pointer gap-2 hover:shadow-lg transition-shadow">
-          <GraduationCap
-            size={60}
-            className="sm:w-[70px] sm:h-[70px] lg:w-[80px] lg:h-[80px] stroke-1 text-[var(--green)]"
-          />
-          <span className="text-2xl sm:text-3xl font-medium text-[var(--green)] text-center">
-            Profil
-          </span>
-          <p className="text-gray-500 text-center text-xs sm:text-sm leading-relaxed">
-            Temukan informasi lengkap mengenai sejarah, visi dan misi, serta
-            nilai-nilai yang menjadi dasar kampus kami.
-          </p>
-        </Card>
-      </Link>
-      <Link href="/fakultas">
-        <Card className="flex items-center justify-center p-6 sm:p-8 flex-col w-full mx-auto cursor-pointer gap-2 hover:shadow-lg transition-shadow">
-          <School
-            size={60}
-            className="sm:w-[70px] sm:h-[70px] lg:w-[80px] lg:h-[80px] stroke-1 text-[var(--green)]"
-          />
-          <span className="text-2xl sm:text-3xl font-medium text-[var(--green)] text-center">
-            Fakultas
-          </span>
-          <p className="text-gray-500 text-center text-xs sm:text-sm  leading-relaxed">
-            Jelajahi berbagai fakultas dan program studi yang tersedia.
-          </p>
-        </Card>
-      </Link>
-      <Link href="/pendaftaran">
-        <Card className="flex items-center justify-center p-6 sm:p-8 flex-col mx-auto w-full stroke-black cursor-pointer gap-2 hover:shadow-lg transition-shadow sm:col-span-2 lg:col-span-1">
-          <NotepadText
-            size={60}
-            className="sm:w-[70px] sm:h-[70px] lg:w-[80px] lg:h-[80px] stroke-1 text-[var(--green)]"
-          />
-          <span className="text-2xl sm:text-3xl font-medium text-[var(--green)] text-center">
-            Pendaftaran
-          </span>
-          <p className="text-gray-500 text-center text-xs sm:text-sm leading-relaxed">
-            Dapatkan informasi seputar persyaratan, alur pendaftaran, serta
-            jadwal penting penerimaan mahasiswa baru.
-          </p>
-        </Card>
-      </Link>
-    </div>
+    <section
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto py-10 sm:py-14"
+      style={{ fontFamily: 'Urbanist, system-ui, sans-serif' }}
+    >
+      {menuItems.map(({ href, icon: Icon, title, desc, colSpan }) => (
+        <Link
+          key={href}
+          href={href}
+          className={`group focus:outline-none ${colSpan ? 'sm:col-span-2 lg:col-span-1' : ''}`}
+        >
+          <div
+            className="flex flex-col items-center justify-center p-7 sm:p-8 w-full h-full gap-3 rounded-2xl border bg-white transition-all duration-200 hover:shadow-lg hover:-translate-y-1 focus-within:ring-2 border-[#E6EEE9] hover:border-[#DABC4E] hover:bg-[#E6EEE9]"
+          >
+            <div
+              className="p-4 rounded-2xl"
+              style={{ backgroundColor: '#E6EEE9' }}
+            >
+              <Icon size={44} className="stroke-1" style={{ color: '#015023' }} />
+            </div>
+            <span className="text-xl sm:text-2xl font-bold text-center" style={{ color: '#015023' }}>
+              {title}
+            </span>
+            <p className="text-gray-500 text-center text-sm leading-relaxed">
+              {desc}
+            </p>
+          </div>
+        </Link>
+      ))}
+    </section>
   );
 }

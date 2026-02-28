@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   Form,
@@ -136,7 +136,7 @@ export default function TambahMetodePembayaran() {
 
               <Button
                 type="submit"
-                variant="green"
+                variant="primary"
                 className="w-40 rounded-2xl"
                 disabled={isLoading}
               >
@@ -149,3 +149,4 @@ export default function TambahMetodePembayaran() {
     </div>
   );
 }
+

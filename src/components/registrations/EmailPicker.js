@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Card } from "@/components/ui/card";
+
 import { Button } from "@/components/ui/button";
 import {
   useEmailFormatOptions,
@@ -46,11 +46,11 @@ export default function EmailPicker() {
   if (hasOfficialEmail && officialEmail) {
     return (
       <>
-        <h2 className="text-3xl sm:text-2xl font-semibold w-full border-b-1 border-gray-500 pb-2 text-[var(--green)] mt-12">
+        <h2 className="text-3xl sm:text-2xl font-semibold w-full pb-2 mt-12" style={{ borderBottom: "2px solid #DABC4E", color: "#015023" }}>
           Email Mahasiswa
         </h2>
 
-        <Card className="p-6 w-full">
+        <div className="p-6 w-full" style={{ backgroundColor: "#ffffff", border: "1px solid #E6EEE9", borderRadius: "16px" }}>
           <div className="flex items-center gap-3 mb-4">
             <CheckCircle2 className="text-green-600 w-8 h-8" />
             <div>
@@ -75,7 +75,7 @@ export default function EmailPicker() {
               Kredensial login telah dikirim ke email pribadi Anda
             </p>
           </div>
-        </Card>
+        </div>
       </>
     );
   }
@@ -84,7 +84,7 @@ export default function EmailPicker() {
   if (isLoadingOptions) {
     return (
       <>
-        <h2 className="text-3xl sm:text-2xl font-semibold w-full border-b-1 border-gray-500 pb-2 text-[var(--green)] mt-12">
+        <h2 className="text-3xl sm:text-2xl font-semibold w-full pb-2 mt-12" style={{ borderBottom: "2px solid #DABC4E", color: "#015023" }}>
           Email Pendaftar
         </h2>
         <div className="flex items-center justify-center w-full py-8">
@@ -97,7 +97,7 @@ export default function EmailPicker() {
 
   return (
     <>
-      <h2 className="text-3xl sm:text-2xl font-semibold w-full border-b-1 border-gray-500 pb-2 text-[var(--green)] mt-12">
+      <h2 className="text-3xl sm:text-2xl font-semibold w-full pb-2 mt-12" style={{ borderBottom: "2px solid #DABC4E", color: "#015023" }}>
         Email Pendaftar
       </h2>
       <p className="w-full">
@@ -105,7 +105,7 @@ export default function EmailPicker() {
         mahasiswa!
       </p>
 
-      <Card className="p-4 w-full space-y-2">
+      <div className="p-4 w-full space-y-2" style={{ backgroundColor: "#ffffff", border: "1px solid #E6EEE9", borderRadius: "16px" }}>
         {formatOptions.map((option, index) => (
           <div
             key={index}
@@ -137,7 +137,7 @@ export default function EmailPicker() {
             </div>
           </div>
         ))}
-      </Card>
+      </div>
 
       {selectedFormat && (
         <div className="w-full space-y-3">
@@ -151,7 +151,7 @@ export default function EmailPicker() {
           <Button
             onClick={handleCreateEmail}
             disabled={isCreating}
-            variant="green"
+            variant="primary"
             className="w-full sm:w-auto"
           >
             {isCreating ? (
@@ -168,3 +168,6 @@ export default function EmailPicker() {
     </>
   );
 }
+
+
+

@@ -5,33 +5,32 @@ import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive cursor-pointer",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors duration-200 disabled:pointer-events-none disabled:opacity-50 cursor-pointer font-urbanist",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        green: "bg-[var(--green)] text-white hover:bg-[var(--green)]/90 focus-visible:ring-[var(--green-foreground)] rounded-full text-[var(--yellow)]",
-        yellow: "bg-[var(--yellow)] text-white hover:bg-[var(--yellow)]/90 focus-visible:ring-[var(--yellow-foreground)] rounded-full text-[var(--green)]",
-        white: "bg-white text-black hover:bg-white/90 focus-visible:ring-white/90",
-        succed: "bg-green-600 text-white rounded-full",
-        destructive:
-          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
-        outline:
-          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost:
-          "",
-        link: "text-primary underline-offset-4 hover:underline",
-        matcha:
-          "bg-[#B0C9BB] hover:bg-[#B0C9BB]/80 hover:text-accent-foreground dark:hover:[#B0C9BB]/50 rounded-full",
-        link: "text-primary underline-offset-4 hover:underline "
+        // Fe-SIA-UGN compatible variants
+        default:     "text-white hover:opacity-90",
+        primary:     "text-white hover:opacity-90",
+        secondary:   "text-white hover:opacity-90",
+        warning:     "text-white hover:opacity-90",
+        success:     "text-white hover:opacity-90",
+        destructive: "text-white hover:opacity-90",
+        outline:     "border-2 bg-transparent hover:opacity-90",
+        ghost:       "bg-transparent hover:opacity-90",
+        link:        "underline-offset-4 hover:underline bg-transparent",
+        // Legacy aliases kept for backward compatibility
+        green:       "text-white hover:opacity-90",
+        yellow:      "hover:opacity-90",
+        white:       "text-black hover:opacity-90",
+        succed:      "text-white hover:opacity-90",
+        matcha:      "hover:opacity-90",
       },
       size: {
-        default: "h-9 px-4 py-2 has-[>svg]:px-3",
-        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
-        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
-        icon: "size-9",
+        default: "h-12 px-4 py-2 has-[>svg]:px-3",
+        sm:      "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
+        lg:      "h-10 rounded-md px-6 has-[>svg]:px-4",
+        icon:    "size-9",
       },
     },
     defaultVariants: {
@@ -43,19 +42,86 @@ const buttonVariants = cva(
 
 function Button({
   className,
-  variant,
+  variant = "default",
   size,
   asChild = false,
+  style,
   ...props
 }) {
   const Comp = asChild ? Slot : "button"
 
+  // Inline styles matching Fe-SIA-UGN's brand color system
+  const getCustomStyle = (variant) => {
+    const baseStyle = { borderRadius: '12px', fontFamily: 'Urbanist, system-ui, sans-serif' }
+    const styles = {
+      default:     { ...baseStyle, backgroundColor: '#015023', color: '#ffffff' },
+      primary:     { ...baseStyle, backgroundColor: '#015023', color: '#ffffff' },
+      secondary:   { ...baseStyle, backgroundColor: '#DABC4E', color: '#015023' },
+      warning:     { ...baseStyle, backgroundColor: '#BE0414', color: '#ffffff' },
+      destructive: { ...baseStyle, backgroundColor: '#BE0414', color: '#ffffff' },
+      success:     { ...baseStyle, backgroundColor: '#16874B', color: '#ffffff' },
+      succed:      { ...baseStyle, backgroundColor: '#16874B', color: '#ffffff' },
+      outline:     { ...baseStyle, borderColor: '#015023', color: '#015023', backgroundColor: 'transparent' },
+      ghost:       { ...baseStyle, backgroundColor: 'transparent', color: '#015023' },
+      link:        { borderRadius: '0', backgroundColor: 'transparent', color: '#015023', fontFamily: 'Urbanist, system-ui, sans-serif' },
+      // Legacy
+      green:       { ...baseStyle, backgroundColor: '#015023', color: '#DABC4E' },
+      yellow:      { ...baseStyle, backgroundColor: '#DABC4E', color: '#015023' },
+      white:       { ...baseStyle, backgroundColor: '#ffffff', color: '#015023' },
+      matcha:      { ...baseStyle, backgroundColor: '#B0C9BB', color: '#015023' },
+    }
+    return styles[variant] || styles.default
+  }
+
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props} />
+      className={cn(buttonVariants({ variant, size }), className)}
+      style={{ ...getCustomStyle(variant), ...style }}
+      {...props}
+    />
   );
 }
 
-export { Button, buttonVariants }
+// Convenience components matching Fe-SIA-UGN pattern
+const PrimaryButton = React.forwardRef((props, ref) => (
+  <Button ref={ref} variant="primary" {...props} />
+))
+
+const SecondaryButton = React.forwardRef((props, ref) => (
+  <Button ref={ref} variant="secondary" {...props} />
+))
+
+const WarningButton = React.forwardRef((props, ref) => (
+  <Button ref={ref} variant="warning" {...props} />
+))
+
+const SuccessButton = React.forwardRef((props, ref) => (
+  <Button ref={ref} variant="success" {...props} />
+))
+
+const OutlineButton = React.forwardRef((props, ref) => (
+  <Button ref={ref} variant="outline" {...props} />
+))
+
+const GhostButton = React.forwardRef((props, ref) => (
+  <Button ref={ref} variant="ghost" {...props} />
+))
+
+PrimaryButton.displayName = "PrimaryButton"
+SecondaryButton.displayName = "SecondaryButton"
+WarningButton.displayName = "WarningButton"
+SuccessButton.displayName = "SuccessButton"
+OutlineButton.displayName = "OutlineButton"
+GhostButton.displayName = "GhostButton"
+
+export {
+  Button,
+  buttonVariants,
+  PrimaryButton,
+  SecondaryButton,
+  WarningButton,
+  SuccessButton,
+  OutlineButton,
+  GhostButton
+}

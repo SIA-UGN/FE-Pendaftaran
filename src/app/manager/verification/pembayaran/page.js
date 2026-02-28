@@ -8,7 +8,6 @@ import { z } from "zod";
 import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -207,8 +206,8 @@ function PembayaranInner() {
     <div className="w-full w-max-6xl px-6 md:px-12">
       <Heading title="Pembayaran" />
       <Heading title={"Rincian Pembayaran"} />
-      <Card className={"mx-0 md:mx-12 p-6 gap-0"}>
-        <h1 className="font-bold text-lg text-[var(--green)] mb-4">
+      <div className="mx-0 md:mx-12 p-6" style={{ backgroundColor: '#E6EEE9', borderRadius: '16px', border: '1px solid #D9E5DE' }}>
+          <h1 className="font-bold text-lg mb-4" style={{ color: '#015023' }}>
           Ringkasan Pembayaran
         </h1>
         <div className="ms-6 gap-4">
@@ -217,7 +216,7 @@ function PembayaranInner() {
           <p>{paymentData.paid_amount}</p>
           <p>{paymentData.payment_method.account_holder}</p>
         </div>
-      </Card>
+      </div>
 
       <Heading title="Bukti Pembayaran" />
       <div className="mx-0 md:mx-12 items-center flex justify-center">

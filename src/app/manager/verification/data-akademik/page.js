@@ -27,7 +27,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import RegistrationProgress from "@/components/registrations/RegistrationProgress";
 
-import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -152,7 +151,7 @@ function DataAkademikInner() {
   return (
     <>
       <div className="mx-3 md:mx-12 mt-6 grid grid-cols-1 gap-12">
-        <Card className="w-full flex flex-col md:flex-row gap-6 p-8 rounded-2xl shadow-md bg-[var(--light-cream)] justify-between">
+        <div className="w-full flex flex-col md:flex-row gap-6 p-8 justify-between" style={{ backgroundColor: '#E6EEE9', borderRadius: '16px', border: '1px solid #D9E5DE' }}>
           <div className="flex flex-col p-2 w-full sm:w-2/3 space-y-1 items-start">
             <h2 className="font-bold text-xl">{applicant.user.name}</h2>
             <h3 className="text-gray-500">
@@ -161,7 +160,7 @@ function DataAkademikInner() {
             <p className="text-gray-500">{applicant.user.email}</p>
           </div>
           <Button variant={"yellow"}>{applicant.user.status}</Button>
-        </Card>
+        </div>
 
         <div className="flex items-center gap-2 pb-0">
           <CheckCircle className="text-green-500" />

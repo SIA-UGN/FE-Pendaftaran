@@ -148,12 +148,12 @@ export function AnnouncementTable({ data }) {
       {/* Desktop Table */}
       <div className="hidden md:block overflow-hidden rounded-md border">
         <Table>
-          <TableHeader>
+          <TableHeader style={{ backgroundColor: '#015023' }}>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="text-white">
                       {header.isPlaceholder
                         ? null
                         : flexRender(

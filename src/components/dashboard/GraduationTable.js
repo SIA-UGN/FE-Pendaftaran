@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import {
@@ -155,7 +155,7 @@ export function GraduationTable({ data, type }) {
       {/* Desktop Table */}
       <div className="hidden md:block overflow-hidden rounded-md border">
         <Table>
-          <TableHeader>
+          <TableHeader style={{ backgroundColor: "#015023" }}>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -324,3 +324,4 @@ export function GraduationTable({ data, type }) {
     </div>
   );
 }
+

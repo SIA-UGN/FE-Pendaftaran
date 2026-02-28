@@ -1,4 +1,3 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { Info } from "lucide-react";
 import { Heading } from "@/components/Heading";
 
@@ -9,17 +8,11 @@ export default function InformasiPendaftaran() {
       <Heading title={"Pendaftaran Manajer Baru"} variant="first"/>
 
       {/* Kartu Informasi */}
-      <Card
-        className="
-          rounded-lg shadow-md 
-          flex flex-col sm:flex-row gap-4 
-          p-4 sm:p-6 lg:p-8 
-          w-full 
-          bg-[var(--light-cream)] 
-          border border-gray-300
-        "
+      <div
+        className="flex flex-col sm:flex-row gap-4 p-4 sm:p-6 lg:p-8 w-full"
+        style={{ backgroundColor: '#E6EEE9', borderRadius: '16px', border: '1px solid #D9E5DE' }}
       >
-        <CardContent className="flex flex-col gap-4 sm:gap-5 w-full p-0">
+        <div className="flex flex-col gap-4 sm:gap-5 w-full">
           {/* Subjudul */}
           <h2
             className="
@@ -42,8 +35,8 @@ export default function InformasiPendaftaran() {
               email aktivasi
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

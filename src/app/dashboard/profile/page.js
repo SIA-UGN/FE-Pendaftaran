@@ -5,7 +5,6 @@ import { Suspense } from "react";
 
 import Image from "next/image";
 
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/Heading";
 import Link from "next/link";
@@ -56,7 +55,7 @@ function ProfileInner() {
     <div className="flex flex-col items-center px-4 sm:px-6 lg:px-8 max-w-6xl my-6 sm:my-8 lg:my-12 w-full gap-3 mx-auto">
       <Heading title={"Akun Pendaftar"} variant="first" />
 
-      <Card className="w-full flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl shadow-md bg-white">
+      <div className="w-full flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8" style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #E6EEE9' }}>
         <Image
           alt="profile"
           src={
@@ -77,7 +76,7 @@ function ProfileInner() {
             {program.name_program || "Program tidak tersedia"}
           </p>
         </div>
-      </Card>
+      </div>
 
       <Heading title={"Status Verifikasi Pendaftar"} />
       <div className="w-full">

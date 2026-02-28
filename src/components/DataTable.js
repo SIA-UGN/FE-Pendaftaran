@@ -27,13 +27,13 @@ export function DataTable({ columns, data }) {
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white/70 shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-md dark:bg-gray-900/60 dark:border-gray-800">
       <div className="max-h-[500px] overflow-auto">
         <Table className="w-full text-sm text-gray-700 dark:text-gray-200">
-          <TableHeader className="sticky top-0 bg-[var(--cream)] shadow-sm z-10">
+          <TableHeader className="sticky top-0 z-10" style={{ backgroundColor: '#015023' }}>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
-                    className="px-4 py-3 text-left font-semibold uppercase tracking-wide "
+                    className="px-4 py-3 text-left font-semibold uppercase tracking-wide text-white"
                   >
                     {header.isPlaceholder
                       ? null

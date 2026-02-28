@@ -1,13 +1,20 @@
-export function Heading({ title, variant = "default" }) {
+export function Heading({ title, subtitle, variant = "default" }) {
   const isFirst = variant === "first";
 
   return (
-    <h2
-      className={`text-xl sm:text-2xl md:text-3xl font-semibold mb-4 sm:mb-6 md:mb-8 w-full border-b border-gray-500 pb-2 text-[var(--green)] ${
-        isFirst ? "mt-0" : "mt-6 sm:mt-8 md:mt-12"
-      }`}
+    <div
+      className={`w-full mb-6 sm:mb-8 md:mb-10 ${isFirst ? "mt-0" : "mt-6 sm:mt-8 md:mt-12"}`}
+      style={{ fontFamily: 'Urbanist, system-ui, sans-serif' }}
     >
-      {title}
-    </h2>
+      <h2
+        className="text-xl sm:text-2xl md:text-3xl font-bold pb-3 border-b-2"
+        style={{ color: '#015023', borderColor: '#DABC4E' }}
+      >
+        {title}
+      </h2>
+      {subtitle && (
+        <p className="mt-2 text-sm sm:text-base text-gray-500">{subtitle}</p>
+      )}
+    </div>
   );
 }

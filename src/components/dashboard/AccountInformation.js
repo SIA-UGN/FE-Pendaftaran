@@ -1,6 +1,5 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/Heading";
 import { useManagerDashboard } from "@/hooks/useManager";
 
@@ -27,27 +26,43 @@ export default function AccountInformation() {
       <Heading title={"Pendaftar"} variant="first" />
 
       <div className="grid w-full md:w-md lg:w-lg grid-cols-1 gap-12">
-        <Card className="flex items-center justify-center p-6 flex-col w-full gap-2 h-40 border border-black">
-          <span className="font-bold text-4xl text-[var(--green)]">
+        <div
+          className="flex items-center justify-center p-6 flex-col w-full gap-2 h-40"
+          style={{
+            backgroundColor: '#ffffff',
+            border: '2px solid #015023',
+            borderRadius: '16px',
+          }}
+        >
+          <span className="font-bold text-4xl" style={{ color: '#015023' }}>
             {total_applicants}
           </span>
           <span className="text-lg text-gray-500">Total Pendaftar</span>
-        </Card>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 w-full gap-6">
-        <Card className="flex items-center justify-center p-6 flex-col w-full gap-2 h-40 border border-black">
-          <span className="font-bold text-4xl text-green-700">{approved}</span>
+        <div
+          className="flex items-center justify-center p-6 flex-col w-full gap-2 h-40"
+          style={{ backgroundColor: '#ffffff', border: '1px solid #E6EEE9', borderRadius: '16px' }}
+        >
+          <span className="font-bold text-4xl" style={{ color: '#016B30' }}>{approved}</span>
           <span className="text-lg text-gray-500">Approved</span>
-        </Card>
-        <Card className="flex items-center justify-center p-6 flex-col w-full gap-2 h-40 border border-black">
-          <span className="font-bold text-4xl text-red-700">{rejected}</span>
+        </div>
+        <div
+          className="flex items-center justify-center p-6 flex-col w-full gap-2 h-40"
+          style={{ backgroundColor: '#ffffff', border: '1px solid #E6EEE9', borderRadius: '16px' }}
+        >
+          <span className="font-bold text-4xl text-red-600">{rejected}</span>
           <span className="text-lg text-gray-500">Rejected</span>
-        </Card>
-        <Card className="flex items-center justify-center p-6 flex-col w-full gap-2 h-40 border border-black">
-          <span className="font-bold text-4xl text-yellow-500">{pending}</span>
+        </div>
+        <div
+          className="flex items-center justify-center p-6 flex-col w-full gap-2 h-40"
+          style={{ backgroundColor: '#ffffff', border: '1px solid #E6EEE9', borderRadius: '16px' }}
+        >
+          <span className="font-bold text-4xl" style={{ color: '#8a7a30' }}>{pending}</span>
           <span className="text-lg text-gray-500">Pending</span>
-        </Card>
+        </div>
       </div>
     </div>
   );

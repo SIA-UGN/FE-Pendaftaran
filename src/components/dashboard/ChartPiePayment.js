@@ -9,13 +9,6 @@ import {
   Sector,
   Tooltip,
 } from "recharts";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
 const renderActiveShape = (props) => {
   const {
@@ -98,7 +91,7 @@ export function ChartPiePayment({ data }) {
   );
 
   return (
-    <Card className="flex flex-col w-full shadow-md gap-0">
+    <div className="flex flex-col w-full" style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #E6EEE9' }}>
       {data.verified === 0 && data.rejected === 0 && data.pending === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center text-gray-600 px-4">
           <p className="text-base sm:text-lg font-medium">
@@ -107,16 +100,16 @@ export function ChartPiePayment({ data }) {
         </div>
       ) : (
         <>
-          <CardHeader className="items-center pb-0 px-4 sm:px-6">
-            <CardTitle className="text-lg sm:text-xl lg:text-2xl text-center">
+          <div className="items-center pb-0 px-4 sm:px-6 flex flex-col">
+            <h3 className="text-lg sm:text-xl lg:text-2xl text-center font-semibold" style={{ color: '#015023' }}>
               Statistik Penerimaan Mahasiswa
-            </CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
+            </h3>
+            <p className="text-xs sm:text-sm text-gray-500">
               Januari – Juni 2024
-            </CardDescription>
-          </CardHeader>
+            </p>
+          </div>
 
-          <CardContent className="flex flex-col items-center justify-center pt-4 sm:pt-6 px-4 sm:px-6">
+          <div className="flex flex-col items-center justify-center pt-4 sm:pt-6 px-4 sm:px-6">
             {/* Chart */}
             <div className="w-full max-w-[280px] sm:max-w-[400px] lg:max-w-[600px] aspect-square">
               <ResponsiveContainer>
@@ -176,9 +169,9 @@ export function ChartPiePayment({ data }) {
               </span>
               <span className="text-xs sm:text-sm text-gray-500">orang</span>
             </div>
-          </CardContent>
+          </div>
         </>
       )}
-    </Card>
+    </div>
   );
 }

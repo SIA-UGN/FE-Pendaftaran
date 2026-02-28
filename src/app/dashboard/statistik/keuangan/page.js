@@ -1,6 +1,5 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
 import { ChartPiePayment } from "@/components/dashboard/ChartPiePayment";
 import { ChartBarLabel } from "@/components/admin/BarChart";
 import { Heading } from "@/components/Heading";

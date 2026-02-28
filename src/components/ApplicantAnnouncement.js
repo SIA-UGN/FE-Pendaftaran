@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import { useProfile } from "@/hooks/useProfile";
 import { useMyRegistration } from "@/hooks/useRegistration";
@@ -25,7 +24,7 @@ export default function ApplicantAnnouncement({ status }) {
 
   const username = email !== "-" ? `@${email.split("@")[0]}` : "-";
   return (
-    <Card className="w-full flex flex-col sm:flex-row gap-6 p-8 rounded-2xl shadow-md">
+    <div className="w-full flex flex-col sm:flex-row gap-6 p-8 shadow-md" style={{ backgroundColor: '#ffffff', border: '1px solid #E6EEE9', borderRadius: '16px' }}>
       <Image
         alt={`Profile ${fullName}`}
         src={profilePhoto}
@@ -34,19 +33,23 @@ export default function ApplicantAnnouncement({ status }) {
         className="w-full sm:w-1/4 h-[260px] rounded-xl object-cover"
       />
       <div className="flex flex-col p-2 w-full sm:w-2/3 space-y-1 items-start">
-        <h2 className="font-bold text-xl text-[var(--green)]">{fullName}</h2>
+        <h2 className="font-bold text-xl" style={{ color: '#015023' }}>{fullName}</h2>
         <p className="text-gray-500">{registrationNumber}</p>
         <h3 className="text-gray-500">{username}</h3>
         <p className="text-gray-500">{email}</p>
         <p className="text-gray-500">{programName}</p>
         <p
-          className={`mt-auto px-4 py-2 rounded-lg font-bold text-white ${
-            status === "Lulus" ? "bg-[var(--green)]" : "bg-red-500"
-          }`}
-        >
+          style={{
+            marginTop: 'auto',
+            padding: '8px 16px',
+            borderRadius: '8px',
+            fontWeight: 'bold',
+            color: '#ffffff',
+            backgroundColor: status === 'Lulus' ? '#015023' : '#BE0414',
+          }}>
           {status}
         </p>
       </div>
-    </Card>
+    </div>
   );
 }
