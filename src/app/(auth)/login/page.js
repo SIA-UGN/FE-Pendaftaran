@@ -64,7 +64,7 @@ export default function Login() {
           </Link>
 
           <div className="flex flex-col items-center gap-4 flex-1 justify-center">
-            <div className="relative w-36 h-36">
+            <div className="relative w-42 h-46" style={{ width: '268px', height: '284px' }}>
               <Image src="/logo.jpg" alt="logo" fill style={{ objectFit: 'contain' }} />
             </div>
             <h2
@@ -87,7 +87,7 @@ export default function Login() {
           <div className="max-w-sm w-full mx-auto flex flex-col flex-1">
 
             {/* Heading */}
-            <div className="mb-7">
+            <div className="mb-3">
               <h1 className="text-3xl font-bold" style={{ color: '#1a1a1a' }}>Selamat Datang</h1>
               <p className="text-gray-400 text-sm mt-1">Masuk ke akun pendaftaran Anda</p>
             </div>
@@ -95,7 +95,7 @@ export default function Login() {
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
               {/* Email */}
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1">
                 <label htmlFor="email" className="text-sm font-semibold text-gray-700">Email</label>
                 <div className="relative">
                   <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
@@ -119,7 +119,7 @@ export default function Login() {
               </div>
 
               {/* Password */}
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1">
                 <div className="flex items-center justify-between">
                   <label htmlFor="password" className="text-sm font-semibold text-gray-700">Password</label>
                   <Link
@@ -160,10 +160,6 @@ export default function Login() {
               </div>
 
               {/* reCAPTCHA */}
-              <div
-                className="rounded-xl overflow-hidden"
-                style={{ border: '1.5px solid #E6EEE9', backgroundColor: '#fff' }}
-              >
                 <div style={{ transform: 'scale(0.93)', transformOrigin: '0 0', width: '108%' }}>
                   <ReCAPTCHA
                     ref={recaptchaRef}
@@ -171,7 +167,6 @@ export default function Login() {
                     onChange={setCaptcha}
                   />
                 </div>
-              </div>
 
               {/* Submit */}
               <button
@@ -185,14 +180,14 @@ export default function Login() {
             </form>
 
             {/* Divider */}
-            <div className="flex items-center gap-3 my-5">
+            <div className="flex items-center gap-1 my-2">
               <div className="flex-1 h-px" style={{ backgroundColor: '#E0E7E3' }} />
               <span className="text-xs text-gray-400 font-medium">atau</span>
               <div className="flex-1 h-px" style={{ backgroundColor: '#E0E7E3' }} />
             </div>
 
             {/* Register CTA */}
-            <p className="text-center text-sm text-gray-400 mb-3">Belum punya akun?</p>
+            <p className="text-center text-sm text-gray-400 mb-2">Belum punya akun?</p>
             <Link href="/register">
               <button
                 type="button"
