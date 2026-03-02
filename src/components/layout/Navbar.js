@@ -149,7 +149,7 @@ export default function Navbar() {
         "w-full flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-12 transition-all duration-300 ease-in-out",
         isScrolled
           ? "mx-auto rounded-[12px] sm:rounded-[18px] max-w-[calc(100%-2rem)] sm:max-w-[calc(100%-3rem)] lg:max-w-[calc(100%-4rem)]"
-          : "rounded-b-[16px] sm:rounded-b-[20px]"
+          : ""
       )}
       style={{
         backgroundColor: '#015023',

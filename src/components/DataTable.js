@@ -33,7 +33,7 @@ export function DataTable({ columns, data }) {
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
-                    className="px-4 py-3 text-left font-semibold uppercase tracking-wide text-white"
+                    className="px-4 py-3 text-left font-semibold uppercase tracking-wide !text-white"
                   >
                     {header.isPlaceholder
                       ? null

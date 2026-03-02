@@ -27,22 +27,14 @@ export function AnnouncementTable({ data }) {
   const columns = [
     {
       accessorKey: "no",
-      header: ({ column }) => {
-        return (
-          <Button variant="ghost" className="w-full">
-            No
-          </Button>
-        );
-      },
+      header: () => <span className="w-full block text-center">No</span>,
       cell: ({ row }) => (
         <div className="text-center font-medium">{row.index + 1}</div>
       ),
     },
     {
       accessorKey: "registration_number",
-      header: ({ column }) => {
-        return <Button variant="ghost">Nomor Registrasi</Button>;
-      },
+      header: () => <span>Nomor Registrasi</span>,
       cell: ({ row }) => (
         <div className="font-medium">
           {row.original.registration_number || "-"}
@@ -51,16 +43,12 @@ export function AnnouncementTable({ data }) {
     },
     {
       accessorKey: "name",
-      header: ({ column }) => {
-        return <Button variant="ghost">Nama</Button>;
-      },
+      header: () => <span>Nama</span>,
       cell: ({ row }) => <div>{row.original.name || "-"}</div>,
     },
     {
       accessorKey: "program",
-      header: ({ column }) => {
-        return <Button variant="ghost">Program Studi</Button>;
-      },
+      header: () => <span>Program Studi</span>,
       cell: ({ row }) => {
         const program = row.original.program;
         return (
@@ -81,9 +69,7 @@ export function AnnouncementTable({ data }) {
     },
     {
       accessorKey: "status",
-      header: ({ column }) => {
-        return <Button variant="ghost">Status</Button>;
-      },
+      header: () => <span>Status</span>,
       cell: ({ row }) => {
         const status = row.original.status || "Lulus";
         const statusLower = status?.toLowerCase();
@@ -153,7 +139,7 @@ export function AnnouncementTable({ data }) {
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className="text-white">
+                    <TableHead key={header.id} className="!text-white">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
