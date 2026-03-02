@@ -386,7 +386,7 @@ export default function History() {
             <BookOpen size={28} style={{ color: '#DABC4E' }} />
           </div>
           <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-relaxed">
-            "Pendidikan adalah warisan terbaik yang bisa diberikan kepada generasi penerus bangsa. Bukan harta, bukan tahta — melainkan ilmu yang bermanfaat dan akhlak yang mulia."
+            &quot;Pendidikan adalah warisan terbaik yang bisa diberikan kepada generasi penerus bangsa. Bukan harta, bukan tahta — melainkan ilmu yang bermanfaat dan akhlak yang mulia.&quot;
           </p>
           <p className="text-sm font-semibold" style={{ color: '#DABC4E' }}>— Kiai Sahal Mahfudh, Tokoh Pendiri UGN</p>
 
