@@ -165,6 +165,10 @@ html {
     font-family: 'Urbanist', system-ui, -apple-system, sans-serif;
   }
 
+  button {
+    cursor: pointer;
+  }
+
   /* Hide scrollbar for specific elements */
   .hide-scrollbar {
     scrollbar-width: none;
