@@ -193,7 +193,7 @@ export default function ForgotPassword() {
                 className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all hover:brightness-110 disabled:opacity-60 mt-1"
                 style={{ backgroundColor: '#015023', color: '#fff' }}
               >
-                {forgotPasswordMutation.isPending ? 'Mengirim...' : <>Kirim Kode Verifikasi <span style={{ fontSize: '1.1em', lineHeight: 1 }}>&rarr;</span></>}
+                {forgotPasswordMutation.isPending ? 'Mengirim...' : <>Kirim Kode Verifikasi </>}
               </button>
             </form>
 
@@ -212,7 +212,7 @@ export default function ForgotPassword() {
                 className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all hover:bg-[#E6EEE9]"
                 style={{ border: '1.5px solid #015023', color: '#015023', backgroundColor: 'transparent' }}
               >
-                Kembali ke Login <span style={{ fontSize: '1.1em', lineHeight: 1 }}>&rarr;</span>
+                Kembali ke Login
               </button>
             </Link>
 

@@ -175,7 +175,7 @@ export default function Login() {
                 className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all hover:brightness-110 disabled:opacity-60 mt-1"
                 style={{ backgroundColor: '#015023', color: '#fff' }}
               >
-                {loginMutation.isPending ? 'Memproses...' : <>Masuk <span style={{ fontSize: '1.1em', lineHeight: 1 }}>&rarr;</span></>}
+                {loginMutation.isPending ? 'Memproses...' : <>Masuk</>}
               </button>
             </form>
 
@@ -194,7 +194,7 @@ export default function Login() {
                 className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all hover:bg-[#E6EEE9]"
                 style={{ border: '1.5px solid #015023', color: '#015023', backgroundColor: 'transparent' }}
               >
-                Daftar Sekarang <span style={{ fontSize: '1.1em', lineHeight: 1 }}>&rarr;</span>
+                Daftar Sekarang
               </button>
             </Link>
 
