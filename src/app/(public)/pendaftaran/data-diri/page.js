@@ -339,7 +339,7 @@ export default function DataDiri() {
                 )}
               />
 
-              <div className="grid grid-cols-3">
+              <div className="grid grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="programStudi"
