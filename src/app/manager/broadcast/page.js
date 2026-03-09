@@ -85,14 +85,17 @@ export default function BroadcastMessage() {
 
   return (
     <ProtectedRoute>
-      <div className="w-full max-w-6xl mx-auto">
-        <div className="flex items-center gap-2 mx-4 sm:mx-8 md:mx-12 ">
-          <Heading title={"Broadcast Notifikasi"} />
+      <div className="w-full max-w-3xl mx-auto">
+        <div className="flex items-center gap-2 mb-6">
+          <Heading title={"Broadcast Notifikasi"} variant="first" />
         </div>
 
+        <div
+          className="bg-white p-8 shadow-lg"
+          style={{ border: '2px solid #015023', borderRadius: '12px' }}
+        >
         <Form {...form}>
           <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="flex flex-col gap-4 sm:gap-5 rounded-xl mx-4 sm:mx-8 md:mx-12">
               <FormField
                 control={form.control}
                 name="targetAudience"
@@ -173,10 +176,8 @@ export default function BroadcastMessage() {
                   </FormItem>
                 )}
               />
-            </div>
-
-            <div className="w-full flex items-center justify-end gap-4 my-8 sm:my-12 px-4 sm:px-8 md:px-12">
-              <Link href="/broadcast">
+            <div className="w-full flex items-center justify-end gap-4 mt-8">
+              <Link href="/manager">
                 <Button
                   type="button"
                   variant="yellow"
@@ -196,6 +197,7 @@ export default function BroadcastMessage() {
             </div>
           </form>
         </Form>
+        </div>
       </div>
     </ProtectedRoute>
   );

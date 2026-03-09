@@ -152,7 +152,7 @@ function DataOrangtuaInner() {
   return (
     <>
       <div className="mx-3 md:mx-12 mt-6 grid grid-cols-1 gap-12">
-        <div className="w-full flex flex-col md:flex-row gap-6 p-8 justify-between" style={{ backgroundColor: '#E6EEE9', borderRadius: '16px', border: '1px solid #D9E5DE' }}>
+        <div className="w-full flex flex-col md:flex-row gap-6 p-8 justify-between" style={{ backgroundColor: '#ffffff', borderRadius: '12px', border: '2px solid #015023' }}>
           <div className="flex flex-col p-2 w-full sm:w-2/3 space-y-1 items-start">
             <h2 className="font-bold text-xl">{applicant.user.name}</h2>
             <h3 className="text-gray-500">
@@ -177,16 +177,17 @@ function DataOrangtuaInner() {
               className="w-full"
             >
               <TabsList
-                className="grid w-full grid-cols-2 bg-gray-200 p-1 rounded-full 
+                className="grid w-full grid-cols-2 p-1 rounded-full 
                 h-10 sm:h-12 
                 text-xs sm:text-sm
                 shadow-md hover:shadow-lg transition-shadow duration-300"
+                style={{ backgroundColor: '#E6EEE9' }}
               >
                 <TabsTrigger
                   value="orangTua"
                   className="rounded-full 
-                  data-[state=active]:bg-green-800 
-                  data-[state=active]:text-[var(--yellow)] 
+                  data-[state=active]:bg-[#015023]
+                  data-[state=active]:text-[#DABC4E]
                   data-[state=inactive]:text-gray-600
                   data-[state=inactive]:hover:text-gray-900
                   transition-all duration-200 cursor-pointer 
@@ -199,8 +200,8 @@ function DataOrangtuaInner() {
                 <TabsTrigger
                   value="wali"
                   className="rounded-full 
-                  data-[state=active]:bg-green-800 
-                  data-[state=active]:text-[var(--yellow)] 
+                  data-[state=active]:bg-[#015023]
+                  data-[state=active]:text-[#DABC4E]
                   data-[state=inactive]:text-gray-600
                   data-[state=inactive]:hover:text-gray-900
                   transition-all duration-200 cursor-pointer 
@@ -217,7 +218,7 @@ function DataOrangtuaInner() {
 
       <Form {...form}>
         <form className="space-y-8">
-          <div className="flex flex-col gap-5 p-12 border rounded-xl m-0 md:m-12 bg-[var(--light-cream)]">
+          <div className="flex flex-col gap-5 p-8 m-0 md:m-12" style={{ backgroundColor: '#ffffff', border: '2px solid #015023', borderRadius: '12px' }}>
             {activeForm === "orangTua" && (
               <div className="animate-in fade-in duration-300">
                 <div className="p-4 rounded-md space-y-4">
@@ -541,10 +542,10 @@ function DataOrangtuaInner() {
           </div>
           <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
             <Link href={`/manager/verification/data-alamat?id=${id}`}>
-              <Button variant={"green"}>Kembali</Button>
+              <Button variant={"yellow"}>Kembali</Button>
             </Link>
             <Link href={`/manager/verification/data-akademik?id=${id}`}>
-              <Button variant="matcha">Lanjut</Button>
+              <Button variant="primary">Lanjut</Button>
             </Link>
           </div>
         </form>

@@ -35,15 +35,15 @@ export default function Keuangan() {
           <div className="w-full flex items-center justify-end gap-2">
             <Button
               type="submit"
-              variant={"matcha"}
-              className={"w-48 rounded-md"}
+              variant={"yellow"}
+              className={"w-48"}
             >
               Kembali
             </Button>
             <Button
               type="submit"
-              variant={"matcha"}
-              className={"w-48 rounded-md"}
+              variant={"primary"}
+              className={"w-48"}
             >
               Lanjut
             </Button>

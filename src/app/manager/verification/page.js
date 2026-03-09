@@ -86,7 +86,7 @@ function ProfileInner() {
 
   return (
     <div className="flex flex-col items-center px-4 sm:px-8 max-w-11/12 my-12 w-full gap-3 mx-auto">
-      <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b-1 border-gray-500 pb-2 text-[\#015023]">
+      <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full border-b border-gray-300 pb-2" style={{ color: '#015023' }}>
         Akun Pendaftar
       </h2>
 
@@ -115,7 +115,7 @@ function ProfileInner() {
         applicant.profile.registration_status === "under_review" ||
         applicant.profile.registration_status === "submitted") && (
         <>
-          <h2 className="text-3xl sm:text-2xl font-semibold mb-2 mt-6 w-full border-b-1 border-gray-500 pb-2 text-[\#015023]">
+          <h2 className="text-3xl sm:text-2xl font-semibold mb-2 mt-6 w-full border-b border-gray-300 pb-2" style={{ color: '#015023' }}>
             Status Verifikasi Pendaftar
           </h2>
 
@@ -131,7 +131,7 @@ function ProfileInner() {
             </Link>
           </div>
 
-          <h2 className="text-3xl sm:text-2xl font-semibold mb-2 mt-6 w-full border-b-1 border-gray-500 pb-2 text-[\#015023]">
+          <h2 className="text-3xl sm:text-2xl font-semibold mb-2 mt-6 w-full border-b border-gray-300 pb-2" style={{ color: '#015023' }}>
             Status Kelulusan Pendaftar
           </h2>
 
@@ -145,10 +145,7 @@ function ProfileInner() {
       {applicant.profile.registration_status === "rejected" && (
         <>
           <h2 className="text-xl font-semibold mt-6">Status Verifikasi</h2>
-          <Button
-            className="w-full bg-red-500 hover:bg-red-500 rounded-4xl"
-            disabled
-          >
+          <Button variant="destructive" className="w-full" disabled>
             Rejected
           </Button>
 
@@ -186,7 +183,8 @@ function ProfileInner() {
                   </Link>
 
                   <Button
-                    className="w-full bg-green-500 hover:bg-green-500 rounded-4xl"
+                    variant="primary"
+                    className="w-full"
                     onClick={() => handleGraduation("Sudah Lulus")}
                     disabled={isGraduationLoading}
                   >
@@ -194,7 +192,8 @@ function ProfileInner() {
                   </Button>
 
                   <Button
-                    className="w-full bg-red-500 hover:bg-red-500 rounded-4xl"
+                    variant="destructive"
+                    className="w-full"
                     onClick={() => handleGraduation("Belum Lulus")}
                     disabled={isGraduationLoading}
                   >

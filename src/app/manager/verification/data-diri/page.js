@@ -129,7 +129,7 @@ function DataDiriInner() {
   return (
     <ProtectedRoute>
       <div className="mx-3 md:mx-12 mt-6 grid grid-cols-1 gap-12">
-        <div className="w-full flex flex-col md:flex-row gap-6 p-8 justify-between" style={{ backgroundColor: '#E6EEE9', borderRadius: '16px', border: '1px solid #D9E5DE' }}>
+        <div className="w-full flex flex-col md:flex-row gap-6 p-8 justify-between" style={{ backgroundColor: '#ffffff', borderRadius: '12px', border: '2px solid #015023' }}>
           <div className="flex flex-col p-2 w-full sm:w-2/3 space-y-1 items-start">
             <h2 className="font-bold text-xl">{profile.full_name}</h2>
             <h3 className="text-gray-500">
@@ -148,7 +148,7 @@ function DataDiriInner() {
 
       <Form {...form}>
         <form className="space-y-6">
-          <div className="flex flex-col gap-5 p-12 border rounded-xl md:m-12 bg-[var(--light-cream)]">
+          <div className="flex flex-col gap-5 p-8 md:m-12" style={{ backgroundColor: '#ffffff', border: '2px solid #015023', borderRadius: '12px' }}>
             <FormField
               control={form.control}
               name="namaLengkap"
@@ -554,10 +554,10 @@ function DataDiriInner() {
 
           <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
             <Link href="/manager/verification">
-              <Button variant={"green"}>Kembali</Button>
+              <Button variant={"yellow"}>Kembali</Button>
             </Link>
             <Link href={`/manager/verification/data-alamat?id=${id}`}>
-              <Button variant="matcha">Lanjut</Button>
+              <Button variant="primary">Lanjut</Button>
             </Link>
           </div>
         </form>

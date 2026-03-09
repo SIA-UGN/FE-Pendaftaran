@@ -279,7 +279,7 @@ function PembayaranInner() {
       <Heading title="Validation Notes" />
       <Form {...form}>
         <div className="space-y-6">
-          <div className="flex flex-col gap-5 p-12 border rounded-xl mx-0 md:mx-12 bg-[var(--light-cream)]">
+          <div className="flex flex-col gap-5 p-8 mx-0 md:mx-12" style={{ backgroundColor: '#ffffff', border: '2px solid #015023', borderRadius: '12px' }}>
             {paymentNotes && (
               <div className="mb-4">
                 <span className="font-semibold text-green-800 block mb-1">
@@ -306,7 +306,7 @@ function PembayaranInner() {
           </div>
           <div className="w-full flex items-center justify-end my-12 px-12 gap-6">
             <Link href="/manager/verification">
-              <Button variant={"green"}>Kembali</Button>
+              <Button variant={"yellow"}>Kembali</Button>
             </Link>
 
             {/* Dialog 1: Verifikasi Pembayaran */}

@@ -59,7 +59,8 @@ export default function Navbar() {
     error,
   } = useUnreadCount(shouldFetchNotifications);
 
-  // Helper function untuk check apakah path aktif
+  const isManagerRoute = pathname.startsWith("/manager");
+
   const isActivePath = (path) => {
     if (path === "/") {
       return pathname === "/";
@@ -199,77 +200,101 @@ export default function Navbar() {
         </button>
       </div>
 
-      <div className="hidden md:flex gap-6">
+      <div className="hidden md:flex items-center gap-4">
         <div className="hidden md:flex">
           <NavigationMenu>
             <NavigationMenuList className="w-fit">
-              <NavigationMenuItem>
-                <NavigationMenuLink
-                  asChild
-                  className={cn(
-                    navigationMenuTriggerStyle(),
-                    isActivePath("/") &&
-                      !isProfilMenuActive() &&
-                      !isActivePath("/pendaftaran") &&
-                      "bg-[var(--yellow)] text-[var(--green)]"
-                  )}
-                >
-                  <Link href="/">Home</Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger
-                  className={cn(
-                    isProfilMenuActive() &&
-                      "bg-[var(--yellow)] text-[var(--green)]"
-                  )}
-                >
-                  Profil
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="w-[200px] p-1.5">
+                {isManagerRoute ? (
+                  <>
                     {[
-                      { href: '/sejarah',              label: 'Sejarah' },
-                      { href: '/visi-misi',            label: 'Visi & Misi' },
-                      { href: '/pimpinan-universitas', label: 'Pimpinan Universitas' },
-                      { href: '/fakultas',             label: 'Fakultas' },
+                      { href: '/manager',            label: 'Dashboard' },
+                      { href: '/manager/pendaftar',  label: 'Data Pendaftar' },
+                      { href: '/manager/broadcast',  label: 'Broadcast' },
                     ].map(({ href, label }) => (
-                      <li key={href}>
-                        <NavigationMenuLink asChild>
-                          <Link
-                            href={href}
-                            className={cn(
-                              'block px-3 py-2.5 text-sm font-medium transition-all duration-150',
-                              'text-[#015023] hover:bg-[#015023]/10',
-                              isActivePath(href) && 'bg-[#015023]/10 font-semibold'
-                            )}
-                            style={{ borderRadius: '8px', fontFamily: 'Urbanist, sans-serif' }}
-                          >
-                            {label}
-                          </Link>
+                      <NavigationMenuItem key={href}>
+                        <NavigationMenuLink
+                          asChild
+                          className={cn(
+                            navigationMenuTriggerStyle(),
+                            pathname === href && "bg-[var(--yellow)] text-[var(--green)]"
+                          )}
+                        >
+                          <Link href={href}>{label}</Link>
                         </NavigationMenuLink>
-                      </li>
+                      </NavigationMenuItem>
                     ))}
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuLink
-                  asChild
-                  className={cn(
-                    navigationMenuTriggerStyle(),
-                    isActivePath("/pendaftaran") &&
-                      "bg-[var(--yellow)] text-[var(--green)]"
-                  )}
-                >
-                  <Link href="/pendaftaran">Pendaftaran</Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
-        </div>
+                  </>
+                ) : (
+                  <>
+                    <NavigationMenuItem>
+                      <NavigationMenuLink
+                        asChild
+                        className={cn(
+                          navigationMenuTriggerStyle(),
+                          isActivePath("/") &&
+                            !isProfilMenuActive() &&
+                            !isActivePath("/pendaftaran") &&
+                            "bg-[var(--yellow)] text-[var(--green)]"
+                        )}
+                      >
+                        <Link href="/">Home</Link>
+                      </NavigationMenuLink>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger
+                        className={cn(
+                          isProfilMenuActive() &&
+                            "bg-[var(--yellow)] text-[var(--green)]"
+                        )}
+                      >
+                        Profil
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <ul className="w-[200px] p-1.5">
+                          {[
+                            { href: '/sejarah',              label: 'Sejarah' },
+                            { href: '/visi-misi',            label: 'Visi & Misi' },
+                            { href: '/pimpinan-universitas', label: 'Pimpinan Universitas' },
+                            { href: '/fakultas',             label: 'Fakultas' },
+                          ].map(({ href, label }) => (
+                            <li key={href}>
+                              <NavigationMenuLink asChild>
+                                <Link
+                                  href={href}
+                                  className={cn(
+                                    'block px-3 py-2.5 text-sm font-medium transition-all duration-150',
+                                    'text-[#015023] hover:bg-[#015023]/10',
+                                    isActivePath(href) && 'bg-[#015023]/10 font-semibold'
+                                  )}
+                                  style={{ borderRadius: '8px', fontFamily: 'Urbanist, sans-serif' }}
+                                >
+                                  {label}
+                                </Link>
+                              </NavigationMenuLink>
+                            </li>
+                          ))}
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                      <NavigationMenuLink
+                        asChild
+                        className={cn(
+                          navigationMenuTriggerStyle(),
+                          isActivePath("/pendaftaran") &&
+                            "bg-[var(--yellow)] text-[var(--green)]"
+                        )}
+                      >
+                        <Link href="/pendaftaran">Pendaftaran</Link>
+                      </NavigationMenuLink>
+                    </NavigationMenuItem>
+                  </>
+                )}
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
 
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-4 shrink-0">
           {isLoggedIn ? (
             <>
               <Link href="/notifikasi" className="relative">
@@ -384,20 +409,18 @@ export default function Navbar() {
             className="absolute top-[calc(100%+2px)] left-0 w-full bg-[var(--green)]/95 backdrop-blur-md text-white flex flex-col lg:hidden z-[999] border-t border-[var(--yellow)]/30 shadow-2xl rounded-b-2xl overflow-hidden max-h-[calc(100vh-80px)] overflow-y-auto"
           >
             <nav className="flex flex-col divide-y divide-[var(--yellow)]/10">
-              {[
-                { href: "/", label: "Home" },
-                { href: "/sejarah", label: "Sejarah" },
-                { href: "/visi-misi", label: "Visi-Misi" },
-                {
-                  href: "/pimpinan-universitas",
-                  label: "Pimpinan Universitas",
-                },
-                {
-                  href: "/fakultas",
-                  label: "Fakultas",
-                },
-                { href: "/pendaftaran", label: "Pendaftaran" },
-              ].map((item) => (
+              {(isManagerRoute ? [
+                { href: '/manager',            label: 'Dashboard' },
+                { href: '/manager/pendaftar',  label: 'Data Pendaftar' },
+                { href: '/manager/broadcast',  label: 'Broadcast' },
+              ] : [
+                { href: "/",                      label: "Home" },
+                { href: "/sejarah",               label: "Sejarah" },
+                { href: "/visi-misi",             label: "Visi-Misi" },
+                { href: "/pimpinan-universitas",  label: "Pimpinan Universitas" },
+                { href: "/fakultas",              label: "Fakultas" },
+                { href: "/pendaftaran",           label: "Pendaftaran" },
+              ]).map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
