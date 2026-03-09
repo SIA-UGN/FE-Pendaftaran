@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Bell, Menu, X, ChevronDown } from "lucide-react";
+import { Bell, Menu, X, ChevronDown, UserCog, FileText, CheckSquare, LogOut } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -239,10 +239,11 @@ export default function Navbar() {
                           <Link
                             href={href}
                             className={cn(
-                              'block px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-150',
-                              'text-white/80 hover:text-white hover:bg-white/10',
-                              isActivePath(href) && 'text-[#DABC4E] bg-[#DABC4E]/10 font-semibold'
+                              'block px-3 py-2.5 text-sm font-medium transition-all duration-150',
+                              'text-[#015023] hover:bg-[#015023]/10',
+                              isActivePath(href) && 'bg-[#015023]/10 font-semibold'
                             )}
+                            style={{ borderRadius: '8px', fontFamily: 'Urbanist, sans-serif' }}
                           >
                             {label}
                           </Link>
@@ -286,68 +287,68 @@ export default function Navbar() {
                 )}
               </Link>
               <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Avatar
-                    className={cn(
-                      "ring-2 ring-transparent transition-all",
-                      isActivePath("/profil") && "ring-[var(--yellow)]"
-                    )}
-                  >
-                    <AvatarImage
-                      src={user?.avatar_url || "/default-avatar-male.webp"}
-                      alt={user?.name || "User avatar"}
-                      key={user?.avatar_url || "default"}
-                    />
-                    <AvatarFallback>
-                      {user?.name?.charAt(0)?.toUpperCase() || "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="start"
-                  alignOffset={14}
-                  className="z-[2000]"
-                >
-                  <DropdownMenuLabel>{user?.name}</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  
-                  <DropdownMenuItem asChild>
-                    <Link
-                      href="/profil"
+                <DropdownMenuTrigger asChild>
+                  <button className="transition-all duration-200 hover:scale-105 hover:opacity-90 cursor-pointer focus:outline-none">
+                    <Avatar
                       className={cn(
-                        isActivePath("/profil") &&
-                          "bg-[var(--yellow)]/10 font-semibold"
+                        "ring-2 ring-transparent transition-all",
+                        isActivePath("/profil") && "ring-[var(--yellow)]"
                       )}
                     >
-                      Profil
+                      <AvatarImage
+                        src={user?.avatar_url || "/default-avatar-male.webp"}
+                        alt={user?.name || "User avatar"}
+                        key={user?.avatar_url || "default"}
+                      />
+                      <AvatarFallback>
+                        {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="z-[2000] w-56"
+                >
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-bold" style={{ color: '#015023', fontFamily: 'Urbanist, sans-serif' }}>
+                        {user?.name || '...'}
+                      </p>
+                      <p className="text-xs" style={{ color: '#015023', opacity: 0.6, fontFamily: 'Urbanist, sans-serif' }}>
+                        {user?.role || '...'}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/profil" className="flex items-center cursor-pointer">
+                      <UserCog className="mr-2 h-4 w-4" />
+                      <span>Profil</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link
-                      href="/pendaftaran"
-                      className={cn(
-                        isActivePath("/pendaftaran") &&
-                          "bg-[var(--yellow)]/10 font-semibold"
-                      )}
-                    >
-                      Pendaftaran
+                    <Link href="/pendaftaran" className="flex items-center cursor-pointer">
+                      <FileText className="mr-2 h-4 w-4" />
+                      <span>Pendaftaran</span>
                     </Link>
                   </DropdownMenuItem>
                   {user?.role === "pendaftar" && (
                     <DropdownMenuItem asChild>
-                      <Link
-                        href="/pendaftaran/status"
-                        className={cn(
-                          isActivePath("/pendaftaran/status") &&
-                            "bg-[var(--yellow)]/10 font-semibold"
-                        )}
-                      >
-                        Hasil Seleksi
+                      <Link href="/pendaftaran/status" className="flex items-center cursor-pointer">
+                        <CheckSquare className="mr-2 h-4 w-4" />
+                        <span>Hasil Seleksi</span>
                       </Link>
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem onClick={handleLogout}>
-                    Logout
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={handleLogout}
+                    className="cursor-pointer"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Logout</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
