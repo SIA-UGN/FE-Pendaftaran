@@ -142,12 +142,12 @@ export default function Navbar() {
         "w-full transition-all duration-300",
         isScrolled
           ? "fixed top-0 left-0 right-0 z-[1000] py-3 sm:py-4"
-          : "relative"
+          : "relative z-[1000]"
       )}
     >
     <nav
       className={cn(
-        "w-full flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-12 transition-all duration-300 ease-in-out",
+        "relative w-full flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-12 transition-all duration-300 ease-in-out",
         isScrolled
           ? "mx-auto rounded-[12px] sm:rounded-[18px] max-w-[calc(100%-2rem)] sm:max-w-[calc(100%-3rem)] lg:max-w-[calc(100%-4rem)]"
           : ""
@@ -402,13 +402,14 @@ export default function Navbar() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="absolute top-[calc(100%+2px)] left-0 w-full bg-[var(--green)]/95 backdrop-blur-md text-white flex flex-col lg:hidden z-[999] border-t border-[var(--yellow)]/30 shadow-2xl rounded-b-2xl overflow-hidden max-h-[calc(100vh-80px)] overflow-y-auto"
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="absolute top-full left-0 right-0 md:hidden z-[999] shadow-2xl overflow-hidden"
+            style={{ backgroundColor: '#015023' }}
           >
-            <nav className="flex flex-col divide-y divide-[var(--yellow)]/10">
+            <nav className="flex flex-col">
               {(isManagerRoute ? [
                 { href: '/manager',            label: 'Dashboard' },
                 { href: '/manager/pendaftar',  label: 'Data Pendaftar' },
@@ -426,7 +427,7 @@ export default function Navbar() {
                   href={item.href}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
-                    "px-6 py-4 text-lg font-medium tracking-wide hover:bg-[var(--yellow)] hover:text-[var(--green)] transition-colors duration-200",
+                    "px-6 py-3.5 text-base font-medium tracking-wide text-white hover:bg-[var(--yellow)] hover:text-[var(--green)] transition-colors duration-200 border-b border-white/10",
                     isActivePath(item.href) &&
                       "bg-[var(--yellow)] text-[var(--green)] font-bold"
                   )}
@@ -442,7 +443,7 @@ export default function Navbar() {
                     href="/notifikasi"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={cn(
-                      "px-6 py-4 text-lg font-medium tracking-wide hover:bg-[var(--yellow)] hover:text-[var(--green)] transition-colors duration-200 flex items-center justify-between",
+                      "px-6 py-3.5 text-base font-medium tracking-wide text-white hover:bg-[var(--yellow)] hover:text-[var(--green)] transition-colors duration-200 border-b border-white/10 flex items-center justify-between",
                       isActivePath("/notifikasi") &&
                         "bg-[var(--yellow)] text-[var(--green)] font-bold"
                     )}
@@ -458,7 +459,7 @@ export default function Navbar() {
                     href="/profil"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={cn(
-                      "px-6 py-4 text-lg font-medium tracking-wide hover:bg-[var(--yellow)] hover:text-[var(--green)] transition-colors duration-200",
+                      "px-6 py-3.5 text-base font-medium tracking-wide text-white hover:bg-[var(--yellow)] hover:text-[var(--green)] transition-colors duration-200 border-b border-white/10",
                       isActivePath("/profil") &&
                         "bg-[var(--yellow)] text-[var(--green)] font-bold"
                     )}
@@ -468,7 +469,7 @@ export default function Navbar() {
                 </>
               )}
 
-              <div className="p-4 flex flex-col gap-3 bg-[var(--green)]/90">
+              <div className="px-6 py-4 flex flex-col gap-3">
                 {isLoggedIn ? (
                   <>
                     <span className="text-sm text-[var(--yellow)] italic">
@@ -476,16 +477,16 @@ export default function Navbar() {
                       <span className="font-semibold">{user?.name}</span>
                     </span>
                     <button
-                      onClick={handleLogout}
-                      className="px-4 py-2 rounded-xl bg-[var(--yellow)] text-[var(--green)] font-semibold hover:bg-white transition-all duration-200 shadow-md"
+                      onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
+                      className="px-4 py-2.5 rounded-xl bg-[var(--yellow)] text-[var(--green)] font-semibold hover:bg-white transition-all duration-200 shadow-md"
                     >
                       Logout
                     </button>
                   </>
                 ) : (
                   <Button
-                    onClick={() => router.push("/login")}
-                    className="w-full bg-[var(--yellow)] text-[var(--green)] hover:bg-white transition-all duration-200 font-semibold rounded-xl shadow-md"
+                    onClick={() => { router.push("/login"); setIsMobileMenuOpen(false); }}
+                    className="w-full bg-[var(--yellow)] text-[var(--green)] hover:bg-white transition-all duration-200 font-semibold rounded-xl shadow-md py-2.5"
                   >
                     Login
                   </Button>

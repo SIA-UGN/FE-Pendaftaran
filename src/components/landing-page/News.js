@@ -219,7 +219,7 @@ export default function News() {
 
           {/* Featured card */}
           <div
-            className="relative w-full h-full min-h-[340px] rounded-2xl overflow-hidden shadow-md group cursor-pointer"
+            className="relative w-full h-full min-h-[280px] sm:min-h-[340px] rounded-2xl overflow-hidden shadow-md group cursor-pointer"
             onClick={() => setSelected(featured)}
           >
             <Image
@@ -262,15 +262,15 @@ export default function News() {
           </div>
 
           {/* Small news cards */}
-          <div className="flex flex-col gap-4 h-full">
+          <div className="flex flex-col gap-3 sm:gap-4 h-full">
             {rest.map((item) => (
               <div
                 key={item.title}
-                className="flex gap-4 rounded-xl border bg-white hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer group flex-1"
+                className="flex gap-3 sm:gap-4 rounded-xl border bg-white hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer group flex-1"
                 style={{ borderColor: '#E6EEE9' }}
                 onClick={() => setSelected(item)}
               >
-                <div className="relative w-24 sm:w-28 flex-shrink-0 h-full min-h-[96px]">
+                <div className="relative w-20 sm:w-28 flex-shrink-0 h-full min-h-[88px] sm:min-h-[96px]">
                   <Image
                     src={item.image}
                     alt={item.title}

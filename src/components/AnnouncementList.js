@@ -24,12 +24,12 @@ const AnnouncementList = React.memo(function AnnouncementList({
 
   return (
     <div className="w-full px-0">
-      <div className="flex items-center justify-between gap-4 my-6 w-full">
+      <div className="flex items-center justify-between gap-2 sm:gap-4 my-4 sm:my-6 w-full">
         <div className="flex-1 min-w-0 border-1 border-black rounded-lg">
           <InputGroup className="w-full">
             <InputGroupInput
-              placeholder="Cari berdasarkan nama atau nomor registrasi..."
-              className="text-sm sm:text-base"
+              placeholder="Cari nama atau nomor registrasi..."
+              className="text-xs sm:text-base"
               value={searchValue}
               onChange={handleSearchChange}
             />

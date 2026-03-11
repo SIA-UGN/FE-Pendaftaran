@@ -131,9 +131,9 @@ export function AnnouncementTable({ data }) {
 
   return (
     <div className="w-full space-y-2">
-      {/* Desktop Table */}
-      <div className="hidden md:block overflow-hidden rounded-md border">
-        <Table>
+      {/* Table with horizontal scroll on mobile */}
+      <div className="overflow-x-auto rounded-md border">
+        <Table className="min-w-[640px]">
           <TableHeader style={{ backgroundColor: '#015023' }}>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -180,75 +180,9 @@ export function AnnouncementTable({ data }) {
         </Table>
       </div>
 
-      {/* Mobile Cards */}
-      <div className="md:hidden space-y-4">
-        {table.getRowModel().rows?.length ? (
-          table.getRowModel().rows.map((row, index) => {
-            const announcement = row.original;
-            const status = announcement.status || "Lulus";
-            const statusLower = status?.toLowerCase();
-
-            const statusColors = {
-              approved: "bg-green-100 text-green-800",
-              pending: "bg-yellow-100 text-yellow-800",
-              rejected: "bg-red-100 text-red-800",
-              verified: "bg-blue-100 text-blue-800",
-              lulus: "bg-green-100 text-green-800",
-              "tidak lulus": "bg-red-100 text-red-800",
-            };
-
-            return (
-              <div
-                key={row.id}
-                className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 pb-2 border-b">
-                    <span className="bg-gray-100 text-gray-700 font-semibold text-sm px-3 py-1 rounded-full">
-                      #{index + 1}
-                    </span>
-                  </div>
-
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">
-                      Nomor Registrasi
-                    </p>
-                    <p className="font-medium text-base">
-                      {announcement.registration_number || "-"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Nama</p>
-                    <p className="text-sm text-gray-700">
-                      {announcement.name || "-"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Status</p>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold inline-block ${
-                        statusColors[statusLower] || "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {status}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            );
-          })
-        ) : (
-          <p className="text-center text-gray-500 py-6">
-            Tidak ada data yang dapat ditampilkan
-          </p>
-        )}
-      </div>
-
       {/* Pagination */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-1 pb-2">
-        <div className="text-sm text-gray-500">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 sm:px-4 py-2">
+        <div className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
           Menampilkan{" "}
           {table.getState().pagination.pageIndex *
             table.getState().pagination.pageSize +
@@ -262,7 +196,7 @@ export function AnnouncementTable({ data }) {
           dari {table.getFilteredRowModel().rows.length} data
         </div>
 
-        <div className="flex items-center gap-2 px-6 py-4">
+        <div className="flex items-center gap-2 px-2 sm:px-6 py-2 sm:py-4">
           <Button
             variant="outline"
             size="sm"

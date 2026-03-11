@@ -84,8 +84,8 @@ export default function Announcement() {
 
       {/* Info: Total data loaded */}
       {pagination?.total > 0 && (
-        <div className="w-full max-w-7xl mb-4 px-4">
-          <p className="text-sm text-gray-600">
+        <div className="w-full max-w-7xl mb-4">
+          <p className="text-xs sm:text-sm text-gray-600">
             Menampilkan {memoizedAnnouncements.length} dari {pagination.total}{" "}
             pengumuman kelulusan
           </p>

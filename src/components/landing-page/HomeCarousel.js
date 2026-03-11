@@ -55,7 +55,7 @@ export default function HomeCarousel() {
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
           {slides.map((slide, index) => (
-            <div key={index} className="relative flex-[0_0_100%] w-full h-[88vh] min-h-[520px]">
+            <div key={index} className="relative flex-[0_0_100%] w-full h-[70vh] sm:h-[80vh] lg:h-[88vh] min-h-[420px] sm:min-h-[520px]">
               {/* Background image */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -86,7 +86,7 @@ export default function HomeCarousel() {
                 <div className="w-12 h-[3px] rounded-full mb-4 sm:mb-5" style={{ backgroundColor: '#DABC4E' }} />
 
                 {/* Heading */}
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-[1.1] tracking-tight mb-4 sm:mb-5 whitespace-pre-line">
+                <h1 className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-[1.1] tracking-tight mb-4 sm:mb-5 whitespace-pre-line">
                   {slide.heading}
                 </h1>
 
