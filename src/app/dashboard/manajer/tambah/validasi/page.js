@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Info, CheckCircle2 } from "lucide-react";
-import { Heading } from "@/components/Heading";
+import { Info, CheckCircle2, ArrowLeft, ShieldCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,95 +24,69 @@ export default function TambahManajer() {
     setOpenConfirm(false);
     setTimeout(() => {
       setOpenSuccess(true);
-    }, 200); // memberi sedikit jeda agar transisi dialog terasa halus
+    }, 200);
   };
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      {/* 🔹 Bagian Pengingat */}
-      <div className="flex flex-col items-center px-4 sm:px-8 max-w-6xl mt-12 w-full">
-        <Heading title={"Pendaftaran Manajer Baru"} />
-
-        <div
-          className="flex flex-col sm:flex-row gap-4 p-4 sm:p-6 lg:p-8 w-full"
-          style={{ backgroundColor: '#E6EEE9', borderRadius: '16px', border: '1px solid #D9E5DE' }}
-        >
-          <div className="flex flex-col gap-4 sm:gap-5 w-full">
-            <h2
-              className="
-                scroll-m-20 pb-2 border-b border-gray-500 
-                text-2xl sm:text-3xl font-semibold tracking-tight 
-                first:mt-0 flex items-center gap-2 text-gray-800
-              "
-            >
-              <Info className="w-6 h-6 sm:w-7 sm:h-7 text-gray-700" />
-              Pengingat
-            </h2>
-
-            <div className="pl-3 sm:pl-6 flex flex-col gap-2 sm:gap-3 text-gray-700">
-              <p className="leading-7 flex items-start sm:items-center gap-2 text-sm sm:text-base">
-                Pastikan data manajer baru sudah benar sebelum data disimpan dan
-                sistem akan mengirimkan aktivasi akun melalui email manajer.
-              </p>
-            </div>
+    <div className="space-y-6">
+      {/* Info Card */}
+      <div className="bg-white rounded-2xl border p-6 sm:p-8" style={{ borderColor: '#E6EEE9' }}>
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#E6EEE9' }}>
+            <Info className="w-5 h-5" style={{ color: '#015023' }} />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold mb-1" style={{ color: '#015023' }}>Pengingat</h2>
+            <p className="text-sm text-gray-500">
+              Pastikan data manajer baru sudah benar sebelum data disimpan dan
+              sistem akan mengirimkan aktivasi akun melalui email manajer.
+            </p>
           </div>
         </div>
       </div>
 
-      {/* 🔹 Bagian Validasi Data */}
-      <div className="flex flex-col items-center px-4 sm:px-8 max-w-6xl my-12 w-full">
-        <Heading title={"Validasi Data Manajer Baru"} />
+      {/* Validation Form Card */}
+      <div className="bg-white rounded-2xl border p-6 sm:p-8" style={{ borderColor: '#E6EEE9' }}>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#E6EEE9' }}>
+            <ShieldCheck className="w-5 h-5" style={{ color: '#015023' }} />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold" style={{ color: '#015023' }}>Validasi Data Manajer Baru</h2>
+            <p className="text-xs text-gray-400">Periksa kembali data sebelum menyimpan</p>
+          </div>
+        </div>
 
-        <form onSubmit={(e) => e.preventDefault()} className="space-y-6 w-full">
-          <div className="flex flex-col gap-5 p-6 sm:p-10 border rounded-xl bg-[var(--yellow)]">
-            <div>
-              <label className="block font-medium mb-1">Nama Lengkap</label>
-              <Input placeholder="Nama Lengkap" readOnly value="John Doe" />
-            </div>
-
-            <div>
-              <label className="block font-medium mb-1">Username</label>
-              <Input placeholder="Username" readOnly value="johnmanager" />
-            </div>
-
-            <div>
-              <label className="block font-medium mb-1">Email</label>
-              <Input
-                type="email"
-                placeholder="email@example.com"
-                readOnly
-                value="john@example.com"
-              />
-            </div>
-
-            <div>
-              <label className="block font-medium mb-1">Password</label>
-              <Input
-                type="password"
-                placeholder="08xxxxxxxx"
-                readOnly
-                value="081234567890"
-              />
-            </div>
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Nama Lengkap</label>
+            <Input placeholder="Nama Lengkap" readOnly value="John Doe" className="rounded-xl border-gray-200 bg-gray-50" />
           </div>
 
-          <div className="w-full flex flex-col sm:flex-row items-center justify-end gap-3 sm:gap-4 mt-4">
-            <Button
-              type="button"
-              variant={"yellow"}
-              className="w-full sm:w-48 rounded-md"
-            >
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
+            <Input placeholder="Username" readOnly value="johnmanager" className="rounded-xl border-gray-200 bg-gray-50" />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+            <Input type="email" placeholder="email@example.com" readOnly value="john@example.com" className="rounded-xl border-gray-200 bg-gray-50" />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+            <Input type="password" readOnly value="081234567890" className="rounded-xl border-gray-200 bg-gray-50" />
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-4">
+            <Button type="button" variant="outline" className="rounded-xl px-6">
+              <ArrowLeft className="w-4 h-4 mr-2" />
               Kembali
             </Button>
 
-            {/* 🔸 Alert Dialog Pertama - Konfirmasi */}
             <AlertDialog open={openConfirm} onOpenChange={setOpenConfirm}>
               <AlertDialogTrigger asChild>
-                <Button
-                  type="button"
-                  variant={"primary"}
-                  className="w-full sm:w-48 rounded-md"
-                >
+                <Button type="button" className="rounded-xl px-6 text-white" style={{ backgroundColor: '#015023' }}>
                   Konfirmasi
                 </Button>
               </AlertDialogTrigger>
@@ -126,17 +99,15 @@ export default function TambahManajer() {
                     Pastikan semua informasi sudah benar sebelum melanjutkan.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Batal</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleConfirm}>
+                  <AlertDialogCancel className="rounded-xl">Batal</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleConfirm} className="rounded-xl">
                     Ya, Simpan
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
 
-            {/* 🔸 Alert Dialog Kedua - Ucapan Selamat */}
             <AlertDialog open={openSuccess} onOpenChange={setOpenSuccess}>
               <AlertDialogContent className="max-w-md text-center">
                 <AlertDialogHeader className="flex flex-col items-center">
@@ -150,10 +121,7 @@ export default function TambahManajer() {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter className="flex justify-center">
-                  <AlertDialogAction
-                    onClick={() => setOpenSuccess(false)}
-                    className="w-32"
-                  >
+                  <AlertDialogAction onClick={() => setOpenSuccess(false)} className="w-32 rounded-xl">
                     Tutup
                   </AlertDialogAction>
                 </AlertDialogFooter>

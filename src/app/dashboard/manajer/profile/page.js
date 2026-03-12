@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { Heading } from "@/components/Heading";
 import { useDeleteManager, useManagers } from "@/hooks/useAdmin";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
@@ -15,6 +14,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Suspense, useState } from "react";
+import { Mail, Phone, User, Trash2 } from "lucide-react";
 
 export default function Profile() {
   return (
@@ -30,7 +30,6 @@ function ProfileInner() {
   const router = useRouter();
   const managerId = searchParams.get("id");
 
-  // Get all managers and find the specific one
   const { data, isLoading, isError, error } = useManagers();
   const {
     mutate: deleteManager,
@@ -39,107 +38,125 @@ function ProfileInner() {
     error: deleteError,
   } = useDeleteManager();
 
-  if (isLoading) return <div>Loading...</div>;
-
-  if (isError)
+  if (isLoading) {
     return (
-      <div>
-        Error fetching manager profile:{" "}
-        {error.response?.data?.message || error.message}
+      <div className="space-y-6">
+        <div className="bg-white rounded-2xl border p-6 animate-pulse" style={{ borderColor: '#E6EEE9' }}>
+          <div className="flex flex-col sm:flex-row gap-6">
+            <div className="w-full sm:w-48 h-48 bg-gray-200 rounded-xl" />
+            <div className="flex-1 space-y-3">
+              <div className="h-6 bg-gray-200 rounded w-1/3" />
+              <div className="h-4 bg-gray-200 rounded w-1/4" />
+              <div className="h-4 bg-gray-200 rounded w-1/5" />
+            </div>
+          </div>
+        </div>
       </div>
     );
+  }
 
-  // Find manager from the list
+  if (isError) return (
+    <div className="bg-white rounded-2xl border p-8" style={{ borderColor: '#E6EEE9' }}>
+      <p className="text-red-600">Error: {error.response?.data?.message || error.message}</p>
+    </div>
+  );
+
   const managersList = data?.data?.data || [];
   const managerData = Array.isArray(managersList)
     ? managersList.find((m) => m.id_user === parseInt(managerId))
     : null;
 
   if (!managerData) {
-    return <div>Manager tidak ditemukan</div>;
+    return (
+      <div className="bg-white rounded-2xl border p-8" style={{ borderColor: '#E6EEE9' }}>
+        <p className="text-gray-500">Manager tidak ditemukan</p>
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-col items-center px-4 sm:px-6 lg:px-8 max-w-7xl my-6 sm:my-8 lg:my-12 w-full gap-3 mx-auto">
-      {/* Akun Manajer */}
-      <Heading title="Akun Manajer" variant="first" />
-
+    <div className="space-y-6">
       {/* Profile Card */}
-      <div className="w-full flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8" style={{ backgroundColor: '#E6EEE9', borderRadius: '16px', border: '1px solid #D9E5DE' }}>
-        <Image
-          alt={`Profile picture of ${managerData.name}`}
-          src={managerData.avatar_url || "/default-avatar.png"}
-          width={180}
-          height={300}
-          className="w-full sm:w-1/3 lg:w-1/4 h-[200px] sm:h-[250px] lg:h-[300px] rounded-lg sm:rounded-xl object-cover mx-auto sm:mx-0"
-        />
-        <div className="flex flex-col p-2 w-full sm:w-2/3 space-y-1 sm:space-y-2 items-start justify-start">
-          <h2 className="font-bold text-lg sm:text-xl lg:text-2xl">
-            {managerData.name}
-          </h2>
-          <h3 className="text-gray-500 text-sm sm:text-base">
-            @{managerData.username || managerData.name}
-          </h3>
-          <p className="text-gray-500 text-sm sm:text-base">
-            {managerData.email}
-          </p>
-          <p className="text-gray-500 text-xs sm:text-sm">
-            {managerData.phone || "Tidak ada nomor telepon"}
-          </p>
+      <div className="bg-white rounded-2xl border p-6 sm:p-8" style={{ borderColor: '#E6EEE9' }}>
+        <h2 className="text-lg font-semibold mb-6" style={{ color: '#015023' }}>Akun Manajer</h2>
+
+        <div className="flex flex-col sm:flex-row gap-6">
+          <Image
+            alt={`Profile picture of ${managerData.name}`}
+            src={managerData.avatar_url || "/default-avatar.png"}
+            width={180}
+            height={220}
+            className="w-full sm:w-44 h-52 rounded-xl object-cover mx-auto sm:mx-0"
+          />
+          <div className="flex flex-col justify-center space-y-3">
+            <h3 className="text-xl font-bold text-gray-900">{managerData.name}</h3>
+            <div className="flex items-center gap-2 text-gray-500 text-sm">
+              <User className="w-4 h-4" />
+              <span>@{managerData.username || managerData.name}</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-500 text-sm">
+              <Mail className="w-4 h-4" />
+              <span>{managerData.email}</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-500 text-sm">
+              <Phone className="w-4 h-4" />
+              <span>{managerData.phone || "Tidak ada nomor telepon"}</span>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Kelola Akun */}
-      <Heading title="Kelola Akun" />
+      <div className="bg-white rounded-2xl border p-6 sm:p-8" style={{ borderColor: '#E6EEE9' }}>
+        <h2 className="text-lg font-semibold mb-4" style={{ color: '#015023' }}>Kelola Akun</h2>
 
-      {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:justify-center">
-        <AlertDialog open={open} onOpenChange={setOpen}>
-          {/* Trigger button */}
-          <AlertDialogTrigger asChild>
-            <Button
-              className="rounded-lg w-full sm:w-1/2 lg:w-1/4 bg-red-600 hover:bg-red-700 text-sm sm:text-base py-2 sm:py-3"
-              disabled={deleteLoading}
-            >
-              Hapus Akun
-            </Button>
-          </AlertDialogTrigger>
-
-          {/* Confirmation dialog */}
-          <AlertDialogContent className="w-[90vw] sm:w-full max-w-lg">
-            <AlertDialogHeader>
-              <AlertDialogTitle>Hapus Manager</AlertDialogTitle>
-              <AlertDialogDescription>
-                Apakah Anda yakin ingin menghapus akun{" "}
-                <strong>{managerData.name}</strong>? Tindakan ini tidak dapat
-                dibatalkan.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <AlertDialog open={open} onOpenChange={setOpen}>
+            <AlertDialogTrigger asChild>
               <Button
-                variant="outline"
-                onClick={() => setOpen(false)}
-                className="w-full sm:w-auto"
-              >
-                Batal
-              </Button>
-              <Button
-                className="bg-red-600 hover:bg-red-700 w-full sm:w-auto"
-                onClick={() => {
-                  deleteManager(managerId, {
-                    onSuccess: () => {
-                      setOpen(false);
-                      router.push("/dashboard/manajer");
-                    },
-                  });
-                }}
+                className="rounded-xl bg-red-600 hover:bg-red-700 text-white"
                 disabled={deleteLoading}
               >
-                {deleteLoading ? "Menghapus..." : "Hapus"}
+                <Trash2 className="w-4 h-4 mr-2" />
+                Hapus Akun
               </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+            </AlertDialogTrigger>
+
+            <AlertDialogContent className="w-[90vw] sm:w-full max-w-lg">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Hapus Manager</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Apakah Anda yakin ingin menghapus akun{" "}
+                  <strong>{managerData.name}</strong>? Tindakan ini tidak dapat
+                  dibatalkan.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setOpen(false)}
+                  className="w-full sm:w-auto rounded-xl"
+                >
+                  Batal
+                </Button>
+                <Button
+                  className="bg-red-600 hover:bg-red-700 w-full sm:w-auto rounded-xl"
+                  onClick={() => {
+                    deleteManager(managerId, {
+                      onSuccess: () => {
+                        setOpen(false);
+                        router.push("/dashboard/data");
+                      },
+                    });
+                  }}
+                  disabled={deleteLoading}
+                >
+                  {deleteLoading ? "Menghapus..." : "Hapus"}
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
     </div>
   );

@@ -60,6 +60,7 @@ export default function Navbar() {
   } = useUnreadCount(shouldFetchNotifications);
 
   const isManagerRoute = pathname.startsWith("/manager");
+  const isDashboardRoute = pathname.startsWith("/dashboard");
 
   const isActivePath = (path) => {
     if (path === "/") {
@@ -160,7 +161,7 @@ export default function Navbar() {
       }}
     >
       <div className="py-1 sm:py-1 flex items-center gap-2 sm:gap-3">
-        {isManagerRoute ? (
+        {(isManagerRoute || isDashboardRoute) ? (
           <div className="flex items-center gap-2 sm:gap-3">
             <Image
               src="/logo.svg"
@@ -221,7 +222,63 @@ export default function Navbar() {
         <div className="hidden md:flex">
           <NavigationMenu>
             <NavigationMenuList className="w-fit">
-                {isManagerRoute ? (
+                {isDashboardRoute ? (
+                  <>
+                    {[
+                      { href: '/dashboard',              label: 'Dashboard' },
+                      { href: '/dashboard/data',         label: 'Data Pendaftar & Manager' },
+                      { href: '/dashboard/edit/pembayaran', label: 'Edit Metode Pembayaran' },
+                      { href: '/dashboard/manajer/tambah', label: 'Pendaftaran Manager' },
+                    ].map(({ href, label }) => (
+                      <NavigationMenuItem key={href}>
+                        <NavigationMenuLink
+                          asChild
+                          className={cn(
+                            navigationMenuTriggerStyle(),
+                            pathname === href && "bg-[var(--yellow)] text-[var(--green)]"
+                          )}
+                        >
+                          <Link href={href}>{label}</Link>
+                        </NavigationMenuLink>
+                      </NavigationMenuItem>
+                    ))}
+                    <NavigationMenuItem>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            className={cn(
+                              navigationMenuTriggerStyle(),
+                              "flex items-center gap-1",
+                              pathname.startsWith('/dashboard/statistik') &&
+                                "bg-[var(--yellow)] text-[var(--green)]"
+                            )}
+                          >
+                            Statistik <ChevronDown className="h-3 w-3 opacity-70" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[180px] z-[2000]">
+                          {[
+                            { href: '/dashboard/statistik/pendaftar',     label: 'Statistik Pendaftar' },
+                            { href: '/dashboard/statistik/program-studi', label: 'Statistik Prodi' },
+                            { href: '/dashboard/statistik/keuangan',      label: 'Statistik Keuangan' },
+                          ].map(({ href, label }) => (
+                            <DropdownMenuItem key={href} asChild>
+                              <Link
+                                href={href}
+                                className={cn(
+                                  'cursor-pointer',
+                                  pathname === href && 'bg-[#015023]/10 font-semibold'
+                                )}
+                              >
+                                {label}
+                              </Link>
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </NavigationMenuItem>
+                  </>
+                ) : isManagerRoute ? (
                   <>
                     {[
                       { href: '/manager',            label: 'Dashboard' },
@@ -427,7 +484,15 @@ export default function Navbar() {
             style={{ backgroundColor: '#015023' }}
           >
             <nav className="flex flex-col">
-              {(isManagerRoute ? [
+              {(isDashboardRoute ? [
+                { href: '/dashboard',              label: 'Dashboard' },
+                { href: '/dashboard/data',         label: 'Data Pendaftar & Manager' },
+                { href: '/dashboard/edit/pembayaran', label: 'Edit Metode Pembayaran' },
+                { href: '/dashboard/manajer/tambah', label: 'Pendaftaran Manager' },
+                { href: '/dashboard/statistik/pendaftar',     label: 'Statistik Pendaftar' },
+                { href: '/dashboard/statistik/program-studi', label: 'Statistik Prodi' },
+                { href: '/dashboard/statistik/keuangan',      label: 'Statistik Keuangan' },
+              ] : isManagerRoute ? [
                 { href: '/manager',            label: 'Dashboard' },
                 { href: '/manager/pendaftar',  label: 'Data Pendaftar' },
                 { href: '/manager/broadcast',  label: 'Broadcast' },

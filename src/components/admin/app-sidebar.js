@@ -1,20 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { LayoutDashboard } from "lucide-react";
-import { UsersRound } from "lucide-react";
-import { FilePlus } from "lucide-react";
-import { WalletMinimal } from "lucide-react";
-import { UserRoundCog } from "lucide-react";
-import { ChartLine } from "lucide-react";
-import { Frame } from "lucide-react";
-import { PieChart } from "lucide-react";
-import { Map } from "lucide-react";
-
-import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { LayoutDashboard, UsersRound, WalletMinimal, UserRoundCog, ChartLine } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
 import {
@@ -25,7 +14,6 @@ import {
   SidebarRail,
   SidebarClose
 } from "@/components/ui/sidebar";
-
 
 const data = {
   navMain: [
@@ -62,12 +50,12 @@ const data = {
 
 export function AppSidebar({ ...props }) {
   return (
-    <Sidebar collapsible="icon" {...props} className={"text-amber-600"}>
+    <Sidebar collapsible="icon" {...props} className="border-r border-[#E6EEE9]">
       <SidebarHeader>
         <SidebarClose />
         <TeamSwitcher />
       </SidebarHeader>
-      <DropdownMenuSeparator className={"bg-[var(--yellow)] mb-3"} />
+      <div className="mx-4 mb-3 border-t" style={{ borderColor: '#E6EEE9' }} />
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>

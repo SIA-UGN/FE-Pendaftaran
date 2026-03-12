@@ -1,20 +1,35 @@
-import { ChartPieApplicant } from "@/components/dashboard/ChartPieApplicant";
+"use client";
+
+import Link from "next/link";
+import { BarChart3, Users, DollarSign, GraduationCap } from "lucide-react";
+
+const statLinks = [
+  { label: "Statistik Pendaftar", desc: "Data verifikasi & kelulusan pendaftar", href: "/dashboard/statistik/pendaftar", icon: Users, color: "#015023" },
+  { label: "Statistik Program Studi", desc: "Distribusi pendaftar per program", href: "/dashboard/statistik/program-studi", icon: GraduationCap, color: "#d97706" },
+  { label: "Statistik Keuangan", desc: "Pendapatan & pembayaran", href: "/dashboard/statistik/keuangan", icon: DollarSign, color: "#22c55e" },
+];
 
 export default function Statistika() {
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className="flex flex-col items-center px-4 sm:px-8 max-w-11/12 mt-12 w-full">
-        <h2 className="text-3xl sm:text-2xl font-semibold mb-6 mt-6 pb-2 w-full" style={{ borderBottom: '2px solid #DABC4E', color: '#015023' }}>
-          Statistik
-        </h2>
-        <ChartPieApplicant />
-        <h2 className="text-3xl sm:text-2xl font-semibold mb-6 mt-6 pb-2 w-full" style={{ borderBottom: '2px solid #DABC4E', color: '#015023' }}>
-          Deskripsi Statistik
-        </h2>
-        <p>
-          Dari data tersebut dapat disimpulkan bahwa semua mahasiswa dinyatakan
-          lulus.
-        </p>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-lg sm:text-xl font-bold" style={{ color: '#015023' }}>Statistik</h2>
+        <p className="text-xs text-gray-400">Pilih kategori statistik untuk melihat detail</p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {statLinks.map((item, i) => (
+          <Link key={i} href={item.href}>
+            <div className="bg-white rounded-2xl p-5 sm:p-6 border transition-all hover:shadow-md cursor-pointer group" style={{ borderColor: '#E6EEE9' }}>
+              <div className="flex items-start justify-between mb-4">
+                <div className="p-2.5 rounded-xl" style={{ backgroundColor: `${item.color}12` }}>
+                  <item.icon size={24} style={{ color: item.color }} />
+                </div>
+              </div>
+              <h3 className="text-sm sm:text-base font-semibold mb-1 group-hover:underline" style={{ color: '#015023' }}>{item.label}</h3>
+              <p className="text-xs text-gray-400">{item.desc}</p>
+            </div>
+          </Link>
+        ))}
       </div>
     </div>
   );

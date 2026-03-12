@@ -13,9 +13,9 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Heading } from "@/components/Heading";
 import { useRouter } from "next/navigation";
 import { useCreatePaymentMethod } from "@/hooks/usePaymentMethod";
+import { ArrowLeft, Plus } from "lucide-react";
 
 const FormSchema = z.object({
   method_type: z.string().min(1, "Jenis pembayaran harus diisi"),
@@ -48,96 +48,90 @@ export default function TambahMetodePembayaran() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className="flex flex-col items-center px-4 sm:px-6 lg:px-8 max-w-6xl my-6 sm:my-8 lg:my-12 w-full">
-        <Heading title="Tambah Metode Pembayaran" variant="first" />
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl border p-6 sm:p-8" style={{ borderColor: '#E6EEE9' }}>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#E6EEE9' }}>
+            <Plus className="w-5 h-5" style={{ color: '#015023' }} />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold" style={{ color: '#015023' }}>Tambah Metode Pembayaran</h2>
+            <p className="text-xs text-gray-400">Tambahkan metode pembayaran baru</p>
+          </div>
+        </div>
 
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6 w-full"
-          >
-            <div className="flex flex-col gap-5 p-8 border rounded-xl bg-[var(--yellow)]">
-              <FormField
-                control={form.control}
-                name="method_type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Jenis Pembayaran</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Bank, E-Wallet, Transfer"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            <FormField
+              control={form.control}
+              name="method_type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">Jenis Pembayaran</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Bank, E-Wallet, Transfer" className="rounded-xl border-gray-200" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="bank_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nama Bank</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Contoh: BCA, BRI, Mandiri"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="bank_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">Nama Bank</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Contoh: BCA, BRI, Mandiri" className="rounded-xl border-gray-200" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="account_number"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nomor Rekening</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Nomor rekening pembayaran"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="account_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">Nomor Rekening</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nomor rekening pembayaran" className="rounded-xl border-gray-200" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="account_holder"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nama Pemilik Rekening</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Nama pemilik rekening" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="account_holder"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-gray-700">Nama Pemilik Rekening</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nama pemilik rekening" className="rounded-xl border-gray-200" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-            <div className="flex justify-end gap-3">
+            <div className="flex items-center justify-end gap-3 pt-4">
               <Button
                 type="button"
-                variant="yellow"
+                variant="outline"
                 onClick={() => router.back()}
-                className="w-40 rounded-2xl"
+                className="rounded-xl px-6"
               >
+                <ArrowLeft className="w-4 h-4 mr-2" />
                 Kembali
               </Button>
-
               <Button
                 type="submit"
-                variant="primary"
-                className="w-40 rounded-2xl"
+                className="rounded-xl px-6 text-white"
+                style={{ backgroundColor: '#015023' }}
                 disabled={isLoading}
               >
                 {isLoading ? "Menyimpan..." : "Tambah Metode"}

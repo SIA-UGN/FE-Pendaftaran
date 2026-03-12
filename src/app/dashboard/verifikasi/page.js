@@ -2,11 +2,8 @@
 
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
-
-
 import { Button } from "@/components/ui/button";
-import { Heading } from "@/components/Heading";
-import { IdCard, UserRound, WalletMinimal, ImageIcon } from "lucide-react";
+import { IdCard, UserRound, WalletMinimal, ImageIcon, ArrowLeft, CheckCircle, XCircle } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,13 +15,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import Link from "next/link";
 import TextareaAutosize from "react-textarea-autosize";
-import { InputGroup, InputGroupAddon } from "@/components/ui/input-group";
+import { InputGroup } from "@/components/ui/input-group";
 import Image from "next/image";
 import { usePaymentVerification, useVerifyPayment } from "@/hooks/useAdmin";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
 
 export default function Keuangan() {
   return (
@@ -56,11 +51,7 @@ function KeuanganInner() {
 
   const handleVerifyPayment = (status) => {
     const action =
-      status === "verified"
-        ? "verify"
-        : status === "rejected"
-        ? "reject"
-        : status;
+      status === "verified" ? "verify" : status === "rejected" ? "reject" : status;
     verifyPayment(
       {
         id: Number(id),
@@ -88,221 +79,201 @@ function KeuanganInner() {
     );
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error: {error.message}</div>;
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="bg-white rounded-2xl border p-6 animate-pulse" style={{ borderColor: '#E6EEE9' }}>
+            <div className="h-5 bg-gray-200 rounded w-1/3 mb-4" />
+            <div className="space-y-3">
+              <div className="h-4 bg-gray-200 rounded w-2/3" />
+              <div className="h-4 bg-gray-200 rounded w-1/2" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (isError) return (
+    <div className="bg-white rounded-2xl border p-8" style={{ borderColor: '#E6EEE9' }}>
+      <p className="text-red-600">Error: {error.message}</p>
+    </div>
+  );
 
   const data = paymentData?.data?.data;
 
   return (
-    <div className="flex flex-col items-center px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto my-6 sm:my-8 lg:my-12 w-full gap-3">
-      <div className="w-full flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8 justify-between items-start sm:items-center" style={{ backgroundColor: '#E6EEE9', borderRadius: '16px', border: '1px solid #D9E5DE' }}>
-        <div className="flex flex-col w-full sm:w-2/3 space-y-1">
-          <h2 className="font-bold text-lg sm:text-xl">
-            {data.applicant_name}
-          </h2>
-          <h3 className="text-gray-500 text-sm sm:text-base">
-            {data.registration_number}
-          </h3>
-          {/* <p className="text-gray-500 text-sm sm:text-base">
-            {data.data.user.email}
-          </p> */}
+    <div className="space-y-6">
+      {/* Applicant Info Card */}
+      <div className="bg-white rounded-2xl border p-6 sm:p-8" style={{ borderColor: '#E6EEE9' }}>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">{data.applicant_name}</h2>
+            <p className="text-sm text-gray-500">{data.registration_number}</p>
+          </div>
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
+            style={{
+              backgroundColor: data.status === 'verified' ? '#dcfce7' : data.status === 'rejected' ? '#fef2f2' : '#fef9c3',
+              color: data.status === 'verified' ? '#166534' : data.status === 'rejected' ? '#991b1b' : '#854d0e'
+            }}>
+            {data.status}
+          </span>
         </div>
-        <Button
-          variant="yellow"
-          className="w-full sm:w-auto text-sm sm:text-base"
-        >
-          {data.status}
-        </Button>
       </div>
 
-      <Heading title="Rincian Pembayaran" />
-      <div className="w-full flex flex-col gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8" style={{ backgroundColor: '#E6EEE9', borderRadius: '16px', border: '1px solid #D9E5DE' }}>
-        <h3 className="font-semibold text-base sm:text-lg">
-          Ringkasan Pembayaran
-        </h3>
-        <div className="flex flex-col gap-3">
-          <div className="flex gap-3 items-start">
-            <UserRound className="w-5 h-5 flex-shrink-0 mt-0.5" />
-            <span className="text-sm sm:text-base">
-              Nama Pengguna: {data.sender_account_holder}
-            </span>
+      {/* Payment Detail Card */}
+      <div className="bg-white rounded-2xl border p-6 sm:p-8" style={{ borderColor: '#E6EEE9' }}>
+        <h3 className="text-lg font-semibold mb-4" style={{ color: '#015023' }}>Rincian Pembayaran</h3>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 text-sm">
+            <UserRound className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <span className="text-gray-500">Nama Pengguna:</span>
+            <span className="font-medium text-gray-900">{data.sender_account_holder}</span>
           </div>
-          <div className="flex gap-3 items-start">
-            <IdCard className="w-5 h-5 flex-shrink-0 mt-0.5" />
-            <span className="text-sm sm:text-base">
-              Nomor Pendaftaran: {data.registration_number}
-            </span>
+          <div className="flex items-center gap-3 text-sm">
+            <IdCard className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <span className="text-gray-500">Nomor Pendaftaran:</span>
+            <span className="font-medium text-gray-900">{data.registration_number}</span>
           </div>
-          <div className="flex gap-3 items-start">
-            <WalletMinimal className="w-5 h-5 flex-shrink-0 mt-0.5" />
-            <span className="text-sm sm:text-base font-semibold">
-              {data.paid_amount}
-            </span>
+          <div className="flex items-center gap-3 text-sm">
+            <WalletMinimal className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <span className="text-gray-500">Jumlah:</span>
+            <span className="font-semibold text-gray-900">{data.paid_amount}</span>
           </div>
         </div>
       </div>
 
-      <Heading title="Bukti Pembayaran" />
-      <AlertDialog open={openBukti} onOpenChange={setOpenBukti}>
-        <AlertDialogTrigger asChild>
-          <div
-            className="w-full flex flex-col items-center justify-center border-2 border-dashed cursor-pointer transition"
-            style={{ borderRadius: '16px', borderColor: '#015023', backgroundColor: '#E6EEE9' }}
-          >
-            <div className="flex flex-col items-center gap-2 py-8 sm:py-10">
-              <ImageIcon className="w-6 h-6 sm:w-8 sm:h-8" />
-              <span className="text-sm sm:text-base">
-                Lihat Bukti Pembayaran
-              </span>
+      {/* Proof Card */}
+      <div className="bg-white rounded-2xl border p-6 sm:p-8" style={{ borderColor: '#E6EEE9' }}>
+        <h3 className="text-lg font-semibold mb-4" style={{ color: '#015023' }}>Bukti Pembayaran</h3>
+        <AlertDialog open={openBukti} onOpenChange={setOpenBukti}>
+          <AlertDialogTrigger asChild>
+            <div className="w-full flex flex-col items-center justify-center border-2 border-dashed rounded-xl cursor-pointer transition hover:bg-gray-50 py-8" style={{ borderColor: '#E6EEE9' }}>
+              <ImageIcon className="w-8 h-8 text-gray-400 mb-2" />
+              <span className="text-sm text-gray-500">Lihat Bukti Pembayaran</span>
             </div>
-          </div>
-        </AlertDialogTrigger>
-
-        <AlertDialogContent className="max-w-xl w-[90vw] sm:w-full">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Bukti Pembayaran</AlertDialogTitle>
-            <AlertDialogDescription>
-              Berikut adalah foto bukti pembayaran yang telah diunggah.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-
-          <div className="flex justify-center my-4">
-            <Image
-              src={data.payment_proof_url}
-              alt="Bukti Pembayaran"
-              className="rounded-lg shadow-md object-contain w-full h-auto"
-              width={400}
-              height={400}
-            />
-          </div>
-
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setOpenBukti(false)}>
-              Tutup
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <Heading title="Validation Notes" />
-      <div
-        className="w-full items-center justify-center p-4 sm:p-6 text-center"
-        style={{ backgroundColor: '#DABC4E', borderRadius: '16px', border: '1px solid #c4a83e' }}
-      >
-        <p className="text-sm sm:text-base">Payment verified amount matches</p>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="max-w-xl w-[90vw] sm:w-full">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Bukti Pembayaran</AlertDialogTitle>
+              <AlertDialogDescription>
+                Berikut adalah foto bukti pembayaran yang telah diunggah.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="flex justify-center my-4">
+              <Image
+                src={data.payment_proof_url}
+                alt="Bukti Pembayaran"
+                className="rounded-lg shadow-md object-contain w-full h-auto"
+                width={400}
+                height={400}
+              />
+            </div>
+            <AlertDialogFooter>
+              <AlertDialogAction onClick={() => setOpenBukti(false)} className="rounded-xl">
+                Tutup
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
 
-      <div className="w-full mt-6 sm:mt-8 lg:mt-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full sm:w-auto sm:ml-auto">
-          <Button
-            variant="yellow"
-            className="flex items-center justify-center gap-2 rounded-lg text-sm sm:text-base py-2 sm:py-3"
-            onClick={() => router.back()}
-          >
-            Kembali
-          </Button>
+      {/* Validation Notes */}
+      <div className="rounded-2xl border p-4 sm:p-6 text-center" style={{ backgroundColor: '#fef9c3', borderColor: '#fde68a' }}>
+        <p className="text-sm font-medium" style={{ color: '#854d0e' }}>Payment verified amount matches</p>
+      </div>
 
-          <AlertDialog open={openFirst} onOpenChange={setOpenFirst}>
-            <AlertDialogTrigger asChild>
-              <Button
-                variant="primary"
-                className="flex items-center justify-center gap-2 rounded-lg text-sm sm:text-base py-2 sm:py-3"
+      {/* Action Buttons */}
+      <div className="flex items-center justify-end gap-3">
+        <Button variant="outline" className="rounded-xl px-6" onClick={() => router.back()}>
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Kembali
+        </Button>
+
+        <AlertDialog open={openFirst} onOpenChange={setOpenFirst}>
+          <AlertDialogTrigger asChild>
+            <Button className="rounded-xl px-6 text-white" style={{ backgroundColor: '#015023' }}>
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Verifikasi Keuangan
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="w-[90vw] sm:w-full max-w-lg">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Konfirmasi Verifikasi</AlertDialogTitle>
+              <AlertDialogDescription>
+                Apakah Anda yakin ingin memverifikasi data keuangan ini?
+                Tindakan ini tidak dapat dibatalkan.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+              <AlertDialogCancel
+                onClick={() => { setOpenFirst(false); setOpenCancel(true); }}
+                className="w-full sm:w-auto rounded-xl"
               >
-                Verifikasi Keuangan
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="w-[90vw] sm:w-full max-w-lg">
-              <AlertDialogHeader>
-                <AlertDialogTitle>Konfirmasi Verifikasi</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Apakah Anda yakin ingin memverifikasi data keuangan ini?
-                  Tindakan ini tidak dapat dibatalkan.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter className="flex-col sm:flex-row gap-2">
-                <AlertDialogCancel
-                  onClick={() => {
-                    setOpenFirst(false);
-                    setOpenCancel(true);
-                  }}
-                  className="w-full sm:w-auto"
-                >
-                  Tolak
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => {
-                    setOpenFirst(false);
-                    handleVerifyPayment("verified");
-                  }}
-                  className="w-full sm:w-auto"
-                  disabled={isVerifying}
-                >
-                  Ya, Verifikasi
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+                Tolak
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => { setOpenFirst(false); handleVerifyPayment("verified"); }}
+                className="w-full sm:w-auto rounded-xl"
+                disabled={isVerifying}
+              >
+                Ya, Verifikasi
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
-          <AlertDialog open={openConfirm} onOpenChange={setOpenConfirm}>
-            <AlertDialogContent className="w-[90vw] sm:w-full max-w-lg">
-              <AlertDialogHeader>
-                <AlertDialogTitle>Selamat</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Pembayaran pendaftar telah berhasil diverifikasi.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
+        <AlertDialog open={openConfirm} onOpenChange={setOpenConfirm}>
+          <AlertDialogContent className="w-[90vw] sm:w-full max-w-lg">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Selamat</AlertDialogTitle>
+              <AlertDialogDescription>
+                Pembayaran pendaftar telah berhasil diverifikasi.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction onClick={() => setOpenConfirm(false)} className="w-full sm:w-auto rounded-xl">
+                Kembali
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
-              <AlertDialogFooter>
-                <AlertDialogAction
-                  onClick={() => setOpenConfirm(false)}
-                  className="w-full sm:w-auto"
-                >
-                  Kembali
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-
-          <AlertDialog open={openCancel} onOpenChange={setOpenCancel}>
-            <AlertDialogContent className="w-[90vw] sm:w-full max-w-lg">
-              <AlertDialogHeader>
-                <AlertDialogTitle>Catatan Penolakan</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Tuliskan alasan penolakan pembayaran
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-
-              <InputGroup className="my-4">
-                <TextareaAutosize
-                  data-slot="input-group-control"
-                  className="flex field-sizing-content min-h-32 w-full resize-none rounded-md bg-transparent px-3 py-2.5 text-sm sm:text-base transition-[color,box-shadow] outline-none border border-gray-300"
-                  placeholder="Masukkan alasan penolakan..."
-                  value={rejectNotes}
-                  onChange={(e) => setRejectNotes(e.target.value)}
-                />
-              </InputGroup>
-
-              <AlertDialogFooter>
-                <AlertDialogCancel
-                  onClick={() => {
-                    setOpenCancel(false);
-                    setRejectNotes("");
-                  }}
-                  className="w-full sm:w-auto"
-                >
-                  Batal
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => handleVerifyPayment("rejected")}
-                  disabled={!rejectNotes.trim() || isVerifying}
-                  className="w-full sm:w-auto"
-                >
-                  Tolak Pembayaran
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
+        <AlertDialog open={openCancel} onOpenChange={setOpenCancel}>
+          <AlertDialogContent className="w-[90vw] sm:w-full max-w-lg">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Catatan Penolakan</AlertDialogTitle>
+              <AlertDialogDescription>
+                Tuliskan alasan penolakan pembayaran
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <InputGroup className="my-4">
+              <TextareaAutosize
+                data-slot="input-group-control"
+                className="flex field-sizing-content min-h-32 w-full resize-none rounded-xl bg-transparent px-3 py-2.5 text-sm transition-[color,box-shadow] outline-none border border-gray-200"
+                placeholder="Masukkan alasan penolakan..."
+                value={rejectNotes}
+                onChange={(e) => setRejectNotes(e.target.value)}
+              />
+            </InputGroup>
+            <AlertDialogFooter>
+              <AlertDialogCancel
+                onClick={() => { setOpenCancel(false); setRejectNotes(""); }}
+                className="w-full sm:w-auto rounded-xl"
+              >
+                Batal
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => handleVerifyPayment("rejected")}
+                disabled={!rejectNotes.trim() || isVerifying}
+                className="w-full sm:w-auto rounded-xl"
+              >
+                Tolak Pembayaran
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

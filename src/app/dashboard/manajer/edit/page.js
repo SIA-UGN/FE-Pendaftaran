@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 import { useUserProfile, useUpdateUser } from "@/hooks/useAdmin";
 import { useManagers } from "@/hooks/useAdmin";
-import { Heading } from "@/components/Heading";
+import { ArrowLeft, UserCog } from "lucide-react";
 
 const FormSchema = z.object({
   name: z.string().min(2, { message: "Nama harus diisi" }),
@@ -76,41 +76,51 @@ function PageInner() {
 
   if (!id) {
     return (
-      <div className="max-w-3xl mx-auto p-8">
-        <p className="text-red-600">
-          ID manajer tidak ditemukan pada parameter.
-        </p>
+      <div className="bg-white rounded-2xl border p-8" style={{ borderColor: '#E6EEE9' }}>
+        <p className="text-red-600">ID manajer tidak ditemukan pada parameter.</p>
       </div>
     );
   }
 
-  const userData = data?.data?.data?.find((m) => m.id_user === parseInt(id));
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white rounded-2xl border p-6 animate-pulse" style={{ borderColor: '#E6EEE9' }}>
+          <div className="h-6 bg-gray-200 rounded w-1/3 mb-6" />
+          <div className="space-y-4">
+            <div className="h-10 bg-gray-200 rounded" />
+            <div className="h-10 bg-gray-200 rounded" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col items-center px-4 sm:px-6 lg:px-8 max-w-6xl my-6 sm:my-8 lg:mb-12 w-full">
-      <Heading title="Edit Data Manager" />
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4 sm:space-y-6 w-full"
-        >
-          <div className="flex flex-col gap-4 sm:gap-5 p-4 sm:p-8 lg:p-12 border rounded-lg sm:rounded-xl bg-[var(--yellow)]">
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl border p-6 sm:p-8" style={{ borderColor: '#E6EEE9' }}>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#E6EEE9' }}>
+            <UserCog className="w-5 h-5" style={{ color: '#015023' }} />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold" style={{ color: '#015023' }}>Edit Data Manager</h2>
+            <p className="text-xs text-gray-400">Perbarui informasi akun manajer</p>
+          </div>
+        </div>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm sm:text-base">
-                    Nama Lengkap
-                  </FormLabel>
+                  <FormLabel className="text-sm font-medium text-gray-700">Nama Lengkap</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Nama Lengkap"
-                      className="text-sm sm:text-base"
-                      {...field}
-                    />
+                    <Input placeholder="Nama Lengkap" className="rounded-xl border-gray-200 focus:border-[#015023] focus:ring-[#015023]" {...field} />
                   </FormControl>
-                  <FormMessage className="text-xs sm:text-sm" />
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -120,41 +130,37 @@ function PageInner() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm sm:text-base">Email</FormLabel>
+                  <FormLabel className="text-sm font-medium text-gray-700">Email</FormLabel>
                   <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="Email"
-                      className="text-sm sm:text-base"
-                      {...field}
-                    />
+                    <Input type="email" placeholder="Email" className="rounded-xl border-gray-200 focus:border-[#015023] focus:ring-[#015023]" {...field} />
                   </FormControl>
-                  <FormMessage className="text-xs sm:text-sm" />
+                  <FormMessage />
                 </FormItem>
               )}
             />
-          </div>
 
-          <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3">
-            <Button
-              type="button"
-              variant="yellow"
-              onClick={() => router.back()}
-              className="w-full sm:w-40 lg:w-48 rounded-xl sm:rounded-2xl text-sm sm:text-base py-2 sm:py-3"
-            >
-              Kembali
-            </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              className="w-full sm:w-40 lg:w-48 rounded-xl sm:rounded-2xl text-sm sm:text-base py-2 sm:py-3"
-              disabled={updateUser.isPending}
-            >
-              {updateUser.isPending ? "Menyimpan..." : "Update Data"}
-            </Button>
-          </div>
-        </form>
-      </Form>
+            <div className="flex items-center justify-end gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.back()}
+                className="rounded-xl px-6"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Kembali
+              </Button>
+              <Button
+                type="submit"
+                className="rounded-xl px-6 text-white"
+                style={{ backgroundColor: '#015023' }}
+                disabled={updateUser.isPending}
+              >
+                {updateUser.isPending ? "Menyimpan..." : "Update Data"}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </div>
     </div>
   );
 }

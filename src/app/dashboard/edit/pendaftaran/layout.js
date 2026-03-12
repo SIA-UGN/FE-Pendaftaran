@@ -4,11 +4,9 @@ import EditHeader from "@/components/admin/EditHeader";
 
 export default function Layout({ children }) {
     return (
-        <div className="w-full max-w-6xl mx-auto">
-            <main>
-                <EditHeader />
-                {children}
-            </main>
+        <div className="space-y-6">
+            <EditHeader />
+            <main>{children}</main>
         </div>
     )
 }
