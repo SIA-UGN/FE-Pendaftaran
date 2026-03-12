@@ -160,20 +160,37 @@ export default function Navbar() {
       }}
     >
       <div className="py-1 sm:py-1 flex items-center gap-2 sm:gap-3">
-        <Link href="/" className="flex items-center gap-2 sm:gap-3">
-          <Image
-            src="/logo.svg"
-            width={45}
-            height={56}
-            alt="Logo"
-            className="w-[45px] h-[56px] sm:w-[50px] sm:h-[62px] md:w-[60px] md:h-[75px]"
-          />
-          <p className="text-[var(--cream)] font-medium text-sm sm:text-base md:text-lg leading-tight hidden sm:block max-w-[150px] md:max-w-[200px]">
-            Universitas
-            <br />
-            Global Nusantara
-          </p>
-        </Link>
+        {isManagerRoute ? (
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Image
+              src="/logo.svg"
+              width={45}
+              height={56}
+              alt="Logo"
+              className="w-[45px] h-[56px] sm:w-[50px] sm:h-[62px] md:w-[60px] md:h-[75px]"
+            />
+            <p className="text-[var(--cream)] font-medium text-sm sm:text-base md:text-lg leading-tight hidden sm:block max-w-[150px] md:max-w-[200px]">
+              Universitas
+              <br />
+              Global Nusantara
+            </p>
+          </div>
+        ) : (
+          <Link href="/" className="flex items-center gap-2 sm:gap-3">
+            <Image
+              src="/logo.svg"
+              width={45}
+              height={56}
+              alt="Logo"
+              className="w-[45px] h-[56px] sm:w-[50px] sm:h-[62px] md:w-[60px] md:h-[75px]"
+            />
+            <p className="text-[var(--cream)] font-medium text-sm sm:text-base md:text-lg leading-tight hidden sm:block max-w-[150px] md:max-w-[200px]">
+              Universitas
+              <br />
+              Global Nusantara
+            </p>
+          </Link>
+        )}
       </div>
 
       <div className="flex md:hidden items-center gap-3">
