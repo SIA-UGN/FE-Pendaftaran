@@ -38,15 +38,6 @@ export default function Pendaftar() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
-  if (isError)
-    return (
-      <div className="flex items-center justify-center min-h-[400px] p-4">
-        <div className="text-red-500 text-center">
-          Error: {error?.response?.data?.message || error?.message}
-        </div>
-      </div>
-    );
-
   const applicantsList = applicantsData?.data?.data || [];
 
   const mappedApplicants = useMemo(() =>
@@ -85,6 +76,15 @@ export default function Pendaftar() {
       return matchSearch && matchStatus && matchProgram;
     });
   }, [mappedApplicants, search, statusFilter, programFilter]);
+
+  if (isError)
+    return (
+      <div className="flex items-center justify-center min-h-[400px] p-4">
+        <div className="text-red-500 text-center">
+          Error: {error?.response?.data?.message || error?.message}
+        </div>
+      </div>
+    );
 
   const totalPages = Math.ceil(filtered.length / pageSize);
   const paginatedData = filtered.slice((page - 1) * pageSize, page * pageSize);
