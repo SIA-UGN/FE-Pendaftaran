@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { Label } from "@/components/ui/label";
@@ -15,7 +15,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { SquarePen, Upload } from "lucide-react";
+import { Mail, SquarePen, Upload } from "lucide-react";
 import { useProfile, useUploadAvatar } from "@/hooks/useProfile";
 import { useChangePassword, useChangeEmail } from "@/hooks/useAuth";
 import toast from "react-hot-toast";
@@ -41,6 +41,7 @@ export default function Profil() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const isSaving = changePasswordMutation.isPending || changeEmailMutation.isPending;
 
   const handleEditClick = ({ title, message, type }) => {
     setAlertTitle(title);
@@ -146,8 +147,9 @@ export default function Profil() {
 
   if (isLoadingProfile) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--green)]"></div>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
+        <div className="h-20 rounded-2xl bg-white border animate-pulse" style={{ borderColor: "#E6EEE9" }} />
+        <div className="h-[420px] rounded-2xl bg-white border animate-pulse" style={{ borderColor: "#E6EEE9" }} />
       </div>
     );
   }
@@ -155,100 +157,84 @@ export default function Profil() {
   const applicant = profileData?.data?.data;
 
   return (
-    <div className="my-12">
-      <div className="flex flex-col items-center pt-4 pb-16 px-4 sm:px-8 max-w-11/12 mx-auto">
-        <h2 className="text-3xl sm:text-2xl font-semibold mb-8 w-full pb-2" style={{ borderBottom: '2px solid #DABC4E', color: '#015023' }}>
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div className="bg-white rounded-2xl border p-6 sm:p-8" style={{ borderColor: "#E6EEE9" }}>
+        <h2 className="text-2xl sm:text-3xl font-bold" style={{ color: "#015023" }}>
           Profil Saya
         </h2>
-        <div className="w-full h-full flex items-center justify-center relative flex-col gap-4 my-6">
-          <Input
-            id="picture"
-            type="file"
-            accept="image/*"
-            className="absolute w-0 opacity-0"
-            onChange={handleAvatarUpload}
-            disabled={uploadAvatarMutation.isPending}
-          />
-          <div className="relative w-72 h-96 rounded-xl cursor-pointer group">
-            <Image
-              alt="Profile banner"
-              src={
-                applicant.user.avatar_url
-                  ? applicant.user.avatar_url
-                  : "/logo.jpg"
-              }
-              width={80}
-              height={300}
-              className="w-full h-[300px] rounded-xl object-cover"
-            />
-            <label
-              htmlFor="picture"
-              className="absolute inset-0 flex items-center justify-center bg-white/20 opacity-0 group-hover:opacity-100 transition duration-300 rounded-2xl cursor-pointer"
-            >
-              <Button
-                type="button"
-                className="text-white font-semibold text-lg rounded-md cursor-pointer pointer-events-none"
-                variant={"primary"}
-                disabled={uploadAvatarMutation.isPending}
-              >
+        <p className="text-sm text-gray-500 mt-1">Kelola informasi akun dan keamanan login Anda.</p>
+      </div>
+
+      <div className="bg-white rounded-2xl border p-6 sm:p-8" style={{ borderColor: "#E6EEE9" }}>
+        <Input
+          id="picture"
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleAvatarUpload}
+          disabled={uploadAvatarMutation.isPending}
+        />
+
+        <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-6 sm:gap-8">
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative w-44 h-44 sm:w-56 sm:h-56 rounded-2xl overflow-hidden border" style={{ borderColor: "#E6EEE9" }}>
+              <Image
+                alt="Avatar pengguna"
+                src={applicant?.user?.avatar_url || "/default-avatar-male.webp"}
+                fill
+                sizes="(max-width: 640px) 176px, 224px"
+                className="object-cover"
+              />
+            </div>
+
+            <label htmlFor="picture" className="w-full max-w-[224px]">
+              <Button type="button" variant="primary" className="w-full" disabled={uploadAvatarMutation.isPending}>
                 {uploadAvatarMutation.isPending ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Uploading...
+                    Mengunggah...
                   </>
                 ) : (
                   <>
                     <Upload className="mr-2 h-4 w-4" />
-                    Upload Image
+                    Ubah Foto Profil
                   </>
                 )}
               </Button>
             </label>
           </div>
-          <div className="py-6 w-full flex flex-col gap-6">
-            <div className="grid w-full items-center gap-3">
+
+          <div className="space-y-6">
+            <div className="grid w-full items-center gap-2">
               <Label htmlFor="name">Nama Lengkap</Label>
-              <Input
-                type="text"
-                id="name"
-                value={user?.name || ""}
-                readOnly
-                className="bg-muted cursor-not-allowed"
-              />
+              <Input type="text" id="name" value={user?.name || ""} readOnly className="bg-gray-50" />
             </div>
-            <div className="grid w-full items-center gap-3">
-              <Label htmlFor="email">Email</Label>
+
+            <div className="grid w-full items-center gap-2">
+              <Label htmlFor="email" className="flex items-center gap-2">
+                <Mail className="w-4 h-4" />
+                Email
+              </Label>
               <div className="relative w-full">
-                <Input
-                  type="email"
-                  id="email"
-                  value={user?.email || ""}
-                  readOnly
-                  className="pr-10"
-                />
+                <Input type="email" id="email" value={user?.email || ""} readOnly className="pr-10 bg-gray-50" />
                 <SquarePen
                   size={16}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-[var(--green)] transition-colors"
                   onClick={() =>
                     handleEditClick({
                       title: "Ubah Email",
-                      message: "Tuliskan email baru anda di bawah:",
+                      message: "Tuliskan email baru Anda di bawah:",
                       type: "email",
                     })
                   }
                 />
               </div>
             </div>
-            <div className="grid w-full items-center gap-3">
+
+            <div className="grid w-full items-center gap-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative w-full">
-                <Input
-                  type="password"
-                  id="password"
-                  value="••••••••"
-                  readOnly
-                  className="pr-10"
-                />
+                <Input type="password" id="password" value="••••••••" readOnly className="pr-10 bg-gray-50" />
                 <SquarePen
                   size={16}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-[var(--green)] transition-colors"
@@ -266,138 +252,133 @@ export default function Profil() {
         </div>
 
         <AlertDialog open={open} onOpenChange={setOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>{alertTitle}</AlertDialogTitle>
-              <AlertDialogDescription className="space-y-3">
-                <p className="mb-2 text-foreground">{alertMessage}</p>
+          <AlertDialogContent
+            className="rounded-2xl border shadow-2xl p-0 overflow-hidden bg-white"
+            style={{ borderColor: "#E6EEE9" }}
+          >
+            <AlertDialogHeader className="px-6 pt-6 pb-4 border-b" style={{ borderColor: "#E6EEE9" }}>
+              <AlertDialogTitle style={{ color: "#015023" }}>{alertTitle}</AlertDialogTitle>
+              <AlertDialogDescription>{alertMessage}</AlertDialogDescription>
+            </AlertDialogHeader>
 
-                {alertType === "email" && (
-                  <div className="space-y-3 mt-2">
+            <div className="px-6 py-5 space-y-4">
+              {alertType === "email" && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="new-email" className="text-xs uppercase tracking-wide" style={{ color: "#015023" }}>
+                      Email Baru
+                    </Label>
                     <Input
+                      id="new-email"
                       type="email"
                       placeholder="Masukkan email baru"
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
-                      className="mt-2"
+                      className="bg-white"
                     />
-
-                    <div>
-                      <Label
-                        htmlFor="email-password"
-                        className="text-xs text-muted-foreground mb-1 block"
-                      >
-                        Password
-                      </Label>
-                      <Input
-                        id="email-password"
-                        type="password"
-                        placeholder="Masukkan password Anda"
-                        value={emailPassword}
-                        onChange={(e) => setEmailPassword(e.target.value)}
-                      />
-                    </div>
-
-                    <div>
-                      <Label
-                        htmlFor="email-password-confirm"
-                        className="text-xs text-muted-foreground mb-1 block"
-                      >
-                        Konfirmasi Password
-                      </Label>
-                      <Input
-                        id="email-password-confirm"
-                        type="password"
-                        placeholder="Ulangi password Anda"
-                        value={emailPasswordConfirmation}
-                        onChange={(e) =>
-                          setEmailPasswordConfirmation(e.target.value)
-                        }
-                      />
-                    </div>
                   </div>
-                )}
 
-                {alertType === "password" && (
-                  <div className="space-y-3 mt-2">
-                    <div>
-                      <Label
-                        htmlFor="current"
-                        className="text-xs text-muted-foreground mb-1 block"
-                      >
-                        Password Saat Ini
-                      </Label>
-                      <Input
-                        type="password"
-                        id="current"
-                        placeholder="Masukkan password saat ini"
-                        value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="new"
-                        className="text-xs text-muted-foreground mb-1 block"
-                      >
-                        Password Baru
-                      </Label>
-                      <Input
-                        type="password"
-                        id="new"
-                        placeholder="Minimal 8 karakter"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <Label
-                        htmlFor="confirm"
-                        className="text-xs text-muted-foreground mb-1 block"
-                      >
-                        Konfirmasi Password Baru
-                      </Label>
-                      <Input
-                        type="password"
-                        id="confirm"
-                        placeholder="Ulangi password baru"
-                        value={passwordConfirmation}
-                        onChange={(e) =>
-                          setPasswordConfirmation(e.target.value)
-                        }
-                      />
-                    </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email-password" className="text-xs uppercase tracking-wide" style={{ color: "#015023" }}>
+                      Password
+                    </Label>
+                    <Input
+                      id="email-password"
+                      type="password"
+                      placeholder="Masukkan password Anda"
+                      value={emailPassword}
+                      onChange={(e) => setEmailPassword(e.target.value)}
+                      className="bg-white"
+                    />
                   </div>
-                )}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel
-                disabled={
-                  changePasswordMutation.isLoading ||
-                  changeEmailMutation.isLoading
-                }
-              >
-                Batal
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email-password-confirm" className="text-xs uppercase tracking-wide" style={{ color: "#015023" }}>
+                      Konfirmasi Password
+                    </Label>
+                    <Input
+                      id="email-password-confirm"
+                      type="password"
+                      placeholder="Ulangi password Anda"
+                      value={emailPasswordConfirmation}
+                      onChange={(e) => setEmailPasswordConfirmation(e.target.value)}
+                      className="bg-white"
+                    />
+                  </div>
+                </>
+              )}
+
+              {alertType === "password" && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="current" className="text-xs uppercase tracking-wide" style={{ color: "#015023" }}>
+                      Password Saat Ini
+                    </Label>
+                    <Input
+                      type="password"
+                      id="current"
+                      placeholder="Masukkan password saat ini"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      className="bg-white"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="new" className="text-xs uppercase tracking-wide" style={{ color: "#015023" }}>
+                      Password Baru
+                    </Label>
+                    <Input
+                      type="password"
+                      id="new"
+                      placeholder="Minimal 8 karakter"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="bg-white"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm" className="text-xs uppercase tracking-wide" style={{ color: "#015023" }}>
+                      Konfirmasi Password Baru
+                    </Label>
+                    <Input
+                      type="password"
+                      id="confirm"
+                      placeholder="Ulangi password baru"
+                      value={passwordConfirmation}
+                      onChange={(e) => setPasswordConfirmation(e.target.value)}
+                      className="bg-white"
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+
+            <AlertDialogFooter className="px-6 pb-6 pt-2">
+              <AlertDialogCancel asChild>
+                <Button variant="outline" disabled={isSaving}>
+                  Batal
+                </Button>
               </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleSave}
-                style={{ backgroundColor: '#015023', color: '#ffffff' }}
-                className="hover:opacity-90"
-                disabled={
-                  changePasswordMutation.isLoading ||
-                  changeEmailMutation.isLoading
-                }
-              >
-                {changePasswordMutation.isLoading ||
-                changeEmailMutation.isLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Menyimpan...
-                  </>
-                ) : (
-                  "Simpan"
-                )}
+              <AlertDialogAction asChild>
+                <Button
+                  variant="primary"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleSave();
+                  }}
+                  disabled={isSaving}
+                >
+                  {isSaving ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Menyimpan...
+                    </>
+                  ) : (
+                    "Simpan"
+                  )}
+                </Button>
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

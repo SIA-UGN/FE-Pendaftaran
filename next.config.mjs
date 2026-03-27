@@ -19,8 +19,13 @@ const nextConfig = {
         hostname: "be-ugn.test",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "be-pendaftaran.trisuladana.com",
+        pathname: "/**",
+      },
     ],
-    domains: ["localhost", "be-ugn.test"],
+    domains: ["localhost", "be-ugn.test", "be-pendaftaran.trisuladana.com"],
   },
   async headers() {
     return [

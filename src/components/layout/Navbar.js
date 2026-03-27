@@ -59,8 +59,13 @@ export default function Navbar() {
     error,
   } = useUnreadCount(shouldFetchNotifications);
 
-  const isManagerRoute = pathname.startsWith("/manager");
-  const isDashboardRoute = pathname.startsWith("/dashboard");
+  const isNotificationRoute = pathname.startsWith("/notifikasi");
+  const isManagerRoute =
+    pathname.startsWith("/manager") ||
+    (isNotificationRoute && user?.role === "manager");
+  const isDashboardRoute =
+    pathname.startsWith("/dashboard") ||
+    (isNotificationRoute && user?.role === "admin");
 
   const isActivePath = (path) => {
     if (path === "/") {
@@ -68,6 +73,10 @@ export default function Navbar() {
     }
     return pathname.startsWith(path);
   };
+
+  const canAccessProfileNav =
+    user?.role === "pendaftar" || user?.role === "mahasiswa";
+  const isProfileActive = canAccessProfileNav && isActivePath("/profil");
 
   const isProfilMenuActive = () => {
     const profilPaths = [
@@ -391,7 +400,7 @@ export default function Navbar() {
                     <Avatar
                       className={cn(
                         "ring-2 ring-transparent transition-all",
-                        isActivePath("/profil") && "ring-[var(--yellow)]"
+                        isProfileActive && "ring-[var(--yellow)]"
                       )}
                     >
                       <AvatarImage
@@ -419,28 +428,32 @@ export default function Navbar() {
                       </p>
                     </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/profil" className="flex items-center cursor-pointer">
-                      <UserCog className="mr-2 h-4 w-4" />
-                      <span>Profil</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/pendaftaran" className="flex items-center cursor-pointer">
-                      <FileText className="mr-2 h-4 w-4" />
-                      <span>Pendaftaran</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  {user?.role === "pendaftar" && (
-                    <DropdownMenuItem asChild>
-                      <Link href="/pendaftaran/status" className="flex items-center cursor-pointer">
-                        <CheckSquare className="mr-2 h-4 w-4" />
-                        <span>Hasil Seleksi</span>
-                      </Link>
-                    </DropdownMenuItem>
+                  {canAccessProfileNav && <DropdownMenuSeparator />}
+                  {canAccessProfileNav && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link href="/profil" className="flex items-center cursor-pointer">
+                          <UserCog className="mr-2 h-4 w-4" />
+                          <span>Profil</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/pendaftaran" className="flex items-center cursor-pointer">
+                          <FileText className="mr-2 h-4 w-4" />
+                          <span>Pendaftaran</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      {user?.role === "pendaftar" && (
+                        <DropdownMenuItem asChild>
+                          <Link href="/pendaftaran/status" className="flex items-center cursor-pointer">
+                            <CheckSquare className="mr-2 h-4 w-4" />
+                            <span>Hasil Seleksi</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuSeparator />
+                    </>
                   )}
-                  <DropdownMenuSeparator />
                   <DropdownMenuItem
                     variant="destructive"
                     onClick={handleLogout}
@@ -537,17 +550,19 @@ export default function Navbar() {
                       </span>
                     )}
                   </Link>
-                  <Link
-                    href="/profil"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={cn(
-                      "px-6 py-3.5 text-base font-medium tracking-wide text-white hover:bg-[var(--yellow)] hover:text-[var(--green)] transition-colors duration-200 border-b border-white/10",
-                      isActivePath("/profil") &&
-                        "bg-[var(--yellow)] text-[var(--green)] font-bold"
-                    )}
-                  >
-                    Profil
-                  </Link>
+                  {canAccessProfileNav && (
+                    <Link
+                      href="/profil"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={cn(
+                        "px-6 py-3.5 text-base font-medium tracking-wide text-white hover:bg-[var(--yellow)] hover:text-[var(--green)] transition-colors duration-200 border-b border-white/10",
+                        isProfileActive &&
+                          "bg-[var(--yellow)] text-[var(--green)] font-bold"
+                      )}
+                    >
+                      Profil
+                    </Link>
+                  )}
                 </>
               )}
 
