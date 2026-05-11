@@ -14,6 +14,12 @@ export const paymentService = {
       timeout: 60000,
     });
   },
+
+  // Midtrans Snap
+  createSnapToken: () => apiClient.post("/payments/snap-token"),
+  checkTransactionStatus: (paymentId) =>
+    apiClient.get(`/payments/${paymentId}/check-status`),
+
   getAllPayments: (params) => apiClient.get("/payments", { params }),
   getPayment: (id) => apiClient.get(`/payments/${id}`),
   verifyPayment: (id, data) => apiClient.put(`/payments/${id}/verify`, data),

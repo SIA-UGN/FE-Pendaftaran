@@ -72,6 +72,18 @@ export const useReUploadPaymentProof = () => {
   });
 };
 
+// Midtrans Snap Token
+export const useCreateSnapToken = () => {
+  return useMutation({
+    mutationFn: () => paymentService.createSnapToken(),
+    onError: (error) => {
+      toast.error(
+        error.response?.data?.message || "Gagal membuat transaksi pembayaran"
+      );
+    },
+  });
+};
+
 // Admin/Manager
 export const usePayments = (params = {}) => {
   return useQuery({
