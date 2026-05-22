@@ -33,6 +33,7 @@ import {
   useAddGuardian,
   useGuardians,
 } from "@/hooks/useRegistration";
+import { useVisibleSections } from "@/hooks/useFormVisibility";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const FormSchema = z.object({
   namaAyah: z.string().optional(),
@@ -76,6 +77,24 @@ export default function DataOrangtua() {
   useEffect(() => {
     refetch();
   }, [refetch]);
+
+  // Form Visibility — Route Guard
+  const { data: activeSections = [], isLoading: sectionsLoading } =
+    useVisibleSections();
+
+  useEffect(() => {
+    if (!sectionsLoading && activeSections.length > 0) {
+      const isGuardiansActive = activeSections.some(
+        (s) => s.code === "guardians"
+      );
+      if (!isGuardiansActive) {
+        toast.error(
+          "Form data orang tua/wali sedang dinonaktifkan oleh administrator."
+        );
+        router.push("/pendaftaran");
+      }
+    }
+  }, [activeSections, sectionsLoading, router]);
 
   const form = useForm({
     resolver: zodResolver(FormSchema),

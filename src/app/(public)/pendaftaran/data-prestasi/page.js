@@ -24,6 +24,7 @@ import {
   useRegistrationProgress,
   useSubmitRegistration,
 } from "@/hooks/useRegistration";
+import { useVisibleSections } from "@/hooks/useFormVisibility";
 import { useAchievements } from "@/hooks/useAchievements";
 
 export default function DataPrestasi() {
@@ -44,6 +45,24 @@ export default function DataPrestasi() {
   useEffect(() => {
     refetch();
   }, [refetch]);
+
+  // Form Visibility — Route Guard
+  const { data: activeSections = [], isLoading: sectionsLoading } =
+    useVisibleSections();
+
+  useEffect(() => {
+    if (!sectionsLoading && activeSections.length > 0) {
+      const isAchievementsActive = activeSections.some(
+        (s) => s.code === "achievements"
+      );
+      if (!isAchievementsActive) {
+        toast.error(
+          "Form data prestasi sedang dinonaktifkan oleh administrator."
+        );
+        router.push("/pendaftaran");
+      }
+    }
+  }, [activeSections, sectionsLoading, router]);
   useEffect(() => {
     if (!progressLoading && progress) {
       const accessibleSteps = progress.accessible_steps || [];

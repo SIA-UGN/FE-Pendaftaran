@@ -33,4 +33,40 @@ export const registrationService = {
   storeAchievements: (data) =>
     apiClient.post("/registration/achievements", data),
   store: (data) => apiClient.post("/registration", data),
+
+  // ==========================================
+  // FORM VISIBILITY SERVICES
+  // ==========================================
+
+  // Public - Ambil section aktif untuk pendaftar
+  getVisibleSections: (programId = null) => {
+    const params = programId ? { program_id: programId } : {};
+    return apiClient.get("/registration-form/sections", { params });
+  },
+
+  // Admin - Ambil semua section (visible & hidden)
+  adminGetSections: (params = {}) => {
+    return apiClient.get("/admin/registration-form/sections", { params });
+  },
+
+  // Admin - Update visibilitas single section
+  adminUpdateVisibility: (id, data) => {
+    return apiClient.patch(
+      `/admin/registration-form/sections/${id}/visibility`,
+      data
+    );
+  },
+
+  // Admin - Update visibilitas batch
+  adminBatchUpdateVisibility: (data) => {
+    return apiClient.patch(
+      "/admin/registration-form/sections/batch-visibility",
+      data
+    );
+  },
+
+  // Admin - Ambil riwayat audit log
+  adminGetSectionHistory: (id) => {
+    return apiClient.get(`/admin/registration-form/sections/${id}/history`);
+  },
 };

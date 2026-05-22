@@ -14,6 +14,7 @@ import {
   useDocuments,
   useDocumentTypes,
 } from "@/hooks/useRegistration";
+import { useVisibleSections } from "@/hooks/useFormVisibility";
 
 export default function UploadDokumen() {
   const router = useRouter();
@@ -52,6 +53,24 @@ export default function UploadDokumen() {
   useEffect(() => {
     refetchDocuments();
   }, [refetchDocuments]);
+
+  // Form Visibility — Route Guard
+  const { data: activeSections = [], isLoading: sectionsLoading } =
+    useVisibleSections();
+
+  useEffect(() => {
+    if (!sectionsLoading && activeSections.length > 0) {
+      const isDocumentsActive = activeSections.some(
+        (s) => s.code === "documents"
+      );
+      if (!isDocumentsActive) {
+        toast.error(
+          "Form upload dokumen sedang dinonaktifkan oleh administrator."
+        );
+        router.push("/pendaftaran");
+      }
+    }
+  }, [activeSections, sectionsLoading, router]);
 
   useEffect(() => {
     if (!progressLoading && progress) {
