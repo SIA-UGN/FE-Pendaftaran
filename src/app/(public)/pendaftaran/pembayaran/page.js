@@ -146,26 +146,12 @@ export default function Pembayaran() {
     return new Intl.NumberFormat("id-ID").format(amount || 0);
   };
 
-  // Loading state
+  // Loading state — matches data-diri / data-prestasi pattern
   if (isLoading) {
     return (
       <ProtectedRoute>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <div className="relative h-16 w-16 mx-auto mb-4">
-              <div
-                className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-green-500 animate-spin"
-                style={{
-                  borderRadius: "50%",
-                  borderTopColor: "#22c55e",
-                  borderRightColor: "transparent",
-                  borderBottomColor: "transparent",
-                  borderLeftColor: "transparent",
-                }}
-              ></div>
-            </div>
-            <p>Memuat data pembayaran...</p>
-          </div>
+        <div className="max-w-7xl mx-auto p-12">
+          <div className="animate-pulse">Memuat data pembayaran...</div>
         </div>
       </ProtectedRoute>
     );
@@ -175,7 +161,7 @@ export default function Pembayaran() {
     <ProtectedRoute>
       {/* Midtrans Snap JS */}
       <Script
-        src="https://app.sandbox.midtrans.com/snap/snap.js"
+        src={process.env.NEXT_PUBLIC_MIDTRANS_SNAP_URL || "https://app.sandbox.midtrans.com/snap/snap.js"}
         data-client-key={paymentResponse?.data?.data?.payment?.snap_client_key || process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || ""}
         strategy="afterInteractive"
         onReady={() => setIsSnapReady(true)}
@@ -185,77 +171,76 @@ export default function Pembayaran() {
         }}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+      <div className="max-w-7xl mx-auto">
         <RegistrationProgress />
 
-        {/* Header */}
-        <div className="flex items-center gap-2 my-6">
-          <CreditCard className="text-green-600 w-6 h-6" />
-          <h2 className="text-2xl font-semibold">Pembayaran Pendaftaran</h2>
+        {/* Header — matches data-diri / data-prestasi pattern */}
+        <div className="flex items-center gap-2 mx-4 sm:mx-8 md:mx-12 mt-4 sm:mt-6">
+          <CreditCard className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: '#015023' }} />
+          <h2 className="text-lg sm:text-xl font-semibold">Pembayaran Pendaftaran</h2>
         </div>
 
-        {/* Alert: no payment data */}
-        {!paymentData && paymentMessage && hasTriedSubmit && (
-          <Alert className="mb-6 border-yellow-500 bg-yellow-50">
-            <AlertCircle className="h-4 w-4 text-yellow-600" />
-            <AlertTitle className="text-yellow-800">Informasi</AlertTitle>
-            <AlertDescription className="text-yellow-700">
-              {paymentMessage}
-            </AlertDescription>
-          </Alert>
-        )}
+        {/* Alerts — using built-in Alert variants */}
+        <div className="mx-4 sm:mx-8 md:mx-12 mt-4 space-y-4">
+          {/* Alert: no payment data */}
+          {!paymentData && paymentMessage && hasTriedSubmit && (
+            <Alert variant="warning">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Informasi</AlertTitle>
+              <AlertDescription>{paymentMessage}</AlertDescription>
+            </Alert>
+          )}
 
-        {/* Alert: deadline warning */}
-        {!isExpired && paymentStatus === "pending" && (
-          <Alert className="mb-6 border-yellow-500 bg-yellow-50">
-            <AlertCircle className="h-4 w-4 text-yellow-600" />
-            <AlertTitle className="text-yellow-800">Perhatian!</AlertTitle>
-            <AlertDescription className="text-yellow-700">
-              Selesaikan pembayaran sebelum batas waktu habis. Jika melewati
-              batas waktu, Anda harus mendaftar ulang.
-            </AlertDescription>
-          </Alert>
-        )}
+          {/* Alert: deadline warning */}
+          {!isExpired && paymentStatus === "pending" && (
+            <Alert variant="warning">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Perhatian!</AlertTitle>
+              <AlertDescription>
+                Selesaikan pembayaran sebelum batas waktu habis. Jika melewati
+                batas waktu, Anda harus mendaftar ulang.
+              </AlertDescription>
+            </Alert>
+          )}
 
-        {/* Alert: expired */}
-        {isExpired && (
-          <Alert className="mb-6 border-red-500 bg-red-50">
-            <XCircle className="h-4 w-4 text-red-600" />
-            <AlertTitle className="text-red-800">Pembayaran Expired</AlertTitle>
-            <AlertDescription className="text-red-700">
-              Batas waktu pembayaran telah habis. Silakan hubungi admin atau
-              daftar ulang.
-            </AlertDescription>
-          </Alert>
-        )}
+          {/* Alert: expired */}
+          {isExpired && (
+            <Alert variant="destructive">
+              <XCircle className="h-4 w-4" />
+              <AlertTitle>Pembayaran Expired</AlertTitle>
+              <AlertDescription>
+                Batas waktu pembayaran telah habis. Silakan hubungi admin atau
+                daftar ulang.
+              </AlertDescription>
+            </Alert>
+          )}
 
-        {/* Alert: rejected */}
-        {paymentStatus === "rejected" && paymentData?.rejection_reason && (
-          <Alert className="mb-6 border-red-500 bg-red-50">
-            <XCircle className="h-4 w-4 text-red-600" />
-            <AlertTitle className="text-red-800">Pembayaran Ditolak</AlertTitle>
-            <AlertDescription className="text-red-700">
-              Alasan: {paymentData.rejection_reason}
-              <br />
-              Silakan lakukan pembayaran ulang.
-            </AlertDescription>
-          </Alert>
-        )}
+          {/* Alert: rejected */}
+          {paymentStatus === "rejected" && paymentData?.rejection_reason && (
+            <Alert variant="destructive">
+              <XCircle className="h-4 w-4" />
+              <AlertTitle>Pembayaran Ditolak</AlertTitle>
+              <AlertDescription>
+                Alasan: {paymentData.rejection_reason}
+                <br />
+                Silakan lakukan pembayaran ulang.
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
 
         {/* Main Content */}
         {paymentData && (
           <>
             {/* MODE 1: Payment Form (pending or rejected) */}
             {(paymentStatus === "pending" || paymentStatus === "rejected") && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mx-4 sm:mx-8 md:mx-12 mt-6">
                 {/* Left Column */}
                 <div className="lg:col-span-2 space-y-6">
                   {/* Ringkasan Pembayaran */}
                   <Card>
                     <CardHeader>
-                      <CardTitle style={{ color: "#015023" }}>
-                        Ringkasan Pembayaran
-                      </CardTitle>
+                      <CardTitle>Ringkasan Pembayaran</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="flex justify-between">
@@ -293,7 +278,7 @@ export default function Pembayaran() {
                           <p className="text-muted-foreground mb-2">
                             Batas Waktu Pembayaran
                           </p>
-                          <div className="text-4xl font-bold text-red-600 font-mono">
+                          <div className="text-4xl font-bold font-mono" style={{ color: '#BE0414' }}>
                             {countdown || "00:00:00"}
                           </div>
                         </div>
@@ -301,21 +286,21 @@ export default function Pembayaran() {
                     </Card>
                   )}
 
-                  {/* Midtrans Info Card */}
-                  <Card className="border-green-200 bg-gradient-to-br from-green-50 to-emerald-50">
+                  {/* Midtrans Info Card — using Card variant="sage" */}
+                  <Card variant="sage">
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-green-800">
+                      <CardTitle className="flex items-center gap-2">
                         <Shield className="w-5 h-5" />
                         Pembayaran Aman via Midtrans
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-3 text-sm text-green-700">
+                      <div className="space-y-3 text-sm">
                         <div className="flex items-start gap-3">
                           <CreditCard className="w-5 h-5 mt-0.5 shrink-0" />
                           <div>
                             <p className="font-semibold">Berbagai Metode Pembayaran</p>
-                            <p className="text-green-600">
+                            <p className="opacity-80">
                               Transfer Bank, E-Wallet (GoPay, OVO, Dana), QRIS,
                               Kartu Kredit/Debit, dan lainnya.
                             </p>
@@ -325,7 +310,7 @@ export default function Pembayaran() {
                           <Shield className="w-5 h-5 mt-0.5 shrink-0" />
                           <div>
                             <p className="font-semibold">Transaksi Terenkripsi</p>
-                            <p className="text-green-600">
+                            <p className="opacity-80">
                               Semua pembayaran diproses dengan enkripsi SSL dan 3D Secure.
                             </p>
                           </div>
@@ -334,7 +319,7 @@ export default function Pembayaran() {
                           <Zap className="w-5 h-5 mt-0.5 shrink-0" />
                           <div>
                             <p className="font-semibold">Verifikasi Otomatis</p>
-                            <p className="text-green-600">
+                            <p className="opacity-80">
                               Pembayaran diverifikasi secara otomatis setelah berhasil.
                             </p>
                           </div>
@@ -347,7 +332,7 @@ export default function Pembayaran() {
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        <Info className="w-5 h-5 text-blue-500" />
+                        <Info className="w-5 h-5" style={{ color: '#015023' }} />
                         Petunjuk Pembayaran
                       </CardTitle>
                     </CardHeader>
@@ -366,12 +351,20 @@ export default function Pembayaran() {
 
                 {/* Right Column - Action */}
                 <div className="space-y-6">
-                  <Card className="border-green-300 shadow-lg">
-                    <CardHeader className="bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-t-lg">
-                      <CardTitle className="text-center text-white text-lg">
+                  {/* Total Pembayaran Card — using brand green header */}
+                  <Card>
+                    <div
+                      className="px-6 py-4 text-center"
+                      style={{
+                        backgroundColor: '#015023',
+                        borderRadius: '16px 16px 0 0',
+                        margin: '-24px -1px 0 -1px',
+                      }}
+                    >
+                      <span className="text-white font-semibold text-lg">
                         Total Pembayaran
-                      </CardTitle>
-                    </CardHeader>
+                      </span>
+                    </div>
                     <CardContent className="pt-6 space-y-4">
                       <div className="text-center">
                         <p className="text-3xl font-bold" style={{ color: "#015023" }}>
@@ -383,9 +376,9 @@ export default function Pembayaran() {
                       </div>
 
                       {snapLoadError && (
-                        <Alert className="border-red-300 bg-red-50">
-                          <AlertCircle className="h-4 w-4 text-red-600" />
-                          <AlertDescription className="text-red-600 text-xs">
+                        <Alert variant="destructive">
+                          <AlertCircle className="h-4 w-4" />
+                          <AlertDescription className="text-xs">
                             Gagal memuat sistem pembayaran. Silakan muat ulang halaman.
                           </AlertDescription>
                         </Alert>
@@ -416,10 +409,10 @@ export default function Pembayaran() {
                     </CardContent>
                   </Card>
 
-                  {/* Navigation */}
-                  <div className="space-y-3">
+                  {/* Navigation — matches data-prestasi pattern */}
+                  <div className="flex flex-col gap-3">
                     <Link href="/pendaftaran/data-prestasi" className="block">
-                      <Button variant="yellow" className="w-full">
+                      <Button variant="matcha" className="w-full">
                         Kembali
                       </Button>
                     </Link>
@@ -448,11 +441,11 @@ export default function Pembayaran() {
 
             {/* MODE 2: Waiting verification / Verified */}
             {(paymentStatus === "waiting_verification" || paymentStatus === "verified") && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mx-4 sm:mx-8 md:mx-12 mt-6">
                 <div className="lg:col-span-2 space-y-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle style={{ color: "#015023" }}>Detail Pembayaran</CardTitle>
+                      <CardTitle>Detail Pembayaran</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="flex justify-between">
@@ -475,7 +468,7 @@ export default function Pembayaran() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Status</span>
-                        <span className={`font-semibold ${paymentStatus === "verified" ? "text-[#015023]" : "text-yellow-600"}`}>
+                        <span className={`font-semibold ${paymentStatus === "verified" ? "text-[#16874B]" : "text-[#92620A]"}`}>
                           {paymentStatus === "verified" ? "✓ Terverifikasi" : "⏳ Menunggu Verifikasi"}
                         </span>
                       </div>
@@ -493,13 +486,13 @@ export default function Pembayaran() {
                     </CardContent>
                   </Card>
 
-                  {/* Status Info */}
-                  <Alert className={paymentStatus === "verified" ? "border-green-500 bg-green-50" : "border-yellow-500 bg-yellow-50"}>
-                    <Info className={`h-4 w-4 ${paymentStatus === "verified" ? "text-[#015023]" : "text-yellow-600"}`} />
-                    <AlertTitle className={paymentStatus === "verified" ? "text-green-800" : "text-yellow-800"}>
+                  {/* Status Info — using Alert variants */}
+                  <Alert variant={paymentStatus === "verified" ? "success" : "warning"}>
+                    <Info className="h-4 w-4" />
+                    <AlertTitle>
                       {paymentStatus === "verified" ? "Pembayaran Terverifikasi" : "Menunggu Verifikasi"}
                     </AlertTitle>
-                    <AlertDescription className={paymentStatus === "verified" ? "text-green-700" : "text-yellow-700"}>
+                    <AlertDescription>
                       {paymentStatus === "verified"
                         ? "Pembayaran Anda telah diverifikasi. Anda dapat melanjutkan proses pendaftaran."
                         : "Pembayaran Anda sedang diproses. Status akan diperbarui secara otomatis."}
@@ -516,9 +509,9 @@ export default function Pembayaran() {
                     <CardContent>
                       <div className="text-center py-4">
                         {paymentStatus === "verified" ? (
-                          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-3" />
+                          <CheckCircle className="w-16 h-16 mx-auto mb-3" style={{ color: '#16874B' }} />
                         ) : (
-                          <Clock className="w-16 h-16 text-yellow-500 mx-auto mb-3" />
+                          <Clock className="w-16 h-16 mx-auto mb-3" style={{ color: '#DABC4E' }} />
                         )}
                         <p className="font-semibold mb-1">
                           {paymentStatus === "verified" ? "Terverifikasi" : "Menunggu Verifikasi"}
@@ -531,9 +524,11 @@ export default function Pembayaran() {
                       </div>
                     </CardContent>
                   </Card>
-                  <div className="space-y-3">
+
+                  {/* Navigation — matches data-prestasi pattern */}
+                  <div className="flex flex-col gap-3">
                     <Link href="/pendaftaran/data-prestasi" className="block">
-                      <Button variant="yellow" className="w-full">Kembali</Button>
+                      <Button variant="matcha" className="w-full">Kembali</Button>
                     </Link>
                     <Link href="/pendaftaran/status" className="block">
                       <Button variant="primary" className="w-full">Lihat Status Pendaftaran</Button>
@@ -544,6 +539,9 @@ export default function Pembayaran() {
             )}
           </>
         )}
+
+        {/* Bottom spacing */}
+        <div className="h-8" />
       </div>
     </ProtectedRoute>
   );
