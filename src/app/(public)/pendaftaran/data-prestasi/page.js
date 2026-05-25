@@ -24,10 +24,13 @@ import {
   useRegistrationProgress,
   useSubmitRegistration,
 } from "@/hooks/useRegistration";
+import { useVisibleSections } from "@/hooks/useFormVisibility";
 import { useAchievements } from "@/hooks/useAchievements";
+import { useRegistrationFlow } from "@/hooks/useRegistrationFlow";
 
 export default function DataPrestasi() {
   const router = useRouter();
+  const { prevRoute } = useRegistrationFlow();
   const { data: progressData, isLoading: progressLoading } =
     useRegistrationProgress();
   const {
@@ -44,6 +47,24 @@ export default function DataPrestasi() {
   useEffect(() => {
     refetch();
   }, [refetch]);
+
+  // Form Visibility — Route Guard
+  const { data: activeSections = [], isLoading: sectionsLoading } =
+    useVisibleSections();
+
+  useEffect(() => {
+    if (!sectionsLoading && activeSections.length > 0) {
+      const isAchievementsActive = activeSections.some(
+        (s) => s.code === "achievements"
+      );
+      if (!isAchievementsActive) {
+        toast.error(
+          "Form data prestasi sedang dinonaktifkan oleh administrator."
+        );
+        router.push("/pendaftaran");
+      }
+    }
+  }, [activeSections, sectionsLoading, router]);
   useEffect(() => {
     if (!progressLoading && progress) {
       const accessibleSteps = progress.accessible_steps || [];
@@ -83,7 +104,7 @@ export default function DataPrestasi() {
         <Prestasi Data={achievements?.data?.data} />
         <div className="flex flex-col mx-4 sm:mx-6 md:mx-8 lg:mx-12 my-6 gap-5 items-center">
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-5 items-center justify-end ms-auto">
-            <Link href="/pendaftaran/data-akademik">
+            <Link href={prevRoute}>
               <Button variant="matcha" className="w-full sm:w-auto">
                 Kembali
               </Button>

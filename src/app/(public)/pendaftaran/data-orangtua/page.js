@@ -33,7 +33,9 @@ import {
   useAddGuardian,
   useGuardians,
 } from "@/hooks/useRegistration";
+import { useVisibleSections } from "@/hooks/useFormVisibility";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useRegistrationFlow } from "@/hooks/useRegistrationFlow";
 const FormSchema = z.object({
   namaAyah: z.string().optional(),
   alamatAyah: z.string().optional(),
@@ -61,6 +63,7 @@ const FormSchema = z.object({
 export default function DataOrangtua() {
   const router = useRouter();
   const [activeForm, setActiveForm] = useState("orangTua");
+  const { prevRoute, nextRoute } = useRegistrationFlow();
   const { data: progressData, isLoading: progressLoading } =
     useRegistrationProgress();
   const { data: registrationData, refetch } = useMyRegistration();
@@ -76,6 +79,24 @@ export default function DataOrangtua() {
   useEffect(() => {
     refetch();
   }, [refetch]);
+
+  // Form Visibility — Route Guard
+  const { data: activeSections = [], isLoading: sectionsLoading } =
+    useVisibleSections();
+
+  useEffect(() => {
+    if (!sectionsLoading && activeSections.length > 0) {
+      const isGuardiansActive = activeSections.some(
+        (s) => s.code === "guardians"
+      );
+      if (!isGuardiansActive) {
+        toast.error(
+          "Form data orang tua/wali sedang dinonaktifkan oleh administrator."
+        );
+        router.push("/pendaftaran");
+      }
+    }
+  }, [activeSections, sectionsLoading, router]);
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
@@ -275,7 +296,7 @@ export default function DataOrangtua() {
       toast.success("Data orang tua/wali berhasil disimpan!");
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      router.push("/pendaftaran/data-akademik");
+      router.push(nextRoute);
     } catch (error) {
       console.error("Failed to save guardians:", error);
     }
@@ -794,7 +815,7 @@ export default function DataOrangtua() {
               )}
             </div>
             <div className="md:w-full flex items-center justify-end my-12 px-12 gap-6">
-              <Link href="/pendaftaran" className="w-1/2 sm:w-48">
+              <Link href={prevRoute} className="w-1/2 sm:w-48">
                 <Button type="button" variant={"yellow"} className={"w-full"}>
                   Kembali
                 </Button>

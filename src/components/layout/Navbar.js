@@ -238,6 +238,7 @@ export default function Navbar() {
                       { href: '/dashboard/data',         label: 'Data Pendaftar & Manager' },
                       { href: '/dashboard/edit/pembayaran', label: 'Edit Metode Pembayaran' },
                       { href: '/dashboard/manajer/tambah', label: 'Pendaftaran Manager' },
+                      { href: '/dashboard/form-visibility', label: 'Form Visibility' },
                     ].map(({ href, label }) => (
                       <NavigationMenuItem key={href}>
                         <NavigationMenuLink
@@ -502,6 +503,7 @@ export default function Navbar() {
                 { href: '/dashboard/data',         label: 'Data Pendaftar & Manager' },
                 { href: '/dashboard/edit/pembayaran', label: 'Edit Metode Pembayaran' },
                 { href: '/dashboard/manajer/tambah', label: 'Pendaftaran Manager' },
+                { href: '/dashboard/form-visibility', label: 'Form Visibility' },
                 { href: '/dashboard/statistik/pendaftar',     label: 'Statistik Pendaftar' },
                 { href: '/dashboard/statistik/program-studi', label: 'Statistik Prodi' },
                 { href: '/dashboard/statistik/keuangan',      label: 'Statistik Keuangan' },

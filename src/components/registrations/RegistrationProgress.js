@@ -1,11 +1,59 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle, Lock } from "lucide-react";
 import { useRegistrationProgress } from "@/hooks/useRegistration";
 import { useMyPayment } from "@/hooks/usePayment";
+import { useVisibleSections } from "@/hooks/useFormVisibility";
+
+// Master definition semua langkah di FE, dengan mapping ke API code
+// Didefinisikan di luar komponen karena bersifat statis (tidak bergantung pada state/props)
+const ALL_STEPS = [
+  {
+    href: "/pendaftaran/data-diri",
+    label: "Data Diri",
+    key: "data-diri",
+    code: "profile", // memetakan ke database code
+    step_number: 1,
+  },
+  {
+    href: "/pendaftaran/data-alamat",
+    label: "Data Alamat",
+    key: "data-alamat",
+    code: "profile",
+    step_number: 2,
+  },
+  {
+    href: "/pendaftaran/data-orangtua",
+    label: "Data Orang Tua",
+    key: "data-orangtua",
+    code: "guardians",
+    step_number: 3,
+  },
+  {
+    href: "/pendaftaran/data-akademik",
+    label: "Dokumen",
+    key: "data-akademik",
+    code: "documents",
+    step_number: 4,
+  },
+  {
+    href: "/pendaftaran/data-prestasi",
+    label: "Data Prestasi",
+    key: "data-prestasi",
+    code: "achievements",
+    step_number: 5,
+  },
+  {
+    href: "/pendaftaran/pembayaran",
+    label: "Pembayaran",
+    key: "pembayaran",
+    code: null, // selalu aktif — pembayaran global
+    step_number: 6,
+  },
+];
 
 export default function RegistrationProgress() {
   const pathname = usePathname();
@@ -15,49 +63,27 @@ export default function RegistrationProgress() {
   const { data: progressData, isLoading, isError } = useRegistrationProgress();
   const { data: paymentData, isLoading: paymentLoading } = useMyPayment();
 
+  // Fetch section aktif dari backend (Form Visibility API)
+  const { data: activeSections = [], isLoading: sectionsLoading } =
+    useVisibleSections();
+
   useEffect(() => {
     const path = pathname.split("/").pop() || "";
     setActiveStep(path);
   }, [pathname]);
 
-  const steps = [
-    {
-      href: "/pendaftaran/data-diri",
-      label: "Data Diri",
-      key: "data-diri",
-      step_number: 1,
-    },
-    {
-      href: "/pendaftaran/data-alamat",
-      label: "Data Alamat",
-      key: "data-alamat",
-      step_number: 2,
-    },
-    {
-      href: "/pendaftaran/data-orangtua",
-      label: "Data Orang Tua",
-      key: "data-orangtua",
-      step_number: 3,
-    },
-    {
-      href: "/pendaftaran/data-akademik",
-      label: "Dokumen",
-      key: "data-akademik",
-      step_number: 4,
-    },
-    {
-      href: "/pendaftaran/data-prestasi",
-      label: "Data Prestasi",
-      key: "data-prestasi",
-      step_number: 5,
-    },
-    {
-      href: "/pendaftaran/pembayaran",
-      label: "Pembayaran",
-      key: "pembayaran",
-      step_number: 6,
-    },
-  ];
+  // Filter langkah secara dinamis berdasarkan Form Visibility API
+  // Jika API belum dimuat atau error, fallback tampilkan semua step (graceful degradation)
+  const steps = useMemo(() => {
+    if (sectionsLoading || activeSections.length === 0) {
+      return ALL_STEPS;
+    }
+
+    return ALL_STEPS.filter((step) => {
+      if (step.code === null) return true; // selalu tampilkan (e.g. pembayaran)
+      return activeSections.some((sec) => sec.code === step.code);
+    });
+  }, [activeSections, sectionsLoading]);
 
   const activeIndex = steps.findIndex((s) => s.key === activeStep);
 
@@ -196,12 +222,12 @@ export default function RegistrationProgress() {
           completedCount += 1;
         }
 
-        const totalSteps = 7;
+        const totalSteps = steps.length + 1;
         return Math.min((completedCount / totalSteps) * 120, 87);
       })()
     : 0;
 
-  if (isLoading || paymentLoading) {
+  if (isLoading || paymentLoading || sectionsLoading) {
     return (
       <div className="sm:w-full w-0 h-0 sm:h-full max-w-11/12 p-0 sm:p-4 flex flex-col items-center gap-12 m-0 sm:mx-auto sm:my-12 sm:mb-6">
         <div className="flex items-center justify-center">
@@ -215,7 +241,10 @@ export default function RegistrationProgress() {
     <div className="sm:w-full w-0 h-0 sm:h-full max-w-11/12 p-0 sm:p-4 flex flex-col items-center gap-12 m-0 sm:mx-auto sm:my-12 sm:mb-6">
       <div className="flex flex-col gap-5 w-full items-center justify-center">
         <div className="flex gap-5 w-full flex-col-reverse">
-          <div className="w-full relative hidden sm:grid grid-cols-6 gap-12 rounded-full">
+          <div
+            className="w-full relative hidden sm:grid gap-12 rounded-full"
+            style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}
+          >
             <div className="absolute top-1/2 left-[7%] right-[7%] transform -translate-y-1/2 h-[4px] bg-gray-200 rounded-full z-0"></div>
 
             <div
@@ -236,7 +265,10 @@ export default function RegistrationProgress() {
             })}
           </div>
 
-          <div className="w-full none hidden md:grid grid-cols-6 gap-6 items-center">
+          <div
+            className="w-full none hidden md:grid gap-6 items-center"
+            style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}
+          >
             {steps.map((step) => {
               const styles = getStepStyles(step.step_number);
 

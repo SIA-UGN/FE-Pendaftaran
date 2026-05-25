@@ -33,4 +33,84 @@ export const registrationService = {
   storeAchievements: (data) =>
     apiClient.post("/registration/achievements", data),
   store: (data) => apiClient.post("/registration", data),
+
+  // ==========================================
+  // FORM VISIBILITY SERVICES
+  // ==========================================
+
+  // Public - Ambil section aktif untuk pendaftar
+  getVisibleSections: (programId = null) => {
+    const params = programId ? { program_id: programId } : {};
+    return apiClient.get("/registration-form/sections", { params });
+  },
+
+  // Admin - Ambil semua section (visible & hidden)
+  adminGetSections: (params = {}) => {
+    return apiClient.get("/admin/registration-form/sections", { params });
+  },
+
+  // Admin - Update visibilitas single section
+  adminUpdateVisibility: (id, data) => {
+    return apiClient.patch(
+      `/admin/registration-form/sections/${id}/visibility`,
+      data
+    );
+  },
+
+  // Admin - Update visibilitas batch
+  adminBatchUpdateVisibility: (data) => {
+    return apiClient.patch(
+      "/admin/registration-form/sections/batch-visibility",
+      data
+    );
+  },
+
+  // Admin - Ambil riwayat audit log
+  adminGetSectionHistory: (id) => {
+    return apiClient.get(`/admin/registration-form/sections/${id}/history`);
+  },
+
+  // ==========================================
+  // FIELD-LEVEL VISIBILITY SERVICES
+  // ==========================================
+
+  // Public - Ambil field yang visible untuk sebuah section
+  getVisibleFields: (sectionId) => {
+    return apiClient.get(`/registration-form/sections/${sectionId}/fields`);
+  },
+
+  // Public - Ambil sections beserta fields (include_fields=true)
+  getVisibleSectionsWithFields: (programId = null) => {
+    const params = { include_fields: true };
+    if (programId) params.program_id = programId;
+    return apiClient.get("/registration-form/sections", { params });
+  },
+
+  // Admin - Ambil semua field untuk sebuah section
+  adminGetFields: (sectionId) => {
+    return apiClient.get(`/admin/registration-form/sections/${sectionId}/fields`);
+  },
+
+  // Admin - Ambil sections beserta fields
+  adminGetSectionsWithFields: (params = {}) => {
+    return apiClient.get("/admin/registration-form/sections", {
+      params: { ...params, include_fields: true },
+    });
+  },
+
+  // Admin - Update visibility single field
+  adminUpdateFieldVisibility: (fieldId, data) => {
+    return apiClient.patch(
+      `/admin/registration-form/fields/${fieldId}/visibility`,
+      data
+    );
+  },
+
+  // Admin - Batch update visibility field
+  adminBatchUpdateFieldVisibility: (data) => {
+    return apiClient.patch(
+      "/admin/registration-form/fields/batch-visibility",
+      data
+    );
+  },
 };

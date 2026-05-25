@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useRegistrationProgress } from "@/hooks/useRegistration";
 import { useMyPayment } from "@/hooks/usePayment";
+import { useVisibleSections } from "@/hooks/useFormVisibility";
 import toast from "react-hot-toast";
 
 export default function PendaftaranPage() {
@@ -34,12 +35,30 @@ export default function PendaftaranPage() {
     isLoading: paymentLoading,
     isError: paymentError,
   } = useMyPayment(isReady);
-  const stepRoutes = {
-    1: "/pendaftaran/data-diri",
-    2: "/pendaftaran/data-alamat",
-    3: "/pendaftaran/data-orangtua",
-    4: "/pendaftaran/data-akademik",
-    5: "/pendaftaran/data-prestasi",
+
+  // Fetch section aktif dari backend (Form Visibility API)
+  const { data: activeSections = [], isLoading: sectionsLoading } =
+    useVisibleSections();
+
+  /**
+   * Mapping section code (API) → step number & route.
+   * Profile mencakup step 1 (data-diri) & step 2 (data-alamat).
+   */
+  const sectionSteps = [
+    { code: "profile", step: 1, route: "/pendaftaran/data-diri" },
+    { code: "profile", step: 2, route: "/pendaftaran/data-alamat" },
+    { code: "guardians", step: 3, route: "/pendaftaran/data-orangtua" },
+    { code: "documents", step: 4, route: "/pendaftaran/data-akademik" },
+    { code: "achievements", step: 5, route: "/pendaftaran/data-prestasi" },
+  ];
+
+  /**
+   * Cek apakah suatu section code aktif di backend.
+   * Jika API belum dimuat / kosong → anggap aktif (graceful degradation).
+   */
+  const isSectionActive = (code) => {
+    if (sectionsLoading || activeSections.length === 0) return true;
+    return activeSections.some((s) => s.code === code);
   };
 
   const getNextIncompleteStep = () => {
@@ -49,6 +68,7 @@ export default function PendaftaranPage() {
 
     const { completed_steps = [], accessible_steps = [] } = progressData.data;
 
+    // Cek pembayaran terlebih dahulu
     if (paymentData?.data?.data?.payment) {
       const paymentStatus = paymentData.data.data.payment.status;
 
@@ -56,18 +76,29 @@ export default function PendaftaranPage() {
         return "/pendaftaran/status";
       }
 
-      if (completed_steps.length === 5) {
+      // Hitung jumlah step yang harus diselesaikan (hanya section aktif)
+      const activeStepCount = sectionSteps.filter((s) =>
+        isSectionActive(s.code)
+      ).length;
+
+      if (completed_steps.length >= activeStepCount) {
         return "/pendaftaran/pembayaran";
       }
     }
 
-    for (let step = 1; step <= 5; step++) {
+    // Iterasi hanya section yang aktif, cari step belum selesai
+    for (const { code, step, route } of sectionSteps) {
+      if (!isSectionActive(code)) continue; // Skip section non-aktif
       if (!completed_steps.includes(step) && accessible_steps.includes(step)) {
-        return stepRoutes[step];
+        return route;
       }
     }
 
-    if (completed_steps.length === 5) {
+    // Semua step aktif sudah selesai → ke pembayaran
+    const activeStepCount = sectionSteps.filter((s) =>
+      isSectionActive(s.code)
+    ).length;
+    if (completed_steps.length >= activeStepCount) {
       return "/pendaftaran/pembayaran";
     }
 
@@ -75,6 +106,7 @@ export default function PendaftaranPage() {
   };
 
   const handleContinue = () => {
+    if (sectionsLoading) return; // Tunggu data visibility dimuat
     const nextRoute = getNextIncompleteStep();
     router.push(nextRoute);
   };

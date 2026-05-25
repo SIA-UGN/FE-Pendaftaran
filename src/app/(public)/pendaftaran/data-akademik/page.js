@@ -14,9 +14,12 @@ import {
   useDocuments,
   useDocumentTypes,
 } from "@/hooks/useRegistration";
+import { useVisibleSections } from "@/hooks/useFormVisibility";
+import { useRegistrationFlow } from "@/hooks/useRegistrationFlow";
 
 export default function UploadDokumen() {
   const router = useRouter();
+  const { prevRoute, nextRoute } = useRegistrationFlow();
   const { data: progressData, isLoading: progressLoading } =
     useRegistrationProgress();
   const { data: documentsData, refetch: refetchDocuments } = useDocuments();
@@ -52,6 +55,24 @@ export default function UploadDokumen() {
   useEffect(() => {
     refetchDocuments();
   }, [refetchDocuments]);
+
+  // Form Visibility — Route Guard
+  const { data: activeSections = [], isLoading: sectionsLoading } =
+    useVisibleSections();
+
+  useEffect(() => {
+    if (!sectionsLoading && activeSections.length > 0) {
+      const isDocumentsActive = activeSections.some(
+        (s) => s.code === "documents"
+      );
+      if (!isDocumentsActive) {
+        toast.error(
+          "Form upload dokumen sedang dinonaktifkan oleh administrator."
+        );
+        router.push("/pendaftaran");
+      }
+    }
+  }, [activeSections, sectionsLoading, router]);
 
   useEffect(() => {
     if (!progressLoading && progress) {
@@ -144,7 +165,7 @@ export default function UploadDokumen() {
       toast.success("Semua dokumen berhasil diupload!");
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      router.push("/pendaftaran/data-prestasi");
+      router.push(nextRoute);
     } catch (error) {
       console.error("Failed to upload documents:", error);
     } finally {
@@ -322,7 +343,7 @@ export default function UploadDokumen() {
           </div>
 
           <div className="w-full flex items-center justify-end my-6 sm:my-8 md:my-10 lg:my-12 px-4 sm:px-6 md:px-8 lg:px-12 gap-6">
-            <Link href="/pendaftaran/data-orangtua" className="w-1/2 sm:w-48">
+            <Link href={prevRoute} className="w-1/2 sm:w-48">
               <Button type="button" variant={"yellow"} className={"w-full"}>
                 Kembali
               </Button>
