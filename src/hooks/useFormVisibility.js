@@ -88,6 +88,96 @@ export const useAdminSectionHistory = (id) => {
     queryKey: ["adminSectionHistory", id],
     queryFn: () => registrationService.adminGetSectionHistory(id),
     enabled: !!id,
+    select: (response) => response?.data?.data?.data || response?.data?.data || [],
+  });
+};
+
+// ==========================================
+// FIELD-LEVEL HOOKS
+// ==========================================
+
+/**
+ * Public — fetch field yang visible untuk sebuah section.
+ */
+export const useVisibleFields = (sectionId) => {
+  return useQuery({
+    queryKey: ["visibleFields", sectionId],
+    queryFn: () => registrationService.getVisibleFields(sectionId),
+    enabled: !!sectionId,
+    staleTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
     select: (response) => response?.data?.data || [],
+  });
+};
+
+/**
+ * Admin — fetch semua field untuk sebuah section.
+ */
+export const useAdminFields = (sectionId) => {
+  return useQuery({
+    queryKey: ["adminFields", sectionId],
+    queryFn: () => registrationService.adminGetFields(sectionId),
+    enabled: !!sectionId,
+    select: (response) => response?.data?.data || [],
+  });
+};
+
+/**
+ * Admin — fetch semua section BESERTA field-nya.
+ */
+export const useAdminSectionsWithFields = (params = {}) => {
+  return useQuery({
+    queryKey: ["adminSectionsWithFields", params],
+    queryFn: () => registrationService.adminGetSectionsWithFields(params),
+    select: (response) => response?.data?.data || [],
+  });
+};
+
+/**
+ * Admin — mutation update visibility single field.
+ */
+export const useUpdateFieldVisibility = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ fieldId, data }) =>
+      registrationService.adminUpdateFieldVisibility(fieldId, data),
+    onSuccess: () => {
+      toast.success("Visibilitas field berhasil diperbarui!");
+      queryClient.invalidateQueries({ queryKey: ["adminFields"] });
+      queryClient.invalidateQueries({ queryKey: ["adminSectionsWithFields"] });
+      queryClient.invalidateQueries({ queryKey: ["visibleFields"] });
+      queryClient.invalidateQueries({ queryKey: ["visibleSections"] });
+    },
+    onError: (error) => {
+      const msg =
+        error?.response?.data?.message || "Gagal memperbarui visibilitas field";
+      toast.error(msg);
+    },
+  });
+};
+
+/**
+ * Admin — mutation batch update visibility field.
+ */
+export const useBatchUpdateFieldVisibility = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data) =>
+      registrationService.adminBatchUpdateFieldVisibility(data),
+    onSuccess: () => {
+      toast.success("Batch update visibilitas field berhasil!");
+      queryClient.invalidateQueries({ queryKey: ["adminFields"] });
+      queryClient.invalidateQueries({ queryKey: ["adminSectionsWithFields"] });
+      queryClient.invalidateQueries({ queryKey: ["visibleFields"] });
+      queryClient.invalidateQueries({ queryKey: ["visibleSections"] });
+    },
+    onError: (error) => {
+      const msg =
+        error?.response?.data?.message ||
+        "Gagal melakukan batch update field";
+      toast.error(msg);
+    },
   });
 };

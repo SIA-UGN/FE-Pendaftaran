@@ -34,6 +34,7 @@ import {
 } from "@/hooks/useRegistration";
 import { useProvinces, useCitiesByProvince } from "@/hooks/useMasterData";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRegistrationFlow } from "@/hooks/useRegistrationFlow";
 
 const FormSchema = z.object({
   provinsi: z.string().min(1, { message: "Provinsi wajib diisi." }),
@@ -53,6 +54,7 @@ const FormSchema = z.object({
 export default function DataAlamat() {
   const router = useRouter();
   const { user } = useAuth();
+  const { prevRoute, nextRoute } = useRegistrationFlow();
   const { data: progressData, isLoading: progressLoading } =
     useRegistrationProgress();
   const { data: registrationData, refetch } = useMyRegistration();
@@ -156,7 +158,7 @@ export default function DataAlamat() {
     storeMutation.mutate(payload, {
       onSuccess: async () => {
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        router.push("/pendaftaran/data-orangtua");
+        router.push(nextRoute);
       },
     });
   }
@@ -371,7 +373,7 @@ export default function DataAlamat() {
               />
             </div>
             <div className="w-full flex items-center justify-end my-6 sm:my-8 md:my-10 lg:my-12 px-4 sm:px-6 md:px-8 lg:px-12 gap-6">
-              <Link href="/pendaftaran" className="w-1/2 sm:w-48">
+              <Link href={prevRoute} className="w-1/2 sm:w-48">
                 <Button type="button" variant={"yellow"} className={"w-full"}>
                   Kembali
                 </Button>

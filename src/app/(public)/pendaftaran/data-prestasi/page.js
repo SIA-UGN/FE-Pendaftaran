@@ -26,9 +26,11 @@ import {
 } from "@/hooks/useRegistration";
 import { useVisibleSections } from "@/hooks/useFormVisibility";
 import { useAchievements } from "@/hooks/useAchievements";
+import { useRegistrationFlow } from "@/hooks/useRegistrationFlow";
 
 export default function DataPrestasi() {
   const router = useRouter();
+  const { prevRoute } = useRegistrationFlow();
   const { data: progressData, isLoading: progressLoading } =
     useRegistrationProgress();
   const {
@@ -102,7 +104,7 @@ export default function DataPrestasi() {
         <Prestasi Data={achievements?.data?.data} />
         <div className="flex flex-col mx-4 sm:mx-6 md:mx-8 lg:mx-12 my-6 gap-5 items-center">
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-5 items-center justify-end ms-auto">
-            <Link href="/pendaftaran/data-akademik">
+            <Link href={prevRoute}>
               <Button variant="matcha" className="w-full sm:w-auto">
                 Kembali
               </Button>

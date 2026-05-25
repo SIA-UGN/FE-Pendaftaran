@@ -34,6 +34,7 @@ import {
   useMyRegistration,
 } from "@/hooks/useRegistration";
 import { usePrograms } from "@/hooks/useMasterData";
+import { useRegistrationFlow } from "@/hooks/useRegistrationFlow";
 
 const FormSchema = z.object({
   programStudi: z.string().min(1, { message: "Program Studi wajib dipilih." }),
@@ -83,6 +84,7 @@ const FormSchema = z.object({
 
 export default function DataDiri() {
   const router = useRouter();
+  const { prevRoute, nextRoute } = useRegistrationFlow();
   const { data: progressData, isLoading: progressLoading } =
     useRegistrationProgress();
   const { data: registrationData, refetch } = useMyRegistration();
@@ -279,7 +281,7 @@ export default function DataDiri() {
         }
         await Promise.all(uploadPromises);
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        router.push("/pendaftaran/data-alamat");
+        router.push(nextRoute);
       },
     });
   }
@@ -854,7 +856,7 @@ export default function DataDiri() {
               </div>
             </div>
             <div className="w-full flex items-center justify-end my-8 sm:my-12 px-4 sm:px-8 md:px-12 gap-4">
-              <Link href="/pendaftaran" className="w-1/2 sm:w-48">
+              <Link href={prevRoute} className="w-1/2 sm:w-48">
                 <Button type="button" variant={"yellow"} className={"w-full"}>
                   Kembali
                 </Button>
