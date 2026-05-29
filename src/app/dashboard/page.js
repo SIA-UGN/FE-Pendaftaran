@@ -202,14 +202,14 @@ export default function Page() {
             <Table className="min-w-[400px]">
               <TableHeader>
                 <TableRow className="bg-gray-50">
-                  <TableHead className="text-xs font-semibold text-gray-500">Program Studi</TableHead>
-                  <TableHead className="text-xs font-semibold text-gray-500 text-right">Jumlah Pendaftar</TableHead>
+                  <TableHead className="text-xs font-semibold text-white">Program Studi</TableHead>
+                  <TableHead className="text-xs font-semibold text-white text-right">Jumlah Pendaftar</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {top_programs.map((p, i) => (
                   <TableRow key={i} className="hover:bg-gray-50/50">
-                    <TableCell className="text-sm text-gray-700">{p.program_name || p.name}</TableCell>
+                    <TableCell className="text-sm font-semibold text-gray-800">{p.program_name || p.name || p.program || "-"}</TableCell>
                     <TableCell className="text-sm font-semibold text-gray-800 text-right">{p.total_applicants || p.count || 0}</TableCell>
                   </TableRow>
                 ))}
@@ -236,11 +236,11 @@ export default function Page() {
           <Table className="min-w-[600px]">
             <TableHeader>
               <TableRow className="bg-gray-50">
-                <TableHead className="text-xs font-semibold text-gray-500">Nama</TableHead>
-                <TableHead className="text-xs font-semibold text-gray-500">Email</TableHead>
-                <TableHead className="text-xs font-semibold text-gray-500">Program Studi</TableHead>
-                <TableHead className="text-xs font-semibold text-gray-500">Tanggal</TableHead>
-                <TableHead className="text-xs font-semibold text-gray-500">Status</TableHead>
+                <TableHead className="text-xs font-semibold text-white">Nama</TableHead>
+                <TableHead className="text-xs font-semibold text-white">Email</TableHead>
+                <TableHead className="text-xs font-semibold text-white">Program Studi</TableHead>
+                <TableHead className="text-xs font-semibold text-white">Tanggal</TableHead>
+                <TableHead className="text-xs font-semibold text-white">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

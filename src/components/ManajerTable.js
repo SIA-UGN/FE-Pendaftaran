@@ -194,7 +194,7 @@ export function ManajerTable({ data }) {
       accessorKey: "id",
       header: ({ column }) => {
         return (
-          <Button variant="ghost" className="w-full">
+          <Button variant="ghost" className="w-full" style={{ color: "white" }}>
             No
           </Button>
         );
@@ -206,7 +206,7 @@ export function ManajerTable({ data }) {
     {
       accessorKey: "name",
       header: ({ column }) => {
-        return <Button variant="ghost">Nama</Button>;
+        return <Button variant="ghost" style={{ color: "white" }}>Nama</Button>;
       },
       cell: ({ row }) => <div>{row.getValue("name")}</div>,
     },
@@ -217,6 +217,7 @@ export function ManajerTable({ data }) {
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            style={{ color: "white" }}
           >
             Email
             <ArrowUpDown className="ml-2 h-4 w-4" />
