@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { Label } from "@/components/ui/label";
@@ -24,6 +24,7 @@ export default function Profil() {
   const { data: profileData, isPending: isLoadingProfile } = useProfile();
   const user = profileData?.data?.data?.user;
 
+  const fileInputRef = useRef(null);
   const uploadAvatarMutation = useUploadAvatar();
   const changePasswordMutation = useChangePassword();
   const changeEmailMutation = useChangeEmail();
@@ -166,13 +167,12 @@ export default function Profil() {
       </div>
 
       <div className="bg-white rounded-2xl border p-6 sm:p-8" style={{ borderColor: "#E6EEE9" }}>
-        <Input
-          id="picture"
+        <input
+          ref={fileInputRef}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,image/jpg"
           className="hidden"
           onChange={handleAvatarUpload}
-          disabled={uploadAvatarMutation.isPending}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-6 sm:gap-8">
@@ -187,21 +187,25 @@ export default function Profil() {
               />
             </div>
 
-            <label htmlFor="picture" className="w-full max-w-[224px]">
-              <Button type="button" variant="primary" className="w-full" disabled={uploadAvatarMutation.isPending}>
-                {uploadAvatarMutation.isPending ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Mengunggah...
-                  </>
-                ) : (
-                  <>
-                    <Upload className="mr-2 h-4 w-4" />
-                    Ubah Foto Profil
-                  </>
-                )}
-              </Button>
-            </label>
+            <Button
+              type="button"
+              variant="primary"
+              className="w-full max-w-[224px]"
+              disabled={uploadAvatarMutation.isPending}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {uploadAvatarMutation.isPending ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Mengunggah...
+                </>
+              ) : (
+                <>
+                  <Upload className="mr-2 h-4 w-4" />
+                  Ubah Foto Profil
+                </>
+              )}
+            </Button>
           </div>
 
           <div className="space-y-6">
