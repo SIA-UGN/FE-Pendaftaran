@@ -40,14 +40,14 @@ const buttonVariants = cva(
   }
 )
 
-function Button({
+const Button = React.forwardRef(({
   className,
   variant = "default",
   size,
   asChild = false,
   style,
   ...props
-}) {
+}, ref) => {
   const Comp = asChild ? Slot : "button"
 
   // Inline styles matching Fe-SIA-UGN's brand color system
@@ -78,10 +78,12 @@ function Button({
       data-slot="button"
       className={cn(buttonVariants({ variant, size }), className)}
       style={{ ...getCustomStyle(variant), ...style }}
+      ref={ref}
       {...props}
     />
   );
-}
+})
+Button.displayName = "Button"
 
 // Convenience components matching Fe-SIA-UGN pattern
 const PrimaryButton = React.forwardRef((props, ref) => (

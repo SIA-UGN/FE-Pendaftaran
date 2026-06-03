@@ -536,7 +536,7 @@ export default function FormVisibilityPage() {
 
         {/* ========== Section Table + Expandable Fields ========== */}
         <Card className="border-0 shadow-lg overflow-hidden">
-          <CardHeader className="pb-3 bg-gradient-to-r from-[#E6EEE9] to-white">
+          <CardHeader className="pb-3">
             <CardTitle className="text-lg" style={{ color: "#015023" }}>
               Daftar Section &amp; Field
             </CardTitle>

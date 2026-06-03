@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useUploadDocument } from "@/hooks/useRegistration";
 import { CheckCircle, Upload, X, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,7 @@ import {
 } from "@/hooks/useRegistration";
 import { usePrograms } from "@/hooks/useMasterData";
 import { useRegistrationFlow } from "@/hooks/useRegistrationFlow";
+import { useVisibleSections, useVisibleFields } from "@/hooks/useFormVisibility";
 
 const FormSchema = z.object({
   programStudi: z.string().min(1, { message: "Program Studi wajib dipilih." }),
@@ -95,6 +96,104 @@ export default function DataDiri() {
   const progress = progressData?.data;
   const programs = programsData?.data?.data || [];
 
+  // Form Visibility — Hook & Route Guard
+  const { data: activeSections = [], isLoading: sectionsLoading } = useVisibleSections();
+  
+  // Ambil section profile
+  const profileSection = useMemo(() => {
+    return activeSections.find((s) => s.code === "profile");
+  }, [activeSections]);
+
+  // Fetch field-level visibility
+  const { data: visibleFields = [], isLoading: fieldsLoading } = useVisibleFields(profileSection?.id);
+
+  // Helper untuk cek visibilitas field
+  const isFieldVisible = useMemo(() => {
+    return (fieldCode) => {
+      return visibleFields.some((f) => f.code === fieldCode);
+    };
+  }, [visibleFields]);
+
+  // Helper untuk cek apakah field required
+  const isFieldRequired = useMemo(() => {
+    return (fieldCode) => {
+      const field = visibleFields.find((f) => f.code === fieldCode);
+      return field ? field.is_required : true; // Default ke true jika tidak ditemukan
+    };
+  }, [visibleFields]);
+
+  // Zod validation schema dinamis berdasarkan visibilitas & status required
+  const DynamicFormSchema = useMemo(() => {
+    return z.object({
+      programStudi: isFieldVisible("programStudi")
+        ? (isFieldRequired("programStudi") ? z.string().min(1, { message: "Program Studi wajib dipilih." }) : z.string().optional())
+        : z.string().optional(),
+      programStudi2: z.string().optional(),
+      programStudi3: z.string().optional(),
+      sekolahAsal: isFieldVisible("sekolahAsal")
+        ? (isFieldRequired("sekolahAsal") ? z.string().min(3, { message: "Nama sekolah asal wajib diisi." }) : z.string().optional())
+        : z.string().optional(),
+      ijazahTerakhir: isFieldVisible("ijazahTerakhir")
+        ? (isFieldRequired("ijazahTerakhir") ? z.string({ required_error: "Ijazah terakhir harus dipilih." }) : z.string().optional())
+        : z.string().optional(),
+      namaLengkap: isFieldVisible("namaLengkap")
+        ? (isFieldRequired("namaLengkap") ? z.string().min(2, { message: "Nama Lengkap harus memiliki setidaknya 2 karakter." }) : z.string().optional())
+        : z.string().optional(),
+      email: isFieldVisible("email")
+        ? (isFieldRequired("email") ? z.string().email({ message: "Silakan masukkan alamat email yang valid." }) : z.string().optional())
+        : z.string().optional(),
+      jenisKelamin: isFieldVisible("jenisKelamin")
+        ? (isFieldRequired("jenisKelamin") ? z.string().min(1, { message: "Jenis Kelamin wajib diisi." }) : z.string().optional())
+        : z.string().optional(),
+      agama: isFieldVisible("agama")
+        ? (isFieldRequired("agama") ? z.string().min(1, { message: "Agama wajib diisi." }) : z.string().optional())
+        : z.string().optional(),
+      noPonsel: isFieldVisible("noPonsel")
+        ? (isFieldRequired("noPonsel") ? z.string().min(10, { message: "Nomor Ponsel tidak valid." }) : z.string().optional())
+        : z.string().optional(),
+      tempatLahir: isFieldVisible("tempatLahir")
+        ? (isFieldRequired("tempatLahir") ? z.string().min(1, { message: "Tempat Lahir wajib diisi." }) : z.string().optional())
+        : z.string().optional(),
+      tanggalLahir: isFieldVisible("tanggalLahir")
+        ? (isFieldRequired("tanggalLahir")
+            ? z.string().refine(
+                (date) => {
+                  if (!date) return false;
+                  const selectedDate = new Date(date);
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  return selectedDate < today;
+                },
+                { message: "Tanggal lahir harus sebelum hari ini." }
+              )
+            : z.string().optional())
+        : z.string().optional(),
+      nik: isFieldVisible("nik")
+        ? (isFieldRequired("nik") ? z.string().length(16, { message: "NIK harus 16 digit." }) : z.string().optional())
+        : z.string().optional(),
+      ktp: isFieldVisible("ktp")
+        ? (isFieldRequired("ktp") ? z.any().refine((file) => file != null, { message: "File KTP/KITAS wajib diupload." }) : z.any().optional())
+        : z.any().optional(),
+      noAkta: z.string().optional(),
+      akta: z.any().optional(),
+      noKK: isFieldVisible("noKK")
+        ? (isFieldRequired("noKK") ? z.string().length(16, { message: "Nomor KK harus 16 digit." }) : z.string().optional())
+        : z.string().optional(),
+      kk: isFieldVisible("kk")
+        ? (isFieldRequired("kk") ? z.any().refine((file) => file != null, { message: "File Kartu Keluarga wajib diupload." }) : z.any().optional())
+        : z.any().optional(),
+      kewarganegaraan: isFieldVisible("kewarganegaraan")
+        ? (isFieldRequired("kewarganegaraan") ? z.string().min(1, { message: "Kewarganegaraan wajib diisi." }) : z.string().optional())
+        : z.string().optional(),
+      anakKe: isFieldVisible("anakKe")
+        ? (isFieldRequired("anakKe") ? z.coerce.number().min(1, { message: "Anak ke berapa wajib diisi." }) : z.any().optional())
+        : z.any().optional(),
+      jumlahSaudara: isFieldVisible("jumlahSaudara")
+        ? (isFieldRequired("jumlahSaudara") ? z.coerce.number().min(0, { message: "Jumlah saudara wajib diisi." }) : z.any().optional())
+        : z.any().optional(),
+    });
+  }, [isFieldRequired, isFieldVisible]);
+
   const [filePreviews, setFilePreviews] = useState({
     ktp: null,
     akta: null,
@@ -102,7 +201,7 @@ export default function DataDiri() {
   });
 
   const form = useForm({
-    resolver: zodResolver(FormSchema),
+    resolver: (...args) => zodResolver(DynamicFormSchema)(...args),
     defaultValues: {
       programStudi: "",
       programStudi2: "",
@@ -127,6 +226,17 @@ export default function DataDiri() {
       jumlahSaudara: "",
     },
   });
+
+  // Route Guard Effect
+  useEffect(() => {
+    if (!sectionsLoading && activeSections.length > 0) {
+      const isProfileActive = activeSections.some((s) => s.code === "profile");
+      if (!isProfileActive) {
+        toast.error("Form data diri sedang dinonaktifkan oleh administrator.");
+        router.push("/pendaftaran");
+      }
+    }
+  }, [activeSections, sectionsLoading, router]);
 
   useEffect(() => {
     refetch();
@@ -286,11 +396,11 @@ export default function DataDiri() {
     });
   }
 
-  if (progressLoading) {
+  if (progressLoading || sectionsLoading || fieldsLoading) {
     return (
       <ProtectedRoute>
         <div className="max-w-7xl mx-auto p-12">
-          <div className="animate-pulse">Memuat...</div>
+          <div className="animate-pulse flex items-center justify-center min-h-[50vh] text-gray-500">Memuat formulir...</div>
         </div>
       </ProtectedRoute>
     );
@@ -309,550 +419,586 @@ export default function DataDiri() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="flex flex-col gap-4 sm:gap-5 p-4 sm:p-8 md:p-12 border rounded-xl mx-4 sm:mx-8 md:mx-12 bg-[var(--light-cream)]">
-              <FormField
-                control={form.control}
-                name="namaLengkap"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Nama Lengkap <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input placeholder="Nama Lengkap" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Email <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="Email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-3 gap-4">
+              {isFieldVisible("namaLengkap") && (
                 <FormField
                   control={form.control}
-                  name="programStudi"
+                  name="namaLengkap"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
-                        Program Studi <span className="text-red-500">*</span>
+                        Nama Lengkap {isFieldRequired("namaLengkap") && <span className="text-red-500">*</span>}
                       </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih Program Studi" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {programs.map((program) => (
-                            <SelectItem
-                              key={program.id_program}
-                              value={program.id_program.toString()}
-                            >
-                              {program.name_program}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <Input placeholder="Nama Lengkap" {...field} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+              )}
+
+              {isFieldVisible("email") && (
                 <FormField
                   control={form.control}
-                  name="programStudi2"
+                  name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Program Studi 2</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih Program Studi" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {programs.map((program) => (
-                            <SelectItem
-                              key={program.id_program}
-                              value={program.id_program.toString()}
-                            >
-                              {program.name_program}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="programStudi3"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Program Studi 3</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih Program Studi" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {programs.map((program) => (
-                            <SelectItem
-                              key={program.id_program}
-                              value={program.id_program.toString()}
-                            >
-                              {program.name_program}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="sekolahAsal"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Sekolah Asal <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input placeholder="Nama sekolah asal" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="ijazahTerakhir"
-                  render={({ field }) => (
-                    <FormItem className={"w-full"}>
                       <FormLabel>
-                        Ijazah Terakhir <span className="text-red-500">*</span>
+                        Email {isFieldRequired("email") && <span className="text-red-500">*</span>}
                       </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl className="w-full">
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih ijazah terakhir" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="sma">SMA</SelectItem>
-                          <SelectItem value="smk">SMK</SelectItem>
-                          <SelectItem value="ma">MA</SelectItem>
-                          <SelectItem value="other">Lainnya</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <Input type="email" placeholder="Email" {...field} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </div>
+              )}
+
+              {isFieldVisible("programStudi") && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="programStudi"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Program Studi {isFieldRequired("programStudi") && <span className="text-red-500">*</span>}
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih Program Studi" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {programs.map((program) => (
+                              <SelectItem
+                                key={program.id_program}
+                                value={program.id_program.toString()}
+                              >
+                                {program.name_program}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="programStudi2"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Program Studi 2</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih Program Studi" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {programs.map((program) => (
+                              <SelectItem
+                                key={program.id_program}
+                                value={program.id_program.toString()}
+                              >
+                                {program.name_program}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="programStudi3"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Program Studi 3</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih Program Studi" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {programs.map((program) => (
+                              <SelectItem
+                                key={program.id_program}
+                                value={program.id_program.toString()}
+                              >
+                                {program.name_program}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
+
+              {isFieldVisible("sekolahAsal") && (
+                <FormField
+                  control={form.control}
+                  name="sekolahAsal"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Sekolah Asal {isFieldRequired("sekolahAsal") && <span className="text-red-500">*</span>}
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nama sekolah asal" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {isFieldVisible("ijazahTerakhir") && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="ijazahTerakhir"
+                    render={({ field }) => (
+                      <FormItem className={"w-full"}>
+                        <FormLabel>
+                          Ijazah Terakhir {isFieldRequired("ijazahTerakhir") && <span className="text-red-500">*</span>}
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl className="w-full">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih ijazah terakhir" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="sma">SMA</SelectItem>
+                            <SelectItem value="smk">SMK</SelectItem>
+                            <SelectItem value="ma">MA</SelectItem>
+                            <SelectItem value="other">Lainnya</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="jenisKelamin"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Jenis Kelamin <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl className={"w-full"}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih Jenis Kelamin" />
-                          </SelectTrigger>
+                {isFieldVisible("jenisKelamin") && (
+                  <FormField
+                    control={form.control}
+                    name="jenisKelamin"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Jenis Kelamin {isFieldRequired("jenisKelamin") && <span className="text-red-500">*</span>}
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <FormControl className={"w-full"}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih Jenis Kelamin" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="male">Laki-laki</SelectItem>
+                            <SelectItem value="female">Perempuan</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {isFieldVisible("agama") && (
+                  <FormField
+                    control={form.control}
+                    name="agama"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Agama {isFieldRequired("agama") && <span className="text-red-500">*</span>}
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <FormControl className={"w-full"}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih Agama" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="islam">Islam</SelectItem>
+                            <SelectItem value="kristen">Kristen</SelectItem>
+                            <SelectItem value="katolik">Katolik</SelectItem>
+                            <SelectItem value="hindu">Hindu</SelectItem>
+                            <SelectItem value="buddha">Buddha</SelectItem>
+                            <SelectItem value="konghucu">Konghucu</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {isFieldVisible("noPonsel") && (
+                  <FormField
+                    control={form.control}
+                    name="noPonsel"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Nomor Ponsel {isFieldRequired("noPonsel") && <span className="text-red-500">*</span>}
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="08xxxxxxxx" {...field} />
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="male">Laki-laki</SelectItem>
-                          <SelectItem value="female">Perempuan</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
-                <FormField
-                  control={form.control}
-                  name="agama"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Agama <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl className={"w-full"}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih Agama" />
-                          </SelectTrigger>
+                {isFieldVisible("tempatLahir") && (
+                  <FormField
+                    control={form.control}
+                    name="tempatLahir"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Tempat Lahir {isFieldRequired("tempatLahir") && <span className="text-red-500">*</span>}
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="Tempat Lahir" {...field} />
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="islam">Islam</SelectItem>
-                          <SelectItem value="kristen">Kristen</SelectItem>
-                          <SelectItem value="katolik">Katolik</SelectItem>
-                          <SelectItem value="hindu">Hindu</SelectItem>
-                          <SelectItem value="buddha">Buddha</SelectItem>
-                          <SelectItem value="konghucu">Konghucu</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
-                <FormField
-                  control={form.control}
-                  name="noPonsel"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Nomer Ponsel <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="08xxxxxxxx" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {isFieldVisible("tanggalLahir") && (
+                  <FormField
+                    control={form.control}
+                    name="tanggalLahir"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Tanggal Lahir {isFieldRequired("tanggalLahir") && <span className="text-red-500">*</span>}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="date"
+                            max={new Date().toISOString().split("T")[0]}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
-                <FormField
-                  control={form.control}
-                  name="tempatLahir"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Tempat Lahir <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="Tempat Lahir" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="tanggalLahir"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Tanggal Lahir <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="date"
-                          max={new Date().toISOString().split("T")[0]}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="nik"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        NIK <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="NIK" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {isFieldVisible("nik") && (
+                  <FormField
+                    control={form.control}
+                    name="nik"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          NIK {isFieldRequired("nik") && <span className="text-red-500">*</span>}
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="NIK" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
               </div>
 
-              <FormField
-                control={form.control}
-                name="ktp"
-                render={({ field: { onChange, value, ...field } }) => (
-                  <FormItem>
-                    <FormLabel>
-                      KTP / KITAS <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <div className="border-2 border-dashed rounded-lg p-6 text-center bg-white">
-                      {!filePreviews.ktp ? (
-                        <div className="">
-                          <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                          <div className="mt-4">
-                            <label
-                              htmlFor="ktp"
-                              className="cursor-pointer text-blue-600 hover:text-blue-500"
+              {isFieldVisible("ktp") && (
+                <FormField
+                  control={form.control}
+                  name="ktp"
+                  render={({ field: { onChange, value, ...field } }) => (
+                    <FormItem>
+                      <FormLabel>
+                        KTP / KITAS {isFieldRequired("ktp") && <span className="text-red-500">*</span>}
+                      </FormLabel>
+                      <div className="border-2 border-dashed rounded-lg p-6 text-center bg-white">
+                        {!filePreviews.ktp ? (
+                          <div className="">
+                            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                            <div className="mt-4">
+                              <label
+                                htmlFor="ktp"
+                                className="cursor-pointer text-blue-600 hover:text-blue-500"
+                              >
+                                <span>Pilih file</span>
+                                <input
+                                  id="ktp"
+                                  type="file"
+                                  className="sr-only"
+                                  accept=".pdf,.jpg,.jpeg,.png"
+                                  onChange={(e) => handleFileChange("ktp", e)}
+                                />
+                              </label>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2">
+                              JPG, PNG, atau PDF, maksimal 2MB
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between bg-white p-3 rounded">
+                            <div className="flex items-center gap-2">
+                              <FileText className="h-5 w-5 text-blue-600" />
+                              <span className="text-sm">{filePreviews.ktp}</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveFile("ktp")}
+                              className="text-red-600 hover:text-red-500"
                             >
-                              <span>Pilih file</span>
-                              <input
-                                id="ktp"
-                                type="file"
-                                className="sr-only"
-                                accept=".pdf,.jpg,.jpeg,.png"
-                                onChange={(e) => handleFileChange("ktp", e)}
-                              />
-                            </label>
+                              <X className="h-5 w-5" />
+                            </button>
                           </div>
-                          <p className="text-xs text-gray-500 mt-2">
-                            JPG, PNG, atau PDF, maksimal 2MB
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-between bg-white p-3 rounded">
-                          <div className="flex items-center gap-2">
-                            <FileText className="h-5 w-5 text-blue-600" />
-                            <span className="text-sm">{filePreviews.ktp}</span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveFile("ktp")}
-                            className="text-red-600 hover:text-red-500"
-                          >
-                            <X className="h-5 w-5" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                        )}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
-              <FormField
-                control={form.control}
-                name="noAkta"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nomor Registrasi Akta Lahir</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Nomor Akta" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="akta"
-                render={({ field: { onChange, value, ...field } }) => (
-                  <FormItem>
-                    <FormLabel>Akta Kelahiran</FormLabel>
-                    <div className="border-2 border-dashed rounded-lg p-6 text-center bg-white">
-                      {!filePreviews.akta ? (
-                        <div>
-                          <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                          <div className="mt-4">
-                            <label
-                              htmlFor="akta"
-                              className="cursor-pointer text-blue-600 hover:text-blue-500"
-                            >
-                              <span>Pilih file</span>
-                              <input
-                                id="akta"
-                                type="file"
-                                className="sr-only"
-                                accept=".pdf,.jpg,.jpeg,.png"
-                                onChange={(e) => handleFileChange("akta", e)}
-                              />
-                            </label>
-                          </div>
-                          <p className="text-xs text-gray-500 mt-2">
-                            JPG, PNG, atau PDF, maksimal 2MB
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-between bg-white p-3 rounded">
-                          <div className="flex items-center gap-2">
-                            <FileText className="h-5 w-5 text-blue-600" />
-                            <span className="text-sm">{filePreviews.akta}</span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveFile("akta")}
-                            className="text-red-600 hover:text-red-500"
-                          >
-                            <X className="h-5 w-5" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="noKK"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Nomor Kartu Keluarga{" "}
-                      <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input placeholder="Nomor KK" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="kk"
-                render={({ field: { onChange, value, ...field } }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Kartu Keluarga <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <div className="border-2 border-dashed rounded-lg p-6 text-center bg-white">
-                      {!filePreviews.kk ? (
-                        <div>
-                          <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                          <div className="mt-4">
-                            <label
-                              htmlFor="kk"
-                              className="cursor-pointer text-blue-600 hover:text-blue-500"
-                            >
-                              <span>Pilih file</span>
-                              <input
-                                id="kk"
-                                type="file"
-                                className="sr-only"
-                                accept=".pdf,.jpg,.jpeg,.png"
-                                onChange={(e) => handleFileChange("kk", e)}
-                              />
-                            </label>
-                          </div>
-                          <p className="text-xs text-gray-500 mt-2">
-                            JPG, PNG, atau PDF, maksimal 2MB
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-between bg-white p-3 rounded">
-                          <div className="flex items-center gap-2">
-                            <FileText className="h-5 w-5 text-blue-600" />
-                            <span className="text-sm">{filePreviews.kk}</span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveFile("kk")}
-                            className="text-red-600 hover:text-red-500"
-                          >
-                            <X className="h-5 w-5" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="kewarganegaraan"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Kewarganegaraan <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl className={"w-full"}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih Kewarganegaraan" />
-                        </SelectTrigger>
+              {isFieldVisible("noAkta") && (
+                <FormField
+                  control={form.control}
+                  name="noAkta"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nomor Registrasi Akta Lahir</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nomor Akta" {...field} />
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="wni">WNI</SelectItem>
-                        <SelectItem value="wna">WNA</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {isFieldVisible("akta") && (
+                <FormField
+                  control={form.control}
+                  name="akta"
+                  render={({ field: { onChange, value, ...field } }) => (
+                    <FormItem>
+                      <FormLabel>Akta Kelahiran</FormLabel>
+                      <div className="border-2 border-dashed rounded-lg p-6 text-center bg-white">
+                        {!filePreviews.akta ? (
+                          <div>
+                            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                            <div className="mt-4">
+                              <label
+                                htmlFor="akta"
+                                className="cursor-pointer text-blue-600 hover:text-blue-500"
+                              >
+                                <span>Pilih file</span>
+                                <input
+                                  id="akta"
+                                  type="file"
+                                  className="sr-only"
+                                  accept=".pdf,.jpg,.jpeg,.png"
+                                  onChange={(e) => handleFileChange("akta", e)}
+                                />
+                              </label>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2">
+                              JPG, PNG, atau PDF, maksimal 2MB
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between bg-white p-3 rounded">
+                            <div className="flex items-center gap-2">
+                              <FileText className="h-5 w-5 text-blue-600" />
+                              <span className="text-sm">{filePreviews.akta}</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveFile("akta")}
+                              className="text-red-600 hover:text-red-500"
+                            >
+                              <X className="h-5 w-5" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {isFieldVisible("noKK") && (
+                <FormField
+                  control={form.control}
+                  name="noKK"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Nomor Kartu Keluarga {isFieldRequired("noKK") && <span className="text-red-500">*</span>}
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nomor KK" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {isFieldVisible("kk") && (
+                <FormField
+                  control={form.control}
+                  name="kk"
+                  render={({ field: { onChange, value, ...field } }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Kartu Keluarga {isFieldRequired("kk") && <span className="text-red-500">*</span>}
+                      </FormLabel>
+                      <div className="border-2 border-dashed rounded-lg p-6 text-center bg-white">
+                        {!filePreviews.kk ? (
+                          <div>
+                            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                            <div className="mt-4">
+                              <label
+                                htmlFor="kk"
+                                className="cursor-pointer text-blue-600 hover:text-blue-500"
+                              >
+                                <span>Pilih file</span>
+                                <input
+                                  id="kk"
+                                  type="file"
+                                  className="sr-only"
+                                  accept=".pdf,.jpg,.jpeg,.png"
+                                  onChange={(e) => handleFileChange("kk", e)}
+                                />
+                              </label>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2">
+                              JPG, PNG, atau PDF, maksimal 2MB
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between bg-white p-3 rounded">
+                            <div className="flex items-center gap-2">
+                              <FileText className="h-5 w-5 text-blue-600" />
+                              <span className="text-sm">{filePreviews.kk}</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveFile("kk")}
+                              className="text-red-600 hover:text-red-500"
+                            >
+                              <X className="h-5 w-5" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {isFieldVisible("kewarganegaraan") && (
+                <FormField
+                  control={form.control}
+                  name="kewarganegaraan"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Kewarganegaraan {isFieldRequired("kewarganegaraan") && <span className="text-red-500">*</span>}
+                      </FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl className={"w-full"}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih Kewarganegaraan" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="wni">WNI</SelectItem>
+                          <SelectItem value="wna">WNA</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="anakKe"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Anak ke Berapa <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input type="number" placeholder="0" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {isFieldVisible("anakKe") && (
+                  <FormField
+                    control={form.control}
+                    name="anakKe"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Anak ke Berapa {isFieldRequired("anakKe") && <span className="text-red-500">*</span>}
+                        </FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="0" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
-                <FormField
-                  control={form.control}
-                  name="jumlahSaudara"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Jumlah Saudara Kandung{" "}
-                        <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input type="number" placeholder="0" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {isFieldVisible("jumlahSaudara") && (
+                  <FormField
+                    control={form.control}
+                    name="jumlahSaudara"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Jumlah Saudara Kandung {isFieldRequired("jumlahSaudara") && <span className="text-red-500">*</span>}
+                        </FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="0" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
               </div>
             </div>
             <div className="w-full flex items-center justify-end my-8 sm:my-12 px-4 sm:px-8 md:px-12 gap-4">
