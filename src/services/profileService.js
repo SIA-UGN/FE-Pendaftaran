@@ -10,7 +10,6 @@ export const profileService = {
     const formData = new FormData();
     formData.append("avatar", file);
     return apiClient.post("/profile/avatar", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
       timeout: 30000,
     });
   },

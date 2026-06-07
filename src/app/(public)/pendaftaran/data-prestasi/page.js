@@ -119,7 +119,7 @@ export default function DataPrestasi() {
                   Lewati
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent>
+              <AlertDialogContent className="rounded-2xl w-[90vw] sm:w-full max-w-md">
                 <AlertDialogHeader>
                   <AlertDialogTitle>Lewati Data Prestasi?</AlertDialogTitle>
                   <AlertDialogDescription>
@@ -128,9 +128,16 @@ export default function DataPrestasi() {
                     Anda yakin?
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Batal</AlertDialogCancel>
+                <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                  <AlertDialogCancel
+                    className="w-full sm:w-auto rounded-xl"
+                    style={{ borderColor: '#015023', color: '#015023' }}
+                  >
+                    Batal
+                  </AlertDialogCancel>
                   <AlertDialogAction
+                    className="w-full sm:w-auto rounded-xl"
+                    style={{ backgroundColor: '#015023', color: '#ffffff' }}
                     onClick={async () => {
                       await skipAchievements();
                       await submitRegistration.mutateAsync();

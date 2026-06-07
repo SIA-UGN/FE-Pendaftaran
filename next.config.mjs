@@ -34,8 +34,10 @@ const nextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value:
-              "frame-src 'self' https://www.google.com https://www.gstatic.com;",
+            value: [
+              "frame-src 'self' https://www.google.com https://www.gstatic.com https://app.sandbox.midtrans.com https://app.midtrans.com",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://app.sandbox.midtrans.com https://app.midtrans.com",
+            ].join("; "),
           },
         ],
       },

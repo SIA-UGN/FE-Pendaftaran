@@ -50,6 +50,7 @@ export function PaymentMethodTable({ data }) {
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="w-full"
+            style={{ color: "white" }}
           >
             ID
             <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -67,6 +68,7 @@ export function PaymentMethodTable({ data }) {
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            style={{ color: "white" }}
           >
             Nama Penerima
             <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -82,6 +84,7 @@ export function PaymentMethodTable({ data }) {
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            style={{ color: "white" }}
           >
             Nomor Rekening
             <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -97,6 +100,7 @@ export function PaymentMethodTable({ data }) {
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            style={{ color: "white" }}
           >
             Nama Bank
             <ArrowUpDown className="ml-2 h-4 w-4" />

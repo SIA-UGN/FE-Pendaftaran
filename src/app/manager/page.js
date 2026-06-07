@@ -325,13 +325,13 @@ export default function Dashboard() {
           <Table className="min-w-[600px]">
             <TableHeader>
               <TableRow className="bg-gray-50">
-                <TableHead className="text-xs font-semibold text-gray-500 w-16">ID</TableHead>
-                <TableHead className="text-xs font-semibold text-gray-500">Nama</TableHead>
-                <TableHead className="text-xs font-semibold text-gray-500">Email</TableHead>
-                <TableHead className="text-xs font-semibold text-gray-500">Program Studi</TableHead>
-                <TableHead className="text-xs font-semibold text-gray-500">Tanggal</TableHead>
-                <TableHead className="text-xs font-semibold text-gray-500">Status</TableHead>
-                <TableHead className="text-xs font-semibold text-gray-500 w-12">Aksi</TableHead>
+                <TableHead className="text-xs font-semibold text-white w-16">ID</TableHead>
+                <TableHead className="text-xs font-semibold text-white">Nama</TableHead>
+                <TableHead className="text-xs font-semibold text-white">Email</TableHead>
+                <TableHead className="text-xs font-semibold text-white">Program Studi</TableHead>
+                <TableHead className="text-xs font-semibold text-white">Tanggal</TableHead>
+                <TableHead className="text-xs font-semibold text-white">Status</TableHead>
+                <TableHead className="text-xs font-semibold text-white w-12">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
